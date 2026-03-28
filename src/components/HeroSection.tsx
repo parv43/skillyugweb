@@ -3,160 +3,131 @@
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
-const NeuralNode = ({ x, y, size, delay }: any) => (
-  <motion.circle
-    cx={x}
-    cy={y}
-    r={size}
-    fill="#3b82f6"
-    initial={{ opacity: 0.1, scale: 0.8 }}
-    animate={{ opacity: [0.1, 0.4, 0.1], scale: [0.8, 1.2, 0.8] }}
-    transition={{ duration: 4, delay, repeat: Infinity, ease: "easeInOut" }}
-    className="drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
-  />
-)
-
-const NeuralConnection = ({ x1, y1, x2, y2, delay }: any) => (
-  <motion.line
-    x1={x1}
-    y1={y1}
-    x2={x2}
-    y2={y2}
-    stroke="url(#neuralGradient)"
-    strokeWidth="1"
-    initial={{ pathLength: 0, opacity: 0 }}
-    animate={{ pathLength: [0, 1, 1], opacity: [0, 0.3, 0] }}
-    transition={{ duration: 5, delay, repeat: Infinity, ease: "easeInOut" }}
-  />
-)
-
-// The orbiting AI tools icons
-const OrbitingIcon = ({ icon, angle, radiusX, radiusY, duration }: any) => {
+// The tool cards orbiting the central badge
+const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
   return (
-    <motion.div
-      className="absolute top-1/2 left-1/2 -ms-6 -mt-6 w-12 h-12 z-20 will-change-transform flex items-center justify-center"
-      initial={{ rotate: angle }}
-      animate={{ rotate: angle + 360 }}
-      transition={{ duration, repeat: Infinity, ease: "linear" }}
+    <div
+      className="absolute top-1/2 left-1/2 -ml-[45px] -mt-[45px] w-[90px] h-[90px] z-20 pointer-events-none animate-orbit"
+      style={{
+        '--start-angle': `${angle}deg`,
+        '--duration': `${duration}s`
+      } as React.CSSProperties}
     >
-      <motion.div
-        className="absolute w-full h-full flex items-center justify-center glass-panel rounded-full text-xl"
-        style={{ transform: \`translateY(-\${radiusX}px)\` }}
-        initial={{ rotate: -angle }}
-        animate={{ rotate: -(angle + 360) }}
-        transition={{ duration, repeat: Infinity, ease: "linear" }}
+      {/* Container that pushes the card outward by radius value */}
+      <div 
+        className="w-full h-full absolute inset-0 will-change-transform" 
+        style={{ transform: `translateY(-${radius}px)` }}
       >
-        {icon}
-      </motion.div>
-    </motion.div>
+        <div
+          className="w-full h-full pointer-events-auto animate-counter-orbit flex flex-col items-center justify-center bg-[rgba(255,255,255,0.05)] backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-[16px] overflow-hidden hover:bg-white/10 hover:border-blue-400/30 transition-colors duration-300"
+          style={{
+            '--start-angle': `${angle}deg`,
+            '--tilt': `${tilt}deg`,
+            '--duration': `${duration}s`
+          } as React.CSSProperties}
+        >
+          <span className="text-3xl mb-1">{icon}</span>
+          <span className="text-[10px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
+            {label}
+          </span>
+        </div>
+      </div>
+    </div>
   )
 }
 
 export default function HeroSection() {
-  const [mounted, setMounted] = useState(false)
+  // Single perfect circle orbit radius (tightened for closer connection)
+  const orbitRadius = 230
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
-
-  const tools = ["🤖", "🎨", "🧠", "✨", "🎬", "📈"]
+  const tools = [
+    { label: "ChatGPT", icon: "💬", tilt: 0 },
+    { label: "Midjourney", icon: "🎨", tilt: 0 },
+    { label: "DALL-E", icon: "🌠", tilt: 0 },
+    { label: "Claude", icon: "🧠", tilt: 0 },
+    { label: "Canva AI", icon: "🖼️", tilt: 0 },
+    { label: "Runway", icon: "🎬", tilt: 0 },
+  ]
 
   return (
-    <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 pb-16">
-      {/* Background Neural Network SVG */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-50">
-        <svg width="100%" height="100%" className="min-w-full min-h-full">
-          <defs>
-            <linearGradient id="neuralGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.5" />
-            </linearGradient>
-          </defs>
-          <NeuralNode x="20%" y="30%" size={4} delay={0} />
-          <NeuralNode x="80%" y="20%" size={5} delay={1} />
-          <NeuralNode x="70%" y="70%" size={3} delay={0.5} />
-          <NeuralNode x="30%" y="80%" size={6} delay={2} />
-          <NeuralNode x="10%" y="60%" size={4} delay={1.5} />
-          <NeuralNode x="90%" y="50%" size={5} delay={0.5} />
-
-          <NeuralConnection x1="20%" y1="30%" x2="80%" y2="20%" delay={0} />
-          <NeuralConnection x1="80%" y1="20%" x2="70%" y2="70%" delay={1} />
-          <NeuralConnection x1="70%" y1="70%" x2="30%" y2="80%" delay={0.5} />
-          <NeuralConnection x1="30%" y1="80%" x2="20%" y2="30%" delay={2} />
-          <NeuralConnection x1="10%" y1="60%" x2="30%" y2="80%" delay={1.5} />
-          <NeuralConnection x1="90%" y1="50%" x2="70%" y2="70%" delay={1} />
-        </svg>
-
-        {/* Deep Glowing Orbs */}
-        <div className="absolute top-[20%] left-[20%] w-[40vw] h-[40vw] rounded-full bg-blue-600/10 blur-[100px]" />
-        <div className="absolute bottom-[20%] right-[20%] w-[40vw] h-[40vw] rounded-full bg-purple-600/10 blur-[100px]" />
+    <section className="relative w-full min-h-[90vh] bg-[#020617] overflow-hidden flex items-center justify-center pt-24 pb-20">
+      
+      {/* Background Neural Gradients */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[20%] right-[10%] w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/15 via-purple-900/5 to-transparent rounded-full" />
+        <div className="absolute bottom-[20%] left-[10%] w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent rounded-full" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:60px_60px] opacity-40" />
       </div>
 
-      <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-7xl px-6 lg:px-12 z-10 gap-16">
+      <div className="container mx-auto px-6 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-16 lg:gap-8">
         
-        {/* Left Side: Text and CTA */}
+        {/* Left Column: Copy & CTAs */}
         <motion.div 
-          className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left space-y-8"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left"
+          transition={{ duration: 0.8 }}
         >
-          <div className="glass-panel px-4 py-2 rounded-full border border-blue-500/30 inline-flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-            <span className="text-sm font-medium text-blue-200 uppercase tracking-widest">Future Ready Education</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-blue-500/30 mb-6 bg-blue-500/5">
+            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+            <span className="text-[11px] sm:text-xs font-bold text-blue-200 uppercase tracking-widest">Skillyug Summer AI Bootcamp • Classes 6–12</span>
           </div>
 
-          <h1 className="text-5xl lg:text-7xl font-bold tracking-tight leading-tight">
-            Master the <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 neon-text">
-              Ultimate AI Tools
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
+            Give Your Child the AI Skills<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text">
+              That Will Shape Their Future
             </span>
           </h1>
 
-          <p className="text-lg lg:text-xl text-slate-400 max-w-xl leading-relaxed">
-            The next generation of innovators starts here. Equip your child with the AI skills they need to shape the world tomorrow.
+          <p className="text-lg md:text-xl font-medium text-pink-400 mb-4">
+            Your child's learning, creativity, and future readiness are our top priorities.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <button className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg tracking-wide shadow-lg hover:scale-105 transition-transform">
+          <p className="text-base md:text-lg text-slate-300 max-w-xl mb-10 font-light leading-relaxed">
+            In this hands-on bootcamp, students learn how to use modern AI tools to build real projects, automate tasks, and develop future-ready skills.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
+            <button className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center">
               Join the Bootcamp
             </button>
-            <button className="glass-panel px-8 py-4 rounded-full text-slate-300 font-semibold hover:bg-white/5 transition-colors">
+            <button className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center">
               Explore Curriculum
             </button>
           </div>
         </motion.div>
 
-        {/* Right Side: Skillyug Orbit System */}
+        {/* Right Column: Orbit Animation */}
         <motion.div 
-          className="flex-1 relative w-full aspect-square max-w-[500px] flex items-center justify-center"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          className="w-full lg:w-1/2 h-[500px] sm:h-[600px] flex items-center justify-center relative scale-90 sm:scale-100"
           transition={{ duration: 1, delay: 0.2 }}
         >
-          {/* Orbital path rings */}
-          <div className="absolute inset-[15%] rounded-full border border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.01)]" />
-          <div className="absolute inset-[5%] rounded-full border border-white/5" />
-
-          {/* Core Skillyug Logo Planet */}
-          <div className="relative z-10 w-32 h-32 flex items-center justify-center rounded-full glass-panel shadow-[0_0_40px_rgba(59,130,246,0.3)] border border-blue-500/30 p-2">
-            <div className="absolute inset-0 rounded-full border border-purple-500/40 animate-ping opacity-20" />
-            <h2 className="text-2xl font-black text-white tracking-widest">SKILLYUG</h2>
+          {/* Faint Orbit Ring (230px radius = 460px diameter) */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="absolute w-[460px] h-[460px] rounded-full border border-white/5" />
           </div>
 
-          {/* Orbiting Tech Icons */}
-          {tools.map((icon, index) => (
-            <OrbitingIcon
-              key={index}
-              icon={icon}
-              angle={(index / tools.length) * 360}
-              radiusX={220} // distance from center
-              duration={20 + (index % 2) * 5}
+          {/* Central Pill Badge */}
+          <div className="relative z-30 px-8 py-4 rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.4)] flex items-center justify-center">
+            <span className="text-xl md:text-2xl font-black text-black tracking-[0.2em] relative z-10">SKILLYUG</span>
+            {/* Soft outer glow */}
+            <div className="absolute inset-0 rounded-full border border-white/40 animate-pulse opacity-50" />
+          </div>
+
+          {/* Orbiting Tool Cards */}
+          {tools.map((tool, i) => (
+            <OrbitingTool
+              key={i}
+              icon={tool.icon}
+              label={tool.label}
+              angle={(360 / tools.length) * i} // Evenly distributed 60-degree increments
+              radius={orbitRadius} 
+              duration={18} // Single uniform 18-second orbit
+              tilt={tool.tilt}
             />
           ))}
+          
         </motion.div>
+
       </div>
     </section>
   )

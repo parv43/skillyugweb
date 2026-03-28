@@ -1,108 +1,111 @@
 "use client"
 
-import React, { useEffect, useRef } from "react"
-import { motion, useInView, useAnimation } from "framer-motion"
+import React from "react"
+import { motion } from "framer-motion"
+import { MessageSquare, Layout, Image, PenTool, Search, Presentation, Edit3, Sparkles, FileText } from "lucide-react"
 
-// Using Lucide React icons
-import { Bot, Sparkles, Code2, BrainCircuit, Rocket, Zap } from "lucide-react"
-
-const SkillNode = ({ icon: Icon, label, position, delay }: any) => {
+const ToolCard = ({ icon: Icon, title, desc, color = "blue" }: any) => {
   return (
-    <motion.div
-      className={`absolute flex flex-col items-center justify-center space-y-3 z-10 \${position}`}
-      initial={{ opacity: 0, scale: 0.5 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, delay, type: "spring" }}
-    >
-      <div className="w-16 h-16 rounded-2xl glass-panel border-blue-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.2)] animate-float">
-        <Icon className="w-8 h-8 text-blue-400" />
+    <div className="grid-item flex flex-col items-center text-center p-2 group">
+      <div className={`w-14 h-14 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-5 border border-${color}-500/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)] group-hover:-translate-y-1 transition-transform duration-300 relative`}>
+        <Icon className={`w-6 h-6 text-${color}-400`} />
       </div>
-      <span className="text-sm font-medium text-slate-300 tracking-wide bg-slate-900/50 px-3 py-1 rounded-full backdrop-blur-sm border border-white/5">
-        {label}
-      </span>
-    </motion.div>
-  )
-}
-
-const ConnectionLine = ({ d, strokeDasharray, duration, delay }: any) => {
-  return (
-    <motion.path
-      d={d}
-      stroke="url(#lineGradient)"
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeDasharray={strokeDasharray || "4 4"}
-      initial={{ pathLength: 0, opacity: 0 }}
-      whileInView={{ pathLength: 1, opacity: 0.3 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration, delay, ease: "easeInOut" }}
-    />
+      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+      <p className="text-sm text-slate-400 leading-relaxed max-w-[280px]">
+        {desc}
+      </p>
+    </div>
   )
 }
 
 export default function SkillsSection() {
+  const tools = [
+    {
+      title: "ChatGPT",
+      desc: "Students use ChatGPT to understand difficult concepts, summarize chapters, and generate study notes.",
+      icon: MessageSquare,
+      color: "blue"
+    },
+    {
+      title: "NotebookLM",
+      desc: "Students organize research material and class notes to better understand subjects and prepare for exams.",
+      icon: Layout,
+      color: "blue"
+    },
+    {
+      title: "Canva AI",
+      desc: "Students design presentations, posters, and visual school projects using AI-powered design tools.",
+      icon: Image,
+      color: "blue"
+    },
+    {
+      title: "Napkin AI",
+      desc: "Students convert ideas into clear visual diagrams to explain concepts easily.",
+      icon: PenTool,
+      color: "blue"
+    },
+    {
+      title: "Perplexity AI",
+      desc: "Students research topics faster using AI-powered search with reliable explanations and sources.",
+      icon: Search,
+      color: "blue"
+    },
+    {
+      title: "Gamma AI",
+      desc: "Students generate professional presentations quickly for school assignments and projects.",
+      icon: Presentation,
+      color: "blue"
+    },
+    {
+      title: "Grammarly AI",
+      desc: "Students improve writing quality for essays, assignments, and school reports.",
+      icon: Edit3,
+      color: "blue"
+    },
+    {
+      title: "AI Study Assistant",
+      desc: "Students learn how AI can help organize study plans and prepare for exams efficiently.",
+      icon: Sparkles,
+      color: "blue"
+    },
+    {
+      title: "AI Research Tools",
+      desc: "Students discover how AI helps them collect information and learn independently.",
+      icon: FileText,
+      color: "blue"
+    }
+  ]
+
   return (
-    <section className="relative w-full py-32 bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-white/5">
+    <section id="what-they-learn" className="relative w-full py-32 bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 border-b">
       
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-900/10 blur-[150px] pointer-events-none rounded-full" />
-
-      <div className="text-center mb-24 z-20">
-        <motion.h2 
-          className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-purple-400 mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          Skills of the Future
-        </motion.h2>
-        <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-          Connect the dots in your child's education. From basic prompts to complex neural thinking.
-        </p>
+      {/* Deep ambient lighting (optimized) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-purple-900/5 to-transparent pointer-events-none rounded-full" />
+      
+      {/* SEO-Friendly Header */}
+      <div className="w-full flex justify-center mb-16 md:mb-20 z-20 px-6">
+        <div className="text-center max-w-[800px] w-full mx-auto">
+          <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-6 tracking-tight leading-tight">
+            What Students Will Actually Learn
+          </h2>
+          <p className="text-slate-400 text-lg md:text-xl font-light">
+            No complex developer tools. At the Skillyug Summer AI Bootcamp, we focus solely on practical AI study tools and homework apps that help Class 6–12 students learn better and finish assignments faster.
+          </p>
+        </div>
       </div>
 
-      <div className="relative w-full max-w-5xl h-[500px] mx-auto hidden md:block z-10">
-        {/* Connection SVGs */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none">
-          <defs>
-            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#8b5cf6" />
-              <stop offset="50%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#ec4899" />
-            </linearGradient>
-          </defs>
-
-          {/* Hardcoded paths connecting nodes */}
-          <ConnectionLine d="M 200 120 Q 300 120 400 220" duration={1.5} delay={0.2} />
-          <ConnectionLine d="M 800 120 Q 700 120 600 220" duration={1.5} delay={0.4} />
-          <ConnectionLine d="M 500 250 L 500 380" duration={1} delay={0.6} strokeDasharray="6 6" />
-          <ConnectionLine d="M 200 400 Q 300 400 400 350" duration={1.5} delay={0.8} />
-          <ConnectionLine d="M 800 400 Q 700 400 600 350" duration={1.5} delay={1.0} />
-          <ConnectionLine d="M 200 120 L 200 400" duration={2} delay={0.5} strokeDasharray="2 4" />
-          <ConnectionLine d="M 800 120 L 800 400" duration={2} delay={0.7} strokeDasharray="2 4" />
-        </svg>
-
-        {/* Floating Skill Nodes */}
-        <SkillNode icon={Sparkles} label="Prompt Engineering" position="top-[100px] left-[150px]" delay={0.2} />
-        <SkillNode icon={Code2} label="Code Generation" position="top-[100px] right-[150px]" delay={0.4} />
-        <SkillNode icon={BrainCircuit} label="AI Models Core" position="top-[220px] left-[450px]" delay={0.6} />
-        <SkillNode icon={Bot} label="Custom Assistants" position="bottom-[100px] left-[150px]" delay={0.8} />
-        <SkillNode icon={Rocket} label="Startup Ideation" position="bottom-[100px] right-[150px]" delay={1.0} />
-        <SkillNode icon={Zap} label="Logic & Workflows" position="bottom-[50px] left-[450px]" delay={1.2} />
+      {/* Modern Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 max-w-6xl mx-auto w-full z-10 relative">
+        {tools.map((tool, idx) => (
+          <ToolCard 
+            key={idx}
+            title={tool.title}
+            desc={tool.desc}
+            icon={tool.icon}
+          />
+        ))}
       </div>
 
-      {/* Mobile Flow Layout */}
-      <div className="flex flex-col items-center gap-8 md:hidden px-6 z-10 w-full">
-         <SkillNode icon={BrainCircuit} label="AI Models Core" position="relative" delay={0.1} />
-         <div className="h-10 w-[2px] bg-gradient-to-b from-blue-500/50 to-transparent"></div>
-         <SkillNode icon={Sparkles} label="Prompt Engineering" position="relative" delay={0.2} />
-         <div className="h-10 w-[2px] bg-gradient-to-b from-purple-500/50 to-transparent"></div>
-         <SkillNode icon={Code2} label="Code Generation" position="relative" delay={0.3} />
-         <div className="h-10 w-[2px] bg-gradient-to-b from-pink-500/50 to-transparent"></div>
-         <SkillNode icon={Bot} label="Custom Assistants" position="relative" delay={0.4} />
-      </div>
     </section>
   )
 }

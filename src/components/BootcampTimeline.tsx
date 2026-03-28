@@ -1,91 +1,109 @@
 "use client"
 
-import React, { useRef } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import React from "react"
+import { motion } from "framer-motion"
+import { Compass, MessageSquare, Image as ImageIcon, Zap, Trophy, ChevronRight } from "lucide-react"
 
-const TimelineNode = ({ title, desc, icon, index }: any) => {
+const BootcampStep = ({ icon: Icon, title, desc, index }: any) => {
   return (
-    <div className="relative flex justify-center mb-24 lg:mb-32 group">
-      {/* Connector line behind */}
-      <div className="absolute top-12 bottom-[-100px] lg:bottom-[-130px] w-1 bg-gradient-to-b from-blue-500/50 to-purple-500/10 timeline-line -z-10 hidden sm:block"></div>
+    <div className="flex flex-col md:flex-row items-center md:items-start group relative w-full md:w-1/5 shrink-0 px-4 md:px-2 z-10">
+      
+      {/* Step Content */}
+      <motion.div 
+        className="flex flex-col items-center text-center w-full"
 
-      {/* Floating UI element */}
-      <motion.div
-        className="glass-panel w-full sm:w-[500px] p-6 rounded-3xl z-10 mx-6 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-300"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-10%" }}
-        transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+
+        
+        transition={{ duration: 0.4, delay: index * 0.1 }}
       >
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#0f172a] border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center -mt-14 mb-6 relative">
-            <span className="text-2xl">{icon}</span>
-            <div className="absolute inset-0 rounded-2xl animate-ping opacity-20 bg-blue-400"></div>
-          </div>
-          <span className="text-sm uppercase tracking-widest text-blue-400 font-bold mb-2 block">
-            Phase 0{index + 1}
-          </span>
-          <h3 className="text-2xl font-black text-white mb-3 text-center">{title}</h3>
-          <p className="text-slate-400 text-center text-sm leading-relaxed">
-            {desc}
-          </p>
+        <div className="w-16 h-16 rounded-full bg-[#020617] border border-slate-700/50 flex items-center justify-center mb-4 text-blue-400 group-hover:border-blue-500/30 transition-colors relative z-10 shadow-[0_0_10px_rgba(2,6,23,1)] overflow-hidden">
+          <Icon className="w-8 h-8 relative z-10" />
+          <div className="absolute inset-0 bg-slate-800/50 group-hover:bg-slate-800 transition-colors z-0" />
         </div>
+        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Step 0{index + 1}</div>
+        <h3 className="text-lg font-bold text-slate-100 mb-2 leading-tight">{title}</h3>
+        <p className="text-sm text-slate-400 font-light leading-relaxed max-w-[200px]">{desc}</p>
       </motion.div>
     </div>
   )
 }
 
 export default function BootcampTimeline() {
-  const containerRef = useRef(null)
-  
+  const steps = [
+    {
+      title: "Explore AI Tools",
+      desc: "Learn what modern AI can actually do.",
+      icon: Compass
+    },
+    {
+      title: "Prompting Fundamentals",
+      desc: "Talk to AI to get exact results.",
+      icon: MessageSquare
+    },
+    {
+      title: "Content Creation",
+      desc: "Generate stunning art and copy.",
+      icon: ImageIcon
+    },
+    {
+      title: "Automation Workflows",
+      desc: "Link apps to run tasks silently.",
+      icon: Zap
+    },
+    {
+      title: "Final Student Project",
+      desc: "Build a complete AI-powered app.",
+      icon: Trophy
+    }
+  ]
+
   return (
-    <section ref={containerRef} className="relative w-full py-40 bg-[radial-gradient(ellipse_at_bottom,#1e1b4b_0%,#020617_100%)] overflow-hidden">
-      
-      <div className="text-center mb-32 z-20 px-6 max-w-4xl mx-auto">
+    <section id="curriculum" className="relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50">
+      <div className="text-center mb-16 z-20 px-6 max-w-3xl mx-auto">
         <motion.h2 
-          className="text-4xl md:text-5xl lg:text-6xl font-black text-white drop-shadow-[0_0_20px_rgba(168,85,247,0.4)] mb-6"
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          className="text-3xl md:text-5xl font-bold text-slate-100 mb-4 tracking-tight"
+          
         >
-          The Bootcamp Journey
+          Learning Progression
         </motion.h2>
-        <p className="text-slate-300 text-lg md:text-xl font-light">
-          A structured neural-pathway from absolute beginner to autonomous AI creator.
+        <p className="text-slate-400 text-base md:text-lg font-light">
+          A focused 5-step journey from beginner to active creator.
         </p>
       </div>
 
-      <div className="w-full relative z-10">
-        <TimelineNode 
-          index={0}
-          title="AI Core Foundations" 
-          desc="Understanding the neural networks, LLMs, and precisely what AI is capable of in 2026."
-          icon="🧠" 
-        />
-        <TimelineNode 
-          index={1}
-          title="Mastering AI Prompts" 
-          desc="Learning advanced zero-shot and few-shot prompt engineering techniques to generate exact outputs."
-          icon="✍️" 
-        />
-        <TimelineNode 
-          index={2}
-          title="Visual Intelligence" 
-          desc="Using tools like Midjourney, Runway, and DALL-E to generate stunning visual art and videos from text."
-          icon="🎨" 
-        />
-        <TimelineNode 
-          index={3}
-          title="Building with Code Generation" 
-          desc="Leveraging AI as a pair-programmer to build fully functional web and mobile applications without massive syntax knowledge."
-          icon="💻" 
-        />
-        <TimelineNode 
-          index={4}
-          title="The Final Prototype" 
-          desc="Presenting a cohesive, AI-built startup idea or tool in a culminating demo day for parents and guests."
-          icon="🚀" 
-        />
+      <div className="w-full max-w-7xl mx-auto px-4 relative flex flex-col md:flex-row justify-between items-start gap-8 md:gap-0">
+        
+        {/* Continuous Horizontal Line (Desktop) - Hardware Accelerated */}
+        <div className="hidden md:block absolute top-[31px] left-[10%] right-[10%] h-[2px] z-0 overflow-hidden rounded-full">
+          <motion.div 
+            className="w-full h-full bg-gradient-to-r from-slate-800/50 via-blue-500/80 to-slate-800/50 origin-left will-change-transform"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            
+            transition={{ duration: 3.5, ease: "easeInOut", delay: 0.2 }}
+          />
+        </div>
+
+        {/* Continuous Vertical Line (Mobile) - Hardware Accelerated */}
+        <div className="md:hidden absolute top-[32px] bottom-[32px] left-1/2 -translate-x-1/2 w-[2px] z-0 overflow-hidden rounded-full">
+          <motion.div 
+            className="w-full h-full bg-gradient-to-b from-slate-800/50 via-blue-500/80 to-slate-800/50 origin-top will-change-transform"
+            initial={{ scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            
+            transition={{ duration: 3.5, ease: "easeInOut", delay: 0.2 }}
+          />
+        </div>
+
+        {steps.map((step, i) => (
+          <BootcampStep 
+            key={i}
+            index={i}
+            title={step.title}
+            desc={step.desc}
+            icon={step.icon}
+          />
+        ))}
       </div>
     </section>
   )

@@ -1,54 +1,152 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { motion, useScroll } from "framer-motion"
+import { Menu, X } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
-  const { scrollY } = useScroll()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
-    return scrollY.onChange((latest) => {
-      setScrolled(latest > 50)
-    })
-  }, [scrollY])
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 60)
+    }
+    
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    handleScroll() // Initial check
+    
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Close mobile menu when navigating
+  const handleNavClick = () => {
+    setMobileMenuOpen(false)
+  }
+
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "Curriculum", href: "/#curriculum" },
+    { name: "Projects", href: "/#projects" },
+    { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
+    { name: "Testimonials", href: "/#testimonials" },
+    { name: "Blog", href: "/blog" },
+  ]
 
   return (
-    <motion.nav
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 \${
-        scrolled ? "bg-[#020617]/80 backdrop-blur-xl border-b border-white/5 py-4" : "bg-transparent py-6"
+    <header 
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? "bg-[rgba(5,10,30,0.85)] backdrop-blur-[10px] border-b border-white/5 py-4 shadow-lg" 
+          : "bg-transparent py-6"
       }`}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
         
         {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center">
+        <Link href="/" className="flex items-center gap-3 group" aria-label="Skillyug Home">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] transition-all">
             <span className="text-white font-black text-xs">SY</span>
           </div>
           <span className="text-xl font-black text-white tracking-widest hidden sm:block">SKILLYUG</span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav aria-label="Main Navigation" className="hidden md:block">
+          <ul className="flex gap-8 items-center bg-white/5 px-6 py-2.5 rounded-full border border-white/5 backdrop-blur-sm shadow-[inset_0_0_10px_rgba(255,255,255,0.02)]">
+            {navLinks.map((link) => {
+              const active = link.name === "Blog" 
+                ? pathname.startsWith("/blog") 
+                : link.name === "Home" 
+                  ? pathname === "/" 
+                  : false;
+              
+              return (
+                <li key={link.name}>
+                  <Link 
+                    href={link.href} 
+                    className={`text-sm font-medium transition-all ${
+                      active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                    }`}
+                    aria-label={link.ariaLabel || `Go to ${link.name}`}
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* Desktop CTA */}
+        <div className="hidden md:block">
+           <Link 
+             href="/#demo" 
+             className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] hover:scale-105 transition-all duration-300 block border border-white/10"
+             aria-label="Book Free Demo"
+           >
+             Book Free Demo
+           </Link>
         </div>
 
-        {/* Links */}
-        <div className="hidden md:flex gap-8 items-center bg-white/5 px-6 py-2 rounded-full border border-white/5 backdrop-blur-sm shadow-[inset_0_0_10px_rgba(255,255,255,0.02)]">
-          {["Program", "Curriculum", "Projects", "Testimonials"].map((item) => (
-            <a key={item} href="#" className="text-sm font-medium text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all">
-              {item}
-            </a>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <div>
-           <button className="glass-panel px-5 py-2.5 rounded-full text-sm font-bold text-white hover:bg-white/10 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all border border-blue-500/30">
-             Book Demo
-           </button>
-        </div>
-
+        {/* Mobile Menu Toggle */}
+        <button 
+          className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-expanded={mobileMenuOpen}
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-controls="mobile-menu"
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
-    </motion.nav>
+
+      {/* Mobile Navigation Menu */}
+      <div 
+        id="mobile-menu"
+        className={`md:hidden absolute top-full left-0 w-full bg-[#050a1e] border-b border-white/10 shadow-2xl transition-all duration-300 overflow-hidden ${
+          mobileMenuOpen ? "max-h-[500px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
+        }`}
+      >
+        <nav aria-label="Mobile Navigation">
+          <ul className="flex flex-col px-6 gap-2">
+            {navLinks.map((link) => {
+              const active = link.name === "Blog" 
+                ? pathname.startsWith("/blog") 
+                : link.name === "Home" 
+                  ? pathname === "/" 
+                  : false;
+                  
+              return (
+                <li key={link.name}>
+                  <Link 
+                    href={link.href} 
+                    className={`block text-base font-medium transition-colors py-3 px-4 rounded-lg ${
+                      active ? "text-white bg-white/10" : "text-slate-300 hover:text-white hover:bg-white/5"
+                    }`}
+                    aria-label={link.ariaLabel || `Go to ${link.name}`}
+                    onClick={handleNavClick}
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              );
+            })}
+            <li className="mt-4 pt-4 border-t border-white/10">
+              <Link 
+                href="/#demo" 
+                className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] block border border-white/10"
+                aria-label="Book Free Demo"
+                onClick={handleNavClick}
+              >
+                Book Free Demo
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
   )
 }
