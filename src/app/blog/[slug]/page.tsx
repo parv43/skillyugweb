@@ -13,7 +13,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${blog.title} | Skillyug AI Blog`,
     description: blog.metaDescription,
-    keywords: blog.keywords.join(", ")
+    keywords: blog.keywords.join(", "),
+    alternates: {
+      canonical: `https://skillyugedu.com/blog/${slug}`,
+    },
+    openGraph: {
+      title: `${blog.title} | Skillyug AI Blog`,
+      description: blog.metaDescription,
+      url: `https://skillyugedu.com/blog/${slug}`,
+      siteName: 'Skillyug',
+      images: [
+        {
+          url: blog.thumbnail,
+          width: 1200,
+          height: 630,
+        },
+      ],
+      locale: 'en_IN',
+      type: 'article',
+    },
   };
 }
 
@@ -29,6 +47,15 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
 
   if (!blog) {
     notFound();
+  }
+
+  // Find related blogs (same category, different slug)
+  const relatedBlogs = blogs
+    .filter(b => b.category === blog.category && b.slug !== blog.slug)
+    .slice(0, 3);
+  if (relatedBlogs.length < 3) {
+    const moreBlogs = blogs.filter(b => b.slug !== blog.slug && !relatedBlogs.find(r => r.slug === b.slug));
+    relatedBlogs.push(...moreBlogs.slice(0, 3 - relatedBlogs.length));
   }
 
   // Check if title has keywords requiring a list section
@@ -50,15 +77,16 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
         
         {/* Top Section */}
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
-          <Link 
-            href="/blog"
-            className="inline-flex items-center text-sm font-medium text-slate-400 hover:text-white transition-colors"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to Blog
-          </Link>
+          <div className="flex items-center text-sm font-medium text-slate-400 gap-2">
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <span className="text-slate-600">/</span>
+            <Link 
+              href="/blog"
+              className="hover:text-white transition-colors"
+            >
+              Blog
+            </Link>
+          </div>
           <div className="flex items-center gap-4">
             <span className="text-xs font-bold text-blue-400 uppercase tracking-widest bg-blue-500/10 px-3 py-1.5 rounded-md border border-blue-500/20">
               {blog.category}
@@ -161,6 +189,21 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             {blog.content.conclusion}
           </div>
           
+          {/* Related Articles */}
+          {relatedBlogs.length > 0 && (
+            <div className="mt-16 pt-12 border-t border-white/10">
+              <h2 className="text-2xl font-bold text-white mb-6">Related Articles</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {relatedBlogs.map(related => (
+                  <Link href={`/blog/${related.slug}`} key={related.slug} className="group block p-5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition duration-300">
+                    <h3 className="text-[17px] font-semibold text-blue-300 group-hover:text-blue-400 mb-2 leading-tight line-clamp-2">{related.title}</h3>
+                    <p className="text-sm text-slate-400 line-clamp-2 m-0">{related.shortDescription}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+          
         </div>
       </article>
 
@@ -210,6 +253,16 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center opacity-70 mb-4 cyber-glow">
           <span className="text-white font-black text-xs">SY</span>
         </div>
+
+        <nav className="mb-6">
+          <ul className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
+            <li><a href="/" className="hover:text-blue-400 transition-colors">Home</a></li>
+            <li><a href="/blog" className="hover:text-blue-400 transition-colors">Blog</a></li>
+            <li><a href="/#ask-ai" className="hover:text-blue-400 transition-colors">Interactive Demo</a></li>
+            <li><a href="/#curriculum" className="hover:text-blue-400 transition-colors">Curriculum</a></li>
+          </ul>
+        </nav>
+
         <p className="text-sm font-mono text-slate-500 tracking-widest text-center">
           © 2026 SKILLYUG NEURAL SYSTEMS<br />
           ALL RIGHTS RESERVED.

@@ -9,6 +9,17 @@ export const metadata: Metadata = {
   title: "AI Learning Blog for Students and Parents | Skillyug",
   description: "Learn AI tools, study smarter, and prepare for the future. Discover the best AI apps and tutorials for students.",
   keywords: "AI Tools for Students, AI Learning for Kids, AI Bootcamp for Students, Summer AI Bootcamp",
+  alternates: {
+    canonical: 'https://skillyugedu.com/blog',
+  },
+  openGraph: {
+    title: 'AI Learning Blog for Students and Parents | Skillyug',
+    description: 'Learn AI tools, study smarter, and prepare for the future. Discover the best AI apps and tutorials for students.',
+    url: 'https://skillyugedu.com/blog',
+    siteName: 'Skillyug',
+    locale: 'en_IN',
+    type: 'website',
+  },
 };
 
 export default function BlogListingPage() {

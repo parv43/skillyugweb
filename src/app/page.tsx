@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import Navbar from "@/components/Navbar"
 import HeroSection from "@/components/HeroSection"
 import SkillsSection from "@/components/SkillsSection"
@@ -9,6 +10,22 @@ import Testimonials from "@/components/Testimonials"
 import DemoBookingSection from "@/components/DemoBookingSection"
 import FloatingCTA from "@/components/FloatingCTA"
 import SlidingCTA from "@/components/SlidingCTA"
+
+export const metadata: Metadata = {
+  title: 'Skillyug | AI Education & Bootcamps for Students',
+  description: 'Empowering Class 6-12 students with Future AI Skills. Learn ChatGPT, Canva AI, Gamma, and more through our hands-on AI Creator Bootcamp.',
+  alternates: {
+    canonical: 'https://skillyugedu.com',
+  },
+  openGraph: {
+    title: 'Skillyug | AI Education & Bootcamps for Students',
+    description: 'Empowering Class 6-12 students with Future AI Skills. Learn ChatGPT, Canva AI, Gamma, and more through our hands-on AI Creator Bootcamp.',
+    url: 'https://skillyugedu.com',
+    siteName: 'Skillyug',
+    locale: 'en_IN',
+    type: 'website',
+  },
+}
 
 export default function Home() {
   return (
@@ -58,11 +75,20 @@ export default function Home() {
       {/* Floating CTA System */}
       <FloatingCTA />
       
-      {/* Minimal Footer */}
       <footer className="relative z-10 w-full bg-[#020617] border-t border-slate-900/80 py-12 flex flex-col items-center">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center opacity-70 mb-4 cyber-glow">
           <span className="text-white font-black text-xs">SY</span>
         </div>
+        
+        <nav className="mb-6">
+          <ul className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
+            <li><a href="/" className="hover:text-blue-400 transition-colors">Home</a></li>
+            <li><a href="/blog" className="hover:text-blue-400 transition-colors">Blog</a></li>
+            <li><a href="#ask-ai" className="hover:text-blue-400 transition-colors">Interactive Demo</a></li>
+            <li><a href="#curriculum" className="hover:text-blue-400 transition-colors">Curriculum</a></li>
+          </ul>
+        </nav>
+
         <p className="text-sm font-mono text-slate-500 tracking-widest text-center">
           © 2026 SKILLYUG NEURAL SYSTEMS<br />
           ALL RIGHTS RESERVED.
