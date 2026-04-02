@@ -14,11 +14,11 @@ export default function TermsAndConditions() {
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white">
       <Navbar />
-      
+
       <div className="max-w-[800px] mx-auto pt-32 pb-24 px-6 md:px-8">
         <h1 className="text-3xl md:text-4xl font-bold mb-2">Terms & Conditions</h1>
         <p className="text-slate-400 text-sm mb-12">Last updated on 02-04-2026 22:24:07</p>
-        
+
         <div className="text-slate-300 text-base space-y-6 leading-relaxed">
           <p>
             These Terms and Conditions, along with privacy policy or other terms (“Terms”) constitute a binding agreement by and between SKILLYUG LLP, ( “Website Owner” or “we” or “us” or “our”) and you (“you” or “your”) and relate to your use of our website, goods (as applicable) or services (as applicable) (collectively, “Services”).
@@ -45,13 +45,13 @@ export default function TermsAndConditions() {
           </ul>
         </div>
       </div>
-      
+
       {/* Shared Footer */}
       <footer className="relative z-10 w-full bg-[#020617] border-t border-slate-900/80 py-12 flex flex-col items-center">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center opacity-70 mb-4 cyber-glow">
           <span className="text-white font-black text-xs">SY</span>
         </div>
-        
+
         <nav className="mb-6">
           <ul className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
             <li><Link href="/" className="hover:text-blue-400 transition-colors">Home</Link></li>

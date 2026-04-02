@@ -101,7 +101,7 @@ export default function Home() {
         </div>
 
         <p className="text-sm font-mono text-slate-500 tracking-widest text-center">
-          © 2026 SKILLYUG NEURAL SYSTEMS<br />
+          © 2026 SKILLYUG<br />
           ALL RIGHTS RESERVED.
         </p>
       </footer>

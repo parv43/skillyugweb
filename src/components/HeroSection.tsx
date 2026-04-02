@@ -5,20 +5,17 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 
 // The tool cards orbiting the central badge
-const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
+const OrbitingTool = ({ label, icon, angle, duration, tilt }: any) => {
   return (
     <div
-      className="absolute top-1/2 left-1/2 -ml-[45px] -mt-[45px] w-[90px] h-[90px] z-20 pointer-events-none animate-orbit"
+      className="orbit-card absolute top-1/2 left-1/2 z-20 pointer-events-none animate-orbit"
       style={{
         '--start-angle': `${angle}deg`,
         '--duration': `${duration}s`
       } as React.CSSProperties}
     >
-      {/* Container that pushes the card outward by radius value */}
-      <div 
-        className="w-full h-full absolute inset-0 will-change-transform" 
-        style={{ transform: `translateY(-${radius}px)` }}
-      >
+      {/* Container that pushes the card outward by CSS --orbit-radius */}
+      <div className="orbit-push w-full h-full absolute inset-0 will-change-transform">
         <div
           className="w-full h-full pointer-events-auto animate-counter-orbit flex flex-col items-center justify-center bg-[rgba(255,255,255,0.05)] backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-[16px] overflow-hidden hover:bg-white/10 hover:border-blue-400/30 transition-colors duration-300"
           style={{
@@ -27,8 +24,8 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
             '--duration': `${duration}s`
           } as React.CSSProperties}
         >
-          <span className="text-3xl mb-1">{icon}</span>
-          <span className="text-[10px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
+          <span className="orbit-emoji text-3xl mb-1">{icon}</span>
+          <span className="orbit-label text-[10px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
             {label}
           </span>
         </div>
@@ -73,7 +70,7 @@ export default function HeroSection() {
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
-            Give Your Child the AI Skills<br />
+            Give Your Child the Gag Skills<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text">
               That Will Shape Their Future
             </span>
@@ -105,12 +102,14 @@ export default function HeroSection() {
 
         {/* Right Column: Orbit Animation */}
         <motion.div 
-          className="w-full lg:w-1/2 h-[500px] sm:h-[600px] flex items-center justify-center relative scale-90 sm:scale-100"
+          className="w-full lg:w-1/2 h-[300px] sm:h-[600px] flex items-center justify-center relative"
           transition={{ duration: 1, delay: 0.2 }}
         >
-          {/* Faint Orbit Ring (230px radius = 460px diameter) */}
+          {/* Faint Orbit Ring — uses CSS var for radius, responsive via media query */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="absolute w-[460px] h-[460px] rounded-full border border-white/5" />
+            <div 
+              className="absolute rounded-full border border-white/5 w-[200px] h-[200px] sm:w-[460px] sm:h-[460px]"
+            />
           </div>
 
           {/* Central Pill Badge */}
@@ -126,9 +125,8 @@ export default function HeroSection() {
               key={i}
               icon={tool.icon}
               label={tool.label}
-              angle={(360 / tools.length) * i} // Evenly distributed 60-degree increments
-              radius={orbitRadius} 
-              duration={18} // Single uniform 18-second orbit
+              angle={(360 / tools.length) * i}
+              duration={18}
               tilt={tool.tilt}
             />
           ))}
