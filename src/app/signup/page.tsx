@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from 'next/link';
+import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { supabase } from "@/lib/supabaseClient";
 
@@ -14,6 +15,7 @@ export default function SignUpPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,14 +168,21 @@ export default function SignUpPage() {
                   <div className="relative group">
                     <input 
                       id="password"
-                      type="password"
-                      className="w-full bg-[#262528]/30 border-none rounded-xl py-4 px-4 text-[#f9f5f8] placeholder:text-[#767577] focus:ring-2 focus:ring-[#a4a6ff] transition-all outline-none"
+                      type={showPassword ? "text" : "password"}
+                      className="w-full bg-[#262528]/30 border-none rounded-xl py-4 px-4 pr-12 text-[#f9f5f8] placeholder:text-[#767577] focus:ring-2 focus:ring-[#a4a6ff] transition-all outline-none"
                       placeholder="••••••••"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       required
                       minLength={6}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#767577] hover:text-[#a4a6ff] transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
                   </div>
                 </div>
                 
