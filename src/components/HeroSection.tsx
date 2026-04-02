@@ -38,8 +38,24 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
 }
 
 export default function HeroSection() {
-  // Single perfect circle orbit radius (tightened for closer connection)
-  const orbitRadius = 230
+  // Dynamic orbit radius for mobile responsiveness
+  const [orbitRadius, setOrbitRadius] = useState(230)
+
+  useEffect(() => {
+    const updateRadius = () => {
+      // Mobile radius (~150px) to prevent horizontal overflow on smaller screens
+      // Desktop radius stays at the original 230px
+      if (window.innerWidth < 768) {
+        setOrbitRadius(150)
+      } else {
+        setOrbitRadius(230)
+      }
+    }
+    
+    updateRadius()
+    window.addEventListener('resize', updateRadius)
+    return () => window.removeEventListener('resize', updateRadius)
+  }, [])
 
   const tools = [
     { label: "ChatGPT", icon: "💬", tilt: 0 },
@@ -108,9 +124,12 @@ export default function HeroSection() {
           className="w-full lg:w-1/2 h-[500px] sm:h-[600px] flex items-center justify-center relative scale-90 sm:scale-100"
           transition={{ duration: 1, delay: 0.2 }}
         >
-          {/* Faint Orbit Ring (230px radius = 460px diameter) */}
+          {/* Faint Orbit Ring (Diameter = 2 * orbitRadius) */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="absolute w-[460px] h-[460px] rounded-full border border-white/5" />
+            <div 
+              className="absolute rounded-full border border-white/5 transition-all duration-500" 
+              style={{ width: orbitRadius * 2, height: orbitRadius * 2 }}
+            />
           </div>
 
           {/* Central Pill Badge */}
