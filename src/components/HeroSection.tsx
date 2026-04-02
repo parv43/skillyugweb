@@ -5,28 +5,17 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 
 // The tool cards orbiting the central badge
-const OrbitingTool = ({ label, icon, angle, radius, duration, tilt, isMobile }: any) => {
-  const cardSize = isMobile ? 65 : 90
-  const halfSize = cardSize / 2
-  const emojiSize = isMobile ? "text-xl" : "text-3xl"
-
+const OrbitingTool = ({ label, icon, angle, duration, tilt }: any) => {
   return (
     <div
-      className="absolute top-1/2 left-1/2 z-20 pointer-events-none animate-orbit"
+      className="orbit-card absolute top-1/2 left-1/2 z-20 pointer-events-none animate-orbit"
       style={{
-        marginLeft: -halfSize,
-        marginTop: -halfSize,
-        width: cardSize,
-        height: cardSize,
         '--start-angle': `${angle}deg`,
         '--duration': `${duration}s`
       } as React.CSSProperties}
     >
-      {/* Container that pushes the card outward by radius value */}
-      <div 
-        className="w-full h-full absolute inset-0 will-change-transform" 
-        style={{ transform: `translateY(-${radius}px)` }}
-      >
+      {/* Container that pushes the card outward by CSS --orbit-radius */}
+      <div className="orbit-push w-full h-full absolute inset-0 will-change-transform">
         <div
           className="w-full h-full pointer-events-auto animate-counter-orbit flex flex-col items-center justify-center bg-[rgba(255,255,255,0.05)] backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-[16px] overflow-hidden hover:bg-white/10 hover:border-blue-400/30 transition-colors duration-300"
           style={{
@@ -35,8 +24,8 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt, isMobile }: 
             '--duration': `${duration}s`
           } as React.CSSProperties}
         >
-          <span className={`${emojiSize} mb-1`}>{icon}</span>
-          <span className="text-[9px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
+          <span className="orbit-emoji text-3xl mb-1">{icon}</span>
+          <span className="orbit-label text-[10px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
             {label}
           </span>
         </div>
@@ -46,25 +35,8 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt, isMobile }: 
 }
 
 export default function HeroSection() {
-  // Dynamic orbit radius for mobile responsiveness
-  const [orbitRadius, setOrbitRadius] = useState(230)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const updateRadius = () => {
-      const mobile = window.innerWidth < 768
-      setIsMobile(mobile)
-      if (mobile) {
-        setOrbitRadius(100)
-      } else {
-        setOrbitRadius(230)
-      }
-    }
-    
-    updateRadius()
-    window.addEventListener('resize', updateRadius)
-    return () => window.removeEventListener('resize', updateRadius)
-  }, [])
+  // Single perfect circle orbit radius (tightened for closer connection)
+  const orbitRadius = 230
 
   const tools = [
     { label: "ChatGPT", icon: "💬", tilt: 0 },
@@ -130,14 +102,13 @@ export default function HeroSection() {
 
         {/* Right Column: Orbit Animation */}
         <motion.div 
-          className="w-full lg:w-1/2 h-[320px] sm:h-[600px] flex items-center justify-center relative"
+          className="w-full lg:w-1/2 h-[300px] sm:h-[600px] flex items-center justify-center relative"
           transition={{ duration: 1, delay: 0.2 }}
         >
-          {/* Faint Orbit Ring (Diameter = 2 * orbitRadius) */}
+          {/* Faint Orbit Ring — uses CSS var for radius, responsive via media query */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div 
-              className="absolute rounded-full border border-white/5 transition-all duration-500" 
-              style={{ width: orbitRadius * 2, height: orbitRadius * 2 }}
+              className="absolute rounded-full border border-white/5 w-[200px] h-[200px] sm:w-[460px] sm:h-[460px]"
             />
           </div>
 
@@ -155,10 +126,8 @@ export default function HeroSection() {
               icon={tool.icon}
               label={tool.label}
               angle={(360 / tools.length) * i}
-              radius={orbitRadius} 
               duration={18}
               tilt={tool.tilt}
-              isMobile={isMobile}
             />
           ))}
           
