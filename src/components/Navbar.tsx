@@ -21,9 +21,19 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Close mobile menu when navigating
-  const handleNavClick = () => {
+  // Close mobile menu and handle smooth scroll for hash links
+  const handleNavClick = (e: React.MouseEvent, href: string) => {
     setMobileMenuOpen(false)
+
+    // Handle smooth scroll for same-page hash links
+    if (pathname === "/" && href.includes("#")) {
+      const hash = href.split("#")[1]
+      const element = document.getElementById(hash)
+      if (element) {
+        e.preventDefault()
+        element.scrollIntoView({ behavior: "smooth" })
+      }
+    }
   }
 
   const navLinks = [
@@ -67,6 +77,7 @@ export default function Navbar() {
                 <li key={link.name}>
                   <Link 
                     href={link.href} 
+                    onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
                     className={`text-sm font-medium transition-all ${
                       active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
                     }`}
@@ -83,7 +94,7 @@ export default function Navbar() {
         {/* Desktop CTA */}
         <div className="hidden md:block">
            <Link 
-             href="/#demo" 
+             href="/signup" 
              className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] hover:scale-105 transition-all duration-300 block border border-white/10"
              aria-label="Book Free Demo"
            >
@@ -127,7 +138,7 @@ export default function Navbar() {
                       active ? "text-white bg-white/10" : "text-slate-300 hover:text-white hover:bg-white/5"
                     }`}
                     aria-label={link.ariaLabel || `Go to ${link.name}`}
-                    onClick={handleNavClick}
+                    onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
                   >
                     {link.name}
                   </Link>
@@ -136,10 +147,10 @@ export default function Navbar() {
             })}
             <li className="mt-4 pt-4 border-t border-white/10">
               <Link 
-                href="/#demo" 
+                href="/signup" 
+                onClick={() => setMobileMenuOpen(false)}
                 className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] block border border-white/10"
                 aria-label="Book Free Demo"
-                onClick={handleNavClick}
               >
                 Book Free Demo
               </Link>

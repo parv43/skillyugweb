@@ -6,10 +6,12 @@ import StudentProjects from "@/components/StudentProjects"
 import BootcampTimeline from "@/components/BootcampTimeline"
 import AIToolsSection from "@/components/AIToolsSection"
 import InteractiveChatDemo from "@/components/InteractiveChatDemo"
+import GallerySection from "@/components/GallerySection"
 import Testimonials from "@/components/Testimonials"
 import DemoBookingSection from "@/components/DemoBookingSection"
 import FloatingCTA from "@/components/FloatingCTA"
 import SlidingCTA from "@/components/SlidingCTA"
+import ContactUs from "@/components/ContactUs"
 
 export const metadata: Metadata = {
   title: 'Skillyug | AI Education & Bootcamps for Students',
@@ -69,11 +71,14 @@ export default function Home() {
       <SkillsSection />
       <StudentProjects />
       <BootcampTimeline />
+      <GallerySection />
       <Testimonials />
       <DemoBookingSection />
       
       {/* Floating CTA System */}
       <FloatingCTA />
+      
+      <ContactUs />
       
       <footer className="relative z-10 w-full bg-[#020617] border-t border-slate-900/80 py-12 flex flex-col items-center">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center opacity-70 mb-4 cyber-glow">
@@ -88,6 +93,12 @@ export default function Home() {
             <li><a href="#curriculum" className="hover:text-blue-400 transition-colors">Curriculum</a></li>
           </ul>
         </nav>
+
+        <div className="mb-8 flex gap-4 text-xs text-slate-500">
+          <a href="/refund-policy" className="hover:text-slate-300 transition-colors">Refund Policy</a>
+          <span>|</span>
+          <a href="/terms-and-conditions" className="hover:text-slate-300 transition-colors">Terms & Conditions</a>
+        </div>
 
         <p className="text-sm font-mono text-slate-500 tracking-widest text-center">
           © 2026 SKILLYUG NEURAL SYSTEMS<br />
