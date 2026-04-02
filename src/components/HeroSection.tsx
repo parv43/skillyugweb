@@ -5,11 +5,19 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 
 // The tool cards orbiting the central badge
-const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
+const OrbitingTool = ({ label, icon, angle, radius, duration, tilt, isMobile }: any) => {
+  const cardSize = isMobile ? 65 : 90
+  const halfSize = cardSize / 2
+  const emojiSize = isMobile ? "text-xl" : "text-3xl"
+
   return (
     <div
-      className="absolute top-1/2 left-1/2 -ml-[45px] -mt-[45px] w-[90px] h-[90px] z-20 pointer-events-none animate-orbit"
+      className="absolute top-1/2 left-1/2 z-20 pointer-events-none animate-orbit"
       style={{
+        marginLeft: -halfSize,
+        marginTop: -halfSize,
+        width: cardSize,
+        height: cardSize,
         '--start-angle': `${angle}deg`,
         '--duration': `${duration}s`
       } as React.CSSProperties}
@@ -27,8 +35,8 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
             '--duration': `${duration}s`
           } as React.CSSProperties}
         >
-          <span className="text-3xl mb-1">{icon}</span>
-          <span className="text-[10px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
+          <span className={`${emojiSize} mb-1`}>{icon}</span>
+          <span className="text-[9px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
             {label}
           </span>
         </div>
@@ -40,13 +48,14 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
 export default function HeroSection() {
   // Dynamic orbit radius for mobile responsiveness
   const [orbitRadius, setOrbitRadius] = useState(230)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const updateRadius = () => {
-      // Mobile radius (~150px) to prevent horizontal overflow on smaller screens
-      // Desktop radius stays at the original 230px
-      if (window.innerWidth < 768) {
-        setOrbitRadius(150)
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      if (mobile) {
+        setOrbitRadius(100)
       } else {
         setOrbitRadius(230)
       }
@@ -121,7 +130,7 @@ export default function HeroSection() {
 
         {/* Right Column: Orbit Animation */}
         <motion.div 
-          className="w-full lg:w-1/2 h-[500px] sm:h-[600px] flex items-center justify-center relative scale-90 sm:scale-100"
+          className="w-full lg:w-1/2 h-[320px] sm:h-[600px] flex items-center justify-center relative"
           transition={{ duration: 1, delay: 0.2 }}
         >
           {/* Faint Orbit Ring (Diameter = 2 * orbitRadius) */}
@@ -145,10 +154,11 @@ export default function HeroSection() {
               key={i}
               icon={tool.icon}
               label={tool.label}
-              angle={(360 / tools.length) * i} // Evenly distributed 60-degree increments
+              angle={(360 / tools.length) * i}
               radius={orbitRadius} 
-              duration={18} // Single uniform 18-second orbit
+              duration={18}
               tilt={tool.tilt}
+              isMobile={isMobile}
             />
           ))}
           
