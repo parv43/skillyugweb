@@ -63,26 +63,15 @@ export default function Home() {
       {/* Promotional Ribbon */}
       <SlidingCTA />
       
-      <div className="hidden md:block">
-        <AIToolsSection />
-      </div>
+      <AIToolsSection />
       
       {/* Section 3: Interactive Prompting Chat Demo */}
-      <div className="hidden md:block">
-        <InteractiveChatDemo />
-      </div>
+      <InteractiveChatDemo />
       
       <SkillsSection />
       <StudentProjects />
-
-      {/* Gallery — visible on all devices */}
+      <BootcampTimeline />
       <GallerySection />
-
-      {/* Learning Progression — visible on desktop only */}
-      <div className="hidden md:block">
-        <BootcampTimeline />
-      </div>
-
       <Testimonials />
       <DemoBookingSection />
       
