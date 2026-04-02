@@ -63,11 +63,11 @@ export default function FloatingCTA() {
   return (
     <div
       ref={buttonRef}
-      className={`fixed right-6 bottom-24 z-50 transition-all duration-500 transform origin-right ${
+      className={`fixed right-4 bottom-6 md:right-6 md:bottom-24 z-50 transition-all duration-500 transform origin-right ${
         isVisible 
           ? (isOverlapping ? "translate-y-2.5 opacity-100" : "translate-y-0 opacity-100") 
           : "translate-y-10 opacity-0 pointer-events-none"
-      } ${isOverlapping ? "scale-[0.8]" : "scale-100"} hidden md:block`}
+      } ${isOverlapping ? "scale-[0.8]" : "scale-100"}`}
     >
       <Link
         href="/signup"

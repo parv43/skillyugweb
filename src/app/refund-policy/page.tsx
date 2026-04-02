@@ -16,6 +16,10 @@ export default function RefundPolicy() {
       <Navbar />
 
       <div className="max-w-[800px] mx-auto pt-32 pb-24 px-6 md:px-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 transition-colors mb-8 group text-sm font-semibold">
+          <span className="text-lg leading-none">←</span>
+          <span>Back to Home</span>
+        </Link>
         <h1 className="text-3xl md:text-4xl font-bold mb-2">Cancellation & Refund Policy</h1>
         <p className="text-slate-400 text-sm mb-12">Last updated on 02-04-2026 22:26:13</p>
 

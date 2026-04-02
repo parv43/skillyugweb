@@ -155,6 +155,16 @@ export default function Navbar() {
                 Book Free Demo
               </Link>
             </li>
+            <li className="mt-2">
+              <Link 
+                href="/#contact" 
+                onClick={(e: React.MouseEvent) => handleNavClick(e, "/#contact")}
+                className="w-full text-center py-3 rounded-lg text-base font-bold text-blue-300 border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition-colors block"
+                aria-label="Contact Us"
+              >
+                Contact Us
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>

@@ -52,7 +52,7 @@ export default function SignUpPage() {
         <div className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] bg-[#a4a6ff]/10 blur-[120px] rounded-full pointer-events-none"></div>
         <div className="bg-[#262528]/40 backdrop-blur-3xl border-t border-l border-[#48474a]/25 p-10 md:p-14 rounded-[2rem] shadow-2xl relative z-10 max-w-lg w-full text-center space-y-6">
           <div className="text-6xl">📬</div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#f9f5f8]">Check your inbox!</h1>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#f9f5f8]">Check your Mailbox!</h1>
           <p className="text-[#adaaad] text-lg leading-relaxed">
             We sent a verification link to <span className="text-[#a4a6ff] font-bold">{email}</span>.
             Click it to activate your account and access Skillyug.
