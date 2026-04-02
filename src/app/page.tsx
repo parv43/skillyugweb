@@ -75,10 +75,8 @@ export default function Home() {
       <SkillsSection />
       <StudentProjects />
 
-      {/* Gallery — visible on desktop only */}
-      <div className="hidden md:block">
-        <GallerySection />
-      </div>
+      {/* Gallery — visible on all devices */}
+      <GallerySection />
 
       {/* Learning Progression — visible on desktop only */}
       <div className="hidden md:block">
