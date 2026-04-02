@@ -20,7 +20,7 @@ export default function ContactUs() {
             Contact Skillyug
           </h2>
           <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
-            Have questions about the bootcamp or bringing AI to your school? Drop us a message and our team will get right back to you.
+            Have questions about the bootcamp? Drop us a message and our team will get right back to you.
           </p>
         </div>
 
@@ -39,7 +39,7 @@ export default function ContactUs() {
                     <input 
                       type="text" 
                       className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 placeholder:text-slate-600" 
-                      placeholder="John Doe" 
+                      placeholder="Full name" 
                       required
                     />
                   </div>
@@ -98,7 +98,7 @@ export default function ContactUs() {
                 </div>
                 <div>
                   <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1.5">Email Us</h3>
-                  <p className="text-lg md:text-xl font-bold text-white tracking-wide">Contact@skillyugedu.com</p>
+                  <p className="text-lg md:text-xl font-bold text-white tracking-wide">contact@skillyugedu.com</p>
                   <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">Send us a direct email. Our support team typically responds within 24 hours.</p>
                 </div>
               </div>
