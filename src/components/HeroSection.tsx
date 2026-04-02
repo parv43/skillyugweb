@@ -66,7 +66,7 @@ export default function HeroSection() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-blue-500/30 mb-6 bg-blue-500/5">
             <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-            <span className="text-[11px] sm:text-xs font-bold text-blue-200 uppercase tracking-widest">Skillyug Winter AI Bootcamp • Classes 6–12</span>
+            <span className="text-[11px] sm:text-xs font-bold text-blue-200 uppercase tracking-widest">Skillyug Summer AI Bootcamp • Classes 6–12</span>
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
