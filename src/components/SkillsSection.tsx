@@ -79,8 +79,19 @@ export default function SkillsSection() {
   return (
     <section id="what-they-learn" className="relative w-full py-32 bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 border-b">
       
+      {/* Background Layer with subtle Classroom Image */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <img 
+          src="/classroom.jpeg" 
+          alt="Classroom Environment"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-[#020617]/70" />
+      </div>
+
       {/* Deep ambient lighting (optimized) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-purple-900/5 to-transparent pointer-events-none rounded-full" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-purple-900/5 to-transparent pointer-events-none rounded-full z-10" />
+
       
       {/* SEO-Friendly Header */}
       <div className="w-full flex justify-center mb-16 md:mb-20 z-20 px-6">

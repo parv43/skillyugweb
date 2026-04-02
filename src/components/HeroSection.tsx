@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 // The tool cards orbiting the central badge
 const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
@@ -87,10 +88,16 @@ export default function HeroSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
-            <button className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center">
+            <Link 
+              href="/signup"
+              className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
+            >
               Join the Bootcamp
-            </button>
-            <button className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center">
+            </Link>
+            <button 
+              onClick={() => document.getElementById("curriculum")?.scrollIntoView({ behavior: "smooth" })}
+              className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center"
+            >
               Explore Curriculum
             </button>
           </div>

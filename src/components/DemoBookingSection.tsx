@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react"
 import { motion, useInView, animate } from "framer-motion"
 import { CheckCircle2, Zap, ArrowRight, ShieldCheck } from "lucide-react"
+import Link from "next/link"
 
 export default function DemoBookingSection() {
   const sectionRef = useRef(null)
@@ -22,7 +23,7 @@ export default function DemoBookingSection() {
   }, [isInView])
 
   return (
-    <section id="demo" className="relative w-full py-32 bg-[#020617] overflow-hidden border-t border-slate-900" ref={sectionRef}>
+    <section id="demo-booking" className="relative w-full py-32 bg-[#020617] overflow-hidden border-t border-slate-900" ref={sectionRef}>
       
       {/* Performant Ambient Background (no massive blur filters) */}
       <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent rounded-full pointer-events-none" />
@@ -111,10 +112,10 @@ export default function DemoBookingSection() {
               </div>
 
               {/* Main CTA */}
-              <button className="w-full glow-button py-5 rounded-2xl flex items-center justify-center gap-3 text-white font-bold text-lg hover:-translate-y-1 transition-transform shadow-[0_0_16px_rgba(59,130,246,0.2)]">
+              <Link href="/book-slot" className="w-full glow-button py-5 rounded-2xl flex items-center justify-center gap-3 text-white font-bold text-lg hover:-translate-y-1 transition-transform shadow-[0_0_16px_rgba(59,130,246,0.2)]">
                 Book My Slot Now
                 <ArrowRight className="w-5 h-5" />
-              </button>
+              </Link>
 
               <div className="flex items-center justify-center gap-2 mt-6 text-slate-500 text-xs">
                 <ShieldCheck className="w-4 h-4" />
