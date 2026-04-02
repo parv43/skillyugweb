@@ -114,7 +114,7 @@ export default function ContactUs() {
                 <div>
                   <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1.5">Call Us</h3>
                   <p className="text-base md:text-xl font-bold text-white tracking-wide break-all">07941057514</p>
-                  <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">Available Monday through Friday, from 9:00 AM to 6:00 PM IST.</p>
+                  <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">Available Monday to Friday, from 9:00 AM to 6:00 PM IST.</p>
                 </div>
               </div>
             </div>
