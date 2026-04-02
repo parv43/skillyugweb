@@ -98,7 +98,7 @@ export default function ContactUs() {
                 </div>
                 <div>
                   <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1.5">Email Us</h3>
-                  <p className="text-lg md:text-xl font-bold text-white tracking-wide">contact@skillyugedu.com</p>
+                  <p className="text-base md:text-xl font-bold text-white tracking-wide break-all">contact@skillyugedu.com</p>
                   <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">Send us a direct email. Our support team typically responds within 24 hours.</p>
                 </div>
               </div>
@@ -113,7 +113,7 @@ export default function ContactUs() {
                 </div>
                 <div>
                   <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1.5">Call Us</h3>
-                  <p className="text-lg md:text-xl font-bold text-white tracking-wide">07941057514</p>
+                  <p className="text-base md:text-xl font-bold text-white tracking-wide break-all">07941057514</p>
                   <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">Available Monday through Friday, from 9:00 AM to 6:00 PM IST.</p>
                 </div>
               </div>
