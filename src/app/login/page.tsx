@@ -23,7 +23,12 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setErrorMsg(error.message);
+      // Supabase returns "Email not confirmed" when user hasn't verified
+      if (error.message.toLowerCase().includes("email not confirmed") || error.message.toLowerCase().includes("invalid login credentials")) {
+        setErrorMsg("Wrong credentials or email not verified. Please check your inbox and verify your email first.");
+      } else {
+        setErrorMsg(error.message);
+      }
       setLoading(false);
     } else {
       router.push("/book-slot");

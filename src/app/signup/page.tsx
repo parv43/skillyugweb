@@ -13,6 +13,7 @@ export default function SignUpPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +24,7 @@ export default function SignUpPage() {
       email,
       password,
       options: {
+        emailRedirectTo: `https://www.skillyugedu.com/auth/callback`,
         data: {
           full_name: fullName,
           phone_number: phoneNumber,
@@ -34,10 +36,30 @@ export default function SignUpPage() {
       setErrorMsg(error.message);
       setLoading(false);
     } else {
-      // Assuming auto confirm or seamless login locally setup
-      router.push("/book-slot");
+      // Show the "check your email" screen
+      setEmailSent(true);
+      setLoading(false);
     }
   };
+
+  // Email verification sent screen
+  if (emailSent) {
+    return (
+      <div className="bg-[#0e0e10] text-[#f9f5f8] min-h-screen flex flex-col items-center justify-center px-6 font-sans">
+        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-[#ac8aff]/10 blur-[120px] rounded-full pointer-events-none"></div>
+        <div className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] bg-[#a4a6ff]/10 blur-[120px] rounded-full pointer-events-none"></div>
+        <div className="bg-[#262528]/40 backdrop-blur-3xl border-t border-l border-[#48474a]/25 p-10 md:p-14 rounded-[2rem] shadow-2xl relative z-10 max-w-lg w-full text-center space-y-6">
+          <div className="text-6xl">📬</div>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#f9f5f8]">Check your inbox!</h1>
+          <p className="text-[#adaaad] text-lg leading-relaxed">
+            We sent a verification link to <span className="text-[#a4a6ff] font-bold">{email}</span>.
+            Click it to activate your account and access Skillyug.
+          </p>
+          <p className="text-[#767577] text-sm">Didn't receive it? Check your spam folder.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#0e0e10] text-[#f9f5f8] min-h-screen selection:bg-[#a4a6ff]/30 flex flex-col overflow-x-hidden font-sans">
