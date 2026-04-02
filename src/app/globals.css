@@ -111,38 +111,3 @@ body {
   animation: counter-spin-orbit var(--duration) linear infinite;
   will-change: transform;
 }
-
-/* Orbit mobile scaling — makes cards and radius smaller on phones */
-.orbit-push {
-  --orbit-radius: 230px;
-  transform: translateY(calc(-1 * var(--orbit-radius)));
-}
-
-.orbit-card {
-  width: 90px;
-  height: 90px;
-  margin-left: -45px;
-  margin-top: -45px;
-}
-
-@media (max-width: 767px) {
-  .orbit-push {
-    --orbit-radius: 100px;
-  }
-
-  .orbit-card {
-    width: 60px;
-    height: 60px;
-    margin-left: -30px;
-    margin-top: -30px;
-  }
-
-  .orbit-card .orbit-emoji {
-    font-size: 1rem;
-    margin-bottom: 2px;
-  }
-
-  .orbit-card .orbit-label {
-    font-size: 8px;
-  }
-}

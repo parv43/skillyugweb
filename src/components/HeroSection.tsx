@@ -5,17 +5,20 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 
 // The tool cards orbiting the central badge
-const OrbitingTool = ({ label, icon, angle, duration, tilt }: any) => {
+const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
   return (
     <div
-      className="orbit-card absolute top-1/2 left-1/2 z-20 pointer-events-none animate-orbit"
+      className="absolute top-1/2 left-1/2 -ml-[45px] -mt-[45px] w-[90px] h-[90px] z-20 pointer-events-none animate-orbit"
       style={{
         '--start-angle': `${angle}deg`,
         '--duration': `${duration}s`
       } as React.CSSProperties}
     >
-      {/* Container that pushes the card outward by CSS --orbit-radius */}
-      <div className="orbit-push w-full h-full absolute inset-0 will-change-transform">
+      {/* Container that pushes the card outward by radius value */}
+      <div 
+        className="w-full h-full absolute inset-0 will-change-transform" 
+        style={{ transform: `translateY(-${radius}px)` }}
+      >
         <div
           className="w-full h-full pointer-events-auto animate-counter-orbit flex flex-col items-center justify-center bg-[rgba(255,255,255,0.05)] backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-[16px] overflow-hidden hover:bg-white/10 hover:border-blue-400/30 transition-colors duration-300"
           style={{
@@ -24,8 +27,8 @@ const OrbitingTool = ({ label, icon, angle, duration, tilt }: any) => {
             '--duration': `${duration}s`
           } as React.CSSProperties}
         >
-          <span className="orbit-emoji text-3xl mb-1">{icon}</span>
-          <span className="orbit-label text-[10px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
+          <span className="text-3xl mb-1">{icon}</span>
+          <span className="text-[10px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
             {label}
           </span>
         </div>
@@ -35,8 +38,24 @@ const OrbitingTool = ({ label, icon, angle, duration, tilt }: any) => {
 }
 
 export default function HeroSection() {
-  // Single perfect circle orbit radius (tightened for closer connection)
-  const orbitRadius = 230
+  // Dynamic orbit radius for mobile responsiveness
+  const [orbitRadius, setOrbitRadius] = useState(230)
+
+  useEffect(() => {
+    const updateRadius = () => {
+      // Mobile radius (170px) as requested
+      // Desktop radius stays at the original 230px
+      if (window.innerWidth < 768) {
+        setOrbitRadius(170)
+      } else {
+        setOrbitRadius(230)
+      }
+    }
+    
+    updateRadius()
+    window.addEventListener('resize', updateRadius)
+    return () => window.removeEventListener('resize', updateRadius)
+  }, [])
 
   const tools = [
     { label: "ChatGPT", icon: "💬", tilt: 0 },
@@ -105,10 +124,11 @@ export default function HeroSection() {
           className="w-full lg:w-1/2 h-[300px] sm:h-[600px] flex items-center justify-center relative"
           transition={{ duration: 1, delay: 0.2 }}
         >
-          {/* Faint Orbit Ring — uses CSS var for radius, responsive via media query */}
+          {/* Faint Orbit Ring (Diameter = 2 * orbitRadius) */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div 
-              className="absolute rounded-full border border-white/5 w-[200px] h-[200px] sm:w-[460px] sm:h-[460px]"
+              className="absolute rounded-full border border-white/5 transition-all duration-500" 
+              style={{ width: orbitRadius * 2, height: orbitRadius * 2 }}
             />
           </div>
 
@@ -125,8 +145,9 @@ export default function HeroSection() {
               key={i}
               icon={tool.icon}
               label={tool.label}
-              angle={(360 / tools.length) * i}
-              duration={18}
+              angle={(360 / tools.length) * i} // Evenly distributed 60-degree increments
+              radius={orbitRadius} 
+              duration={18} // Single uniform 18-second orbit
               tilt={tool.tilt}
             />
           ))}
