@@ -70,7 +70,7 @@ export default function HeroSection() {
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
-            Give Your Child the Gag Skills<br />
+            Give Your Child the AI Skills<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text">
               That Will Shape Their Future
             </span>
