@@ -28,7 +28,7 @@ export default function ContactUs() {
           
           {/* Contact Form Section */}
           <div className="lg:col-span-7">
-            <div className="glass-panel bg-[#0f172a]/60 backdrop-blur-md rounded-[2rem] p-8 md:p-10 border border-white/5 relative overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.1)] group">
+            <div className="glass-panel bg-[#0f172a]/60 backdrop-blur-md rounded-[2rem] p-8 pb-10 md:p-10 border border-white/5 relative overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.1)] group">
               {/* Internal subtle glow */}
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
 

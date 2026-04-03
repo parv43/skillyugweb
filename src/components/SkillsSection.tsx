@@ -77,7 +77,7 @@ export default function SkillsSection() {
   ]
 
   return (
-    <section id="what-they-learn" className="relative w-full py-32 bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 border-b">
+    <section id="what-they-learn" className="relative w-full py-16 md:py-32 bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 border-b">
       
       {/* Background Layer with subtle Classroom Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -92,21 +92,47 @@ export default function SkillsSection() {
       {/* Deep ambient lighting (optimized) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-purple-900/5 to-transparent pointer-events-none rounded-full z-10" />
 
-      
       {/* SEO-Friendly Header */}
-      <div className="w-full flex justify-center mb-16 md:mb-20 z-20 px-6">
+      <div className="w-full flex justify-center mb-10 md:mb-20 z-20 px-6">
         <div className="text-center max-w-[800px] w-full mx-auto">
-          <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-6 tracking-tight leading-tight">
+          <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-4 md:mb-6 tracking-tight leading-tight">
             What Students Will Actually Learn
           </h2>
-          <p className="text-slate-400 text-lg md:text-xl font-light">
+          <p className="text-slate-400 text-base md:text-xl font-light">
             No complex developer tools. At the Skillyug Summer AI Bootcamp, we focus solely on practical AI study tools and homework apps that help Class 6–12 students learn better and finish assignments faster.
           </p>
         </div>
       </div>
 
-      {/* Modern Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 max-w-6xl mx-auto w-full z-10 relative">
+      {/* ── Mobile Layout (< md): compact icon-row cards ── */}
+      <div className="flex flex-col gap-3 px-4 max-w-lg mx-auto w-full z-10 relative md:hidden">
+        {tools.map((tool, idx) => {
+          const Icon = tool.icon
+          const colors = ["blue", "purple", "pink", "indigo", "cyan", "violet", "sky", "fuchsia", "teal"]
+          const color = colors[idx % colors.length]
+          return (
+            <motion.div
+              key={idx}
+              className="flex items-start gap-4 bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 backdrop-blur-sm"
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.35, delay: idx * 0.05 }}
+              viewport={{ once: true }}
+            >
+              <div className={`w-11 h-11 rounded-xl bg-[#020617] border border-${color}-500/30 flex items-center justify-center flex-shrink-0`}>
+                <Icon className={`w-5 h-5 text-${color}-400`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-white font-bold text-sm leading-tight mb-1">{tool.title}</h3>
+                <p className="text-slate-400 text-xs leading-relaxed">{tool.desc}</p>
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* ── Desktop Layout (≥ md): original 3-col grid ── */}
+      <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 max-w-6xl mx-auto w-full z-10 relative">
         {tools.map((tool, idx) => (
           <ToolCard 
             key={idx}

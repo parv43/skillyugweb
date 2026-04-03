@@ -70,24 +70,57 @@ export default function StudentProjects() {
     }
   ]
 
+  const iconColors = ["blue", "yellow", "pink", "purple", "emerald", "orange"]
+
   return (
-    <section id="projects" className="relative w-full py-32 bg-[#020617] overflow-hidden flex flex-col border-t border-white/5">
+    <section id="projects" className="relative w-full py-16 md:py-32 bg-[#020617] overflow-hidden flex flex-col border-t border-white/5">
       
       {/* Minimal ambient glow (optimized) */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent pointer-events-none rounded-full z-0" />
 
-      <div className="text-center mb-20 z-20 px-6 max-w-3xl mx-auto">
+      {/* Heading */}
+      <div className="text-center mb-10 md:mb-20 z-20 px-6 max-w-3xl mx-auto">
         <motion.h2 
-          className="text-4xl md:text-5xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-6 drop-shadow-md tracking-tight"
+          className="text-3xl md:text-5xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-4 md:mb-6 drop-shadow-md tracking-tight"
         >
           How This Bootcamp Gives Students an Advantage With AI
         </motion.h2>
-        <p className="text-slate-400 text-lg font-light flex-1">
+        <p className="text-slate-400 text-base md:text-lg font-light">
           Students learn how to use modern AI tools to study faster, complete assignments efficiently, and build confidence using technology that is shaping the future of education and work.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 px-6 max-w-7xl mx-auto w-full z-10 relative">
+      {/* ── Mobile Layout (< md): compact icon-row cards ── */}
+      <div className="flex flex-col gap-3 px-4 max-w-lg mx-auto w-full z-10 relative md:hidden">
+        {projects.map((project, idx) => {
+          const Icon = project.icon
+          const color = iconColors[idx]
+          return (
+            <motion.div
+              key={idx}
+              className="flex items-start gap-4 bg-[#0f172a]/70 border border-white/8 rounded-2xl p-4"
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.35, delay: idx * 0.06 }}
+              viewport={{ once: true }}
+            >
+              <div className={`w-11 h-11 rounded-xl bg-[#020617] border border-${color}-500/30 flex items-center justify-center flex-shrink-0`}>
+                <Icon className={`w-5 h-5 text-${color}-400`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h3 className="text-white font-bold text-sm leading-tight">{project.title}</h3>
+                  <span className={`text-[10px] font-bold text-${color}-400 uppercase tracking-wider bg-${color}-500/10 px-2 py-0.5 rounded-full`}>{project.tech}</span>
+                </div>
+                <p className="text-slate-400 text-xs leading-relaxed">{project.desc}</p>
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* ── Desktop Layout (≥ md): original 3-col grid ── */}
+      <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 px-6 max-w-7xl mx-auto w-full z-10 relative">
         {projects.map((project, idx) => (
           <ProjectCard 
             key={idx}

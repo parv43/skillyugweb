@@ -40,6 +40,7 @@ export default function BookSlotPage() {
     const form = e.currentTarget;
     const formData = new FormData(form);
     const phoneNumber = formData.get("phoneNumber") as string;
+    const studentName = formData.get("studentName") as string;
 
     // Strict 10 digit validation
     if (phoneNumber.length !== 10) {
@@ -57,6 +58,15 @@ export default function BookSlotPage() {
       const result = await response.json();
       
       if (result.result === "success") {
+        // Save to Supabase slot_bookings table (name + phone)
+        const { error: supabaseError } = await supabase
+          .from("slot_bookings")
+          .insert({ name: studentName, phone: phoneNumber });
+
+        if (supabaseError) {
+          console.warn("Supabase insert warning:", supabaseError.message);
+        }
+
         alert("Your spot has been booked successfully!");
         form.reset();
       } else {
@@ -274,10 +284,10 @@ export default function BookSlotPage() {
             <span className="material-symbols-outlined">bookmark</span>
             <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.05rem] font-bold mt-1">Saved</span>
           </div>
-          <div className="flex flex-col items-center justify-center text-[#938f99] hover:text-[#cfbcff] transition-colors cursor-pointer active:scale-90">
+          <Link href="/profile" className="flex flex-col items-center justify-center text-[#938f99] hover:text-[#cfbcff] transition-colors cursor-pointer active:scale-90">
             <span className="material-symbols-outlined">person</span>
             <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.05rem] font-bold mt-1">Profile</span>
-          </div>
+          </Link>
         </nav>
       </div>
     </>

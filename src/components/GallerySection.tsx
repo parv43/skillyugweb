@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useAnimationControls } from "framer-motion";
+import Image from "next/image";
 
 const galleryItems = [
   {
@@ -96,22 +97,24 @@ export default function GallerySection() {
                key={index} 
                className="w-[280px] sm:w-[320px] md:w-[400px] lg:w-[480px] flex-shrink-0 aspect-[4/3] rounded-2xl md:rounded-[3rem] overflow-hidden glass-panel border border-white/10 shadow-[0_0_40px_rgba(59,130,246,0.1)] relative group select-none transition-all duration-500 hover:border-blue-400/30"
              >
-                {/* Story Overlay triggered on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/95 via-[#020617]/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 z-20 pointer-events-none flex flex-col justify-end p-6 md:p-8">
-                  <h3 className="text-white font-bold text-xl md:text-2xl mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out delay-75 shadow-black text-shadow-sm">
+                {/* Story Overlay — hidden by default, visible on hover (desktop) or touch (mobile) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/95 via-[#020617]/50 to-transparent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-all duration-500 z-20 pointer-events-none flex flex-col justify-end p-6 md:p-8">
+                  <h3 className="text-white font-bold text-xl md:text-2xl mb-2 translate-y-4 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-500 ease-out delay-75 shadow-black text-shadow-sm">
                     {item.title}
                   </h3>
-                  <p className="text-slate-300 text-sm md:text-base leading-relaxed translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out delay-100 font-medium">
+                  <p className="text-slate-300 text-sm md:text-base leading-relaxed translate-y-4 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-500 ease-out delay-100 font-medium">
                     {item.story}
                   </p>
                 </div>
 
                 <div className="absolute inset-0 bg-[#020617]/20 group-hover:bg-transparent transition-colors z-10 pointer-events-none" />
-                <img 
+                <Image 
                    src={item.src} 
                    alt={`Skillyug Gallery - ${item.title}`} 
-                   className="w-full h-full object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110"
-                   loading="lazy"
+                   fill
+                   sizes="(max-width: 640px) 280px, (max-width: 768px) 320px, (max-width: 1024px) 400px, 480px"
+                   className="object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110"
+                   priority={index < 3}
                 />
              </div>
           ))}
