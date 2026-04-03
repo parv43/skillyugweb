@@ -99,8 +99,11 @@ export default function HeroSection() {
             Your child's learning, creativity, and future readiness are our top priorities.
           </p>
 
-          <p className="text-base md:text-lg text-slate-300 max-w-xl mb-10 font-light leading-relaxed">
+          <p className="text-base md:text-lg text-slate-300 max-w-xl mb-10 font-light leading-relaxed hidden md:block">
             In this hands-on bootcamp, students learn how to use modern AI tools to build real projects, automate tasks, and develop future-ready skills.
+          </p>
+          <p className="text-base text-slate-300 max-w-xl mb-10 font-light leading-relaxed md:hidden block">
+            Master AI, build projects, and automate tasks in this hands-on bootcamp.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
