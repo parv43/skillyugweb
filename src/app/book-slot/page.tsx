@@ -284,10 +284,10 @@ export default function BookSlotPage() {
             <span className="material-symbols-outlined">bookmark</span>
             <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.05rem] font-bold mt-1">Saved</span>
           </div>
-          <div className="flex flex-col items-center justify-center text-[#938f99] hover:text-[#cfbcff] transition-colors cursor-pointer active:scale-90">
+          <Link href="/profile" className="flex flex-col items-center justify-center text-[#938f99] hover:text-[#cfbcff] transition-colors cursor-pointer active:scale-90">
             <span className="material-symbols-outlined">person</span>
             <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.05rem] font-bold mt-1">Profile</span>
-          </div>
+          </Link>
         </nav>
       </div>
     </>

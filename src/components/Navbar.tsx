@@ -4,10 +4,12 @@ import React, { useState, useEffect } from "react"
 import { Menu, X } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { supabase } from "@/lib/supabaseClient"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [session, setSession] = useState<any>(null)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -17,8 +19,22 @@ export default function Navbar() {
     
     window.addEventListener("scroll", handleScroll, { passive: true })
     handleScroll() // Initial check
+
+    // Check user session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
     
-    return () => window.removeEventListener("scroll", handleScroll)
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      subscription.unsubscribe()
+    }
   }, [])
 
   // Close mobile menu and handle smooth scroll for hash links
@@ -92,14 +108,24 @@ export default function Navbar() {
         </nav>
 
         {/* Desktop CTA */}
-        <div className="hidden md:block">
-           <Link 
-             href="/signup" 
-             className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] hover:scale-105 transition-all duration-300 block border border-white/10"
-             aria-label="Book Free Demo"
-           >
-             Book Free Demo
-           </Link>
+        <div className="hidden md:flex items-center gap-4">
+          {session ? (
+            <Link 
+              href="/profile" 
+              className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-slate-800/80 hover:bg-slate-700/80 shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-105 transition-all duration-300 block border border-white/10"
+              aria-label="View Profile"
+            >
+              My Profile
+            </Link>
+          ) : (
+            <Link 
+              href="/signup" 
+              className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] hover:scale-105 transition-all duration-300 block border border-white/10"
+              aria-label="Book Free Demo"
+            >
+              Book Free Demo
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -146,14 +172,25 @@ export default function Navbar() {
               );
             })}
             <li className="mt-4 pt-4 border-t border-white/10">
-              <Link 
-                href="/signup" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] block border border-white/10"
-                aria-label="Book Free Demo"
-              >
-                Book Free Demo
-              </Link>
+              {session ? (
+                <Link 
+                  href="/profile" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-slate-800/80 hover:bg-slate-700/80 shadow-[0_0_15px_rgba(255,255,255,0.05)] block border border-white/10 transition-colors"
+                  aria-label="View Profile"
+                >
+                  My Profile
+                </Link>
+              ) : (
+                <Link 
+                  href="/signup" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] block border border-white/10"
+                  aria-label="Book Free Demo"
+                >
+                  Book Free Demo
+                </Link>
+              )}
             </li>
             <li className="mt-2">
               <Link 
