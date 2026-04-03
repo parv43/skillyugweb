@@ -195,6 +195,30 @@ export default function SignUpPage() {
                   {loading ? "Creating account..." : "Sign Up"}
                 </button>
               </form>
+
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-[#48474a]/50"></div>
+                <span className="flex-shrink-0 mx-4 text-[#adaaad] text-xs font-semibold uppercase tracking-wider">Or</span>
+                <div className="flex-grow border-t border-[#48474a]/50"></div>
+              </div>
+              
+              <button
+                type="button"
+                onClick={async () => {
+                  setErrorMsg("");
+                  const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                      redirectTo: `${window.location.origin}/auth/callback`,
+                    },
+                  });
+                  if (error) setErrorMsg(error.message);
+                }}
+                className="w-full bg-[#262528]/50 hover:bg-[#262528] border border-[#48474a]/25 text-[#f9f5f8] font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3"
+              >
+                <img src="/Google.png" alt="Google" className="w-5 h-5" />
+                Continue with Google
+              </button>
               
               {/* Footer Link */}
               <div className="pt-4 text-center">
