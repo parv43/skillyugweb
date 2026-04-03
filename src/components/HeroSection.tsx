@@ -42,58 +42,57 @@ import Image from "next/image"
 // ─── Mobile-Only Hero ───────────────────────────────────────────────────────
 function MobileHero() {
   return (
-    <section className="relative min-h-[90vh] pt-28 pb-12 flex flex-col justify-start bg-[#020617]">
-      {/* Background neon blobs */}
+    <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-[#020617] overflow-hidden">
+      {/* Subtle Background Glows matching the screenshot */}
       <div className="absolute inset-0 pointer-events-none -z-10">
-        <div className="absolute top-[10%] left-[10%] w-64 h-64 bg-purple-600/20 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute top-[30%] right-[10%] w-80 h-80 bg-blue-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: "2s" }} />
+        <div className="absolute top-[5%] left-[0%] w-[300px] h-[300px] bg-purple-600/10 rounded-full blur-[100px]" />
       </div>
 
-      <div className="px-6 relative z-10 w-full mb-8 flex flex-col items-start text-left">
+      <div className="px-6 relative z-10 w-full flex flex-col items-start text-left">
         {/* Header Copy */}
-        <h1 className="text-4xl sm:text-5xl font-extrabold leading-[1.15] tracking-tight mb-4 text-white">
-          Empower your child's<br /> learning and creativity with<br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+        <h1 className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-white">
+          Empower your child's learning and creativity with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-fuchsia-400">
             future-ready AI skills.
           </span>
         </h1>
-        <p className="text-slate-300 text-base md:text-lg max-w-sm mb-10 font-medium">
+        <p className="text-slate-300 text-[17px] leading-relaxed max-w-sm mb-10 font-normal">
           Master AI, build projects, and automate tasks in this hands-on bootcamp.
         </p>
 
         {/* CTAs */}
-        <div className="w-full flex flex-col gap-4">
+        <div className="w-full flex flex-col gap-4 mb-10">
           <Link
             href="/signup"
-            className="w-full py-4 px-8 rounded-full text-lg font-bold text-white text-center active:scale-95 transition-transform"
-            style={{ background: "linear-gradient(135deg,#4f46e5 20%,#c084fc 100%)", boxShadow: "0 4px 20px rgba(139,92,246,0.3)" }}
+            className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
+            style={{ 
+              background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
+              boxShadow: "0 4px 20px rgba(139,92,246,0.3)" 
+            }}
           >
             Join the Bootcamp
           </Link>
           <button
             onClick={() => document.getElementById("curriculum")?.scrollIntoView({ behavior: "smooth" })}
-            className="w-full py-4 px-8 rounded-full border border-slate-700 bg-[#0f172a]/40 text-white font-bold text-lg backdrop-blur-sm active:scale-95 transition-colors hover:bg-slate-800/60"
+            className="w-full py-4 px-8 rounded-full border border-white/20 bg-transparent text-white font-semibold text-[17px] active:scale-95 transition-colors"
           >
             Explore Curriculum
           </button>
         </div>
       </div>
 
-      {/* Hero Image */}
-      <div className="relative w-full flex-grow flex items-end justify-center px-4 mt-6 z-10">
-        <div className="relative w-full max-w-lg mx-auto overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_-10px_40px_rgba(139,92,246,0.15)]">
-          <Image
-            src="/Another_Mother_Son_Image.png"
-            alt="Father and son learning AI together on a laptop"
-            width={800}
-            height={800}
-            className="w-full h-auto object-cover"
-            priority
-            sizes="(max-width: 768px) 100vw, 800px"
-          />
-          {/* Subtle gradient overlay at the bottom to blend with background if needed */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
-        </div>
+      {/* Full-width Hero Image bleeding to edges */}
+      <div className="relative w-full mt-auto flex items-end justify-center z-10">
+        <Image
+          src="/Another_Mother_Son_Image.png"
+          alt="Father and son learning AI together on a laptop"
+          width={800}
+          height={800}
+          className="w-full h-auto object-cover object-top"
+          priority
+          sizes="100vw"
+        />
+        {/* Optional subtle gradient to fade the image bottom into the next section if needed */}
+        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
       </div>
     </section>
   )
