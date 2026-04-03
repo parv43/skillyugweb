@@ -76,7 +76,10 @@ export default function Home() {
       <SkillsSection />
       <StudentProjects />
       <BootcampTimeline />
-      <GallerySection />
+      {/* Gallery — hidden on mobile to avoid duplication (shown at top for mobile) */}
+      <div className="hidden md:block">
+        <GallerySection />
+      </div>
       <Testimonials />
       <DemoBookingSection />
       
