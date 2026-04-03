@@ -7,7 +7,7 @@ import Link from "next/link"
 
 export default function DemoBookingSection() {
   const sectionRef = useRef(null)
-  const isInView = useInView(sectionRef, { amount: 0.3 })
+  const isInView = useInView(sectionRef, { amount: 0.3, once: true })
   const [percent, setPercent] = useState(0)
 
   // Animated counter from 0 to 84 whenever the section enters view
@@ -96,8 +96,7 @@ export default function DemoBookingSection() {
                   <motion.div 
                     className="absolute top-0 bottom-0 left-0 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full origin-left will-change-transform shadow-[0_0_12px_rgba(139,92,246,0.3)]"
                     initial={{ scaleX: 0 }}
-                    whileInView={{ scaleX: 0.84 }}
-                    viewport={{ once: true, margin: "-100px" }}
+                    animate={isInView ? { scaleX: 0.84 } : { scaleX: 0 }}
                     transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
                   >
                     {/* Subtle moving gradient shimmer */}
