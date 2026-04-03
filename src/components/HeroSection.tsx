@@ -37,80 +37,63 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
   )
 }
 
+import Image from "next/image"
+
 // ─── Mobile-Only Hero ───────────────────────────────────────────────────────
 function MobileHero() {
   return (
-    <section className="relative min-h-screen pt-24 pb-12 overflow-hidden flex flex-col items-center bg-[#020617]">
+    <section className="relative min-h-[90vh] pt-28 pb-12 flex flex-col justify-start bg-[#020617]">
       {/* Background neon blobs */}
       <div className="absolute inset-0 pointer-events-none -z-10">
-        <div className="absolute top-[20%] left-[10%] w-64 h-64 bg-purple-600/20 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-[20%] right-[10%] w-80 h-80 bg-blue-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: "2s" }} />
+        <div className="absolute top-[10%] left-[10%] w-64 h-64 bg-purple-600/20 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute top-[30%] right-[10%] w-80 h-80 bg-blue-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: "2s" }} />
       </div>
 
-      {/* Header Copy */}
-      <div className="text-center px-6 mb-8 z-10">
-        <h1 className="text-3xl font-extrabold leading-tight tracking-tight mb-2 text-white">
+      <div className="px-6 relative z-10 w-full mb-8 flex flex-col items-start text-left">
+        {/* Header Copy */}
+        <h1 className="text-4xl sm:text-5xl font-extrabold leading-[1.15] tracking-tight mb-4 text-white">
           Empower your child's<br /> learning and creativity with<br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 text-4xl mt-1 inline-block">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
             future-ready AI skills.
           </span>
         </h1>
-        <p className="text-slate-400 text-sm max-w-xs mx-auto mb-8">
+        <p className="text-slate-300 text-base md:text-lg max-w-sm mb-10 font-medium">
           Master AI, build projects, and automate tasks in this hands-on bootcamp.
         </p>
 
-        {/* Primary CTA — same route as desktop */}
-        <Link
-          href="/signup"
-          className="block w-full max-w-xs mx-auto py-4 px-8 rounded-full text-lg font-bold text-white text-center active:scale-95 transition-transform"
-          style={{ background: "linear-gradient(135deg,#4f46e5 0%,#a855f7 100%)", boxShadow: "0 4px 20px rgba(139,92,246,0.4)" }}
-        >
-          Join the Bootcamp
-        </Link>
+        {/* CTAs */}
+        <div className="w-full flex flex-col gap-4">
+          <Link
+            href="/signup"
+            className="w-full py-4 px-8 rounded-full text-lg font-bold text-white text-center active:scale-95 transition-transform"
+            style={{ background: "linear-gradient(135deg,#4f46e5 20%,#c084fc 100%)", boxShadow: "0 4px 20px rgba(139,92,246,0.3)" }}
+          >
+            Join the Bootcamp
+          </Link>
+          <button
+            onClick={() => document.getElementById("curriculum")?.scrollIntoView({ behavior: "smooth" })}
+            className="w-full py-4 px-8 rounded-full border border-slate-700 bg-[#0f172a]/40 text-white font-bold text-lg backdrop-blur-sm active:scale-95 transition-colors hover:bg-slate-800/60"
+          >
+            Explore Curriculum
+          </button>
+        </div>
       </div>
 
-      {/* Orbit Animation — same as desktop but fixed at 170px radius */}
-      <div className="relative w-full h-[360px] flex items-center justify-center mt-2">
-        {/* Faint Orbit Ring */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="absolute rounded-full border border-white/5" style={{ width: 340, height: 340 }} />
-        </div>
-
-        {/* Central Pill Badge */}
-        <div className="relative z-30 px-8 py-4 rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.4)] flex items-center justify-center">
-          <span className="text-xl font-black text-black tracking-[0.2em] relative z-10">SKILLYUG</span>
-          <div className="absolute inset-0 rounded-full border border-white/40 animate-pulse opacity-50" />
-        </div>
-
-        {/* Orbiting Tool Cards at 170px radius */}
-        {[
-          { label: "ChatGPT", icon: "💬" },
-          { label: "Midjourney", icon: "🎨" },
-          { label: "DALL-E", icon: "🌠" },
-          { label: "Claude", icon: "🧠" },
-          { label: "Canva AI", icon: "🖼️" },
-          { label: "Runway", icon: "🎬" },
-        ].map((tool, i) => (
-          <OrbitingTool
-            key={i}
-            icon={tool.icon}
-            label={tool.label}
-            angle={(360 / 6) * i}
-            radius={170}
-            duration={18}
-            tilt={0}
+      {/* Hero Image */}
+      <div className="relative w-full flex-grow flex items-end justify-center px-4 mt-6 z-10">
+        <div className="relative w-full max-w-lg mx-auto overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_-10px_40px_rgba(139,92,246,0.15)]">
+          <Image
+            src="/Another_Mother_Son_Image.png"
+            alt="Father and son learning AI together on a laptop"
+            width={800}
+            height={800}
+            className="w-full h-auto object-cover"
+            priority
+            sizes="(max-width: 768px) 100vw, 800px"
           />
-        ))}
-      </div>
-
-      {/* Secondary CTA — same scroll behavior as desktop */}
-      <div className="mt-10 px-6 w-full flex flex-col items-center">
-        <button
-          onClick={() => document.getElementById("curriculum")?.scrollIntoView({ behavior: "smooth" })}
-          className="w-full max-w-xs py-4 px-8 rounded-full border border-slate-700 bg-slate-800/30 text-white font-semibold backdrop-blur-sm transition-colors hover:bg-slate-800/60"
-        >
-          Explore Curriculum
-        </button>
+          {/* Subtle gradient overlay at the bottom to blend with background if needed */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
+        </div>
       </div>
     </section>
   )
