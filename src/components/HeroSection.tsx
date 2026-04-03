@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import Image from "next/image"
 
 // The tool cards orbiting the central badge
 const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
@@ -70,27 +69,38 @@ function MobileHero() {
         </Link>
       </div>
 
-      {/* Family scene image */}
-      <div className="relative w-full max-w-lg mt-4 px-4">
-        <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative"
-          style={{ filter: "contrast(1.1) brightness(1)" }}
-        >
-          <Image
-            src="/Another_Mother_Son_Image.png"
-            alt="Mother and son learning AI together"
-            width={600}
-            height={450}
-            sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 600px"
-            priority
-            className="w-full h-auto block opacity-80"
-          />
-          {/* Bottom gradient fade */}
-          <div className="absolute inset-0"
-            style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(2,6,23,0.8) 90%, #020617 100%)" }}
-          />
-
+      {/* Orbit Animation — same as desktop but fixed at 170px radius */}
+      <div className="relative w-full h-[360px] flex items-center justify-center mt-2">
+        {/* Faint Orbit Ring */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="absolute rounded-full border border-white/5" style={{ width: 340, height: 340 }} />
         </div>
 
+        {/* Central Pill Badge */}
+        <div className="relative z-30 px-8 py-4 rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.4)] flex items-center justify-center">
+          <span className="text-xl font-black text-black tracking-[0.2em] relative z-10">SKILLYUG</span>
+          <div className="absolute inset-0 rounded-full border border-white/40 animate-pulse opacity-50" />
+        </div>
+
+        {/* Orbiting Tool Cards at 170px radius */}
+        {[
+          { label: "ChatGPT", icon: "💬" },
+          { label: "Midjourney", icon: "🎨" },
+          { label: "DALL-E", icon: "🌠" },
+          { label: "Claude", icon: "🧠" },
+          { label: "Canva AI", icon: "🖼️" },
+          { label: "Runway", icon: "🎬" },
+        ].map((tool, i) => (
+          <OrbitingTool
+            key={i}
+            icon={tool.icon}
+            label={tool.label}
+            angle={(360 / 6) * i}
+            radius={170}
+            duration={18}
+            tilt={0}
+          />
+        ))}
       </div>
 
       {/* Secondary CTA — same scroll behavior as desktop */}
