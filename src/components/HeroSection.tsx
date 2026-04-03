@@ -83,7 +83,7 @@ function MobileHero() {
       {/* Full-width Hero Image bleeding to edges */}
       <div className="relative w-full mt-auto flex items-end justify-center z-10">
         <Image
-          src="/Another_Mother_Son_Image.png"
+          src="/Parent_child.png"
           alt="Father and son learning AI together on a laptop"
           width={800}
           height={800}
