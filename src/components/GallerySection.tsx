@@ -97,12 +97,12 @@ export default function GallerySection() {
                key={index} 
                className="w-[280px] sm:w-[320px] md:w-[400px] lg:w-[480px] flex-shrink-0 aspect-[4/3] rounded-2xl md:rounded-[3rem] overflow-hidden glass-panel border border-white/10 shadow-[0_0_40px_rgba(59,130,246,0.1)] relative group select-none transition-all duration-500 hover:border-blue-400/30"
              >
-                {/* Story Overlay — visible on mobile by default, triggered on hover for desktop */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/95 via-[#020617]/50 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 z-20 pointer-events-none flex flex-col justify-end p-6 md:p-8">
-                  <h3 className="text-white font-bold text-xl md:text-2xl mb-2 translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500 ease-out delay-75 shadow-black text-shadow-sm">
+                {/* Story Overlay — hidden by default, visible on hover (desktop) or touch (mobile) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/95 via-[#020617]/50 to-transparent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-all duration-500 z-20 pointer-events-none flex flex-col justify-end p-6 md:p-8">
+                  <h3 className="text-white font-bold text-xl md:text-2xl mb-2 translate-y-4 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-500 ease-out delay-75 shadow-black text-shadow-sm">
                     {item.title}
                   </h3>
-                  <p className="text-slate-300 text-sm md:text-base leading-relaxed translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500 ease-out delay-100 font-medium">
+                  <p className="text-slate-300 text-sm md:text-base leading-relaxed translate-y-4 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-500 ease-out delay-100 font-medium">
                     {item.story}
                   </p>
                 </div>
