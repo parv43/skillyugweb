@@ -94,12 +94,6 @@ function MobileHero() {
           />
         </div>
 
-        {/* SKILLYUG badge floating below image */}
-        <div className="flex justify-center -mt-6 relative z-20">
-          <div className="bg-white rounded-full px-8 py-3 shadow-[0_0_20px_rgba(255,255,255,0.4)]">
-            <span className="font-black tracking-[0.2em] text-slate-900 text-lg">SKILLYUG</span>
-          </div>
-        </div>
       </div>
 
       {/* Secondary CTA — same scroll behavior as desktop */}
