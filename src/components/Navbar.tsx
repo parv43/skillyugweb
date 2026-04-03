@@ -143,8 +143,8 @@ export default function Navbar() {
       {/* Mobile Navigation Menu */}
       <div 
         id="mobile-menu"
-        className={`md:hidden absolute top-full left-0 w-full bg-[#050a1e] border-b border-white/10 shadow-2xl transition-all duration-300 overflow-hidden ${
-          mobileMenuOpen ? "max-h-[500px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
+        className={`md:hidden absolute top-full left-0 w-full bg-[#050a1e] border-b border-white/10 shadow-2xl transition-all duration-300 overflow-y-auto ${
+          mobileMenuOpen ? "max-h-[85vh] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
         }`}
       >
         <nav aria-label="Mobile Navigation">
