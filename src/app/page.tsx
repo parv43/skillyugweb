@@ -62,6 +62,11 @@ export default function Home() {
       
       {/* Promotional Ribbon */}
       <SlidingCTA />
+
+      {/* Gallery — mobile only, shown right after hero */}
+      <div className="md:hidden">
+        <GallerySection />
+      </div>
       
       <AIToolsSection />
       
