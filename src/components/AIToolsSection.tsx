@@ -133,19 +133,74 @@ export default function AIToolsSection() {
         />
       </div>
 
-      {/* Mobile Stack Layout */}
-      <div className="flex flex-col gap-6 w-full px-6 lg:hidden z-10 relative">
-        <EcosystemNode icon={TerminalSquare} label="Initial Prompt" desc="Student defines vision." position="relative w-full" delay={0.1} />
-        <div className="w-1 h-8 bg-gradient-to-b from-blue-500/50 to-transparent mx-auto" />
-        <EcosystemNode icon={MessageSquare} label="ChatGPT & Claude" desc="Generates raw material." position="relative w-full" delay={0.2} />
-        <div className="w-1 h-8 bg-gradient-to-b from-purple-500/50 to-transparent mx-auto" />
-        <EcosystemNode icon={Image} label="Midjourney & DALL-E" desc="Generates visual art." position="relative w-full" delay={0.3} />
-        <div className="w-1 h-8 bg-gradient-to-b from-pink-500/50 to-transparent mx-auto" />
-        <EcosystemNode icon={Binary} label="Final Deployment" desc="Assembling the pieces." position="relative w-full" delay={0.4} />
+      {/* ── Mobile Layout (< lg) ── */}
+      <div className="flex flex-col w-full px-4 lg:hidden z-10 relative gap-8">
+
+        {/* Tool Cards — 2-column grid */}
+        <div className="grid grid-cols-2 gap-3 w-full">
+          {[
+            { icon: TerminalSquare, label: "Initial Prompt", desc: "Student defines vision & logic", color: "slate" },
+            { icon: MessageSquare, label: "ChatGPT & Claude", desc: "Brainstorms ideas & writes copy", color: "blue" },
+            { icon: Image, label: "Midjourney & DALL-E", desc: "Generates stunning AI visuals", color: "purple" },
+            { icon: Layout, label: "Canva & Figma", desc: "Assembles into pro layouts", color: "pink" },
+            { icon: Binary, label: "Live Deployment", desc: "Ships a real app or project", color: "emerald" },
+            { icon: Zap, label: "AI Automation", desc: "Automates repetitive tasks", color: "yellow" },
+          ].map(({ icon: Icon, label, desc, color }, i) => (
+            <motion.div
+              key={i}
+              className="bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 flex flex-col items-center text-center gap-2"
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: i * 0.07 }}
+              viewport={{ once: true }}
+            >
+              <div className={`w-12 h-12 rounded-xl bg-[#020617] flex items-center justify-center border border-${color}-500/30 mb-1`}>
+                <Icon className={`w-6 h-6 text-${color}-400`} />
+              </div>
+              <h4 className="text-white font-bold text-xs leading-tight">{label}</h4>
+              <p className="text-slate-400 text-[11px] leading-relaxed">{desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Flow connector */}
+        <div className="flex items-center gap-2 px-2">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
+          <span className="text-slate-500 text-xs font-semibold tracking-widest uppercase">Student Workflow</span>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/40 to-transparent" />
+        </div>
+
+        {/* Workflow Steps — numbered list cards */}
+        <div className="flex flex-col gap-3 w-full">
+          {[
+            { step: "01", title: "Prompt Design", desc: "Students write a structured prompt explaining their idea to an LLM.", color: "from-blue-500/20 to-blue-500/5", border: "border-blue-500/20" },
+            { step: "02", title: "AI Generation", desc: "AI tools output the raw code, text, graphics, and structure required.", color: "from-purple-500/20 to-purple-500/5", border: "border-purple-500/20" },
+            { step: "03", title: "Human Polish", desc: "Students use Canva to refine layouts and edit out AI hallucinations.", color: "from-pink-500/20 to-pink-500/5", border: "border-pink-500/20" },
+            { step: "04", title: "Final Project", desc: "A complete, functioning website, game, or presentation is created.", color: "from-emerald-500/20 to-emerald-500/5", border: "border-emerald-500/20" },
+          ].map(({ step, title, desc, color, border }, i) => (
+            <motion.div
+              key={i}
+              className={`relative bg-gradient-to-br ${color} border ${border} rounded-2xl p-4 flex items-start gap-4 overflow-hidden`}
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: i * 0.08 }}
+              viewport={{ once: true }}
+            >
+              <span className="text-4xl font-black font-mono opacity-15 absolute right-4 top-3 select-none">{step}</span>
+              <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-white font-black text-xs">{step}</span>
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-sm mb-1">{title}</h3>
+                <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
-      {/* Real Student Workflow Visualization */}
-      <div className="w-full max-w-6xl mx-auto px-6 mt-32 z-20">
+      {/* ── Desktop Workflow Steps (≥ lg) ── */}
+      <div className="w-full max-w-6xl mx-auto px-6 mt-32 z-20 hidden lg:block">
         <div className="text-center mb-12">
           <h3 className="text-2xl font-bold text-white mb-4">Example Student Workflow</h3>
           <div className="h-px w-24 bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto" />
