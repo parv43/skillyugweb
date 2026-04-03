@@ -40,6 +40,7 @@ export default function BookSlotPage() {
     const form = e.currentTarget;
     const formData = new FormData(form);
     const phoneNumber = formData.get("phoneNumber") as string;
+    const studentName = formData.get("studentName") as string;
 
     // Strict 10 digit validation
     if (phoneNumber.length !== 10) {
@@ -57,6 +58,15 @@ export default function BookSlotPage() {
       const result = await response.json();
       
       if (result.result === "success") {
+        // Save to Supabase slot_bookings table (name + phone)
+        const { error: supabaseError } = await supabase
+          .from("slot_bookings")
+          .insert({ name: studentName, phone: phoneNumber });
+
+        if (supabaseError) {
+          console.warn("Supabase insert warning:", supabaseError.message);
+        }
+
         alert("Your spot has been booked successfully!");
         form.reset();
       } else {
