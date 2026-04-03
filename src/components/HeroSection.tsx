@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 
 // The tool cards orbiting the central badge
 const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
@@ -74,10 +75,13 @@ function MobileHero() {
         <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative"
           style={{ filter: "contrast(1.1) brightness(0.9)" }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://lh3.googleusercontent.com/aida/ADBb0ugjfLt4eVyRmq1TAoO243JAS3lIgnLvTiCxSELSUqM8oGzEOoH7h02xglVZhcjd2Xg3bWb95uvIW296tT9vZXHg56PGRMtAy3nLKJuw0QINlazOnf0_GpyK6g-V99zgGoHdcz5-uUsbtQx4Qp7k9m1jwexV8jH5R0RqCcSPTDgEhU6JQTUVp0yAnGYucMlvmSlSrc9uBv-PxcEbc2o7WYV2IiiOnr9NtbTay7eXOn6XRb3BK5yzI6229wt3aLom-QD81dByPEQT3Q"
+          <Image
+            src="/Mother_Son_Image.png"
             alt="Mother and son learning AI together"
+            width={600}
+            height={450}
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 600px"
+            priority
             className="w-full h-auto block opacity-80"
           />
           {/* Bottom gradient fade */}
