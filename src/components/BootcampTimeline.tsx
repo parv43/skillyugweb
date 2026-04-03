@@ -58,7 +58,7 @@ export default function BootcampTimeline() {
   ]
 
   return (
-    <section id="curriculum" className="relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50">
+    <section id="curriculum" className="hidden md:block relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50">
       <div className="text-center mb-16 z-20 px-6 max-w-3xl mx-auto">
         <motion.h2 
           className="text-3xl md:text-5xl font-bold text-slate-100 mb-4 tracking-tight"
