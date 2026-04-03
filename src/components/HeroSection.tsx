@@ -88,10 +88,7 @@ function MobileHero() {
           <div className="absolute inset-0"
             style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(2,6,23,0.8) 90%, #020617 100%)" }}
           />
-          {/* Purple tint overlay */}
-          <div className="absolute inset-0 rounded-3xl"
-            style={{ background: "radial-gradient(circle at center,rgba(139,92,246,0.15) 0%,rgba(2,6,23,0.3) 100%)", mixBlendMode: "color" }}
-          />
+
         </div>
 
       </div>
