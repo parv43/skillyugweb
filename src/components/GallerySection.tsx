@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useAnimationControls } from "framer-motion";
+import Image from "next/image";
 
 const galleryItems = [
   {
@@ -107,11 +108,13 @@ export default function GallerySection() {
                 </div>
 
                 <div className="absolute inset-0 bg-[#020617]/20 group-hover:bg-transparent transition-colors z-10 pointer-events-none" />
-                <img 
+                <Image 
                    src={item.src} 
                    alt={`Skillyug Gallery - ${item.title}`} 
-                   className="w-full h-full object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110"
-                   loading="lazy"
+                   fill
+                   sizes="(max-width: 640px) 280px, (max-width: 768px) 320px, (max-width: 1024px) 400px, 480px"
+                   className="object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110"
+                   priority={index < 3}
                 />
              </div>
           ))}

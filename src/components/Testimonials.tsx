@@ -2,6 +2,7 @@
 
 import React from "react"
 import { motion } from "framer-motion"
+import Image from "next/image"
 
 const testimonials = [
   {
@@ -45,8 +46,14 @@ const TestimonialSlide = ({ testimonial }: any) => {
           </p>
           
           <div className="flex items-center gap-4 mt-auto">
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-tr from-blue-900 to-purple-900 border border-white/20 p-1 flex-shrink-0">
-              <img src={testimonial.image} alt={testimonial.name} className="w-full h-full object-cover rounded-full" />
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-tr from-blue-900 to-purple-900 border border-white/20 p-1 flex-shrink-0 relative">
+              <Image 
+                src={testimonial.image} 
+                alt={testimonial.name} 
+                width={48} 
+                height={48} 
+                className="object-cover rounded-full" 
+              />
             </div>
             <div>
               <h4 className="text-white font-bold tracking-wide">{testimonial.name}</h4>
