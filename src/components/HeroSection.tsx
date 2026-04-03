@@ -88,14 +88,18 @@ export default function HeroSection() {
             <span className="text-[11px] sm:text-xs font-bold text-blue-200 uppercase tracking-widest">Skillyug Summer AI Bootcamp • Classes 6–12</span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1] hidden md:block">
             Give Your Child the AI Skills<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text">
               That Will Shape Their Future
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl font-medium text-pink-400 mb-4">
+          <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.2] md:hidden block">
+            Empower your child's learning and creativity with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text">future-ready AI skills.</span>
+          </h1>
+
+          <p className="text-lg md:text-xl font-medium text-pink-400 mb-4 hidden md:block">
             Your child's learning, creativity, and future readiness are our top priorities.
           </p>
 
