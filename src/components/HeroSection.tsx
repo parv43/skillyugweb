@@ -48,7 +48,7 @@ function MobileHero() {
         <div className="absolute top-[5%] left-[0%] w-[300px] h-[300px] bg-purple-600/10 rounded-full blur-[100px]" />
       </div>
 
-      <div className="px-6 relative z-10 w-full flex flex-col items-start text-left">
+      <div className="px-6 relative z-20 w-full flex flex-col items-start text-left">
         {/* Header Copy */}
         <h1 className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-white">
           Empower your child's learning and creativity with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-fuchsia-400">
@@ -60,7 +60,7 @@ function MobileHero() {
         </p>
 
         {/* CTAs */}
-        <div className="w-full flex flex-col gap-4 mb-10">
+        <div className="w-full flex flex-col gap-4 mb-6">
           <Link
             href="/signup"
             className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
@@ -81,7 +81,7 @@ function MobileHero() {
       </div>
 
       {/* Full-width Hero Image bleeding to edges */}
-      <div className="relative w-full mt-auto flex items-end justify-center z-10">
+      <div className="relative w-full mt-[-80px] flex items-end justify-center z-10">
         <Image
           src="/Gemini_Generated_Image_utyu78utyu78utyu (1).png"
           alt="Father and son learning AI together on a laptop"
