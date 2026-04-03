@@ -67,11 +67,18 @@ export default function Home() {
       <div className="md:hidden">
         <GallerySection />
       </div>
+
+      {/* Interactive Chat Demo — mobile only, shown after gallery */}
+      <div className="md:hidden">
+        <InteractiveChatDemo />
+      </div>
       
       <AIToolsSection />
       
-      {/* Section 3: Interactive Prompting Chat Demo */}
-      <InteractiveChatDemo />
+      {/* Section 3: Interactive Prompting Chat Demo — desktop only */}
+      <div className="hidden md:block">
+        <InteractiveChatDemo />
+      </div>
       
       <SkillsSection />
       <StudentProjects />
