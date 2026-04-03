@@ -81,7 +81,7 @@ function MobileHero() {
       </div>
 
       {/* Full-width Hero Image bleeding to edges */}
-      <div className="relative w-full mt-[-80px] flex items-end justify-center z-10">
+      <div className="relative w-full mt-[-120px] flex items-end justify-center z-10">
         <Image
           src="/Gemini_Generated_Image_utyu78utyu78utyu (1).png"
           alt="Father and son learning AI together on a laptop"
@@ -91,7 +91,8 @@ function MobileHero() {
           priority
           sizes="100vw"
         />
-        {/* Optional subtle gradient to fade the image bottom into the next section if needed */}
+        {/* Connection gradients: Top for text legibility, Bottom for section transition */}
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#020617] via-[#020617]/40 to-transparent pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
       </div>
     </section>
