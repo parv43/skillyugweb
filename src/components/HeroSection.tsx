@@ -73,10 +73,10 @@ function MobileHero() {
       {/* Family scene image */}
       <div className="relative w-full max-w-lg mt-4 px-4">
         <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative"
-          style={{ filter: "contrast(1.1) brightness(0.9)" }}
+          style={{ filter: "contrast(1.1) brightness(1)" }}
         >
           <Image
-            src="/Mother_Son_Image.png"
+            src="/Another_Mother_Son_Image.png"
             alt="Mother and son learning AI together"
             width={600}
             height={450}
@@ -86,7 +86,7 @@ function MobileHero() {
           />
           {/* Bottom gradient fade */}
           <div className="absolute inset-0"
-            style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(2,6,23,0.8) 80%, #020617 100%)" }}
+            style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(2,6,23,0.8) 90%, #020617 100%)" }}
           />
           {/* Purple tint overlay */}
           <div className="absolute inset-0 rounded-3xl"
