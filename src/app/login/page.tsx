@@ -83,8 +83,8 @@ export default function LoginPage() {
         <div className="w-full max-w-[480px]">
           {/* Brand Anchor */}
           <div className="flex justify-center mb-12">
-            <Link href="/">
-              <span className="font-black text-[#f9f5f8] tracking-tighter text-4xl cursor-pointer">Skillyug</span>
+            <Link href="/" className="hover:scale-105 transition-transform duration-300">
+              <img src="/skillyug.png" alt="Skillyug Logo" className="h-36 md:h-56 w-auto object-contain" />
             </Link>
           </div>
 
