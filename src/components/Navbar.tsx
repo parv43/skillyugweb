@@ -72,11 +72,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
         
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group" aria-label="Skillyug Home">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] transition-all">
-            <span className="text-white font-black text-xs">SY</span>
-          </div>
-          <span className="text-xl font-black text-white tracking-widest hidden sm:block">SKILLYUG</span>
+        <Link href="/" className="flex items-center group bg-gradient-to-r from-black/80 via-black/40 to-transparent p-2 pr-4 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all hover:bg-black/60" aria-label="Skillyug Home">
+          <img src="/skillyug.png" alt="Skillyug Logo" className="h-8 md:h-10 object-contain" />
         </Link>
 
         {/* Desktop Navigation */}

@@ -96,8 +96,8 @@ export default function Home() {
       <ContactUs />
       
       <footer className="relative z-10 w-full bg-[#020617] border-t border-slate-900/80 py-12 flex flex-col items-center">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center opacity-70 mb-4 cyber-glow">
-          <span className="text-white font-black text-xs">SY</span>
+        <div className="bg-gradient-to-r from-black/80 via-black/40 to-transparent p-3 pr-5 rounded-2xl mb-8 shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-md border border-white/5 opacity-80 hover:opacity-100 transition-opacity">
+          <img src="/skillyug.png" alt="Skillyug Logo" className="h-10 md:h-12 object-contain" />
         </div>
         
         <nav className="mb-6">
