@@ -95,9 +95,9 @@ export default function Home() {
       
       <ContactUs />
       
-      <footer className="relative z-10 w-full bg-[#020617] border-t border-slate-900/80 py-16 flex flex-col items-center">
-        <div className="bg-gradient-to-r from-black/40 via-black/20 to-transparent p-4 pr-8 rounded-3xl mb-10 shadow-2xl backdrop-blur-md border border-white/5 overflow-hidden group">
-          <img src="/skillyug.png" alt="Skillyug Logo" className="h-16 md:h-20 object-contain scale-110 transition-transform group-hover:scale-125 duration-500" />
+      <footer className="relative z-10 w-full bg-[#020617] border-t border-slate-900/80 py-20 flex flex-col items-center">
+        <div className="bg-black/40 p-2 px-6 rounded-3xl mb-12 shadow-2xl backdrop-blur-xl border border-white/10 overflow-hidden group">
+          <img src="/skillyug.png" alt="Skillyug Logo" className="h-14 md:h-18 object-contain scale-[2.8] transition-transform group-hover:scale-[3.2] duration-500 transform-gpu" />
         </div>
         
         <nav className="mb-6">
