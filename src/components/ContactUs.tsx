@@ -1,9 +1,59 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Mail, Phone } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function ContactUs() {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    role: "Select Option",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMsg("");
+    setSuccess(false);
+
+    if (formData.name.trim() === "" || formData.phone.trim() === "" || formData.message.trim() === "") {
+      setErrorMsg("Please fill in all required fields.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Insert into Supabase table "contact_messages"
+    const { error } = await supabase
+      .from('contact_messages')
+      .insert([
+        { 
+          name: formData.name, 
+          phone: formData.phone, 
+          role: formData.role === "Select Option" ? "Not Specified" : formData.role, 
+          message: formData.message 
+        }
+      ]);
+
+    if (error) {
+      console.error("Error submitting contact form:", error);
+      setErrorMsg("Failed to send message. Please try again later.");
+    } else {
+      setSuccess(true);
+      setFormData({ name: "", phone: "", role: "Select Option", message: "" });
+    }
+    
+    setIsSubmitting(false);
+  };
+
   return (
     <section className="relative w-full py-24 bg-[#020617] overflow-hidden flex justify-center border-t border-slate-900 z-10" id="contact">
       {/* Background Glows */}
@@ -32,12 +82,26 @@ export default function ContactUs() {
               {/* Internal subtle glow */}
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
 
-              <form className="space-y-6 relative z-10">
+              <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                {success && (
+                  <div className="p-4 bg-green-500/20 border border-green-500/30 rounded-xl text-green-300 text-sm font-bold text-center">
+                    Message sent successfully! We will get back to you soon.
+                  </div>
+                )}
+                {errorMsg && (
+                  <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-300 text-sm font-bold text-center">
+                    {errorMsg}
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Student Name</label>
                     <input 
                       type="text" 
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
                       className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 placeholder:text-slate-600" 
                       placeholder="Full name" 
                       required
@@ -47,6 +111,9 @@ export default function ContactUs() {
                     <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Phone Number</label>
                     <input 
                       type="tel" 
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
                       className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 placeholder:text-slate-600" 
                       placeholder="+91 000-0000" 
                       required
@@ -56,20 +123,28 @@ export default function ContactUs() {
 
                 <div className="space-y-2">
                   <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Role / Grade</label>
-                  <select className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 appearance-none">
-                    <option className="bg-[#0f172a]">Select Option</option>
-                    <option className="bg-[#0f172a]">Grade 6-8</option>
-                    <option className="bg-[#0f172a]">Grade 9-10</option>
-                    <option className="bg-[#0f172a]">Grade 11-12</option>
-                    <option className="bg-[#0f172a]">Undergraduate</option>
-                    <option className="bg-[#0f172a]">Parent</option>
-                    <option className="bg-[#0f172a]">School Administrator</option>
+                  <select 
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 appearance-none"
+                  >
+                    <option value="Select Option" className="bg-[#0f172a]">Select Option</option>
+                    <option value="Grade 6-8" className="bg-[#0f172a]">Grade 6-8</option>
+                    <option value="Grade 9-10" className="bg-[#0f172a]">Grade 9-10</option>
+                    <option value="Grade 11-12" className="bg-[#0f172a]">Grade 11-12</option>
+                    <option value="Undergraduate" className="bg-[#0f172a]">Undergraduate</option>
+                    <option value="Parent" className="bg-[#0f172a]">Parent</option>
+                    <option value="School Administrator" className="bg-[#0f172a]">School Administrator</option>
                   </select>
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Message</label>
                   <textarea 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
                     className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 placeholder:text-slate-600 resize-none" 
                     placeholder="How can we help you?" 
                     rows={4}
@@ -79,9 +154,10 @@ export default function ContactUs() {
 
                 <button 
                   type="submit" 
-                  className="w-full glow-button bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-full font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_0_20px_rgba(59,130,246,0.3)] mt-2"
+                  disabled={isSubmitting}
+                  className="w-full glow-button bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-full font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_0_20px_rgba(59,130,246,0.3)] mt-2 disabled:opacity-50"
                 >
-                  Send Message
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </div>
