@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { supabase } from "@/lib/supabaseClient"
 
 // The tool cards orbiting the central badge
 const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
@@ -41,6 +42,17 @@ import Image from "next/image"
 
 // ─── Mobile-Only Hero ───────────────────────────────────────────────────────
 function MobileHero() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setIsLoggedIn(!!session)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
   return (
     <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-[#020617] overflow-hidden">
       {/* Subtle Background Glows matching the screenshot */}
@@ -62,7 +74,7 @@ function MobileHero() {
         {/* CTAs */}
         <div className="w-full flex flex-col gap-4 mb-6">
           <Link
-            href="/signup"
+            href={isLoggedIn ? "/book-slot" : "/signup"}
             className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
             style={{ 
               background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
@@ -101,8 +113,18 @@ function MobileHero() {
 
 // ─── Main Export ─────────────────────────────────────────────────────────────
 export default function HeroSection() {
-  // Dynamic orbit radius for mobile responsiveness
   const [orbitRadius, setOrbitRadius] = useState(230)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setIsLoggedIn(!!session)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     const updateRadius = () => {
@@ -173,7 +195,7 @@ export default function HeroSection() {
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
               <Link 
-                href="/signup"
+                href={isLoggedIn ? "/book-slot" : "/signup"}
                 className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
               >
                 Join the Bootcamp
