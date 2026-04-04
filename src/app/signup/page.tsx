@@ -92,8 +92,8 @@ export default function SignUpPage() {
     return (
       <div className="bg-[#0e0e10] text-[#f9f5f8] min-h-screen selection:bg-[#a4a6ff]/30 flex flex-col overflow-x-hidden font-sans">
         <header className="fixed top-0 w-full z-50 bg-[#0e0e10]/80 backdrop-blur-3xl flex justify-between items-center px-6 md:px-12 h-24">
-          <Link href="/">
-            <div className="text-4xl font-black text-[#f9f5f8] tracking-tighter cursor-pointer">Skillyug</div>
+          <Link href="/" className="hover:scale-105 transition-transform duration-300">
+            <img src="/skillyug.png" alt="Skillyug Logo" className="h-16 md:h-20 w-auto object-contain" />
           </Link>
         </header>
 
@@ -173,8 +173,8 @@ export default function SignUpPage() {
   return (
     <div className="bg-[#0e0e10] text-[#f9f5f8] min-h-screen selection:bg-[#a4a6ff]/30 flex flex-col overflow-x-hidden font-sans">
       <header className="fixed top-0 w-full z-50 bg-[#0e0e10]/80 backdrop-blur-3xl flex justify-between items-center px-6 md:px-12 h-24">
-        <Link href="/">
-          <div className="text-4xl font-black text-[#f9f5f8] tracking-tighter cursor-pointer">Skillyug</div>
+        <Link href="/" className="hover:scale-105 transition-transform duration-300">
+          <img src="/skillyug.png" alt="Skillyug Logo" className="h-16 md:h-20 w-auto object-contain" />
         </Link>
       </header>
 
