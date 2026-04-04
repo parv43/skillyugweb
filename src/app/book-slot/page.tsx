@@ -41,6 +41,7 @@ export default function BookSlotPage() {
     const formData = new FormData(form);
     const phoneNumber = formData.get("phoneNumber") as string;
     const studentName = formData.get("studentName") as string;
+    const gradeValue = formData.get("grade") as string;
 
     // Strict 10 digit validation
     if (phoneNumber.length !== 10) {
@@ -58,10 +59,14 @@ export default function BookSlotPage() {
       const result = await response.json();
       
       if (result.result === "success") {
-        // Save to Supabase slot_bookings table (name + phone)
+        // Save to Supabase slot_bookings table (name + phone + grade)
         const { error: supabaseError } = await supabase
           .from("slot_bookings")
-          .insert({ name: studentName, phone: phoneNumber });
+          .insert({ 
+            name: studentName, 
+            phone: phoneNumber,
+            "grade\\class": gradeValue 
+          });
 
         if (supabaseError) {
           console.warn("Supabase insert warning:", supabaseError.message);

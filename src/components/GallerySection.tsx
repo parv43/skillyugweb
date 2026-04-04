@@ -26,7 +26,7 @@ const galleryItems = [
     story: "An incredible face-to-face interaction with SUGAR Cosmetics Founder & Shark Tank India Judge Mrs. Vineeta Singh, absorbing her dynamic entrepreneurial spirit."
   },
   {
-    src: "/WhatsApp Image 2026-04-02 at 6.58.22 PM.jpeg",
+    src: "/1765300217060.jpeg",
     title: "The Skillyug Team",
     story: "The driving force behind the mission. A dedicated team of technologists and educators completely united by a passion to democratize AI learning."
   }

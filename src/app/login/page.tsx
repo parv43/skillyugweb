@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { supabase } from "@/lib/supabaseClient";
+import { validateEmail } from "@/lib/emailValidation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,11 +14,25 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [emailSuggestion, setEmailSuggestion] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMsg("");
+    setEmailSuggestion("");
+
+    // Strict Email Validation
+    const validation = validateEmail(email);
+    if (validation.error) {
+      setErrorMsg(validation.error);
+      if (validation.suggestion) {
+        setEmailSuggestion(validation.suggestion);
+      }
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -34,6 +49,15 @@ export default function LoginPage() {
       setLoading(false);
     } else {
       router.push("/book-slot");
+    }
+  };
+
+  const handleEmailBlur = () => {
+    const validation = validateEmail(email);
+    if (validation.suggestion) {
+      setEmailSuggestion(validation.suggestion);
+    } else {
+      setEmailSuggestion("");
     }
   };
 
@@ -88,10 +112,30 @@ export default function LoginPage() {
                     className="w-full bg-[#262528]/30 border-none rounded-lg py-4 px-5 text-[#f9f5f8] placeholder:text-[#adaaad]/40 focus:ring-1 focus:ring-[#a4a6ff] transition-all duration-300 outline-none" 
                     placeholder="name@gmail.com"
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={e => {
+                      setEmail(e.target.value);
+                      if (emailSuggestion) setEmailSuggestion("");
+                    }}
+                    onBlur={handleEmailBlur}
                     required
                   />
                 </div>
+                {emailSuggestion && (
+                  <div className="mt-2 text-sm text-[#ac8aff] flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                    <span>💡 Did you mean </span>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const [name] = email.split("@");
+                        setEmail(`${name}@${emailSuggestion}`);
+                        setEmailSuggestion("");
+                      }}
+                      className="font-bold underline hover:text-[#f9f5f8] transition-colors"
+                    >
+                      {emailSuggestion}?
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Password Input */}
@@ -128,6 +172,30 @@ export default function LoginPage() {
                   {loading ? "Logging in..." : "Login"}
                 </button>
               </div>
+
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-[#48474a]/50"></div>
+                <span className="flex-shrink-0 mx-4 text-[#adaaad] text-xs font-semibold uppercase tracking-wider">Or</span>
+                <div className="flex-grow border-t border-[#48474a]/50"></div>
+              </div>
+              
+              <button
+                type="button"
+                onClick={async () => {
+                  setErrorMsg("");
+                  const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                      redirectTo: `${window.location.origin}/auth/callback`,
+                    },
+                  });
+                  if (error) setErrorMsg(error.message);
+                }}
+                className="w-full bg-[#262528]/50 hover:bg-[#262528] border border-[#48474a]/25 text-[#f9f5f8] font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3"
+              >
+                <img src="/Google.png" alt="Google" className="w-5 h-5" />
+                Continue with Google
+              </button>
             </form>
 
             <footer className="mt-10 text-center relative z-10">

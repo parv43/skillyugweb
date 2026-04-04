@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { supabase } from "@/lib/supabaseClient";
+import { validateEmail } from "@/lib/emailValidation";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -14,13 +15,26 @@ export default function SignUpPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [emailSuggestion, setEmailSuggestion] = useState("");
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMsg("");
+    setEmailSuggestion("");
+
+    // Strict Email Validation
+    const validation = validateEmail(email);
+    if (validation.error) {
+      setErrorMsg(validation.error);
+      if (validation.suggestion) {
+        setEmailSuggestion(validation.suggestion);
+      }
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -38,30 +52,20 @@ export default function SignUpPage() {
       setErrorMsg(error.message);
       setLoading(false);
     } else {
-      // Show the "check your email" screen
-      setEmailSent(true);
-      setLoading(false);
+      // Since email confirmation is disabled, user is logged in immediately
+      router.push("/book-slot");
     }
   };
 
-  // Email verification sent screen
-  if (emailSent) {
-    return (
-      <div className="bg-[#0e0e10] text-[#f9f5f8] min-h-screen flex flex-col items-center justify-center px-6 font-sans">
-        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-[#ac8aff]/10 blur-[120px] rounded-full pointer-events-none"></div>
-        <div className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] bg-[#a4a6ff]/10 blur-[120px] rounded-full pointer-events-none"></div>
-        <div className="bg-[#262528]/40 backdrop-blur-3xl border-t border-l border-[#48474a]/25 p-10 md:p-14 rounded-[2rem] shadow-2xl relative z-10 max-w-lg w-full text-center space-y-6">
-          <div className="text-6xl">📬</div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#f9f5f8]">Check your Mailbox!</h1>
-          <p className="text-[#adaaad] text-lg leading-relaxed">
-            We sent a verification link to <span className="text-[#a4a6ff] font-bold">{email}</span>.
-            Click it to activate your account and access Skillyug.
-          </p>
-          <p className="text-[#767577] text-sm">Didn't receive it? Check your spam folder.</p>
-        </div>
-      </div>
-    );
-  }
+  const handleEmailBlur = () => {
+    const validation = validateEmail(email);
+    if (validation.suggestion) {
+      setEmailSuggestion(validation.suggestion);
+    } else {
+      setEmailSuggestion("");
+    }
+  };
+
 
   return (
     <div className="bg-[#0e0e10] text-[#f9f5f8] min-h-screen selection:bg-[#a4a6ff]/30 flex flex-col overflow-x-hidden font-sans">
@@ -135,10 +139,30 @@ export default function SignUpPage() {
                       className="w-full bg-[#262528]/30 border-none rounded-xl py-4 px-4 text-[#f9f5f8] placeholder:text-[#767577] focus:ring-2 focus:ring-[#a4a6ff] transition-all outline-none"
                       placeholder="name@gmail.com"
                       value={email}
-                      onChange={e => setEmail(e.target.value)}
+                      onChange={e => {
+                        setEmail(e.target.value);
+                        if (emailSuggestion) setEmailSuggestion("");
+                      }}
+                      onBlur={handleEmailBlur}
                       required
                     />
                   </div>
+                  {emailSuggestion && (
+                    <div className="mt-2 text-sm text-[#ac8aff] flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                      <span>💡 Did you mean </span>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const [name] = email.split("@");
+                          setEmail(`${name}@${emailSuggestion}`);
+                          setEmailSuggestion("");
+                        }}
+                        className="font-bold underline hover:text-[#f9f5f8] transition-colors"
+                      >
+                        {emailSuggestion}?
+                      </button>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Phone Number Field */}
@@ -195,6 +219,30 @@ export default function SignUpPage() {
                   {loading ? "Creating account..." : "Sign Up"}
                 </button>
               </form>
+
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-[#48474a]/50"></div>
+                <span className="flex-shrink-0 mx-4 text-[#adaaad] text-xs font-semibold uppercase tracking-wider">Or</span>
+                <div className="flex-grow border-t border-[#48474a]/50"></div>
+              </div>
+              
+              <button
+                type="button"
+                onClick={async () => {
+                  setErrorMsg("");
+                  const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                      redirectTo: `${window.location.origin}/auth/callback`,
+                    },
+                  });
+                  if (error) setErrorMsg(error.message);
+                }}
+                className="w-full bg-[#262528]/50 hover:bg-[#262528] border border-[#48474a]/25 text-[#f9f5f8] font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3"
+              >
+                <img src="/Google.png" alt="Google" className="w-5 h-5" />
+                Continue with Google
+              </button>
               
               {/* Footer Link */}
               <div className="pt-4 text-center">

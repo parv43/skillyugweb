@@ -106,7 +106,7 @@ export default function SkillsSection() {
 
       {/* ── Mobile Layout (< md): compact icon-row cards ── */}
       <div className="flex flex-col gap-3 px-4 max-w-lg mx-auto w-full z-10 relative md:hidden">
-        {tools.map((tool, idx) => {
+        {tools.filter(t => t.title !== "AI Study Assistant" && t.title !== "AI Research Tools").map((tool, idx) => {
           const Icon = tool.icon
           const colors = ["blue", "purple", "pink", "indigo", "cyan", "violet", "sky", "fuchsia", "teal"]
           const color = colors[idx % colors.length]
