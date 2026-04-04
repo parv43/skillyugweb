@@ -1,10 +1,26 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { supabase } from "@/lib/supabaseClient"
 
 export default function CTASection() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setIsLoggedIn(!!session)
+    }
+    checkSession()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
   return (
     <section className="relative w-full py-40 bg-[#020617] flex items-center justify-center overflow-hidden border-t-2 border-slate-800">
       {/* Deep glow circle (optimized) */}
@@ -16,7 +32,6 @@ export default function CTASection() {
         className="relative z-10 glass-panel max-w-5xl mx-auto px-8 py-20 rounded-[3rem] shadow-[0_0_30px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col items-center text-center w-11/12"
         initial={{ scale: 0.9, y: 50 }}
         whileInView={{ scale: 1, y: 0 }}
-        
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         {/* Subtle wireframe background inside standard glass panel */}
@@ -39,7 +54,10 @@ export default function CTASection() {
 
           {/* Dual Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10 w-full">
-            <Link href="/signup" className="glow-button px-10 py-5 rounded-full text-white font-bold text-xl tracking-wide shadow-2xl hover:scale-[1.03] transition-transform w-full sm:w-auto text-center border border-blue-400/50 inline-block">
+            <Link
+              href={isLoggedIn ? "/book-slot" : "/signup"}
+              className="glow-button px-10 py-5 rounded-full text-white font-bold text-xl tracking-wide shadow-2xl hover:scale-[1.03] transition-transform w-full sm:w-auto text-center border border-blue-400/50 inline-block"
+            >
               Join the Bootcamp
             </Link>
             <button className="glass-panel px-10 py-5 rounded-full text-white font-bold text-xl tracking-wide hover:bg-white/5 transition-colors w-full sm:w-auto border border-white/20 text-center">
