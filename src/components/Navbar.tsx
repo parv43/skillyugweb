@@ -72,8 +72,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
         
         {/* Logo */}
-        <Link href="/" className="flex items-center group bg-gradient-to-r from-black/80 via-black/40 to-transparent p-2 pr-4 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.3)] backdrop-blur-md transition-all hover:bg-black/60" aria-label="Skillyug Home">
-          <img src="/skillyug.png" alt="Skillyug Logo" className="h-8 md:h-10 object-contain" />
+        <Link href="/" className="flex items-center group bg-gradient-to-r from-black/20 via-black/10 to-transparent p-1.5 pr-3 rounded-xl border border-white/5 shadow-2xl backdrop-blur-md transition-all hover:bg-black/30 overflow-hidden" aria-label="Skillyug Home">
+          <img src="/skillyug.png" alt="Skillyug Logo" className="h-10 md:h-14 object-contain scale-110 transform-gpu" />
         </Link>
 
         {/* Desktop Navigation */}
