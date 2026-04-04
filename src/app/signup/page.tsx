@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { supabase } from "@/lib/supabaseClient";
+import { validateEmail } from "@/lib/emailValidation";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -15,11 +16,25 @@ export default function SignUpPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [emailSuggestion, setEmailSuggestion] = useState("");
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMsg("");
+    setEmailSuggestion("");
+
+    // Strict Email Validation
+    const validation = validateEmail(email);
+    if (validation.error) {
+      setErrorMsg(validation.error);
+      if (validation.suggestion) {
+        setEmailSuggestion(validation.suggestion);
+      }
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -39,6 +54,15 @@ export default function SignUpPage() {
     } else {
       // Since email confirmation is disabled, user is logged in immediately
       router.push("/book-slot");
+    }
+  };
+
+  const handleEmailBlur = () => {
+    const validation = validateEmail(email);
+    if (validation.suggestion) {
+      setEmailSuggestion(validation.suggestion);
+    } else {
+      setEmailSuggestion("");
     }
   };
 
@@ -115,10 +139,30 @@ export default function SignUpPage() {
                       className="w-full bg-[#262528]/30 border-none rounded-xl py-4 px-4 text-[#f9f5f8] placeholder:text-[#767577] focus:ring-2 focus:ring-[#a4a6ff] transition-all outline-none"
                       placeholder="name@gmail.com"
                       value={email}
-                      onChange={e => setEmail(e.target.value)}
+                      onChange={e => {
+                        setEmail(e.target.value);
+                        if (emailSuggestion) setEmailSuggestion("");
+                      }}
+                      onBlur={handleEmailBlur}
                       required
                     />
                   </div>
+                  {emailSuggestion && (
+                    <div className="mt-2 text-sm text-[#ac8aff] flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                      <span>💡 Did you mean </span>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const [name] = email.split("@");
+                          setEmail(`${name}@${emailSuggestion}`);
+                          setEmailSuggestion("");
+                        }}
+                        className="font-bold underline hover:text-[#f9f5f8] transition-colors"
+                      >
+                        {emailSuggestion}?
+                      </button>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Phone Number Field */}
