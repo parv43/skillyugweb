@@ -44,12 +44,17 @@ export const COMMON_TYPOS: Record<string, string> = {
   "hotmal.com": "hotmail.com",
 };
 
+export interface ValidationResult {
+  error?: string;
+  suggestion?: string;
+}
+
 /**
  * Validates an email address and suggests corrections.
  * @param email The email address to validate.
- * @returns { error?: string, suggestion?: string }
+ * @returns {ValidationResult}
  */
-export function validateEmail(email: string) {
+export function validateEmail(email: string): ValidationResult {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return { error: "Please enter a valid email address." };
