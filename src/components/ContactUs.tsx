@@ -55,7 +55,7 @@ export default function ContactUs() {
   };
 
   return (
-    <section className="relative w-full py-24 bg-[#020617] overflow-hidden flex justify-center border-t border-slate-900 z-10" id="contact">
+    <section className="relative w-full pt-24 pb-8 bg-[#020617] overflow-hidden flex justify-center border-t border-slate-900 z-10" id="contact">
       {/* Background Glows */}
       <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-blue-900/20 blur-[120px] rounded-full pointer-events-none"></div>
       <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-purple-900/20 blur-[120px] rounded-full pointer-events-none"></div>

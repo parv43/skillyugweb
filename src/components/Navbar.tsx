@@ -65,18 +65,15 @@ export default function Navbar() {
     <header 
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? "bg-[rgba(5,10,30,0.85)] backdrop-blur-[10px] border-b border-white/5 py-4 shadow-lg" 
+          ? "bg-black/5 backdrop-blur-md border-b border-white/5 py-4 shadow-lg" 
           : "bg-transparent py-6"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
         
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group" aria-label="Skillyug Home">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] transition-all">
-            <span className="text-white font-black text-xs">SY</span>
-          </div>
-          <span className="text-xl font-black text-white tracking-widest hidden sm:block">SKILLYUG</span>
+        <Link href="/" className="flex items-center group transition-all" aria-label="Skillyug Home">
+          <img src="/skillyug.png" alt="Skillyug Logo" className="h-14 md:h-20 object-contain scale-[1.8] transform-gpu hover:scale-[1.9] transition-transform duration-300" />
         </Link>
 
         {/* Desktop Navigation */}
