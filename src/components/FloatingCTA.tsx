@@ -70,7 +70,7 @@ export default function FloatingCTA() {
       } ${isOverlapping ? "scale-[0.8]" : "scale-100"}`}
     >
       <Link
-        href="/signup"
+        href="/book-demo"
         className={`group relative flex items-center transition-all duration-500 bg-[#0f172a] border border-blue-500/30 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:border-blue-400 hover:shadow-[0_0_25px_rgba(59,130,246,0.3)] hover:-translate-y-1 ${
           isOverlapping ? "px-4 py-3 gap-2" : "px-6 py-3.5 gap-3"
         }`}

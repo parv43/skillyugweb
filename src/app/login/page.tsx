@@ -45,7 +45,7 @@ export default function LoginPage() {
         error.message.toLowerCase().includes("invalid login credentials")
       ) {
         setErrorMsg(
-          "Please verify your email first. Check your inbox for a verification link from Skillyug."
+          "Please verify your email first. Check your Mail inbox for a verification link from Skillyug."
         );
       } else {
         setErrorMsg(error.message);
