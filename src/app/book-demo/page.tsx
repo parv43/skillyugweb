@@ -12,6 +12,7 @@ export default function BookDemoPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [prefilledName, setPrefilledName] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -19,10 +20,11 @@ export default function BookDemoPage() {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        router.push("/login");
+        router.push("/login?redirect=/book-demo");
         return;
       }
       setUserId(session.user.id);
+      setUserEmail(session.user.email ?? null);
       const fullName = session.user?.user_metadata?.full_name || "";
       if (fullName) setPrefilledName(fullName);
     };
@@ -54,6 +56,7 @@ export default function BookDemoPage() {
         .insert({
           user_id: userId,
           name: studentName,
+          email: userEmail,
           phone: phoneNumber,
           preferred_time: gradeValue,
         });

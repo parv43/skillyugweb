@@ -17,8 +17,7 @@ export default function BookSlotPage() {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        // Redirct to login if hitting this route without auth
-        router.push("/login");
+        router.push("/login?redirect=/book-slot");
         return;
       }
       // Pickup user's name metadata
