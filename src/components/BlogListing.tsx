@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BlogPost } from "@/lib/blogData";
 import { motion, AnimatePresence } from "framer-motion";
 import AnonymousReactionBar from "@/components/AnonymousReactionBar";
+import ShareButton from "@/components/ShareButton";
 
 interface BlogListingProps {
   categories: string[];
@@ -82,8 +83,9 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
                     {blog.shortDescription}
                   </p>
                   <div className="mt-auto pt-4 border-t border-white/5">
-                    <div className="mb-4" onClick={(e) => e.preventDefault()}>
+                    <div className="mb-4 flex flex-wrap items-center gap-2" onClick={(e) => e.preventDefault()}>
                       <AnonymousReactionBar itemId={blog.slug} initialCounts={reactionCounts[blog.slug] || {}} />
+                      <ShareButton url={`/blog/${blog.slug}`} title={blog.title} />
                     </div>
                     <div className="flex items-center text-sm font-bold text-slate-300 group-hover:text-white transition-colors">
                       Read More 

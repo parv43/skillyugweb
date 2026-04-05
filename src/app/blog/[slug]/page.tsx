@@ -5,6 +5,7 @@ import { blogs } from "@/lib/blogData";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import AnonymousReactionBar from "@/components/AnonymousReactionBar";
+import ShareButton from "@/components/ShareButton";
 import { getReactionCounts } from "@/app/actions/reactions";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -196,7 +197,10 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           {/* Reaction Bar */}
           <div className="mt-12 mb-8 py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-lg font-bold text-slate-200">What did you think of this article?</div>
-            <AnonymousReactionBar itemId={slug} initialCounts={initialCounts} />
+            <div className="flex flex-wrap items-center gap-3">
+              <AnonymousReactionBar itemId={slug} initialCounts={initialCounts} />
+              <ShareButton url={`/blog/${slug}`} title={blog.title} />
+            </div>
           </div>
           
           {/* Related Articles */}
