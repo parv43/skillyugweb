@@ -152,7 +152,7 @@ export default function BookDemoPage() {
 
         {/* Header */}
         <header className="w-full top-0 sticky z-[100] bg-[#0b0a0f] flex justify-between items-center px-6 py-4">
-          <div className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#d1c4ff] to-[#7c9aff] font-headline tracking-tight text-3xl">Skillyug</div>
+          <img src="/skillyug.png" alt="Skillyug Logo" className="h-20 md:h-24 w-auto object-contain scale-[1.8] md:scale-[2.0]" />
         </header>
 
         <main className="flex-grow flex items-center justify-center px-6 py-12 md:py-24 relative z-10">

@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import { blogs } from "@/lib/blogData";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import AnonymousReactionBar from "@/components/AnonymousReactionBar";
+import { getReactionCounts } from "@/app/actions/reactions";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -48,6 +50,8 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
   if (!blog) {
     notFound();
   }
+
+  const initialCounts = await getReactionCounts(slug);
 
   // Find related blogs (same category, different slug)
   const relatedBlogs = blogs
@@ -187,6 +191,12 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           </h2>
           <div className="mb-12 leading-relaxed whitespace-pre-wrap text-slate-300">
             {blog.content.conclusion}
+          </div>
+
+          {/* Reaction Bar */}
+          <div className="mt-12 mb-8 py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-lg font-bold text-slate-200">What did you think of this article?</div>
+            <AnonymousReactionBar itemId={slug} initialCounts={initialCounts} />
           </div>
           
           {/* Related Articles */}

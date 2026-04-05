@@ -95,13 +95,14 @@ function MobileHero() {
       {/* Full-width Hero Image bleeding to edges */}
       <div className="relative w-full mt-[-120px] flex items-end justify-center z-10">
         <Image
-          src="/Gemini_Generated_Image_utyu78utyu78utyu (1).png"
+          src="/hero-mobile-optimized.webp"
           alt="Father and son learning AI together on a laptop"
           width={800}
-          height={800}
+          height={1376}
           className="w-full h-auto object-cover object-top"
           priority
           sizes="100vw"
+          quality={85}
         />
         {/* Connection gradients: Top for text legibility, Bottom for section transition */}
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#020617] via-[#020617]/40 to-transparent pointer-events-none" />

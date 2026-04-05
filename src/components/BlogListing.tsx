@@ -1,16 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BlogPost } from "@/lib/blogData";
 import { motion, AnimatePresence } from "framer-motion";
+import AnonymousReactionBar from "@/components/AnonymousReactionBar";
 
 interface BlogListingProps {
   categories: string[];
   blogs: BlogPost[];
+  reactionCounts?: Record<string, Record<string, number>>;
 }
 
-export default function BlogListing({ categories, blogs }: BlogListingProps) {
+export default function BlogListing({ categories, blogs, reactionCounts = {} }: BlogListingProps) {
   const [activeCategory, setActiveCategory] = useState("All");
 
   const filteredBlogs = activeCategory === "All"
@@ -79,11 +81,16 @@ export default function BlogListing({ categories, blogs }: BlogListingProps) {
                   <p className="text-slate-400 text-sm mb-6 leading-relaxed flex-grow line-clamp-3">
                     {blog.shortDescription}
                   </p>
-                  <div className="mt-auto pt-4 border-t border-white/5 flex items-center text-sm font-bold text-slate-300 group-hover:text-white transition-colors">
-                    Read More 
-                    <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
+                  <div className="mt-auto pt-4 border-t border-white/5">
+                    <div className="mb-4" onClick={(e) => e.preventDefault()}>
+                      <AnonymousReactionBar itemId={blog.slug} initialCounts={reactionCounts[blog.slug] || {}} />
+                    </div>
+                    <div className="flex items-center text-sm font-bold text-slate-300 group-hover:text-white transition-colors">
+                      Read More 
+                      <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </Link>

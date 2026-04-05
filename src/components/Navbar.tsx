@@ -11,16 +11,28 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [session, setSession] = useState<any>(null)
   const pathname = usePathname()
+  const rafRef = React.useRef<number | null>(null)
+  const lastScrollY = React.useRef(0)
 
   useEffect(() => {
+    // ✅ Use requestAnimationFrame for optimal performance (syncs with 60fps)
     const handleScroll = () => {
-      setScrolled(window.scrollY > 60)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      
+      rafRef.current = requestAnimationFrame(() => {
+        const isScrolled = window.scrollY > 60
+        // Only update state if value actually changed (prevent unnecessary re-renders)
+        if (isScrolled !== scrolled) {
+          setScrolled(isScrolled)
+        }
+        lastScrollY.current = window.scrollY
+      })
     }
     
     window.addEventListener("scroll", handleScroll, { passive: true })
     handleScroll() // Initial check
 
-    // Check user session
+    // Check user session - happens ONCE on mount, not on every scroll
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
@@ -28,14 +40,15 @@ export default function Navbar() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
+      setSession(session) // Only called when auth state actually changes
     })
     
     return () => {
       window.removeEventListener("scroll", handleScroll)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
       subscription.unsubscribe()
     }
-  }, [])
+  }, [scrolled])
 
   // Close mobile menu and handle smooth scroll for hash links
   const handleNavClick = (e: React.MouseEvent, href: string) => {
