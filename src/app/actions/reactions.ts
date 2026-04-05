@@ -3,10 +3,13 @@
 import { createClient } from "@supabase/supabase-js";
 
 // Make sure to set SUPABASE_SERVICE_ROLE_KEY in your environment variables
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
+// Create admin client only if keys are available
+const supabaseAdmin = supabaseUrl && supabaseServiceRoleKey 
+  ? createClient(supabaseUrl, supabaseServiceRoleKey)
+  : null;
 
 export async function toggleAnonymousReaction(
   itemId: string,
@@ -15,6 +18,12 @@ export async function toggleAnonymousReaction(
 ) {
   if (!itemId || !reactionType || !guestId) {
     throw new Error("Missing required parameters: itemId, reactionType, and guestId are required.");
+  }
+
+  // Gracefully handle missing Supabase configuration (e.g., during build)
+  if (!supabaseAdmin) {
+    console.warn("Supabase not configured - reactions unavailable");
+    return { action: "skipped", reason: "Supabase not available" };
   }
 
   // Check if a reaction exists for that exact guest_id, item_id, and type.
@@ -65,6 +74,12 @@ export async function toggleAnonymousReaction(
 
 export async function getReactionCounts(itemId: string): Promise<Record<string, number>> {
   if (!itemId) return {};
+
+  // Gracefully handle missing Supabase configuration (e.g., during build)
+  if (!supabaseAdmin) {
+    console.warn("Supabase not configured - returning empty reaction counts");
+    return {};
+  }
 
   const { data, error } = await supabaseAdmin
     .from("anonymous_reactions")
