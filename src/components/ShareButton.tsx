@@ -9,33 +9,57 @@ interface ShareButtonProps {
 
 export default function ShareButton({ url, title }: ShareButtonProps) {
   const [showCopyNotification, setShowCopyNotification] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+
+  const copyToClipboard = async (shareUrl: string) => {
+    await navigator.clipboard.writeText(shareUrl);
+    setShowCopyNotification(true);
+    setTimeout(() => setShowCopyNotification(false), 2000);
+  };
 
   const handleShare = async () => {
+    if (isSharing) return;
+
     const shareUrl = typeof window !== "undefined" ? `${window.location.origin}${url}` : url;
     const shareText = `Check out this article: ${title}`;
+    setIsSharing(true);
 
-    // Try using Web Share API if available
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: title,
-          text: shareText,
-          url: shareUrl,
-        });
-      } catch (err) {
-        if ((err as Error).name !== "AbortError") {
+    try {
+      // Try using Web Share API if available, then fall back to clipboard.
+      if (typeof navigator !== "undefined" && navigator.share) {
+        try {
+          await navigator.share({
+            title: title,
+            text: shareText,
+            url: shareUrl,
+          });
+        } catch (err) {
+          const errorName = (err as Error).name;
+          if (errorName === "AbortError") {
+            return;
+          }
+
+          if (errorName === "InvalidStateError" || errorName === "NotAllowedError") {
+            try {
+              await copyToClipboard(shareUrl);
+              return;
+            } catch (copyErr) {
+              console.error("Failed to copy to clipboard:", copyErr);
+              return;
+            }
+          }
+
           console.error("Error sharing:", err);
         }
+      } else {
+        try {
+          await copyToClipboard(shareUrl);
+        } catch (err) {
+          console.error("Failed to copy to clipboard:", err);
+        }
       }
-    } else {
-      // Fallback: Copy to clipboard
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        setShowCopyNotification(true);
-        setTimeout(() => setShowCopyNotification(false), 2000);
-      } catch (err) {
-        console.error("Failed to copy to clipboard:", err);
-      }
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -43,6 +67,7 @@ export default function ShareButton({ url, title }: ShareButtonProps) {
     <div className="relative">
       <button
         onClick={handleShare}
+        disabled={isSharing}
         className="flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium transition-all duration-300 border bg-[rgba(255,255,255,0.03)] text-slate-400 border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.08)] hover:border-white/20 hover:text-white hover:shadow-[0_0_15px_rgba(59,130,246,0.2)]"
         aria-label="Share this article"
       >
