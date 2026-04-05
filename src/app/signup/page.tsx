@@ -116,7 +116,7 @@ export default function SignUpPage() {
 
               <span className="text-[#ac8aff] tracking-[0.2em] font-bold text-sm block mb-3">ALMOST THERE</span>
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#f9f5f8] mb-4">
-                Check Your Inbox
+                Check Your Mail Inbox
               </h1>
               <p className="text-[#adaaad] text-base leading-relaxed mb-2">
                 We've sent a verification link to:

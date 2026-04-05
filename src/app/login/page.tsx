@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from 'next/link';
 import { Eye, EyeOff } from "lucide-react";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from "@/lib/supabaseClient";
 import { validateEmail } from "@/lib/emailValidation";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/book-slot';
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -45,14 +47,14 @@ export default function LoginPage() {
         error.message.toLowerCase().includes("invalid login credentials")
       ) {
         setErrorMsg(
-          "Please verify your email first. Check your inbox for a verification link from Skillyug."
+          "Please verify your email first. Check your Mail inbox for a verification link from Skillyug."
         );
       } else {
         setErrorMsg(error.message);
       }
       setLoading(false);
     } else {
-      router.push("/book-slot");
+      router.push(redirectTo);
     }
   };
 
@@ -212,5 +214,13 @@ export default function LoginPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

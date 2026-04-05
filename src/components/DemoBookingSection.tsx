@@ -111,7 +111,7 @@ export default function DemoBookingSection() {
               </div>
 
               {/* Main CTA */}
-              <Link href="/book-slot" className="w-full glow-button py-5 rounded-2xl flex items-center justify-center gap-3 text-white font-bold text-lg hover:-translate-y-1 transition-transform shadow-[0_0_16px_rgba(59,130,246,0.2)]">
+              <Link href="/book-demo" className="w-full glow-button py-5 rounded-2xl flex items-center justify-center gap-3 text-white font-bold text-lg hover:-translate-y-1 transition-transform shadow-[0_0_16px_rgba(59,130,246,0.2)]">
                 Book My Slot Now
                 <ArrowRight className="w-5 h-5" />
               </Link>
