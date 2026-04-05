@@ -1,14 +1,16 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 
-// Make sure to set SUPABASE_SERVICE_ROLE_KEY in your environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Create admin client only if keys are available
-const supabaseAdmin = supabaseUrl && supabaseServiceRoleKey 
-  ? createClient(supabaseUrl, supabaseServiceRoleKey)
+// Prefer the service role key, but fall back to the anon key so production
+// still works when only public Supabase env vars are configured.
+const supabaseAdmin = supabaseUrl && (supabaseServiceRoleKey || supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseServiceRoleKey || supabaseAnonKey)
   : null;
 
 export async function toggleAnonymousReaction(
@@ -52,6 +54,9 @@ export async function toggleAnonymousReaction(
       throw new Error("Failed to remove reaction.");
     }
 
+    revalidatePath("/blog");
+    revalidatePath(`/blog/${itemId}`);
+
     return { action: "removed" };
   } else {
     // If it doesn't exist, insert it (like)
@@ -67,6 +72,9 @@ export async function toggleAnonymousReaction(
       console.error("Error inserting reaction:", insertError);
       throw new Error("Failed to add reaction.");
     }
+
+    revalidatePath("/blog");
+    revalidatePath(`/blog/${itemId}`);
 
     return { action: "added" };
   }

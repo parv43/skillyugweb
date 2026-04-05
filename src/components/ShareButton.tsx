@@ -20,8 +20,8 @@ export default function ShareButton({ url, title }: ShareButtonProps) {
   const handleShare = async () => {
     if (isSharing) return;
 
-    const shareUrl = typeof window !== "undefined" ? `${window.location.origin}${url}` : url;
-    const shareText = `Check out this article: ${title}`;
+    const shareUrl =
+      typeof window !== "undefined" ? new URL(url, window.location.origin).toString() : url;
     setIsSharing(true);
 
     try {
@@ -30,7 +30,6 @@ export default function ShareButton({ url, title }: ShareButtonProps) {
         try {
           await navigator.share({
             title: title,
-            text: shareText,
             url: shareUrl,
           });
         } catch (err) {
