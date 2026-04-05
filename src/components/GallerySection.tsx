@@ -6,27 +6,27 @@ import Image from "next/image";
 
 const galleryItems = [
   {
-    src: "/classroom.jpeg",
+    src: "/classroom.webp",
     title: "AI Orientation at DWPS",
     story: "Bringing the future of tech directly into the classroom. An engaging session empowering young innovators at DWPS with foundational AI knowledge."
   },
   {
-    src: "/Dhruv_Galgotiya.jpeg",
+    src: "/dhruv-galgotia.webp",
     title: "Meeting Dr. Dhruv Galgotia",
     story: "Strategic discussions and visionary planning with Dr. Dhruv Galgotia, exploring avenues to scale impactful education and align our roadmaps."
   },
   {
-    src: "/paytmAdvisor.jpeg",
+    src: "/paytmAdvisor.webp",
     title: "Insights with Mr. Saurabh Jain",
     story: "An inspiring virtual masterclass with Mr. Saurabh Jain, former VP at Paytm, diving deep into startup mentorship and the evolution of tech ecosystems."
   },
   {
-    src: "/vinita singh pic.jpeg",
+    src: "/vinita-singh-pic.webp",
     title: "Connecting with Vineeta Singh",
     story: "An incredible face-to-face interaction with SUGAR Cosmetics Founder & Shark Tank India Judge Mrs. Vineeta Singh, absorbing her dynamic entrepreneurial spirit."
   },
   {
-    src: "/1765300217060.jpeg",
+    src: "/team-photo.webp",
     title: "The Skillyug Team",
     story: "The driving force behind the mission. A dedicated team of technologists and educators completely united by a passion to democratize AI learning."
   }
@@ -37,12 +37,13 @@ export default function GallerySection() {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  // We duplicate the items to create a long enough track for the seamless infinite effect
-  const duplicatedItems = [...galleryItems, ...galleryItems, ...galleryItems];
+  // ✅ Duplicate only 2x instead of 3x (still seamless infinite effect)
+  // Using 2x still creates seamless loop while reducing image load by 33%
+  const duplicatedItems = [...galleryItems, ...galleryItems];
 
   const startAnimation = async () => {
     await controls.start({
-      x: "-33.33%", // Move by one full set of images
+      x: "-50%", // Move by one full set of images (2x instead of 3x)
       transition: {
         duration: 20,
         ease: "linear",

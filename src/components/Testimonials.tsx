@@ -2,26 +2,28 @@
 
 import React from "react"
 import { motion } from "framer-motion"
-import Image from "next/image"
 
 const testimonials = [
   {
     name: "Meera K.",
     role: "High School Student",
     quote: "Skillyug helped me understand how AI tools can make studying much easier.",
-    image: "https://api.dicebear.com/7.x/notionists/svg?seed=Meera&backgroundColor=transparent"
+    initials: "MK",
+    bgColor: "from-blue-500 to-cyan-500"
   },
   {
     name: "Priya V.",
     role: "Parent of 11th Grader",
     quote: "My child now uses AI tools confidently for research, notes, and school assignments.",
-    image: "https://api.dicebear.com/7.x/notionists/svg?seed=Priya&backgroundColor=transparent"
+    initials: "PV",
+    bgColor: "from-purple-500 to-pink-500"
   },
   {
     name: "Karan D.",
     role: "Middle School Student",
     quote: "I learned how to use AI tools to finish homework faster and understand concepts better.",
-    image: "https://api.dicebear.com/7.x/notionists/svg?seed=Karan&backgroundColor=transparent"
+    initials: "KD",
+    bgColor: "from-yellow-500 to-orange-500"
   }
 ]
 
@@ -46,14 +48,8 @@ const TestimonialSlide = ({ testimonial }: any) => {
           </p>
           
           <div className="flex items-center gap-4 mt-auto">
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-tr from-blue-900 to-purple-900 border border-white/20 p-1 flex-shrink-0 relative">
-              <Image 
-                src={testimonial.image} 
-                alt={testimonial.name} 
-                width={48} 
-                height={48} 
-                className="object-cover rounded-full" 
-              />
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 bg-gradient-to-br ${testimonial.bgColor} border border-white/20`}>
+              {testimonial.initials}
             </div>
             <div>
               <h4 className="text-white font-bold tracking-wide">{testimonial.name}</h4>

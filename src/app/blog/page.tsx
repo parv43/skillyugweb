@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { blogs } from "@/lib/blogData";
 import BlogListing from "@/components/BlogListing";
 import { Metadata } from "next";
+import { getReactionCounts } from "@/app/actions/reactions";
 
 export const metadata: Metadata = {
   title: "AI Learning Blog for Students and Parents | Skillyug",
@@ -22,9 +23,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogListingPage() {
+export default async function BlogListingPage() {
   const featuredBlog = blogs.find(blog => blog.featured) || blogs[0];
   const regularBlogs = blogs.filter(blog => blog.slug !== featuredBlog.slug);
+
+  // Fetch reaction counts for all blogs
+  const reactionCountsArray = await Promise.all(
+    regularBlogs.map(async (blog) => ({
+      slug: blog.slug,
+      counts: await getReactionCounts(blog.slug),
+    }))
+  );
+
+  const reactionCounts = Object.fromEntries(
+    reactionCountsArray.map(({ slug, counts }) => [slug, counts])
+  );
 
   const categories = [
     "All",
@@ -96,7 +109,7 @@ export default function BlogListingPage() {
           </div>
         )}
 
-        <BlogListing categories={categories} blogs={regularBlogs} />
+        <BlogListing categories={categories} blogs={regularBlogs} reactionCounts={reactionCounts} />
 
       </div>
     </main>

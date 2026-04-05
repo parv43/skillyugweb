@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 // Google Apps Script endpoint exactly as previously configured
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwg2SKb_ua_S3YWK-FNhLHqkdiO1BdqzAE4nASa1kGWBmgIn4wXAmNadmRMNhcTbrrm/exec";
+const SCRIPT_URL: string = "https://script.google.com/macros/s/AKfycbwg2SKb_ua_S3YWK-FNhLHqkdiO1BdqzAE4nASa1kGWBmgIn4wXAmNadmRMNhcTbrrm/exec";
 
 export default function BookSlotPage() {
   const router = useRouter();
@@ -152,7 +152,7 @@ export default function BookSlotPage() {
 
         {/* TopAppBar */}
         <header className="w-full top-0 sticky z-[100] bg-[#0b0a0f] flex justify-between items-center px-6 py-4">
-          <div className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#d1c4ff] to-[#7c9aff] font-headline tracking-tight text-3xl">Skillyug</div>
+          <img src="/skillyug.png" alt="Skillyug Logo" className="h-20 md:h-24 w-auto object-contain scale-[1.8] md:scale-[2.0]" />
         </header>
 
         <main className="flex-grow flex items-center justify-center px-6 py-12 md:py-24 relative z-10">
@@ -244,6 +244,21 @@ export default function BookSlotPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Field: Promo Code */}
+                <div className="group">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
+                    Promo Code (Optional)
+                  </label>
+                  <div className="relative">
+                    <input 
+                      name="promoCode"
+                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium uppercase" 
+                      placeholder="Enter promo code" 
+                      type="text"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -274,25 +289,7 @@ export default function BookSlotPage() {
           </div>
         </main>
 
-        {/* BottomNavBar (Mobile Only Logic) */}
-        <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#0b0a0f]/80 backdrop-blur-xl rounded-t-2xl shadow-[0_-8px_40px_-12px_rgba(160,140,255,0.1)]">
-          <div className="flex flex-col items-center justify-center text-[#938f99] hover:text-[#cfbcff] transition-colors cursor-pointer active:scale-90">
-            <span className="material-symbols-outlined">explore</span>
-            <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.05rem] font-bold mt-1">Explore</span>
-          </div>
-          <div className="flex flex-col items-center justify-center text-[#d1c4ff] scale-110 transition-transform cursor-pointer active:scale-90">
-            <span className="material-symbols-outlined">event_available</span>
-            <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.05rem] font-bold mt-1">Bookings</span>
-          </div>
-          <div className="flex flex-col items-center justify-center text-[#938f99] hover:text-[#cfbcff] transition-colors cursor-pointer active:scale-90">
-            <span className="material-symbols-outlined">bookmark</span>
-            <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.05rem] font-bold mt-1">Saved</span>
-          </div>
-          <Link href="/profile" className="flex flex-col items-center justify-center text-[#938f99] hover:text-[#cfbcff] transition-colors cursor-pointer active:scale-90">
-            <span className="material-symbols-outlined">person</span>
-            <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.05rem] font-bold mt-1">Profile</span>
-          </Link>
-        </nav>
+
       </div>
     </>
   );
