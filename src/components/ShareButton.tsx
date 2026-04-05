@@ -46,13 +46,8 @@ export default function ShareButton({ url, title }: ShareButtonProps) {
         className="flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium transition-all duration-300 border bg-[rgba(255,255,255,0.03)] text-slate-400 border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.08)] hover:border-white/20 hover:text-white hover:shadow-[0_0_15px_rgba(59,130,246,0.2)]"
         aria-label="Share this article"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8.684 13.342C9.589 12.524 10 11.391 10 10c0-1.657-1.343-3-3-3s-3 1.343-3 3 1.343 3 3 3c.564 0 1.094-.113 1.585-.32m0 0a6.318 6.318 0 0 1 3.832 5.982v2.5m0 0a6.318 6.318 0 0 0-9.497-5.982m0 0A6.318 6.318 0 0 0 14.5 21"
-          />
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M21.78 3.32a1 1 0 0 0-1.06-.22L3.94 10.06a1 1 0 0 0 .09 1.88l5.66 1.89 1.89 5.66a1 1 0 0 0 .8.67H12.5a1 1 0 0 0 .87-.5L21.9 4.38a1 1 0 0 0-.12-1.06ZM11 12.59l-3.5-1.17 8.84-3.68L11 12.59Zm1.41.41 4.85-4.85-3.68 8.84L12.41 13Z" />
         </svg>
         <span>Share</span>
       </button>
