@@ -87,7 +87,7 @@ export default function FloatingCTA() {
         
         <span className="relative font-semibold text-slate-200 group-hover:text-white transition-colors tracking-wide overflow-hidden whitespace-nowrap">
           <span className={`block transition-all duration-200 ease-in-out ${isOverlapping ? "text-xs" : "text-sm"}`}>
-            {isOverlapping ? "Book Free Demo" : "Book a Free Demo Class"}
+            {isOverlapping ? "Book your Demo" : "Book your Demo"}
           </span>
         </span>
       </Link>

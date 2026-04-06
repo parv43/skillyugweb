@@ -74,6 +74,12 @@ function MobileHero() {
         {/* CTAs */}
         <div className="w-full flex flex-col gap-4 mb-6">
           <Link
+            href="/book-demo"
+            className="w-full py-4 px-8 rounded-full border border-white/20 bg-transparent text-white font-semibold text-[17px] active:scale-95 transition-colors text-center inline-block"
+          >
+            Book your Demo
+          </Link>
+          <Link
             href={isLoggedIn ? "/book-slot" : "/signup"}
             className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
             style={{ 
@@ -83,12 +89,6 @@ function MobileHero() {
           >
             Join the Bootcamp
           </Link>
-          <button
-            onClick={() => document.getElementById("curriculum")?.scrollIntoView({ behavior: "smooth" })}
-            className="w-full py-4 px-8 rounded-full border border-white/20 bg-transparent text-white font-semibold text-[17px] active:scale-95 transition-colors"
-          >
-            Explore Curriculum
-          </button>
         </div>
       </div>
 
@@ -195,18 +195,18 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
+              <Link
+                href="/book-demo"
+                className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center inline-block"
+              >
+                Book your Demo
+              </Link>
               <Link 
                 href={isLoggedIn ? "/book-slot" : "/signup"}
                 className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
               >
                 Join the Bootcamp
               </Link>
-              <button 
-                onClick={() => document.getElementById("curriculum")?.scrollIntoView({ behavior: "smooth" })}
-                className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center"
-              >
-                Explore Curriculum
-              </button>
             </div>
           </motion.div>
 

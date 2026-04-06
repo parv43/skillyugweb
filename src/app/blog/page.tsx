@@ -5,6 +5,7 @@ import { blogs } from "@/lib/blogData";
 import BlogListing from "@/components/BlogListing";
 import { Metadata } from "next";
 import { getReactionCounts } from "@/app/actions/reactions";
+import FloatingCTA from "@/components/FloatingCTA";
 
 export const metadata: Metadata = {
   title: "AI Learning Blog for Students and Parents | Skillyug",
@@ -112,6 +113,7 @@ export default async function BlogListingPage() {
         <BlogListing categories={categories} blogs={regularBlogs} reactionCounts={reactionCounts} />
 
       </div>
+      <FloatingCTA />
     </main>
   );
 }

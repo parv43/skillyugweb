@@ -96,7 +96,7 @@ export default function ContactUs() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Student Name</label>
+                    <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Full Name</label>
                     <input 
                       type="text" 
                       name="name"
@@ -115,7 +115,7 @@ export default function ContactUs() {
                       value={formData.phone}
                       onChange={handleChange}
                       className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 placeholder:text-slate-600" 
-                      placeholder="+91 000-0000" 
+                      placeholder="+91 0000-0000" 
                       required
                     />
                   </div>
@@ -136,6 +136,7 @@ export default function ContactUs() {
                     <option value="Undergraduate" className="bg-[#0f172a]">Undergraduate</option>
                     <option value="Parent" className="bg-[#0f172a]">Parent</option>
                     <option value="School Administrator" className="bg-[#0f172a]">School Administrator</option>
+                    <option value="others" className="bg-[#0f172a]">others</option>
                   </select>
                 </div>
 
