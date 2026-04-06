@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import AnonymousReactionBar from "@/components/AnonymousReactionBar";
 import ShareButton from "@/components/ShareButton";
 import { getReactionCounts } from "@/app/actions/reactions";
+import FloatingCTA from "@/components/FloatingCTA";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -79,6 +80,14 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
       <Navbar />
 
       <article className="container mx-auto px-6 relative z-10 pt-32 lg:pt-40 pb-20 max-w-4xl">
+        <div className="mb-6">
+          <Link href="/blog" className="group inline-flex items-center gap-2 text-[#adaaad] hover:text-[#f9f5f8] bg-[#f9f5f8]/5 hover:bg-[#f9f5f8]/10 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm w-fit">
+            <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="font-bold tracking-widest text-xs uppercase pt-0.5">Back to Blog</span>
+          </Link>
+        </div>
         
         {/* Top Section */}
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
@@ -220,6 +229,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           
         </div>
       </article>
+      <FloatingCTA />
 
       {/* Mandatory CTA Section */}
       <section className="relative w-full py-20 mt-10 bg-[rgba(255,255,255,0.02)] border-t border-white/5">

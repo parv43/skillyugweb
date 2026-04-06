@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Link from 'next/link';
 import { Eye, EyeOff, Mail } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { validateEmail } from "@/lib/emailValidation";
 
-export default function SignUpPage() {
+function SignUpForm() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/book-slot";
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +41,7 @@ export default function SignUpPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `https://www.skillyugedu.com/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
         data: {
           full_name: fullName,
           phone_number: phoneNumber,
@@ -67,7 +70,7 @@ export default function SignUpPage() {
       type: 'signup',
       email,
       options: {
-        emailRedirectTo: `https://www.skillyugedu.com/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
       }
     });
     setResendLoading(false);
@@ -157,7 +160,7 @@ export default function SignUpPage() {
               <div className="mt-8 pt-6 border-t border-[#48474a]/25">
                 <p className="text-[#adaaad] text-sm">
                   Already verified?{" "}
-                  <Link href="/login" className="text-[#a4a6ff] font-bold hover:underline">
+                  <Link href={`/login?redirect=${encodeURIComponent(redirectTo)}`} className="text-[#a4a6ff] font-bold hover:underline">
                     Log In
                   </Link>
                 </p>
@@ -306,5 +309,13 @@ export default function SignUpPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignUpForm />
+    </Suspense>
   );
 }

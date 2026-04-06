@@ -10,6 +10,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwg2SKb_ua_S3YWK-FNh
 export default function BookDemoPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [prefilledName, setPrefilledName] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -20,13 +21,15 @@ export default function BookDemoPage() {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        router.push("/login?redirect=/book-demo");
+        router.replace("/login?redirect=/book-demo");
+        setIsCheckingAuth(false);
         return;
       }
       setUserId(session.user.id);
       setUserEmail(session.user.email ?? null);
       const fullName = session.user?.user_metadata?.full_name || "";
       if (fullName) setPrefilledName(fullName);
+      setIsCheckingAuth(false);
     };
     checkAuth();
   }, [router]);
@@ -135,6 +138,14 @@ export default function BookDemoPage() {
       <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
       <div className="text-[#e6e0e9] font-body selection:bg-[#d1c4ff] selection:text-[#2b0064] min-h-screen flex flex-col relative overflow-hidden bg-[#0b0a0f]">
+        {isCheckingAuth && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#0b0a0f]">
+            <div className="text-center">
+              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[#a4a6ff]/30 border-t-[#a4a6ff]" />
+              <p className="text-sm font-medium text-[#cac4cf]">Loading demo booking...</p>
+            </div>
+          </div>
+        )}
 
         {/* Background */}
         <div className="absolute inset-0 z-0 pointer-events-none">
