@@ -1,4 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
 import { Metadata } from "next"
+import Link from "next/link"
 import Navbar from "@/components/Navbar"
 import HeroSection from "@/components/HeroSection"
 import SkillsSection from "@/components/SkillsSection"
@@ -102,17 +104,17 @@ export default function Home() {
         
         <nav className="mb-6">
           <ul className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
-            <li><a href="/" className="hover:text-blue-400 transition-colors">Home</a></li>
-            <li><a href="/blog" className="hover:text-blue-400 transition-colors">Blog</a></li>
-            <li><a href="#ask-ai" className="hover:text-blue-400 transition-colors">Interactive Demo</a></li>
-            <li><a href="#curriculum" className="hover:text-blue-400 transition-colors">Curriculum</a></li>
+            <li><Link href="/" className="hover:text-blue-400 transition-colors">Home</Link></li>
+            <li><Link href="/blog" className="hover:text-blue-400 transition-colors">Blog</Link></li>
+            <li><Link href="/#ask-ai" className="hover:text-blue-400 transition-colors">Interactive Demo</Link></li>
+            <li><Link href="/#curriculum" className="hover:text-blue-400 transition-colors">Curriculum</Link></li>
           </ul>
         </nav>
 
         <div className="mb-8 flex gap-4 text-xs text-slate-500">
-          <a href="/refund-policy" className="hover:text-slate-300 transition-colors">Refund Policy</a>
+          <Link href="/refund-policy" className="hover:text-slate-300 transition-colors">Refund Policy</Link>
           <span>|</span>
-          <a href="/terms-and-conditions" className="hover:text-slate-300 transition-colors">Terms & Conditions</a>
+          <Link href="/terms-and-conditions" className="hover:text-slate-300 transition-colors">Terms & Conditions</Link>
         </div>
 
         <p className="text-sm font-mono text-slate-500 tracking-widest text-center">

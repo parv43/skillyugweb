@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, useAnimationControls } from "framer-motion";
 import Image from "next/image";
 
@@ -41,24 +41,20 @@ export default function GallerySection() {
   // Using 2x still creates seamless loop while reducing image load by 33%
   const duplicatedItems = [...galleryItems, ...galleryItems];
 
-  const startAnimation = async () => {
-    await controls.start({
-      x: "-50%", // Move by one full set of images (2x instead of 3x)
-      transition: {
-        duration: 20,
-        ease: "linear",
-        repeat: Infinity,
-      },
-    });
-  };
-
   useEffect(() => {
     if (!isHovered && !isDragging) {
-      startAnimation();
+      void controls.start({
+        x: "-50%",
+        transition: {
+          duration: 20,
+          ease: "linear",
+          repeat: Infinity,
+        },
+      });
     } else {
       controls.stop();
     }
-  }, [isHovered, isDragging]);
+  }, [controls, isDragging, isHovered]);
 
   return (
     <section className="py-24 relative overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 bg-[#020617]">

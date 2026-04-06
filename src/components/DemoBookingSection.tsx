@@ -75,7 +75,7 @@ export default function DemoBookingSection() {
               {/* Promotional Ribbon */}
               <div className="absolute top-4 -right-12 w-48 h-10 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 transform rotate-45 flex items-center justify-center shadow-lg pointer-events-none z-20">
                 <span className="text-white font-black text-[10px] tracking-[0.2em] uppercase drop-shadow-md">
-                  FREE FREE FREE
+                  LIVE DEMO
                 </span>
               </div>
 
@@ -112,7 +112,7 @@ export default function DemoBookingSection() {
 
               {/* Main CTA */}
               <Link href="/book-demo" className="w-full glow-button py-5 rounded-2xl flex items-center justify-center gap-3 text-white font-bold text-lg hover:-translate-y-1 transition-transform shadow-[0_0_16px_rgba(59,130,246,0.2)]">
-                Book My Slot Now
+                Book Your Demo
                 <ArrowRight className="w-5 h-5" />
               </Link>
 

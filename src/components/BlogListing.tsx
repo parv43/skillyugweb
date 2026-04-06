@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { BlogPost } from "@/lib/blogData";
 import { motion, AnimatePresence } from "framer-motion";

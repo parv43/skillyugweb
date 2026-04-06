@@ -7,15 +7,15 @@ export default function SlidingCTA() {
   const content = (
     <div className="flex items-center gap-6 md:gap-12 px-6 whitespace-nowrap">
       <span className="text-white font-medium text-sm md:text-base tracking-wide">
-        Book a Free Demo Class
+        Book Your Demo Class
       </span>
       <span className="w-1.5 h-1.5 rounded-full bg-blue-500/50" />
       <span className="text-blue-200 font-light text-sm md:text-base tracking-wide opacity-90">
-        After one demo class, you'll clearly see how AI tools can transform your child's learning and confidence.
+        After one demo class, you&apos;ll clearly see how AI tools can transform your child&apos;s learning and confidence.
       </span>
       <span className="w-1.5 h-1.5 rounded-full bg-purple-500/50 hidden md:block" />
       <span className="text-slate-400 font-light text-sm md:text-base tracking-wide hidden md:block">
-        No payment required • See the bootcamp experience first
+        Secure ₹49 booking • See the bootcamp experience first
       </span>
       <span className="w-1.5 h-1.5 rounded-full bg-pink-500/50" />
     </div>

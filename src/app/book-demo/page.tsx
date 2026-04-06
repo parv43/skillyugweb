@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element, @next/next/no-page-custom-font */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -5,8 +6,6 @@ import Link from "next/link";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-
-const DEMO_AMOUNT_PAISE = 4900;
 
 interface RazorpayOrderResponse {
   amount: number;

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState, Suspense } from "react";
@@ -36,7 +37,7 @@ function LoginForm() {
 
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -206,8 +207,8 @@ function LoginForm() {
 
             <footer className="mt-10 text-center relative z-10">
               <p className="text-[#adaaad]">
-                Don't have an account? 
-                <Link href="/signup" className="text-[#a4a6ff] font-bold hover:text-[#ac8aff] transition-colors duration-200 ml-1">Sign Up</Link>
+                Don&apos;t have an account? 
+                <Link href={`/signup?redirect=${encodeURIComponent(redirectTo)}`} className="text-[#a4a6ff] font-bold hover:text-[#ac8aff] transition-colors duration-200 ml-1">Sign Up</Link>
               </p>
             </footer>
           </div>

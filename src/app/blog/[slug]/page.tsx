@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -263,10 +264,10 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
               Student Projects
             </Link>
             <Link 
-              href="/#demo"
+              href="/book-demo"
               className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] block border border-white/10"
             >
-              Book Free Demo Class
+              Book Your Demo
             </Link>
           </div>
         </div>
@@ -280,10 +281,10 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
 
         <nav className="mb-6">
           <ul className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
-            <li><a href="/" className="hover:text-blue-400 transition-colors">Home</a></li>
-            <li><a href="/blog" className="hover:text-blue-400 transition-colors">Blog</a></li>
-            <li><a href="/#ask-ai" className="hover:text-blue-400 transition-colors">Interactive Demo</a></li>
-            <li><a href="/#curriculum" className="hover:text-blue-400 transition-colors">Curriculum</a></li>
+            <li><Link href="/" className="hover:text-blue-400 transition-colors">Home</Link></li>
+            <li><Link href="/blog" className="hover:text-blue-400 transition-colors">Blog</Link></li>
+            <li><Link href="/#ask-ai" className="hover:text-blue-400 transition-colors">Interactive Demo</Link></li>
+            <li><Link href="/#curriculum" className="hover:text-blue-400 transition-colors">Curriculum</Link></li>
           </ul>
         </nav>
 

@@ -1,11 +1,77 @@
 "use client"
 
-import React, { useRef } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
-import { MessageSquare, Image, Layout, Sparkles, Binary, Zap, TerminalSquare } from "lucide-react"
+import React from "react"
+import { motion } from "framer-motion"
+import {
+  MessageSquare,
+  Image,
+  Layout,
+  Binary,
+  Zap,
+  TerminalSquare,
+  type LucideIcon,
+} from "lucide-react"
+
+type AccentColor = "slate" | "blue" | "purple" | "pink" | "emerald" | "yellow"
+
+const ACCENT_STYLES: Record<AccentColor, { border: string; dot: string; text: string }> = {
+  slate: {
+    border: "border-slate-500/30",
+    dot: "bg-slate-400/50",
+    text: "text-slate-300",
+  },
+  blue: {
+    border: "border-blue-500/30",
+    dot: "bg-blue-400/50",
+    text: "text-blue-400",
+  },
+  purple: {
+    border: "border-purple-500/30",
+    dot: "bg-purple-400/50",
+    text: "text-purple-400",
+  },
+  pink: {
+    border: "border-pink-500/30",
+    dot: "bg-pink-400/50",
+    text: "text-pink-400",
+  },
+  emerald: {
+    border: "border-emerald-500/30",
+    dot: "bg-emerald-400/50",
+    text: "text-emerald-400",
+  },
+  yellow: {
+    border: "border-yellow-500/30",
+    dot: "bg-yellow-400/50",
+    text: "text-yellow-400",
+  },
+}
+
+interface FlowLineProps {
+  d: string
+  strokeDasharray?: string
+  duration?: number
+  delay?: number
+}
+
+interface EcosystemNodeProps {
+  icon: LucideIcon
+  label: string
+  desc: string
+  position: string
+  delay?: number
+  color?: AccentColor
+}
+
+interface WorkflowStepProps {
+  step: string
+  title: string
+  desc: string
+  delay: number
+}
 
 // A connection line that draws itself when scrolled into view
-const FlowLine = ({ d, strokeDasharray, duration = 1.5, delay = 0 }: any) => {
+const FlowLine = ({ d, strokeDasharray, duration = 1.5, delay = 0 }: FlowLineProps) => {
   return (
     <motion.path
       d={d}
@@ -22,17 +88,25 @@ const FlowLine = ({ d, strokeDasharray, duration = 1.5, delay = 0 }: any) => {
   )
 }
 
-const EcosystemNode = ({ icon: Icon, label, desc, position, delay = 0, color = "blue" }: any) => {
+const EcosystemNode = ({
+  icon: Icon,
+  label,
+  desc,
+  position,
+  delay = 0,
+  color = "blue",
+}: EcosystemNodeProps) => {
+  const styles = ACCENT_STYLES[color]
   return (
     <motion.div
       className={`absolute flex flex-col items-center justify-center z-20 ${position} w-48 text-center will-change-transform`}
       transition={{ duration: 0.5, delay, type: "spring" }}
     >
-      <div className={`w-16 h-16 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-4 border border-${color}-500/30 shadow-[0_8px_16px_rgba(0,0,0,0.2)] group hover:-translate-y-2 transition-transform duration-300 relative`}>
-        <Icon className={`w-8 h-8 text-${color}-400 group-hover:opacity-80 transition-opacity`} />
+      <div className={`w-16 h-16 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-4 border ${styles.border} shadow-[0_8px_16px_rgba(0,0,0,0.2)] group hover:-translate-y-2 transition-transform duration-300 relative`}>
+        <Icon className={`w-8 h-8 ${styles.text} group-hover:opacity-80 transition-opacity`} />
         {/* Input/Output port dots */}
-        <div className={`absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-${color}-400/50`} />
-        <div className={`absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-${color}-400/50`} />
+        <div className={`absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${styles.dot}`} />
+        <div className={`absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${styles.dot}`} />
       </div>
       <h4 className="text-white font-bold text-sm mb-1">{label}</h4>
       <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
@@ -40,7 +114,7 @@ const EcosystemNode = ({ icon: Icon, label, desc, position, delay = 0, color = "
   )
 }
 
-const WorkflowStep = ({ step, title, desc, delay }: any) => {
+const WorkflowStep = ({ step, title, desc, delay }: WorkflowStepProps) => {
   return (
     <motion.div 
       className="workflow-card flex-1 bg-[#0f172a]/90 shadow-[0_8px_16px_rgba(0,0,0,0.15)] p-6 rounded-3xl border border-white/5 relative z-10 hover:border-purple-500/30 transition-colors will-change-transform"
@@ -145,7 +219,10 @@ export default function AIToolsSection() {
             { icon: Layout, label: "Canva & Figma", desc: "Assembles into pro layouts", color: "pink" },
             { icon: Binary, label: "Live Deployment", desc: "Ships a real app or project", color: "emerald" },
             { icon: Zap, label: "AI Automation", desc: "Automates repetitive tasks", color: "yellow" },
-          ].map(({ icon: Icon, label, desc, color }, i) => (
+          ].map(({ icon: Icon, label, desc, color }, i) => {
+            const accentColor = color as AccentColor
+            const styles = ACCENT_STYLES[accentColor]
+            return (
             <motion.div
               key={i}
               className="bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 flex flex-col items-center text-center gap-2"
@@ -154,13 +231,13 @@ export default function AIToolsSection() {
               transition={{ duration: 0.4, delay: i * 0.07 }}
               viewport={{ once: true }}
             >
-              <div className={`w-12 h-12 rounded-xl bg-[#020617] flex items-center justify-center border border-${color}-500/30 mb-1`}>
-                <Icon className={`w-6 h-6 text-${color}-400`} />
+              <div className={`w-12 h-12 rounded-xl bg-[#020617] flex items-center justify-center border ${styles.border} mb-1`}>
+                <Icon className={`w-6 h-6 ${styles.text}`} />
               </div>
               <h4 className="text-white font-bold text-xs leading-tight">{label}</h4>
               <p className="text-slate-400 text-[11px] leading-relaxed">{desc}</p>
             </motion.div>
-          ))}
+          )})}
         </div>
 
         {/* Flow connector */}

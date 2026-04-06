@@ -1,39 +1,18 @@
-import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { persistDemoBooking } from "@/lib/bookingPersistence";
+import {
+  ensureCapturedRazorpayPayment,
+  fetchRazorpayOrder,
+  fetchRazorpayPayment,
+  getRequiredEnv,
+  verifyRazorpayPaymentSignature,
+} from "@/lib/razorpayServer";
 
 export const runtime = "nodejs";
 
-const DEMO_AMOUNT_PAISE = 4900;
-const DEMO_CURRENCY = "INR";
 const DEMO_ORDER_COOKIE = "demo_booking_order_id";
-
-function getRequiredEnv(name: string) {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
-
-function getRazorpayAuthHeader() {
-  const keyId = getRequiredEnv("RAZORPAY_KEY_ID");
-  const keySecret = getRequiredEnv("RAZORPAY_KEY_SECRET");
-  return `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}`;
-}
-
-function signaturesMatch(expected: string, provided: string) {
-  const expectedBuffer = Buffer.from(expected);
-  const providedBuffer = Buffer.from(provided);
-
-  if (expectedBuffer.length !== providedBuffer.length) {
-    return false;
-  }
-
-  return crypto.timingSafeEqual(expectedBuffer, providedBuffer);
-}
 
 async function getAuthenticatedUser() {
   const cookieStore = await cookies();
@@ -81,8 +60,8 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const studentName = typeof body.studentName === "string" ? body.studentName.trim() : "";
-    const phoneNumber = typeof body.phoneNumber === "string" ? body.phoneNumber.trim() : "";
+    const studentName = typeof body.studentName === "string" ? body.studentName.trim() : null;
+    const phoneNumber = typeof body.phoneNumber === "string" ? body.phoneNumber.trim() : null;
     const razorpayOrderId =
       typeof body.razorpay_order_id === "string" ? body.razorpay_order_id.trim() : "";
     const razorpayPaymentId =
@@ -91,8 +70,6 @@ export async function POST(request: Request) {
       typeof body.razorpay_signature === "string" ? body.razorpay_signature.trim() : "";
 
     if (
-      !studentName ||
-      !/^\d{10}$/.test(phoneNumber) ||
       !razorpayOrderId ||
       !razorpayPaymentId ||
       !razorpaySignature
@@ -107,74 +84,34 @@ export async function POST(request: Request) {
       );
     }
 
-    const expectedSignature = crypto
-      .createHmac("sha256", getRequiredEnv("RAZORPAY_KEY_SECRET"))
-      .update(`${expectedOrderId}|${razorpayPaymentId}`)
-      .digest("hex");
-
-    if (!signaturesMatch(expectedSignature, razorpaySignature)) {
+    if (!verifyRazorpayPaymentSignature(expectedOrderId, razorpayPaymentId, razorpaySignature)) {
       return NextResponse.json({ error: "Payment signature verification failed." }, { status: 400 });
     }
 
-    const paymentResponse = await fetch(
-      `https://api.razorpay.com/v1/payments/${encodeURIComponent(razorpayPaymentId)}`,
-      {
-        headers: {
-          Authorization: getRazorpayAuthHeader(),
-        },
-        cache: "no-store",
-      }
-    );
+    const payment = await fetchRazorpayPayment(razorpayPaymentId);
+    const capturedPayment = await ensureCapturedRazorpayPayment(payment);
+    const order = await fetchRazorpayOrder(expectedOrderId);
 
-    const payment = await paymentResponse.json();
-    if (!paymentResponse.ok) {
-      return NextResponse.json(
-        { error: payment?.error?.description || "Unable to fetch payment details from Razorpay." },
-        { status: 502 }
-      );
-    }
-
-    if (
-      payment.order_id !== expectedOrderId ||
-      payment.amount !== DEMO_AMOUNT_PAISE ||
-      payment.currency !== DEMO_CURRENCY
-    ) {
+    if (capturedPayment.order_id !== expectedOrderId || capturedPayment.amount !== order.amount || capturedPayment.currency !== order.currency) {
       return NextResponse.json(
         { error: "Payment amount or order details do not match the booking request." },
         { status: 400 }
       );
     }
 
-    if (!["authorized", "captured"].includes(payment.status)) {
-      return NextResponse.json(
-        { error: `Unexpected payment status: ${payment.status}` },
-        { status: 400 }
-      );
-    }
-
-    const supabaseAdmin = createClient(
-      getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-      getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY")
-    );
-
-    const { error: insertError } = await supabaseAdmin.from("demo_bookings").upsert(
-        {
-          amount_paid: payment.amount,
-          currency: payment.currency,
+    try {
+      await persistDemoBooking({
+        expectedBookingType: "demo_booking",
+        fallbackDetails: {
           email: user.email ?? null,
-          name: studentName,
-          payment_status: payment.status,
-          phone: phoneNumber,
-          razorpay_order_id: expectedOrderId,
-          razorpay_payment_id: razorpayPaymentId,
-          user_id: user.id,
-      },
-      {
-        onConflict: "razorpay_payment_id",
-      }
-    );
-
-    if (insertError) {
+          phoneNumber,
+          studentName,
+          userId: user.id,
+        },
+        order,
+        payment: capturedPayment,
+      });
+    } catch (insertError) {
       console.error("Failed to save demo booking after payment:", insertError);
       return NextResponse.json(
         {
@@ -196,6 +133,17 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.includes("Missing required environment variable")
+    ) {
+      console.error("Book demo payment verification configuration error:", error);
+      return NextResponse.json(
+        { error: "Payment verification is temporarily unavailable. Please contact support." },
+        { status: 500 }
+      );
+    }
+
     console.error("Book demo payment verification failed:", error);
     return NextResponse.json(
       { error: "Server error while verifying payment. Please contact support if money was debited." },

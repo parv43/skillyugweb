@@ -3,10 +3,20 @@
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 import { supabase } from "@/lib/supabaseClient"
 
 // The tool cards orbiting the central badge
-const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
+interface OrbitingToolProps {
+  label: string
+  icon: string
+  angle: number
+  radius: number
+  duration: number
+  tilt: number
+}
+
+const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: OrbitingToolProps) => {
   return (
     <div
       className="absolute top-1/2 left-1/2 -ml-[45px] -mt-[45px] w-[90px] h-[90px] z-20 pointer-events-none animate-orbit"
@@ -38,8 +48,6 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: any) => {
   )
 }
 
-import Image from "next/image"
-
 // ─── Mobile-Only Hero ───────────────────────────────────────────────────────
 function MobileHero() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -63,7 +71,7 @@ function MobileHero() {
       <div className="px-6 relative z-20 w-full flex flex-col items-start text-left">
         {/* Header Copy */}
         <h1 className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-white">
-          Empower your child's learning and creativity with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-fuchsia-400">
+          Empower your child&apos;s learning and creativity with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-fuchsia-400">
             future-ready AI skills.
           </span>
         </h1>
@@ -80,7 +88,7 @@ function MobileHero() {
             Book your Demo
           </Link>
           <Link
-            href={isLoggedIn ? "/book-slot" : "/signup"}
+            href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
             className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
             style={{ 
               background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
@@ -187,7 +195,7 @@ export default function HeroSection() {
             </h1>
 
             <p className="text-lg md:text-xl font-medium text-pink-400 mb-4">
-              Your child's learning, creativity, and future readiness are our top priorities.
+              Your child&apos;s learning, creativity, and future readiness are our top priorities.
             </p>
 
             <p className="text-base md:text-lg text-slate-300 max-w-xl mb-10 font-light leading-relaxed">
@@ -202,7 +210,7 @@ export default function HeroSection() {
                 Book your Demo
               </Link>
               <Link 
-                href={isLoggedIn ? "/book-slot" : "/signup"}
+                href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
                 className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
               >
                 Join the Bootcamp

@@ -3,7 +3,15 @@
 import React from "react"
 import { motion } from "framer-motion"
 
-const testimonials = [
+interface Testimonial {
+  name: string
+  role: string
+  quote: string
+  initials: string
+  bgColor: string
+}
+
+const testimonials: Testimonial[] = [
   {
     name: "Meera K.",
     role: "High School Student",
@@ -30,7 +38,7 @@ const testimonials = [
 // Duplicate the array to create a seamless infinite loop
 const loopedTestimonials = [...testimonials, ...testimonials]
 
-const TestimonialSlide = ({ testimonial }: any) => {
+const TestimonialSlide = ({ testimonial }: { testimonial: Testimonial }) => {
   return (
     <div className="testimonial-card w-[300px] sm:w-[400px] shrink-0 mx-4 group">
       <div className="h-full flex flex-col p-8 rounded-[2rem] glass-panel bg-white/5 border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all duration-500 shadow-[0_0_15px_rgba(255,255,255,0.02)] hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] cyber-glow relative overflow-hidden">
@@ -41,7 +49,7 @@ const TestimonialSlide = ({ testimonial }: any) => {
         <div className="relative z-10 flex-1 flex flex-col">
           {/* Quote icon */}
           <span className="text-4xl text-purple-400/30 font-serif leading-none mb-4 group-hover:text-purple-400/60 transition-colors">
-            "
+            &ldquo;
           </span>
           <p className="text-slate-300 font-light text-base sm:text-lg leading-relaxed mb-8 flex-1 whitespace-normal">
             {testimonial.quote}

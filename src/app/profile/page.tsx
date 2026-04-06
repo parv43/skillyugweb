@@ -1,14 +1,16 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import React, { useEffect, useState, useRef } from "react"
 import Link from 'next/link'
 import { useRouter } from "next/navigation"
+import type { User as SupabaseUser } from "@supabase/supabase-js"
 import { supabase } from "@/lib/supabaseClient"
 import { LogOut, ArrowLeft, Camera, User, Mail, CheckCircle2, Loader2 } from "lucide-react"
 
 export default function ProfilePage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
@@ -51,6 +53,10 @@ export default function ProfilePage() {
         throw new Error('You must select an image to upload.')
       }
 
+      if (!user) {
+        throw new Error("You must be logged in to upload a profile picture.")
+      }
+
       const file = event.target.files[0]
       const fileExt = file.name.split('.').pop()
       const fileName = `${user.id}-${Math.random()}.${fileExt}`
@@ -85,8 +91,8 @@ export default function ProfilePage() {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMsg(""), 3000)
 
-    } catch (error: any) {
-      setErrorMsg(error.message || "Error uploading image")
+    } catch (error: unknown) {
+      setErrorMsg(error instanceof Error ? error.message : "Error uploading image")
     } finally {
       setUploading(false)
     }
