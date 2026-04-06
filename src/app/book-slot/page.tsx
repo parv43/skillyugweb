@@ -1,92 +1,255 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link"; // For the back button
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-// Google Apps Script endpoint exactly as previously configured
-const SCRIPT_URL: string = "https://script.google.com/macros/s/AKfycbwg2SKb_ua_S3YWK-FNhLHqkdiO1BdqzAE4nASa1kGWBmgIn4wXAmNadmRMNhcTbrrm/exec";
+const SLOT_AMOUNT_PAISE = 5000;
+
+interface RazorpayOrderResponse {
+  amount: number;
+  currency: string;
+  customerEmail: string;
+  keyId: string;
+  orderId: string;
+}
+
+interface RazorpaySuccessPayload {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayFailurePayload {
+  error?: {
+    description?: string;
+    reason?: string;
+  };
+}
+
+interface RazorpayInstance {
+  on: (event: "payment.failed", handler: (payload: RazorpayFailurePayload) => void) => void;
+  open: () => void;
+}
+
+interface RazorpayOptions {
+  amount: number;
+  currency: string;
+  description: string;
+  handler: (payload: RazorpaySuccessPayload) => void | Promise<void>;
+  key: string;
+  modal?: {
+    confirm_close?: boolean;
+    ondismiss?: () => void;
+  };
+  name: string;
+  notes?: Record<string, string>;
+  order_id: string;
+  prefill?: {
+    contact?: string;
+    email?: string;
+    name?: string;
+  };
+  retry?: {
+    enabled: boolean;
+  };
+  theme?: {
+    color: string;
+  };
+}
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: RazorpayOptions) => RazorpayInstance;
+  }
+}
 
 export default function BookSlotPage() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [isRazorpayReady, setIsRazorpayReady] = useState(false);
   const [prefilledName, setPrefilledName] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        router.push("/login?redirect=/book-slot");
+        router.replace("/login?redirect=/book-slot");
+        setIsCheckingAuth(false);
         return;
       }
-      // Pickup user's name metadata
+
       const fullName = session.user?.user_metadata?.full_name || "";
       if (fullName) {
         setPrefilledName(fullName);
       }
+
+      setUserEmail(session.user?.email ?? "");
+      setIsCheckingAuth(false);
     };
+
     checkAuth();
   }, [router]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handlePayment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!SCRIPT_URL || SCRIPT_URL === "YOUR_WEB_APP_URL_HERE") {
-      alert("Please configure the SCRIPT_URL in the code first.");
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    if (!window.Razorpay || !isRazorpayReady) {
+      setErrorMsg("Payment gateway is still loading. Please try again in a moment.");
       return;
     }
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-    const phoneNumber = formData.get("phoneNumber") as string;
-    const studentName = formData.get("studentName") as string;
-    const gradeValue = formData.get("grade") as string;
+    const studentName = (formData.get("studentName") as string)?.trim();
+    const phoneNumber = (formData.get("phoneNumber") as string)?.trim();
+    const grade = formData.get("grade") as string;
+    const promoCode = ((formData.get("promoCode") as string) || "").trim().toUpperCase();
 
-    // Strict 10 digit validation
-    if (phoneNumber.length !== 10) {
-      alert("Please enter exactly 10 digits for the phone number.");
+    if (!studentName || !grade || !/^\d{10}$/.test(phoneNumber)) {
+      setErrorMsg("Enter a valid name, class, and 10-digit phone number before paying.");
       return;
     }
 
-    setIsSubmitting(true);
+    setIsProcessingPayment(true);
 
     try {
-      const response = await fetch(SCRIPT_URL, {
+      const orderResponse = await fetch("/api/book-slot/order", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          grade,
+          phoneNumber,
+          promoCode,
+          studentName,
+        }),
       });
-      const result = await response.json();
-      
-      if (result.result === "success") {
-        // Save to Supabase slot_bookings table (name + phone + grade)
-        const { error: supabaseError } = await supabase
-          .from("slot_bookings")
-          .insert({ 
-            name: studentName, 
-            phone: phoneNumber,
-            "grade\\class": gradeValue 
-          });
 
-        if (supabaseError) {
-          console.warn("Supabase insert warning:", supabaseError.message);
-        }
+      const orderData = (await orderResponse.json()) as RazorpayOrderResponse & { error?: string };
 
-        alert("Your spot has been booked successfully!");
-        form.reset();
-      } else {
-        alert("Something went wrong. Please try again.");
+      if (!orderResponse.ok) {
+        throw new Error(orderData.error || "Failed to start payment.");
       }
+
+      let paymentFinalized = false;
+
+      const razorpay = new window.Razorpay({
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Skillyug",
+        description: "Book Your Spot",
+        order_id: orderData.orderId,
+        prefill: {
+          name: studentName,
+          email: orderData.customerEmail || userEmail,
+          contact: phoneNumber,
+        },
+        notes: {
+          booking_type: "slot_booking",
+          grade,
+          promo_code: promoCode || "NONE",
+        },
+        retry: {
+          enabled: true,
+        },
+        modal: {
+          confirm_close: true,
+          ondismiss: () => {
+            if (!paymentFinalized) {
+              setErrorMsg("Payment was cancelled before completion.");
+              setIsProcessingPayment(false);
+            }
+          },
+        },
+        theme: {
+          color: "#6750a4",
+        },
+        handler: async (paymentPayload) => {
+          paymentFinalized = true;
+
+          try {
+            const verifyResponse = await fetch("/api/book-slot/verify-payment", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                ...paymentPayload,
+                grade,
+                phoneNumber,
+                promoCode,
+                studentName,
+              }),
+            });
+
+            const verifyData = await verifyResponse.json();
+            if (!verifyResponse.ok) {
+              throw new Error(
+                verifyData.error || "Payment was captured but booking confirmation failed."
+              );
+            }
+
+            setSuccessMsg("Payment successful. Your slot has been booked.");
+            form.reset();
+
+            const studentNameInput = form.elements.namedItem("studentName") as HTMLInputElement | null;
+            if (studentNameInput && prefilledName) {
+              studentNameInput.value = prefilledName;
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            setErrorMsg(
+              error instanceof Error
+                ? error.message
+                : "Payment verification failed. Contact support with your payment details."
+            );
+          } finally {
+            setIsProcessingPayment(false);
+          }
+        },
+      });
+
+      razorpay.on("payment.failed", (payload) => {
+        paymentFinalized = true;
+        const failureReason =
+          payload.error?.description || payload.error?.reason || "Payment failed. Please try again.";
+        setErrorMsg(failureReason);
+        setIsProcessingPayment(false);
+      });
+
+      razorpay.open();
     } catch (error) {
-      console.error("Error submitting form", error);
-      alert("Network error, please try again.");
-    } finally {
-      setIsSubmitting(false);
+      console.error("Error creating Razorpay order:", error);
+      setErrorMsg(
+        error instanceof Error ? error.message : "Unable to start payment. Please try again."
+      );
+      setIsProcessingPayment(false);
     }
   };
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="afterInteractive"
+        onLoad={() => setIsRazorpayReady(true)}
+        onError={() => setErrorMsg("Razorpay checkout failed to load. Refresh and try again.")}
+      />
+
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-body { font-family: 'Manrope', sans-serif; }
         .font-label { font-family: 'Manrope', sans-serif; }
@@ -128,109 +291,143 @@ export default function BookSlotPage() {
           background: radial-gradient(circle at center, rgba(160, 140, 255, 0.08) 0%, transparent 70%);
           pointer-events: none;
         }
-      `}} />
+      `,
+        }}
+      />
 
-      {/* External fonts */}
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
-      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Manrope:wght@400;500;700;800&display=swap"
+        rel="stylesheet"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet"
+      />
 
       <div className="text-[#e6e0e9] font-body selection:bg-[#d1c4ff] selection:text-[#2b0064] min-h-screen flex flex-col relative overflow-hidden bg-[#0b0a0f]">
-        
-        {/* Subtle Background Layer (Classroom) */}
+        {isCheckingAuth && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#0b0a0f]">
+            <div className="text-center">
+              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[#a4a6ff]/30 border-t-[#a4a6ff]" />
+              <p className="text-sm font-medium text-[#cac4cf]">Loading your booking...</p>
+            </div>
+          </div>
+        )}
+
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <img 
-            src="/classroom.jpeg" 
+          <img
+            src="/classroom.jpeg"
             alt="Background Classroom"
             className="w-full h-full object-cover object-[center_20%] opacity-80"
           />
           <div className="absolute inset-0 bg-[#0b0a0f]/60" />
         </div>
 
-        {/* Background Decorative Glows */}
-        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#6750a4]/10 rounded-full blur-[140px] pointer-events-none z-0"></div>
-        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#3f51b5]/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#6750a4]/10 rounded-full blur-[140px] pointer-events-none z-0" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#3f51b5]/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
-        {/* TopAppBar */}
         <header className="w-full top-0 sticky z-[100] bg-[#0b0a0f] flex justify-between items-center px-6 py-4">
-          <img src="/skillyug.png" alt="Skillyug Logo" className="h-20 md:h-24 w-auto object-contain scale-[1.8] md:scale-[2.0]" />
+          <img
+            src="/skillyug.png"
+            alt="Skillyug Logo"
+            className="h-20 md:h-24 w-auto object-contain scale-[1.8] md:scale-[2.0]"
+          />
         </header>
 
         <main className="flex-grow flex items-center justify-center px-6 py-12 md:py-24 relative z-10">
-          
-          {/* Spotlight Card Form Container */}
           <div className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-white/5">
             <div className="mb-6">
-              {/* Connected standard NextJS Back link */}
-              <Link href="/" className="flex items-center gap-2 text-[#cac4cf] hover:text-[#d1c4ff] transition-colors font-headline font-bold text-sm group w-fit">
-                <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-[#cac4cf] hover:text-[#d1c4ff] transition-colors font-headline font-bold text-sm group w-fit"
+              >
+                <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">
+                  arrow_back
+                </span>
                 Back
               </Link>
             </div>
-            
-            {/* Header Section */}
+
             <div className="mb-8">
               <h1 className="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-[#e6e0e9] mb-2">
                 Book Your Spot
               </h1>
-              <p className="text-[#cac4cf] font-medium">Secure your placement for the upcoming session.</p>
+              <p className="text-[#cac4cf] font-medium">
+                Complete the payment to confirm your placement for the upcoming session.
+              </p>
             </div>
 
-            {/* Form */}
-            <form className="space-y-8" onSubmit={handleSubmit}>
+            {userEmail && (
+              <div className="mb-6 rounded-xl border border-[#48474a]/35 bg-[#1b1923]/60 px-4 py-3 text-sm text-[#cac4cf]">
+                Logged in as <span className="font-semibold text-white">{userEmail}</span>
+              </div>
+            )}
+
+            {successMsg && (
+              <div className="mb-6 rounded-xl border border-green-500/30 bg-green-500/15 px-4 py-3 text-sm font-semibold text-green-300">
+                {successMsg}
+              </div>
+            )}
+
+            {errorMsg && (
+              <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/15 px-4 py-3 text-sm font-semibold text-red-300">
+                {errorMsg}
+              </div>
+            )}
+
+            <form className="space-y-8" onSubmit={handlePayment}>
               <div className="space-y-6">
-                
-                {/* Field: Student Name */}
                 <div className="group">
                   <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Student Name
                   </label>
                   <div className="relative">
-                    <input 
+                    <input
                       name="studentName"
                       required
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium" 
-                      placeholder="Enter full name" 
+                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
+                      placeholder="Enter full name"
                       type="text"
                       defaultValue={prefilledName}
                     />
                   </div>
                 </div>
 
-                {/* Field: Phone Number */}
                 <div className="group">
                   <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Phone Number
                   </label>
                   <div className="relative">
-                    <input 
+                    <input
                       name="phoneNumber"
                       required
                       pattern="\d{10}"
                       maxLength={10}
                       title="Please enter exactly 10 digits"
                       onInput={(e) => {
-                        e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+                        e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, "");
                       }}
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium" 
-                      placeholder="9876543210" 
+                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
+                      placeholder="9876543210"
                       type="tel"
                     />
                   </div>
                 </div>
 
-                {/* Field: Class/Grade */}
                 <div className="group">
                   <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Class/Grade
                   </label>
                   <div className="relative">
-                    <select 
+                    <select
                       name="grade"
                       required
                       defaultValue=""
                       className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium appearance-none"
                     >
-                      <option disabled value="">Select class or grade</option>
+                      <option disabled value="">
+                        Select class or grade
+                      </option>
                       <option value="6th">6th</option>
                       <option value="7th">7th</option>
                       <option value="8th">8th</option>
@@ -245,51 +442,40 @@ export default function BookSlotPage() {
                   </div>
                 </div>
 
-                {/* Field: Promo Code */}
                 <div className="group">
                   <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Promo Code (Optional)
                   </label>
                   <div className="relative">
-                    <input 
+                    <input
                       name="promoCode"
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium uppercase" 
-                      placeholder="Enter promo code" 
+                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium uppercase"
+                      placeholder="Enter promo code"
                       type="text"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="pt-4 flex flex-col sm:flex-row gap-4">
-                <button 
-                  className="flex-1 bg-gradient-to-r from-[#6750a4] to-[#3f51b5] text-white font-bold py-4 rounded-full hover:shadow-[0_0_30px_-5px_rgba(103,80,164,0.6)] transition-all active:scale-95 flex items-center justify-center gap-2" 
-                  type="button"
-                >
-                  Pay Now
-                </button>
-                <button 
-                  disabled={isSubmitting}
-                  className="flex-1 bg-gradient-to-r from-[#7c4dff] to-[#448aff] text-white font-bold py-4 rounded-full hover:shadow-[0_0_30px_-5px_rgba(124,77,255,0.6)] disabled:opacity-75 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2" 
+              <div className="pt-4">
+                <button
+                  disabled={isProcessingPayment || isCheckingAuth}
+                  className="w-full bg-gradient-to-r from-[#7c4dff] to-[#448aff] text-white font-bold py-5 rounded-full hover:shadow-[0_0_30px_-5px_rgba(124,77,255,0.6)] disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
                   type="submit"
                 >
-                  {isSubmitting ? "Submitting..." : "Submit Details"}
-                  {!isSubmitting && <span className="material-symbols-outlined">arrow_forward</span>}
+                  <span className="material-symbols-outlined">payments</span>
+                  {isProcessingPayment ? "Opening Payment..." : "Pay Now - ₹50"}
                 </button>
               </div>
             </form>
 
-            {/* Footer Note */}
             <div className="mt-8 text-center">
               <p className="text-[11px] font-label text-[#938f99]/60 uppercase tracking-widest">
-                Secure payment processed via RAZORPAY
+                Secure payment processed via Razorpay
               </p>
             </div>
           </div>
         </main>
-
-
       </div>
     </>
   );

@@ -1,21 +1,80 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwg2SKb_ua_S3YWK-FNhLHqkdiO1BdqzAE4nASa1kGWBmgIn4wXAmNadmRMNhcTbrrm/exec";
+const DEMO_AMOUNT_PAISE = 4900;
+
+interface RazorpayOrderResponse {
+  amount: number;
+  currency: string;
+  customerEmail: string;
+  keyId: string;
+  orderId: string;
+}
+
+interface RazorpaySuccessPayload {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayFailurePayload {
+  error?: {
+    description?: string;
+    reason?: string;
+  };
+}
+
+interface RazorpayInstance {
+  on: (event: "payment.failed", handler: (payload: RazorpayFailurePayload) => void) => void;
+  open: () => void;
+}
+
+interface RazorpayOptions {
+  amount: number;
+  currency: string;
+  description: string;
+  handler: (payload: RazorpaySuccessPayload) => void | Promise<void>;
+  key: string;
+  modal?: {
+    confirm_close?: boolean;
+    ondismiss?: () => void;
+  };
+  name: string;
+  notes?: Record<string, string>;
+  order_id: string;
+  prefill?: {
+    contact?: string;
+    email?: string;
+    name?: string;
+  };
+  retry?: {
+    enabled: boolean;
+  };
+  theme?: {
+    color: string;
+  };
+}
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: RazorpayOptions) => RazorpayInstance;
+  }
+}
 
 export default function BookDemoPage() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [prefilledName, setPrefilledName] = useState("");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [isRazorpayReady, setIsRazorpayReady] = useState(false);
+  const [prefilledName, setPrefilledName] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -25,73 +84,164 @@ export default function BookDemoPage() {
         setIsCheckingAuth(false);
         return;
       }
-      setUserId(session.user.id);
-      setUserEmail(session.user.email ?? null);
+
       const fullName = session.user?.user_metadata?.full_name || "";
-      if (fullName) setPrefilledName(fullName);
+      if (fullName) {
+        setPrefilledName(fullName);
+      }
+
+      setUserEmail(session.user?.email ?? "");
       setIsCheckingAuth(false);
     };
+
     checkAuth();
   }, [router]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handlePayment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSuccessMsg("");
     setErrorMsg("");
+    setSuccessMsg("");
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const studentName = formData.get("studentName") as string;
-    const phoneNumber = formData.get("phoneNumber") as string;
-    const gradeValue = formData.get("grade") as string;
-
-    if (phoneNumber.length !== 10) {
-      setErrorMsg("Please enter exactly 10 digits for the phone number.");
+    if (!window.Razorpay || !isRazorpayReady) {
+      setErrorMsg("Payment gateway is still loading. Please try again in a moment.");
       return;
     }
 
-    setIsSubmitting(true);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const studentName = (formData.get("studentName") as string)?.trim();
+    const phoneNumber = (formData.get("phoneNumber") as string)?.trim();
+
+    if (!studentName || !/^\d{10}$/.test(phoneNumber)) {
+      setErrorMsg("Enter a valid name and 10-digit phone number before paying.");
+      return;
+    }
+
+    setIsProcessingPayment(true);
 
     try {
-      // Save to Supabase demo_bookings table
-      const { error: supabaseError } = await supabase
-        .from("demo_bookings")
-        .insert({
-          user_id: userId,
+      const orderResponse = await fetch("/api/book-demo/order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phoneNumber,
+          studentName,
+        }),
+      });
+
+      const orderData = (await orderResponse.json()) as RazorpayOrderResponse & { error?: string };
+
+      if (!orderResponse.ok) {
+        throw new Error(orderData.error || "Failed to start payment.");
+      }
+
+      let paymentFinalized = false;
+
+      const razorpay = new window.Razorpay({
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Skillyug",
+        description: "Book Your Demo",
+        order_id: orderData.orderId,
+        prefill: {
           name: studentName,
-          email: userEmail,
-          phone: phoneNumber,
-          preferred_time: gradeValue,
-        });
+          email: orderData.customerEmail || userEmail,
+          contact: phoneNumber,
+        },
+        notes: {
+          booking_type: "demo_booking",
+        },
+        retry: {
+          enabled: true,
+        },
+        modal: {
+          confirm_close: true,
+          ondismiss: () => {
+            if (!paymentFinalized) {
+              setErrorMsg("Payment was cancelled before completion.");
+              setIsProcessingPayment(false);
+            }
+          },
+        },
+        theme: {
+          color: "#7c4dff",
+        },
+        handler: async (paymentPayload) => {
+          paymentFinalized = true;
 
-      if (supabaseError) {
-        console.error("Supabase error:", supabaseError.message);
-        setErrorMsg("Something went wrong saving your booking. Please try again.");
-        setIsSubmitting(false);
-        return;
-      }
+          try {
+            const verifyResponse = await fetch("/api/book-demo/verify-payment", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                ...paymentPayload,
+                phoneNumber,
+                studentName,
+              }),
+            });
 
-      // Also send to Google Sheets for record keeping
-      try {
-        await fetch(SCRIPT_URL, { method: "POST", body: formData });
-      } catch {
-        // Non-critical — Supabase insert already succeeded
-        console.warn("Google Sheets sync failed, but booking was saved.");
-      }
+            const verifyData = await verifyResponse.json();
+            if (!verifyResponse.ok) {
+              throw new Error(
+                verifyData.error || "Payment was captured but demo confirmation failed."
+              );
+            }
 
-      setSuccessMsg("🎉 Your free demo has been booked! We'll contact you shortly.");
-      form.reset();
+            setSuccessMsg("Payment successful. Your demo has been booked.");
+            form.reset();
+
+            const studentNameInput = form.elements.namedItem("studentName") as HTMLInputElement | null;
+            if (studentNameInput && prefilledName) {
+              studentNameInput.value = prefilledName;
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            setErrorMsg(
+              error instanceof Error
+                ? error.message
+                : "Payment verification failed. Contact support with your payment details."
+            );
+          } finally {
+            setIsProcessingPayment(false);
+          }
+        },
+      });
+
+      razorpay.on("payment.failed", (payload) => {
+        paymentFinalized = true;
+        const failureReason =
+          payload.error?.description || payload.error?.reason || "Payment failed. Please try again.";
+        setErrorMsg(failureReason);
+        setIsProcessingPayment(false);
+      });
+
+      razorpay.open();
     } catch (error) {
-      console.error("Error submitting form", error);
-      setErrorMsg("Network error. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      console.error("Error creating Razorpay order:", error);
+      setErrorMsg(
+        error instanceof Error ? error.message : "Unable to start payment. Please try again."
+      );
+      setIsProcessingPayment(false);
     }
   };
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="afterInteractive"
+        onLoad={() => setIsRazorpayReady(true)}
+        onError={() => setErrorMsg("Razorpay checkout failed to load. Refresh and try again.")}
+      />
+
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-body { font-family: 'Manrope', sans-serif; }
         .font-label { font-family: 'Manrope', sans-serif; }
@@ -132,10 +282,18 @@ export default function BookDemoPage() {
           background: radial-gradient(circle at center, rgba(160, 140, 255, 0.08) 0%, transparent 70%);
           pointer-events: none;
         }
-      `}} />
+      `,
+        }}
+      />
 
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
-      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Manrope:wght@400;500;700;800&display=swap"
+        rel="stylesheet"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet"
+      />
 
       <div className="text-[#e6e0e9] font-body selection:bg-[#d1c4ff] selection:text-[#2b0064] min-h-screen flex flex-col relative overflow-hidden bg-[#0b0a0f]">
         {isCheckingAuth && (
@@ -147,7 +305,6 @@ export default function BookDemoPage() {
           </div>
         )}
 
-        {/* Background */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <img
             src="/classroom.jpeg"
@@ -157,34 +314,46 @@ export default function BookDemoPage() {
           <div className="absolute inset-0 bg-[#0b0a0f]/60" />
         </div>
 
-        {/* Decorative Glows */}
-        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#6750a4]/10 rounded-full blur-[140px] pointer-events-none z-0"></div>
-        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#3f51b5]/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#6750a4]/10 rounded-full blur-[140px] pointer-events-none z-0" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#3f51b5]/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
-        {/* Header */}
         <header className="w-full top-0 sticky z-[100] bg-[#0b0a0f] flex justify-between items-center px-6 py-4">
-          <img src="/skillyug.png" alt="Skillyug Logo" className="h-20 md:h-24 w-auto object-contain scale-[1.8] md:scale-[2.0]" />
+          <img
+            src="/skillyug.png"
+            alt="Skillyug Logo"
+            className="h-20 md:h-24 w-auto object-contain scale-[1.8] md:scale-[2.0]"
+          />
         </header>
 
         <main className="flex-grow flex items-center justify-center px-6 py-12 md:py-24 relative z-10">
           <div className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-white/5">
-
             <div className="mb-6">
-              <Link href="/" className="flex items-center gap-2 text-[#cac4cf] hover:text-[#d1c4ff] transition-colors font-headline font-bold text-sm group w-fit">
-                <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-[#cac4cf] hover:text-[#d1c4ff] transition-colors font-headline font-bold text-sm group w-fit"
+              >
+                <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">
+                  arrow_back
+                </span>
                 Back
               </Link>
             </div>
 
-            {/* Header */}
             <div className="mb-8">
               <h1 className="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-[#e6e0e9] mb-2">
-                Book Free Demo
+                Book Your Demo
               </h1>
-              <p className="text-[#cac4cf] font-medium">Experience a live AI class — completely free, no commitment.</p>
+              <p className="text-[#cac4cf] font-medium">
+                Complete the payment to confirm your live demo booking.
+              </p>
             </div>
 
-            {/* Success / Error Messages */}
+            {userEmail && (
+              <div className="mb-6 rounded-xl border border-[#48474a]/35 bg-[#1b1923]/60 px-4 py-3 text-sm text-[#cac4cf]">
+                Logged in as <span className="font-semibold text-white">{userEmail}</span>
+              </div>
+            )}
+
             {successMsg && (
               <div className="mb-6 p-4 bg-green-500/20 text-green-300 rounded-xl text-sm font-semibold border border-green-500/30">
                 {successMsg}
@@ -196,11 +365,8 @@ export default function BookDemoPage() {
               </div>
             )}
 
-            {/* Form */}
-            <form className="space-y-8" onSubmit={handleSubmit}>
+            <form className="space-y-8" onSubmit={handlePayment}>
               <div className="space-y-6">
-
-                {/* Student Name */}
                 <div className="group">
                   <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Student Name
@@ -215,7 +381,6 @@ export default function BookDemoPage() {
                   />
                 </div>
 
-                {/* Phone Number */}
                 <div className="group">
                   <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Phone Number
@@ -227,7 +392,7 @@ export default function BookDemoPage() {
                     maxLength={10}
                     title="Please enter exactly 10 digits"
                     onInput={(e) => {
-                      e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+                      e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, "");
                     }}
                     className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
                     placeholder="9876543210"
@@ -235,51 +400,23 @@ export default function BookDemoPage() {
                   />
                 </div>
 
-                {/* Class/Grade */}
-                <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
-                    Class/Grade
-                  </label>
-                  <div className="relative">
-                    <select
-                      name="grade"
-                      required
-                      defaultValue=""
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium appearance-none"
-                    >
-                      <option disabled value="">Select class or grade</option>
-                      <option value="6th">6th</option>
-                      <option value="7th">7th</option>
-                      <option value="8th">8th</option>
-                      <option value="9th">9th</option>
-                      <option value="10th">10th</option>
-                      <option value="11th">11th</option>
-                      <option value="12th">12th</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-[#938f99]">
-                      <span className="material-symbols-outlined">expand_more</span>
-                    </div>
-                  </div>
-                </div>
               </div>
 
-              {/* Submit Button */}
               <div className="pt-4">
                 <button
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#7c4dff] to-[#448aff] text-white font-bold py-4 rounded-full hover:shadow-[0_0_30px_-5px_rgba(124,77,255,0.6)] disabled:opacity-75 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2"
+                  disabled={isProcessingPayment || isCheckingAuth}
+                  className="w-full bg-gradient-to-r from-[#7c4dff] to-[#448aff] text-white font-bold py-5 rounded-full hover:shadow-[0_0_30px_-5px_rgba(124,77,255,0.6)] disabled:opacity-75 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2 text-lg"
                   type="submit"
                 >
-                  {isSubmitting ? "Booking..." : "Book My Free Demo"}
-                  {!isSubmitting && <span className="material-symbols-outlined">arrow_forward</span>}
+                  <span className="material-symbols-outlined">payments</span>
+                  {isProcessingPayment ? "Opening Payment..." : "Pay Now - ₹49"}
                 </button>
               </div>
             </form>
 
-            {/* Footer Note */}
             <div className="mt-8 text-center">
               <p className="text-[11px] font-label text-[#938f99]/60 uppercase tracking-widest">
-                100% Free · No Credit Card Required
+                Secure payment processed via Razorpay
               </p>
             </div>
           </div>
