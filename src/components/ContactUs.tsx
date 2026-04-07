@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Phone } from "lucide-react";
+import { Linkedin, Mail, Phone } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 export default function ContactUs() {
   const router = useRouter();
@@ -266,6 +266,33 @@ export default function ContactUs() {
                 </div>
               </div>
             </div>
+
+            {/* LinkedIn Card */}
+            <a
+              href="https://www.linkedin.com/company/skillyug-official/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="glass-panel group block p-8 rounded-[1.5rem] bg-[#0f172a]/40 border border-white/5 border-l-4 border-l-sky-500 hover:bg-[#0f172a]/70 hover:-translate-y-1 transition-all overflow-hidden relative"
+            >
+              <div className="absolute right-0 top-0 w-32 h-32 bg-sky-500/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
+              <div className="flex items-start gap-5 relative z-10">
+                <div className="bg-[#020617]/80 p-4 rounded-2xl text-sky-400 shadow-inner shadow-white/5 border border-white/5">
+                  <Linkedin className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1.5">
+                    LinkedIn
+                  </h3>
+                  <p className="text-base md:text-xl font-bold text-white tracking-wide">
+                    Follow Skillyug
+                  </p>
+                  <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">
+                    Get company updates, announcements, and student highlights
+                    on our official LinkedIn page.
+                  </p>
+                </div>
+              </div>
+            </a>
           </div>
 
         </div>
