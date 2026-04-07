@@ -12,6 +12,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [session, setSession] = useState<Session | null>(null)
+  const [hasMyBatchAccess, setHasMyBatchAccess] = useState(false)
   const pathname = usePathname()
   const rafRef = React.useRef<number | null>(null)
 
@@ -33,12 +34,18 @@ export default function Navbar() {
     // Check user session - happens ONCE on mount, not on every scroll
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
+      if (!session) {
+        setHasMyBatchAccess(false)
+      }
     })
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session) // Only called when auth state actually changes
+      if (!session) {
+        setHasMyBatchAccess(false)
+      }
     })
     
     return () => {
@@ -47,6 +54,39 @@ export default function Navbar() {
       subscription.unsubscribe()
     }
   }, [])
+
+  useEffect(() => {
+    if (!session) {
+      return
+    }
+
+    let cancelled = false
+
+    const loadAccess = async () => {
+      try {
+        const response = await fetch("/api/my-batch/access", { cache: "no-store" })
+        if (!response.ok) {
+          if (!cancelled) setHasMyBatchAccess(false)
+          return
+        }
+
+        const data = (await response.json()) as { hasAccess?: boolean }
+        if (!cancelled) {
+          setHasMyBatchAccess(Boolean(data.hasAccess))
+        }
+      } catch {
+        if (!cancelled) {
+          setHasMyBatchAccess(false)
+        }
+      }
+    }
+
+    loadAccess()
+
+    return () => {
+      cancelled = true
+    }
+  }, [session])
 
   // Close mobile menu and handle smooth scroll for hash links
   const handleNavClick = (e: React.MouseEvent, href: string) => {
@@ -65,12 +105,14 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "My Batch", href: "/my-batch" },
     { name: "Projects", href: "/#projects" },
     { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
     { name: "Testimonials", href: "/#testimonials" },
     { name: "Blog", href: "/blog" },
   ]
+  const visibleNavLinks = hasMyBatchAccess
+    ? [...navLinks.slice(0, 1), { name: "My Batch", href: "/my-batch" }, ...navLinks.slice(1)]
+    : navLinks
 
   return (
     <header 
@@ -90,7 +132,7 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <nav aria-label="Main Navigation" className="hidden md:block">
           <ul className="flex gap-8 items-center bg-white/5 px-6 py-2.5 rounded-full border border-white/5 backdrop-blur-sm shadow-[inset_0_0_10px_rgba(255,255,255,0.02)]">
-            {navLinks.map((link) => {
+            {visibleNavLinks.map((link) => {
               const active = link.name === "Blog" 
                 ? pathname.startsWith("/blog") 
                 : link.name === "My Batch"
@@ -159,7 +201,7 @@ export default function Navbar() {
       >
         <nav aria-label="Mobile Navigation">
           <ul className="flex flex-col px-6 gap-2">
-            {navLinks.map((link) => {
+            {visibleNavLinks.map((link) => {
               const active = link.name === "Blog" 
                 ? pathname.startsWith("/blog") 
                 : link.name === "My Batch"

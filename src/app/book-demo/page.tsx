@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
+import { markPaymentSupportNoticePending } from "@/lib/paymentSupportNotice";
 import { supabase } from "@/lib/supabaseClient";
 
 interface RazorpayOrderResponse {
@@ -59,6 +60,8 @@ interface RazorpayOptions {
   };
 }
 
+type RazorpayScriptStatus = "loading" | "ready" | "failed";
+
 declare global {
   interface Window {
     Razorpay?: new (options: RazorpayOptions) => RazorpayInstance;
@@ -68,12 +71,19 @@ declare global {
 export default function BookDemoPage() {
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState("");
+  const [gatewayNotice, setGatewayNotice] = useState("");
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [isRazorpayReady, setIsRazorpayReady] = useState(false);
+  const [razorpayScriptStatus, setRazorpayScriptStatus] =
+    useState<RazorpayScriptStatus>("loading");
+  const [razorpayAutoRetryCount, setRazorpayAutoRetryCount] = useState(0);
+  const [razorpayScriptKey, setRazorpayScriptKey] = useState(0);
   const [prefilledName, setPrefilledName] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [studentName, setStudentName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const showPaymentHelpCta = Boolean(successMsg || errorMsg);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -87,6 +97,7 @@ export default function BookDemoPage() {
       const fullName = session.user?.user_metadata?.full_name || "";
       if (fullName) {
         setPrefilledName(fullName);
+        setStudentName(fullName);
       }
 
       setUserEmail(session.user?.email ?? "");
@@ -96,22 +107,63 @@ export default function BookDemoPage() {
     checkAuth();
   }, [router]);
 
+  useEffect(() => {
+    if (razorpayScriptStatus !== "loading") {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (window.Razorpay) {
+        setRazorpayScriptStatus("ready");
+        return;
+      }
+
+      if (razorpayAutoRetryCount < 1) {
+        setGatewayNotice(
+          "Payment gateway took too long to load. Reloading it now. Your entered details will stay filled in."
+        );
+        setRazorpayAutoRetryCount((current) => current + 1);
+        setRazorpayScriptKey((current) => current + 1);
+        return;
+      }
+
+      setRazorpayScriptStatus("failed");
+      setErrorMsg(
+        "Razorpay failed to load after retry. Check your network or browser shields, then try again."
+      );
+    }, 4000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [razorpayAutoRetryCount, razorpayScriptStatus, razorpayScriptKey]);
+
+  const handleRetryRazorpayScript = () => {
+    setErrorMsg("");
+    setGatewayNotice("");
+    setRazorpayScriptStatus("loading");
+    setRazorpayAutoRetryCount(0);
+    setRazorpayScriptKey((current) => current + 1);
+  };
+
   const handlePayment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
+    setGatewayNotice("");
 
-    if (!window.Razorpay || !isRazorpayReady) {
-      setErrorMsg("Payment gateway is still loading. Please try again in a moment.");
+    if (razorpayScriptStatus === "failed") {
+      setErrorMsg("Razorpay failed to load. Check your network or browser shields and try again.");
       return;
     }
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const studentName = (formData.get("studentName") as string)?.trim();
-    const phoneNumber = (formData.get("phoneNumber") as string)?.trim();
+    if (razorpayScriptStatus !== "ready" || !window.Razorpay) {
+      setErrorMsg("Payment gateway is still loading. Please wait until it is ready.");
+      return;
+    }
 
-    if (!studentName || !/^\d{10}$/.test(phoneNumber)) {
+    const normalizedStudentName = studentName.trim();
+    const normalizedPhoneNumber = phoneNumber.trim();
+
+    if (!normalizedStudentName || !/^\d{10}$/.test(normalizedPhoneNumber)) {
       setErrorMsg("Enter a valid name and 10-digit phone number before paying.");
       return;
     }
@@ -125,8 +177,8 @@ export default function BookDemoPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          phoneNumber,
-          studentName,
+          phoneNumber: normalizedPhoneNumber,
+          studentName: normalizedStudentName,
         }),
       });
 
@@ -146,9 +198,9 @@ export default function BookDemoPage() {
         description: "Book Your Demo",
         order_id: orderData.orderId,
         prefill: {
-          name: studentName,
+          name: normalizedStudentName,
           email: orderData.customerEmail || userEmail,
-          contact: phoneNumber,
+          contact: normalizedPhoneNumber,
         },
         notes: {
           booking_type: "demo_booking",
@@ -179,8 +231,8 @@ export default function BookDemoPage() {
               },
               body: JSON.stringify({
                 ...paymentPayload,
-                phoneNumber,
-                studentName,
+                phoneNumber: normalizedPhoneNumber,
+                studentName: normalizedStudentName,
               }),
             });
 
@@ -192,12 +244,10 @@ export default function BookDemoPage() {
             }
 
             setSuccessMsg("Payment successful. Your demo has been booked.");
-            form.reset();
-
-            const studentNameInput = form.elements.namedItem("studentName") as HTMLInputElement | null;
-            if (studentNameInput && prefilledName) {
-              studentNameInput.value = prefilledName;
-            }
+            markPaymentSupportNoticePending();
+            setPhoneNumber("");
+            setStudentName(prefilledName || "");
+            router.replace("/my-batch");
           } catch (error) {
             console.error("Payment verification error:", error);
             setErrorMsg(
@@ -232,10 +282,29 @@ export default function BookDemoPage() {
   return (
     <>
       <Script
+        key={razorpayScriptKey}
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="afterInteractive"
-        onLoad={() => setIsRazorpayReady(true)}
-        onError={() => setErrorMsg("Razorpay checkout failed to load. Refresh and try again.")}
+        onLoad={() => {
+          setRazorpayScriptStatus("ready");
+          setRazorpayAutoRetryCount(0);
+          setGatewayNotice((current) =>
+            current
+              ? "Payment gateway reloaded. Your details are still filled in. Please review them and tap Pay Now again."
+              : ""
+          );
+          setErrorMsg((current) =>
+            current === "Razorpay failed to load. Check your network or browser shields and try again."
+              || current ===
+                "Razorpay failed to load after retry. Check your network or browser shields, then try again."
+              ? ""
+              : current
+          );
+        }}
+        onError={() => {
+          setRazorpayScriptStatus("failed");
+          setErrorMsg("Razorpay failed to load. Check your network or browser shields and try again.");
+        }}
       />
 
       <style
@@ -364,6 +433,45 @@ export default function BookDemoPage() {
               </div>
             )}
 
+            {gatewayNotice && (
+              <div className="mb-6 rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-200">
+                {gatewayNotice}
+              </div>
+            )}
+
+            {razorpayScriptStatus === "loading" && (
+              <div className="mb-6 rounded-xl border border-blue-500/25 bg-blue-500/10 px-4 py-3 text-sm font-semibold text-blue-200">
+                Loading payment gateway...
+              </div>
+            )}
+
+            {razorpayScriptStatus === "failed" && (
+              <div className="mb-6">
+                <button
+                  type="button"
+                  onClick={handleRetryRazorpayScript}
+                  className="flex w-full items-center justify-center rounded-xl border border-blue-400/25 bg-blue-500/10 px-5 py-4 text-center text-sm font-semibold text-blue-200 transition-colors hover:bg-blue-500/15 hover:text-white"
+                >
+                  Retry payment gateway
+                </button>
+              </div>
+            )}
+
+            {showPaymentHelpCta && (
+              <div className="mb-6">
+                <Link
+                  href="/#contact"
+                  className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-blue-400/30 bg-gradient-to-r from-blue-600/80 to-violet-600/80 px-5 py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(59,130,246,0.7)] transition-all hover:-translate-y-0.5 hover:from-blue-500 hover:to-violet-500 hover:shadow-[0_16px_36px_-12px_rgba(124,77,255,0.8)]"
+                >
+                  <span className="material-symbols-outlined text-[20px]">support_agent</span>
+                  If you faced any problem during payment, contact us so we can help.
+                  <span className="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1">
+                    arrow_forward
+                  </span>
+                </Link>
+              </div>
+            )}
+
             <form className="space-y-8" onSubmit={handlePayment}>
               <div className="space-y-6">
                 <div className="group">
@@ -373,10 +481,11 @@ export default function BookDemoPage() {
                   <input
                     name="studentName"
                     required
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.currentTarget.value)}
                     className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
                     placeholder="Enter full name"
                     type="text"
-                    defaultValue={prefilledName}
                   />
                 </div>
 
@@ -387,12 +496,16 @@ export default function BookDemoPage() {
                   <input
                     name="phoneNumber"
                     required
+                    value={phoneNumber}
                     pattern="\d{10}"
                     maxLength={10}
                     title="Please enter exactly 10 digits"
                     onInput={(e) => {
                       e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, "");
                     }}
+                    onChange={(e) =>
+                      setPhoneNumber(e.currentTarget.value.replace(/[^0-9]/g, "").slice(0, 10))
+                    }
                     className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
                     placeholder="9876543210"
                     type="tel"
@@ -403,12 +516,22 @@ export default function BookDemoPage() {
 
               <div className="pt-4">
                 <button
-                  disabled={isProcessingPayment || isCheckingAuth}
+                  disabled={
+                    isProcessingPayment ||
+                    isCheckingAuth ||
+                    razorpayScriptStatus !== "ready"
+                  }
                   className="w-full bg-gradient-to-r from-[#7c4dff] to-[#448aff] text-white font-bold py-5 rounded-full hover:shadow-[0_0_30px_-5px_rgba(124,77,255,0.6)] disabled:opacity-75 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2 text-lg"
                   type="submit"
                 >
                   <span className="material-symbols-outlined">payments</span>
-                  {isProcessingPayment ? "Opening Payment..." : "Pay Now - ₹49"}
+                  {isProcessingPayment
+                    ? "Opening Payment..."
+                    : razorpayScriptStatus === "loading"
+                      ? "Loading Payment Gateway..."
+                      : razorpayScriptStatus === "failed"
+                        ? "Payment Gateway Unavailable"
+                        : "Pay Now - ₹49"}
                 </button>
               </div>
             </form>
