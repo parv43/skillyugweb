@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Mail, Phone } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 export default function ContactUs() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     company: "",
     name: "",
@@ -10,9 +13,41 @@ export default function ContactUs() {
     phone: "",
     role: "Select Option"
   });
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncSession = async () => {
+      await supabase.auth.getSession();
+
+      if (!isMounted) {
+        return;
+      }
+
+      setIsCheckingAuth(false);
+    };
+
+    syncSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      if (!isMounted) {
+        return;
+      }
+
+      setIsCheckingAuth(false);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,6 +55,21 @@ export default function ContactUs() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isCheckingAuth) {
+      return;
+    }
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      setErrorMsg("Please log in or sign up before sending a message.");
+      router.push("/login?redirect=/#contact");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMsg("");
     setSuccess(false);
@@ -35,6 +85,7 @@ export default function ContactUs() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -85,14 +136,18 @@ export default function ContactUs() {
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
 
               <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                <label htmlFor="contact-company" className="sr-only">
+                  Company
+                </label>
                 <input
                   type="text"
+                  id="contact-company"
                   name="company"
                   value={formData.company}
                   onChange={handleChange}
                   autoComplete="off"
                   tabIndex={-1}
-                  className="hidden"
+                  className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
                   aria-hidden="true"
                 />
                 {success && (
@@ -108,8 +163,9 @@ export default function ContactUs() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Full Name</label>
+                    <label htmlFor="contact-name" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Full Name</label>
                     <input 
+                      id="contact-name"
                       type="text" 
                       name="name"
                       value={formData.name}
@@ -120,8 +176,9 @@ export default function ContactUs() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Phone Number</label>
+                    <label htmlFor="contact-phone" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Phone Number</label>
                     <input 
+                      id="contact-phone"
                       type="tel" 
                       name="phone"
                       value={formData.phone}
@@ -134,8 +191,9 @@ export default function ContactUs() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Role / Grade</label>
+                  <label htmlFor="contact-role" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Role / Grade</label>
                   <select 
+                    id="contact-role"
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
@@ -153,8 +211,9 @@ export default function ContactUs() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Message</label>
+                  <label htmlFor="contact-message" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Message</label>
                   <textarea 
+                    id="contact-message"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
@@ -167,10 +226,10 @@ export default function ContactUs() {
 
                 <button 
                   type="submit" 
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isCheckingAuth}
                   className="w-full glow-button bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-full font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_0_20px_rgba(59,130,246,0.3)] mt-2 disabled:opacity-50"
                 >
-                  {isSubmitting ? "Sending..." : "Send Message"}
+                  {isCheckingAuth ? "Checking..." : isSubmitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </div>

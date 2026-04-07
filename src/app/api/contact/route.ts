@@ -58,6 +58,30 @@ export async function POST(request: Request) {
       role?: string;
     };
 
+    const authHeader = request.headers.get("authorization");
+    const accessToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: "Please log in or sign up before sending a message." },
+        { status: 401 }
+      );
+    }
+
+    const supabaseAuth = createClient(
+      getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
+      getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+    );
+
+    const { data: authData, error: authError } = await supabaseAuth.auth.getUser(accessToken);
+
+    if (authError || !authData.user) {
+      return NextResponse.json(
+        { error: "Your session has expired. Please log in again before sending a message." },
+        { status: 401 }
+      );
+    }
+
     const company = typeof body.company === "string" ? body.company.trim() : "";
     if (company) {
       return NextResponse.json({ success: true });

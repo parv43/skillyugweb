@@ -11,5 +11,4 @@ alter table public.slot_bookings
   add column if not exists created_at timestamptz not null default now();
 
 create unique index if not exists slot_bookings_razorpay_payment_id_key
-  on public.slot_bookings (razorpay_payment_id)
-  where razorpay_payment_id is not null;
+  on public.slot_bookings (razorpay_payment_id);
