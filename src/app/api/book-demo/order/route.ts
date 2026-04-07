@@ -1,26 +1,13 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { getRequiredEnv, getRazorpayAuthHeader } from "@/lib/razorpayServer";
 
 export const runtime = "nodejs";
 
 const DEMO_AMOUNT_PAISE = 4900;
 const DEMO_CURRENCY = "INR";
 const DEMO_ORDER_COOKIE = "demo_booking_order_id";
-
-function getRequiredEnv(name: string) {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
-
-function getRazorpayAuthHeader() {
-  const keyId = getRequiredEnv("RAZORPAY_KEY_ID");
-  const keySecret = getRequiredEnv("RAZORPAY_KEY_SECRET");
-  return `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}`;
-}
 
 async function getAuthenticatedUser() {
   const cookieStore = await cookies();
@@ -82,6 +69,9 @@ export async function POST(request: Request) {
         receipt,
         notes: {
           booking_type: "demo_booking",
+          email: user.email ?? "",
+          phone_number: phoneNumber,
+          student_name: studentName,
           user_id: user.id,
         },
       }),

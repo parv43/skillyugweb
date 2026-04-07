@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { toggleAnonymousReaction } from "@/app/actions/reactions";
 
 interface AnonymousReactionBarProps {
@@ -27,18 +27,21 @@ function generateGuestId(): string {
 }
 
 export default function AnonymousReactionBar({ itemId, initialCounts = {} }: AnonymousReactionBarProps) {
-  const [guestId, setGuestId] = useState<string | null>(null);
-  const [counts, setCounts] = useState<Record<string, number>>(initialCounts);
-  const [activeReactions, setActiveReactions] = useState<Record<string, boolean>>({});
+  const [guestId] = useState<string | null>(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
 
-  useEffect(() => {
     let storedGuestId = localStorage.getItem("skillyug_guest_id");
     if (!storedGuestId) {
       storedGuestId = generateGuestId();
       localStorage.setItem("skillyug_guest_id", storedGuestId);
     }
-    setGuestId(storedGuestId);
-  }, []);
+
+    return storedGuestId;
+  });
+  const [counts, setCounts] = useState<Record<string, number>>(initialCounts);
+  const [activeReactions, setActiveReactions] = useState<Record<string, boolean>>({});
 
   const handleToggle = async (reactionType: string) => {
     if (!guestId) return;

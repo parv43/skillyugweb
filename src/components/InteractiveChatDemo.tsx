@@ -50,14 +50,14 @@ export default function InteractiveChatDemo() {
       return "Skillyug is designed perfectly for students from Class 6 to 12. Many parents attend the demo before deciding if it's the right fit for their child."
     }
     if (text.includes("book") || text.includes("demo") || text.includes("join") || text.includes("enroll") || text.includes("start")) {
-      return "The best way to understand the program is to attend the demo session! You can book your slot using the 'Book My Slot Now' button below."
+      return "The best way to understand the program is to attend the demo session. You can book your demo using the button below."
     }
     if (text.includes("project") || text.includes("build") || text.includes("create") || text.includes("make")) {
       return "Students build real-world AI chatbots, AI generated designs, and automation workflows. The best way to understand the program is to attend the demo session."
     }
     
     // Off-topic fallback
-    return "I'm here to help parents understand the Skillyug AI Creator Demo Class. Please ask questions related to the program or what students will learn."
+    return "I am here to help parents understand the Skillyug AI Creator Demo Class. Please ask questions related to the program or what students will learn."
   }
 
   const handleSend = (text: string) => {
@@ -94,7 +94,7 @@ export default function InteractiveChatDemo() {
           Master the Art of Prompting
         </motion.h2>
         <p className="text-slate-400 text-lg md:text-xl font-light mb-4">
-          We don't just teach students what AI is. We teach them exactly how to talk to it to get professional results.
+          We don&apos;t just teach students what AI is. We teach them exactly how to talk to it to get professional results.
         </p>
         <p className="text-blue-400/80 text-sm font-medium tracking-wide">
           Have questions before booking the demo? Ask our AI assistant instantly.

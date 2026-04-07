@@ -1,18 +1,19 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import React, { useState, useEffect } from "react"
 import { Menu, X } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import type { Session } from "@supabase/supabase-js"
 import { supabase } from "@/lib/supabaseClient"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [session, setSession] = useState<any>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const pathname = usePathname()
   const rafRef = React.useRef<number | null>(null)
-  const lastScrollY = React.useRef(0)
 
   useEffect(() => {
     // ✅ Use requestAnimationFrame for optimal performance (syncs with 60fps)
@@ -22,10 +23,7 @@ export default function Navbar() {
       rafRef.current = requestAnimationFrame(() => {
         const isScrolled = window.scrollY > 60
         // Only update state if value actually changed (prevent unnecessary re-renders)
-        if (isScrolled !== scrolled) {
-          setScrolled(isScrolled)
-        }
-        lastScrollY.current = window.scrollY
+        setScrolled((previous) => (previous === isScrolled ? previous : isScrolled))
       })
     }
     
@@ -48,7 +46,7 @@ export default function Navbar() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
       subscription.unsubscribe()
     }
-  }, [scrolled])
+  }, [])
 
   // Close mobile menu and handle smooth scroll for hash links
   const handleNavClick = (e: React.MouseEvent, href: string) => {
@@ -131,9 +129,9 @@ export default function Navbar() {
             <Link 
               href="/book-demo" 
               className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] hover:scale-105 transition-all duration-300 block border border-white/10"
-              aria-label="Book Free Demo"
+              aria-label="Book Your Demo"
             >
-              Book Free Demo
+              Book Your Demo
             </Link>
           )}
         </div>
@@ -196,9 +194,9 @@ export default function Navbar() {
                   href="/book-demo" 
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] block border border-white/10"
-                  aria-label="Book Free Demo"
+                  aria-label="Book Your Demo"
                 >
-                  Book Free Demo
+                  Book Your Demo
                 </Link>
               )}
             </li>

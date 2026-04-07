@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { Suspense, useState } from "react";
@@ -122,7 +123,7 @@ function SignUpForm() {
                 Check Your Mail Inbox
               </h1>
               <p className="text-[#adaaad] text-base leading-relaxed mb-2">
-                We've sent a verification link to:
+                We&apos;ve sent a verification link to:
               </p>
               <p className="text-[#a4a6ff] font-bold text-lg mb-6 break-all">
                 {email}
@@ -281,7 +282,9 @@ function SignUpForm() {
                   setErrorMsg("");
                   const { error } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
-                    options: { redirectTo: `${window.location.origin}/auth/callback` },
+                    options: {
+                      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+                    },
                   });
                   if (error) setErrorMsg(error.message);
                 }}
@@ -294,7 +297,7 @@ function SignUpForm() {
               <div className="pt-4 text-center">
                 <p className="text-[#adaaad]">
                   Already have an account? 
-                  <Link href="/login" className="text-[#a4a6ff] font-bold hover:underline ml-1">Log In</Link>
+                  <Link href={`/login?redirect=${encodeURIComponent(redirectTo)}`} className="text-[#a4a6ff] font-bold hover:underline ml-1">Log In</Link>
                 </p>
               </div>
             </div>

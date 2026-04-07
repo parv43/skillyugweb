@@ -2,14 +2,13 @@
 
 import React, { useState } from "react";
 import { Mail, Phone } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
-
 export default function ContactUs() {
   const [formData, setFormData] = useState({
+    company: "",
     name: "",
+    message: "",
     phone: "",
-    role: "Select Option",
-    message: ""
+    role: "Select Option"
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -31,24 +30,27 @@ export default function ContactUs() {
       return;
     }
 
-    // Insert into Supabase table "contact_messages"
-    const { error } = await supabase
-      .from('contact_messages')
-      .insert([
-        { 
-          name: formData.name, 
-          phone: formData.phone, 
-          role: formData.role === "Select Option" ? "Not Specified" : formData.role, 
-          message: formData.message 
-        }
-      ]);
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    if (error) {
-      console.error("Error submitting contact form:", error);
-      setErrorMsg("Failed to send message. Please try again later.");
-    } else {
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to send message. Please try again later.");
+      }
+
       setSuccess(true);
-      setFormData({ name: "", phone: "", role: "Select Option", message: "" });
+      setFormData({ company: "", name: "", message: "", phone: "", role: "Select Option" });
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      setErrorMsg(
+        error instanceof Error ? error.message : "Failed to send message. Please try again later."
+      );
     }
     
     setIsSubmitting(false);
@@ -83,6 +85,16 @@ export default function ContactUs() {
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
 
               <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                <input
+                  type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleChange}
+                  autoComplete="off"
+                  tabIndex={-1}
+                  className="hidden"
+                  aria-hidden="true"
+                />
                 {success && (
                   <div className="p-4 bg-green-500/20 border border-green-500/30 rounded-xl text-green-300 text-sm font-bold text-center">
                     Message sent successfully! We will get back to you soon.

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element, @next/next/no-page-custom-font */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -5,8 +6,6 @@ import Link from "next/link";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-
-const SLOT_AMOUNT_PAISE = 5000;
 
 interface RazorpayOrderResponse {
   amount: number;
@@ -464,7 +463,7 @@ export default function BookSlotPage() {
                   type="submit"
                 >
                   <span className="material-symbols-outlined">payments</span>
-                  {isProcessingPayment ? "Opening Payment..." : "Pay Now - ₹50"}
+                  {isProcessingPayment ? "Opening Payment..." : "Pay Now - ₹299"}
                 </button>
               </div>
             </form>

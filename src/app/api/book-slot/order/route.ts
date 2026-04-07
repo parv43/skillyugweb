@@ -1,26 +1,13 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { getRequiredEnv, getRazorpayAuthHeader } from "@/lib/razorpayServer";
 
 export const runtime = "nodejs";
 
-const SLOT_AMOUNT_PAISE = 5000;
+const SLOT_AMOUNT_PAISE = 29900;
 const SLOT_CURRENCY = "INR";
 const SLOT_ORDER_COOKIE = "slot_booking_order_id";
-
-function getRequiredEnv(name: string) {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
-
-function getRazorpayAuthHeader() {
-  const keyId = getRequiredEnv("RAZORPAY_KEY_ID");
-  const keySecret = getRequiredEnv("RAZORPAY_KEY_SECRET");
-  return `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}`;
-}
 
 async function getAuthenticatedUser() {
   const cookieStore = await cookies();
@@ -84,8 +71,12 @@ export async function POST(request: Request) {
         receipt,
         notes: {
           booking_type: "slot_booking",
+          email: user.email ?? "",
           grade,
+          grade_class: grade,
+          phone_number: phoneNumber,
           promo_code: promoCode || "NONE",
+          student_name: studentName,
           user_id: user.id,
         },
       }),

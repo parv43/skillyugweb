@@ -2,9 +2,16 @@
 
 import React from "react"
 import { motion } from "framer-motion"
-import { Compass, MessageSquare, Image as ImageIcon, Zap, Trophy, ChevronRight } from "lucide-react"
+import { Compass, MessageSquare, Image as ImageIcon, Zap, Trophy, type LucideIcon } from "lucide-react"
 
-const BootcampStep = ({ icon: Icon, title, desc, index }: any) => {
+interface BootcampStepProps {
+  icon: LucideIcon
+  title: string
+  desc: string
+  index: number
+}
+
+const BootcampStep = ({ icon: Icon, title, desc, index }: BootcampStepProps) => {
   return (
     <div className="flex flex-col md:flex-row items-center md:items-start group relative w-full md:w-1/5 shrink-0 px-4 md:px-2 z-10">
       

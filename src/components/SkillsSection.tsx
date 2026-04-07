@@ -1,14 +1,48 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import React from "react"
 import { motion } from "framer-motion"
-import { MessageSquare, Layout, Image, PenTool, Search, Presentation, Edit3, Sparkles, FileText } from "lucide-react"
+import {
+  MessageSquare,
+  Layout,
+  Image,
+  PenTool,
+  Search,
+  Presentation,
+  Edit3,
+  Sparkles,
+  FileText,
+  type LucideIcon,
+} from "lucide-react"
 
-const ToolCard = ({ icon: Icon, title, desc, color = "blue" }: any) => {
+type ToolColor = "blue" | "purple" | "pink" | "indigo" | "cyan" | "violet" | "sky" | "fuchsia" | "teal"
+
+const TOOL_COLORS: Record<ToolColor, { border: string; text: string }> = {
+  blue: { border: "border-blue-500/30", text: "text-blue-400" },
+  purple: { border: "border-purple-500/30", text: "text-purple-400" },
+  pink: { border: "border-pink-500/30", text: "text-pink-400" },
+  indigo: { border: "border-indigo-500/30", text: "text-indigo-400" },
+  cyan: { border: "border-cyan-500/30", text: "text-cyan-400" },
+  violet: { border: "border-violet-500/30", text: "text-violet-400" },
+  sky: { border: "border-sky-500/30", text: "text-sky-400" },
+  fuchsia: { border: "border-fuchsia-500/30", text: "text-fuchsia-400" },
+  teal: { border: "border-teal-500/30", text: "text-teal-400" },
+}
+
+interface ToolCardProps {
+  icon: LucideIcon
+  title: string
+  desc: string
+  color?: ToolColor
+}
+
+const ToolCard = ({ icon: Icon, title, desc, color = "blue" }: ToolCardProps) => {
+  const styles = TOOL_COLORS[color]
   return (
     <div className="grid-item flex flex-col items-center text-center p-2 group">
-      <div className={`w-14 h-14 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-5 border border-${color}-500/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)] group-hover:-translate-y-1 transition-transform duration-300 relative`}>
-        <Icon className={`w-6 h-6 text-${color}-400`} />
+      <div className={`w-14 h-14 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-5 border ${styles.border} shadow-[0_4px_12px_rgba(0,0,0,0.1)] group-hover:-translate-y-1 transition-transform duration-300 relative`}>
+        <Icon className={`w-6 h-6 ${styles.text}`} />
       </div>
       <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
       <p className="text-sm text-slate-400 leading-relaxed max-w-[280px]">
@@ -109,7 +143,8 @@ export default function SkillsSection() {
         {tools.filter(t => t.title !== "AI Study Assistant" && t.title !== "AI Research Tools").map((tool, idx) => {
           const Icon = tool.icon
           const colors = ["blue", "purple", "pink", "indigo", "cyan", "violet", "sky", "fuchsia", "teal"]
-          const color = colors[idx % colors.length]
+          const color = colors[idx % colors.length] as ToolColor
+          const styles = TOOL_COLORS[color]
           return (
             <motion.div
               key={idx}
@@ -119,8 +154,8 @@ export default function SkillsSection() {
               transition={{ duration: 0.35, delay: idx * 0.05 }}
               viewport={{ once: true }}
             >
-              <div className={`w-11 h-11 rounded-xl bg-[#020617] border border-${color}-500/30 flex items-center justify-center flex-shrink-0`}>
-                <Icon className={`w-5 h-5 text-${color}-400`} />
+              <div className={`w-11 h-11 rounded-xl bg-[#020617] border ${styles.border} flex items-center justify-center flex-shrink-0`}>
+                <Icon className={`w-5 h-5 ${styles.text}`} />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-white font-bold text-sm leading-tight mb-1">{tool.title}</h3>

@@ -2,9 +2,52 @@
 
 import React from "react"
 import { motion } from "framer-motion"
-import { BookOpen, Zap, Palette, Cpu, Clock, Rocket } from "lucide-react"
+import { BookOpen, Zap, Palette, Cpu, Clock, Rocket, type LucideIcon } from "lucide-react"
 
-const ProjectCard = ({ title, tech, desc, icon: Icon, delay }: any) => {
+type ProjectColor = "blue" | "yellow" | "pink" | "purple" | "emerald" | "orange"
+
+const PROJECT_COLORS: Record<ProjectColor, { badge: string; border: string; text: string }> = {
+  blue: {
+    badge: "bg-blue-500/10",
+    border: "border-blue-500/30",
+    text: "text-blue-400",
+  },
+  yellow: {
+    badge: "bg-yellow-500/10",
+    border: "border-yellow-500/30",
+    text: "text-yellow-400",
+  },
+  pink: {
+    badge: "bg-pink-500/10",
+    border: "border-pink-500/30",
+    text: "text-pink-400",
+  },
+  purple: {
+    badge: "bg-purple-500/10",
+    border: "border-purple-500/30",
+    text: "text-purple-400",
+  },
+  emerald: {
+    badge: "bg-emerald-500/10",
+    border: "border-emerald-500/30",
+    text: "text-emerald-400",
+  },
+  orange: {
+    badge: "bg-orange-500/10",
+    border: "border-orange-500/30",
+    text: "text-orange-400",
+  },
+}
+
+interface ProjectCardProps {
+  title: string
+  tech: string
+  desc: string
+  icon: LucideIcon
+  delay: number
+}
+
+const ProjectCard = ({ title, tech, desc, icon: Icon, delay }: ProjectCardProps) => {
   return (
     <motion.div
       className="glass-panel p-6 sm:p-8 rounded-[2rem] border border-white/5 hover:border-blue-500/30 transition-all duration-300 group flex flex-col h-full cyber-glow relative overflow-hidden bg-white/[0.02]"
@@ -94,7 +137,8 @@ export default function StudentProjects() {
       <div className="flex flex-col gap-3 px-4 max-w-lg mx-auto w-full z-10 relative md:hidden">
         {projects.map((project, idx) => {
           const Icon = project.icon
-          const color = iconColors[idx]
+          const color = iconColors[idx] as ProjectColor
+          const styles = PROJECT_COLORS[color]
           return (
             <motion.div
               key={idx}
@@ -104,13 +148,13 @@ export default function StudentProjects() {
               transition={{ duration: 0.35, delay: idx * 0.06 }}
               viewport={{ once: true }}
             >
-              <div className={`w-11 h-11 rounded-xl bg-[#020617] border border-${color}-500/30 flex items-center justify-center flex-shrink-0`}>
-                <Icon className={`w-5 h-5 text-${color}-400`} />
+              <div className={`w-11 h-11 rounded-xl bg-[#020617] border ${styles.border} flex items-center justify-center flex-shrink-0`}>
+                <Icon className={`w-5 h-5 ${styles.text}`} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <h3 className="text-white font-bold text-sm leading-tight">{project.title}</h3>
-                  <span className={`text-[10px] font-bold text-${color}-400 uppercase tracking-wider bg-${color}-500/10 px-2 py-0.5 rounded-full`}>{project.tech}</span>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${styles.text} ${styles.badge}`}>{project.tech}</span>
                 </div>
                 <p className="text-slate-400 text-xs leading-relaxed">{project.desc}</p>
               </div>
