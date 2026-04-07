@@ -48,11 +48,11 @@ export default function Home() {
           </defs>
           
           {/* Animated vertical flowing lines */}
-          <path d="M 15% 0 L 15% 100%" stroke="url(#globalGlow)" strokeWidth="1" strokeDasharray="10 10" className="opacity-50" />
-          <path d="M 85% 0 L 85% 100%" stroke="url(#globalGlow)" strokeWidth="1" strokeDasharray="10 10" className="opacity-50" />
+          <line x1="15%" y1="0" x2="15%" y2="100%" stroke="url(#globalGlow)" strokeWidth="1" strokeDasharray="10 10" className="opacity-50" />
+          <line x1="85%" y1="0" x2="85%" y2="100%" stroke="url(#globalGlow)" strokeWidth="1" strokeDasharray="10 10" className="opacity-50" />
           
-          <path d="M 15% 0 L 15% 100%" stroke="url(#globalGlow)" strokeWidth="3" strokeDasharray="100 1000" className="animate-[stroke-dashoffset_10s_linear_infinite] opacity-60" />
-          <path d="M 85% 0 L 85% 100%" stroke="url(#globalGlow)" strokeWidth="3" strokeDasharray="100 1000" className="animate-[stroke-dashoffset_12s_linear_infinite] opacity-60" />
+          <line x1="15%" y1="0" x2="15%" y2="100%" stroke="url(#globalGlow)" strokeWidth="3" strokeDasharray="100 1000" className="animate-[stroke-dashoffset_10s_linear_infinite] opacity-60" />
+          <line x1="85%" y1="0" x2="85%" y2="100%" stroke="url(#globalGlow)" strokeWidth="3" strokeDasharray="100 1000" className="animate-[stroke-dashoffset_12s_linear_infinite] opacity-60" />
         </svg>
       </div>
 
