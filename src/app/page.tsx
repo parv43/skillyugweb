@@ -12,6 +12,7 @@ import GallerySection from "@/components/GallerySection"
 import Testimonials from "@/components/Testimonials"
 import DemoBookingSection from "@/components/DemoBookingSection"
 import FloatingCTA from "@/components/FloatingCTA"
+import PaymentSupportNotice from "@/components/PaymentSupportNotice"
 import SlidingCTA from "@/components/SlidingCTA"
 import ContactUs from "@/components/ContactUs"
 
@@ -60,6 +61,7 @@ export default function Home() {
       </div>
 
       <Navbar />
+      <PaymentSupportNotice />
       <HeroSection />
       
       {/* Promotional Ribbon */}

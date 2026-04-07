@@ -82,6 +82,7 @@ const cohortSignals = [
 export default function MyBatchPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
   const [user, setUser] = useState<BatchUser | null>(null);
 
   useEffect(() => {
@@ -97,6 +98,22 @@ export default function MyBatchPage() {
 
       const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
       const avatarUrl = session.user.user_metadata?.avatar_url || null;
+      const accessResponse = await fetch("/api/my-batch/access", { cache: "no-store" });
+
+      if (!accessResponse.ok) {
+        setAccessDenied(true);
+        setLoading(false);
+        router.replace("/");
+        return;
+      }
+
+      const accessData = (await accessResponse.json()) as { hasAccess?: boolean };
+      if (!accessData.hasAccess) {
+        setAccessDenied(true);
+        setLoading(false);
+        router.replace("/");
+        return;
+      }
 
       setUser({
         avatarUrl,
@@ -111,6 +128,14 @@ export default function MyBatchPage() {
   }, [router]);
 
   if (loading) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center text-slate-200">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+      </div>
+    );
+  }
+
+  if (accessDenied || !user) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-slate-200">
         <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
