@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Mail, Phone } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 export default function ContactUs() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     company: "",
     name: "",
@@ -10,9 +13,41 @@ export default function ContactUs() {
     phone: "",
     role: "Select Option"
   });
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncSession = async () => {
+      await supabase.auth.getSession();
+
+      if (!isMounted) {
+        return;
+      }
+
+      setIsCheckingAuth(false);
+    };
+
+    syncSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      if (!isMounted) {
+        return;
+      }
+
+      setIsCheckingAuth(false);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,6 +55,21 @@ export default function ContactUs() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isCheckingAuth) {
+      return;
+    }
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      setErrorMsg("Please log in or sign up before sending a message.");
+      router.push("/login?redirect=/#contact");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMsg("");
     setSuccess(false);
@@ -35,6 +85,7 @@ export default function ContactUs() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -175,10 +226,10 @@ export default function ContactUs() {
 
                 <button 
                   type="submit" 
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isCheckingAuth}
                   className="w-full glow-button bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-full font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_0_20px_rgba(59,130,246,0.3)] mt-2 disabled:opacity-50"
                 >
-                  {isSubmitting ? "Sending..." : "Send Message"}
+                  {isCheckingAuth ? "Checking..." : isSubmitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </div>

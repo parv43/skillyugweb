@@ -65,7 +65,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Curriculum", href: "/#curriculum" },
+    { name: "My Batch", href: "/my-batch" },
     { name: "Projects", href: "/#projects" },
     { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
     { name: "Testimonials", href: "/#testimonials" },
@@ -93,6 +93,8 @@ export default function Navbar() {
             {navLinks.map((link) => {
               const active = link.name === "Blog" 
                 ? pathname.startsWith("/blog") 
+                : link.name === "My Batch"
+                  ? pathname === "/my-batch"
                 : link.name === "Home" 
                   ? pathname === "/" 
                   : false;
@@ -160,6 +162,8 @@ export default function Navbar() {
             {navLinks.map((link) => {
               const active = link.name === "Blog" 
                 ? pathname.startsWith("/blog") 
+                : link.name === "My Batch"
+                  ? pathname === "/my-batch"
                 : link.name === "Home" 
                   ? pathname === "/" 
                   : false;
