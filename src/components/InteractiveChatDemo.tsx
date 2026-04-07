@@ -219,7 +219,11 @@ export default function InteractiveChatDemo() {
               }}
               className="relative flex items-center"
             >
+              <label htmlFor="interactive-chat-input" className="sr-only">
+                Message the AI assistant
+              </label>
               <input 
+                id="interactive-chat-input"
                 type="text" 
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
@@ -230,9 +234,10 @@ export default function InteractiveChatDemo() {
               <button 
                 type="submit"
                 disabled={!inputVal.trim() || isTyping}
+                aria-label="Send message"
                 className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-blue-500 hover:bg-blue-600 rounded-lg flex items-center justify-center text-white disabled:opacity-50 disabled:hover:bg-blue-500 transition-colors"
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-4 h-4" aria-hidden="true" />
               </button>
             </form>
           </div>

@@ -85,14 +85,18 @@ export default function ContactUs() {
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
 
               <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                <label htmlFor="contact-company" className="sr-only">
+                  Company
+                </label>
                 <input
                   type="text"
+                  id="contact-company"
                   name="company"
                   value={formData.company}
                   onChange={handleChange}
                   autoComplete="off"
                   tabIndex={-1}
-                  className="hidden"
+                  className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
                   aria-hidden="true"
                 />
                 {success && (
@@ -108,8 +112,9 @@ export default function ContactUs() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Full Name</label>
+                    <label htmlFor="contact-name" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Full Name</label>
                     <input 
+                      id="contact-name"
                       type="text" 
                       name="name"
                       value={formData.name}
@@ -120,8 +125,9 @@ export default function ContactUs() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Phone Number</label>
+                    <label htmlFor="contact-phone" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Phone Number</label>
                     <input 
+                      id="contact-phone"
                       type="tel" 
                       name="phone"
                       value={formData.phone}
@@ -134,8 +140,9 @@ export default function ContactUs() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Role / Grade</label>
+                  <label htmlFor="contact-role" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Role / Grade</label>
                   <select 
+                    id="contact-role"
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
@@ -153,8 +160,9 @@ export default function ContactUs() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Message</label>
+                  <label htmlFor="contact-message" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Message</label>
                   <textarea 
+                    id="contact-message"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
