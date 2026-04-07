@@ -26,6 +26,23 @@ interface PersistBookingOptions<TFallback> {
   payment: RazorpayPayment;
 }
 
+type DemoBookingRow = {
+  amount_paid: number;
+  currency: string;
+  email: string | null;
+  name: string;
+  payment_status: string;
+  phone: string;
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  user_id: string | null;
+};
+
+type SlotBookingRow = DemoBookingRow & {
+  grade_class: string;
+  promo_code: string | null;
+};
+
 function cleanString(value?: string | null) {
   return value?.trim() ? value.trim() : null;
 }
@@ -54,6 +71,42 @@ function createSupabaseAdmin() {
   );
 }
 
+async function saveBookingRow<TBookingRow extends { razorpay_payment_id: string }>(
+  table: "demo_bookings" | "slot_bookings",
+  payload: TBookingRow
+) {
+  const supabaseAdmin = createSupabaseAdmin();
+
+  const existingRow = await supabaseAdmin
+    .from(table)
+    .select("razorpay_payment_id")
+    .eq("razorpay_payment_id", payload.razorpay_payment_id)
+    .limit(1)
+    .maybeSingle();
+
+  if (existingRow.error) {
+    throw existingRow.error;
+  }
+
+  if (existingRow.data?.razorpay_payment_id) {
+    const { error } = await supabaseAdmin
+      .from(table)
+      .update(payload)
+      .eq("razorpay_payment_id", payload.razorpay_payment_id);
+
+    if (error) {
+      throw error;
+    }
+
+    return;
+  }
+
+  const { error } = await supabaseAdmin.from(table).insert(payload);
+  if (error) {
+    throw error;
+  }
+}
+
 export async function persistDemoBooking({
   expectedBookingType,
   fallbackDetails,
@@ -75,27 +128,19 @@ export async function persistDemoBooking({
     throw new Error("Booking details are incomplete. Contact support with your payment ID.");
   }
 
-  const supabaseAdmin = createSupabaseAdmin();
-  const { error } = await supabaseAdmin.from("demo_bookings").upsert(
-    {
-      amount_paid: payment.amount,
-      currency: payment.currency,
-      email,
-      name: studentName,
-      payment_status: payment.status,
-      phone: phoneNumber,
-      razorpay_order_id: order.id,
-      razorpay_payment_id: payment.id,
-      user_id: userId,
-    },
-    {
-      onConflict: "razorpay_payment_id",
-    }
-  );
+  const payload: DemoBookingRow = {
+    amount_paid: payment.amount,
+    currency: payment.currency,
+    email,
+    name: studentName,
+    payment_status: payment.status,
+    phone: phoneNumber,
+    razorpay_order_id: order.id,
+    razorpay_payment_id: payment.id,
+    user_id: userId,
+  };
 
-  if (error) {
-    throw error;
-  }
+  await saveBookingRow("demo_bookings", payload);
 }
 
 export async function persistSlotBooking({
@@ -122,27 +167,19 @@ export async function persistSlotBooking({
     throw new Error("Booking details are incomplete. Contact support with your payment ID.");
   }
 
-  const supabaseAdmin = createSupabaseAdmin();
-  const { error } = await supabaseAdmin.from("slot_bookings").upsert(
-    {
-      amount_paid: payment.amount,
-      currency: payment.currency,
-      email,
-      grade_class: gradeClass,
-      name: studentName,
-      payment_status: payment.status,
-      phone: phoneNumber,
-      promo_code: promoCode,
-      razorpay_order_id: order.id,
-      razorpay_payment_id: payment.id,
-      user_id: userId,
-    },
-    {
-      onConflict: "razorpay_payment_id",
-    }
-  );
+  const payload: SlotBookingRow = {
+    amount_paid: payment.amount,
+    currency: payment.currency,
+    email,
+    grade_class: gradeClass,
+    name: studentName,
+    payment_status: payment.status,
+    phone: phoneNumber,
+    promo_code: promoCode,
+    razorpay_order_id: order.id,
+    razorpay_payment_id: payment.id,
+    user_id: userId,
+  };
 
-  if (error) {
-    throw error;
-  }
+  await saveBookingRow("slot_bookings", payload);
 }
