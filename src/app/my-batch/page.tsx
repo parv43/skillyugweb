@@ -212,7 +212,7 @@ export default function MyBatchPage() {
 
               <div className="mt-10 rounded-[1.75rem] border border-white/8 bg-white/[0.03] px-6 py-8 text-center">
                 <Image
-                  src="/skillyug.png"
+                  src="/skillyug-optimized.svg"
                   alt="Skillyug logo"
                   width={260}
                   height={120}

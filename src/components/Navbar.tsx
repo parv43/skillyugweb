@@ -126,7 +126,7 @@ export default function Navbar() {
         
         {/* Logo */}
         <Link href="/" className="flex items-center group transition-all" aria-label="Skillyug Home">
-          <img src="/skillyug.png" alt="Skillyug Logo" className="h-14 md:h-20 object-contain scale-[1.8] transform-gpu hover:scale-[1.9] transition-transform duration-300" />
+          <img src="/skillyug-optimized.svg" alt="Skillyug Logo" className="h-14 md:h-20 object-contain scale-[1.8] transform-gpu hover:scale-[1.9] transition-transform duration-300" />
         </Link>
 
         {/* Desktop Navigation */}
