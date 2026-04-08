@@ -388,7 +388,7 @@ export default function BookSlotPage() {
 
         <div className="absolute inset-0 z-0 pointer-events-none">
           <img
-            src="/classroom.jpeg"
+            src="/classroom.webp"
             alt="Background Classroom"
             className="w-full h-full object-cover object-[center_20%] opacity-80"
           />

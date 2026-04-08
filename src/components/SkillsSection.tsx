@@ -116,7 +116,7 @@ export default function SkillsSection() {
       {/* Background Layer with subtle Classroom Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img 
-          src="/classroom.jpeg" 
+          src="/classroom.webp" 
           alt="Classroom Environment"
           className="w-full h-full object-cover"
         />
