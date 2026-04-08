@@ -95,7 +95,14 @@ export default function Navbar() {
     // Handle smooth scroll for hash links
     if (href.includes("#")) {
       e.preventDefault()
-      const hash = href.split("#")[1]
+      let hash = href.split("#")[1]
+      
+      // If targeting ask-ai, decide which one based on screen size
+      if (hash === "ask-ai") {
+        const isMobile = window.innerWidth < 768; // md breakpoint
+        hash = isMobile ? "ask-ai-mobile" : "ask-ai-desktop";
+      }
+
       const element = document.getElementById(hash)
       if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "start" })
