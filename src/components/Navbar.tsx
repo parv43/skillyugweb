@@ -143,16 +143,28 @@ export default function Navbar() {
               
               return (
                 <li key={link.name}>
-                  <Link 
-                    href={link.href} 
-                    onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
-                    className={`text-sm font-medium transition-all ${
-                      active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                    }`}
-                    aria-label={link.ariaLabel || `Go to ${link.name}`}
-                  >
-                    {link.name}
-                  </Link>
+                  {link.href.includes("#") ? (
+                    <button 
+                      onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
+                      className={`text-sm font-medium transition-all cursor-pointer ${
+                        active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                      }`}
+                      aria-label={link.ariaLabel || `Go to ${link.name}`}
+                    >
+                      {link.name}
+                    </button>
+                  ) : (
+                    <Link 
+                      href={link.href} 
+                      onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
+                      className={`text-sm font-medium transition-all ${
+                        active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                      }`}
+                      aria-label={link.ariaLabel || `Go to ${link.name}`}
+                    >
+                      {link.name}
+                    </Link>
+                  )}
                 </li>
               );
             })}
