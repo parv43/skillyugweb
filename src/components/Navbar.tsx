@@ -92,8 +92,8 @@ export default function Navbar() {
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     setMobileMenuOpen(false)
 
-    // Handle smooth scroll for same-page hash links
-    if (pathname === "/" && href.includes("#")) {
+    // Handle smooth scroll for hash links (on any page)
+    if (href.includes("#")) {
       const hash = href.split("#")[1]
       const element = document.getElementById(hash)
       if (element) {
