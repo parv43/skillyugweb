@@ -4,7 +4,11 @@ import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Bot, User, Send, Sparkles } from "lucide-react"
 
-export default function InteractiveChatDemo() {
+interface InteractiveChatDemoProps {
+  showId?: boolean
+}
+
+export default function InteractiveChatDemo({ showId = true }: InteractiveChatDemoProps) {
   const [messages, setMessages] = useState([
     {
       role: "user",
@@ -82,7 +86,7 @@ export default function InteractiveChatDemo() {
   }
 
   return (
-    <section id="ask-ai" className="relative w-full py-32 bg-[#020617] overflow-hidden border-t border-slate-900">
+    <section id={showId ? "ask-ai" : undefined} className="relative w-full py-32 bg-[#020617] overflow-hidden border-t border-slate-900">
       
       {/* Background Ambience */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-900/10 blur-[150px] rounded-full pointer-events-none" />
