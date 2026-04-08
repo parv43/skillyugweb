@@ -87,7 +87,7 @@ function LoginForm() {
           {/* Brand Anchor */}
           <div className="flex justify-center mb-12">
             <Link href="/" className="hover:scale-105 transition-transform duration-300">
-              <img src="/skillyug.png" alt="Skillyug Logo" className="h-36 md:h-56 w-auto object-contain" />
+              <img src="/skillyug-optimized.svg" alt="Skillyug Logo" className="h-36 md:h-56 w-auto object-contain" />
             </Link>
           </div>
 

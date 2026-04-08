@@ -388,7 +388,7 @@ export default function BookSlotPage() {
 
         <div className="absolute inset-0 z-0 pointer-events-none">
           <img
-            src="/classroom.jpeg"
+            src="/classroom.webp"
             alt="Background Classroom"
             className="w-full h-full object-cover object-[center_20%] opacity-80"
           />
@@ -400,7 +400,7 @@ export default function BookSlotPage() {
 
         <header className="w-full top-0 sticky z-[100] bg-[#0b0a0f] flex justify-between items-center px-6 py-4">
           <img
-            src="/skillyug.png"
+            src="/skillyug-optimized.svg"
             alt="Skillyug Logo"
             className="h-20 md:h-24 w-auto object-contain scale-[1.8] md:scale-[2.0]"
           />
