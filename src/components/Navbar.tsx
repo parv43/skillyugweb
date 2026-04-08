@@ -90,15 +90,22 @@ export default function Navbar() {
 
   // Close mobile menu and handle smooth scroll for hash links
   const handleNavClick = (e: React.MouseEvent, href: string) => {
+    console.log("[🔵 NAVBAR] Click event fired:", { href })
+    
     setMobileMenuOpen(false)
 
-    // Handle smooth scroll for hash links (on any page)
+    // Handle smooth scroll for hash links
     if (href.includes("#")) {
+      e.preventDefault()
       const hash = href.split("#")[1]
+      console.log("[🔵 NAVBAR] Scrolling to hash:", hash)
+      
       const element = document.getElementById(hash)
       if (element) {
-        e.preventDefault()
-        element.scrollIntoView({ behavior: "smooth" })
+        console.log("[✅ NAVBAR] Element found, scrolling...")
+        element.scrollIntoView({ behavior: "smooth", block: "start" })
+      } else {
+        console.log("[❌ NAVBAR] Element not found for hash:", hash)
       }
     }
   }
@@ -145,6 +152,7 @@ export default function Navbar() {
                 <li key={link.name}>
                   {link.href.includes("#") ? (
                     <button 
+                      type="button"
                       onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
                       className={`text-sm font-medium transition-all cursor-pointer ${
                         active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
