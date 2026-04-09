@@ -92,13 +92,20 @@ export default function Navbar() {
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     setMobileMenuOpen(false)
 
-    // Handle smooth scroll for same-page hash links
-    if (pathname === "/" && href.includes("#")) {
-      const hash = href.split("#")[1]
+    // Handle smooth scroll for hash links
+    if (href.includes("#")) {
+      e.preventDefault()
+      let hash = href.split("#")[1]
+      
+      // If targeting ask-ai, decide which one based on screen size
+      if (hash === "ask-ai") {
+        const isMobile = window.innerWidth < 768; // md breakpoint
+        hash = isMobile ? "ask-ai-mobile" : "ask-ai-desktop";
+      }
+
       const element = document.getElementById(hash)
       if (element) {
-        e.preventDefault()
-        element.scrollIntoView({ behavior: "smooth" })
+        element.scrollIntoView({ behavior: "smooth", block: "start" })
       }
     }
   }
@@ -143,16 +150,29 @@ export default function Navbar() {
               
               return (
                 <li key={link.name}>
-                  <Link 
-                    href={link.href} 
-                    onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
-                    className={`text-sm font-medium transition-all ${
-                      active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                    }`}
-                    aria-label={link.ariaLabel || `Go to ${link.name}`}
-                  >
-                    {link.name}
-                  </Link>
+                  {link.href.includes("#") ? (
+                    <button 
+                      type="button"
+                      onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
+                      className={`text-sm font-medium transition-all cursor-pointer ${
+                        active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                      }`}
+                      aria-label={link.ariaLabel || `Go to ${link.name}`}
+                    >
+                      {link.name}
+                    </button>
+                  ) : (
+                    <Link 
+                      href={link.href} 
+                      onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
+                      className={`text-sm font-medium transition-all ${
+                        active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                      }`}
+                      aria-label={link.ariaLabel || `Go to ${link.name}`}
+                    >
+                      {link.name}
+                    </Link>
+                  )}
                 </li>
               );
             })}
