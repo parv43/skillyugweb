@@ -20,12 +20,12 @@ export const metadata: Metadata = {
   title: 'Skillyug | AI Education & Bootcamps for Students',
   description: 'Empowering Class 6-12 students with Future AI Skills. Learn ChatGPT, Canva AI, Gamma, and more through our hands-on AI Creator Bootcamp.',
   alternates: {
-    canonical: 'https://skillyugedu.com',
+    canonical: 'https://www.skillyugedu.com',
   },
   openGraph: {
     title: 'Skillyug | AI Education & Bootcamps for Students',
     description: 'Empowering Class 6-12 students with Future AI Skills. Learn ChatGPT, Canva AI, Gamma, and more through our hands-on AI Creator Bootcamp.',
-    url: 'https://skillyugedu.com',
+    url: 'https://www.skillyugedu.com',
     siteName: 'Skillyug',
     locale: 'en_IN',
     type: 'website',

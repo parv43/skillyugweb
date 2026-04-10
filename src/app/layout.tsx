@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://skillyugedu.com"),
+  metadataBase: new URL("https://www.skillyugedu.com"),
   title: "Skillyug | AI Creator Bootcamp",
   description: "Equip your child with the AI skills they need to shape the world tomorrow.",
   openGraph: {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: "Equip your child with the AI skills they need to shape the world tomorrow.",
     siteName: "Skillyug",
     type: "website",
-    url: "https://skillyugedu.com",
+    url: "https://www.skillyugedu.com",
   },
   twitter: {
     card: "summary_large_image",

@@ -20,12 +20,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: blog.metaDescription,
     keywords: blog.keywords.join(", "),
     alternates: {
-      canonical: `https://skillyugedu.com/blog/${slug}`,
+      canonical: `https://www.skillyugedu.com/blog/${slug}`,
     },
     openGraph: {
       title: `${blog.title} | Skillyug AI Blog`,
       description: blog.metaDescription,
-      url: `https://skillyugedu.com/blog/${slug}`,
+      url: `https://www.skillyugedu.com/blog/${slug}`,
       siteName: 'Skillyug',
       images: [
         {

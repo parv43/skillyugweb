@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Terms and Conditions | Skillyug",
   description: "Read Skillyug terms and conditions for using our services.",
   alternates: {
-    canonical: "https://skillyugedu.com/terms-and-conditions",
+    canonical: "https://www.skillyugedu.com/terms-and-conditions",
   },
 };
 
