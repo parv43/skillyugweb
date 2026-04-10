@@ -75,7 +75,11 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
                 <div className="p-6 flex flex-col flex-grow relative z-10">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-xs font-semibold text-blue-400 uppercase tracking-widest bg-blue-500/10 px-2 py-1 rounded-md">{blog.category}</span>
-                    <span className="text-xs text-slate-400 font-mono">{blog.readTime}</span>
+                    <div className="flex items-center gap-2">
+                       <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">By Skillyug</span>
+                       <span className="w-1 h-1 rounded-full bg-slate-600 hidden sm:block"></span>
+                       <span className="text-xs text-slate-400 font-mono hidden sm:block">{blog.readTime}</span>
+                    </div>
                   </div>
                   <h3 className="text-xl font-bold text-white mb-3 leading-snug group-hover:text-purple-300 transition-colors">
                     {blog.title}

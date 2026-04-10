@@ -89,8 +89,10 @@ export default async function BlogListingPage() {
                 </div>
               </div>
               <div className="w-full lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-4 flex-wrap">
                   <span className="text-xs font-semibold text-purple-400 uppercase tracking-widest">{featuredBlog.category}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                  <span className="text-xs text-slate-300 font-medium">By Skillyug</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
                   <span className="text-xs text-slate-400 font-mono">{featuredBlog.readTime}</span>
                 </div>

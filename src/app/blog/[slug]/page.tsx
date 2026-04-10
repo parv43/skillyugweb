@@ -106,6 +106,8 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             <span className="text-xs font-bold text-blue-400 uppercase tracking-widest bg-blue-500/10 px-3 py-1.5 rounded-md border border-blue-500/20">
               {blog.category}
             </span>
+            <span className="text-sm text-slate-400 font-medium whitespace-nowrap">By Skillyug</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-600 hidden sm:block"></span>
             <span className="text-sm text-slate-400 font-mono flex items-center">
               <svg className="w-4 h-4 mr-1 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
