@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Refund Policy | Skillyug",
   description: "Read Skillyug refund policy for AI bootcamps and services.",
   alternates: {
-    canonical: "https://skillyugedu.com/refund-policy",
+    canonical: "https://www.skillyugedu.com/refund-policy",
   },
 };
 
