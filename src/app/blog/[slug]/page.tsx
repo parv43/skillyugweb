@@ -293,22 +293,10 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           </h2>
 
           <p className="text-lg md:text-xl text-slate-300 font-light max-w-2xl mx-auto mb-12">
-            {blog.content.ctaParagraph || "Help your child learn AI tools the right way with structured guidance and real projects."} {!blog.content.ctaParagraph && <><Link href="/#curriculum" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 decoration-blue-500/30">View our curriculum</Link> or check out <Link href="/#projects" className="text-purple-400 hover:text-purple-300 underline underline-offset-4 decoration-purple-500/30">student projects</Link> to see what they can build.</>}
+            {blog.content.ctaParagraph || "Help your child learn AI tools the right way with structured guidance and real projects."}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full sm:w-auto">
-            <Link
-              href="/#curriculum"
-              className="px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center"
-            >
-              Explore Bootcamp
-            </Link>
-            <Link
-              href="/#projects"
-              className="px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center"
-            >
-              Student Projects
-            </Link>
             <Link
               href="/book-demo"
               className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] block border border-white/10"
