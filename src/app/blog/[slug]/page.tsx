@@ -54,6 +54,14 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
+  let MdxContent: React.ComponentType | null = null;
+  try {
+    const mdxModule = await import(`@/content/blogs/${slug}.mdx`);
+    MdxContent = mdxModule.default;
+  } catch (e) {
+    // No MDX file found, we will fallback to blogData.ts
+  }
+
   const initialCounts = await getReactionCounts(slug);
 
   // Find related blogs (same category, different slug)
@@ -69,9 +77,39 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
   const titleLower = blog.title.toLowerCase();
   const requiresToolsList = ["best", "top", "tools", "apps"].some(keyword => titleLower.includes(keyword));
 
+  const blogPostingSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "headline": blog.title,
+        "description": blog.metaDescription,
+        "image": `https://www.skillyugedu.com${blog.thumbnail}`,
+        "url": `https://www.skillyugedu.com/blog/${slug}`,
+        "inLanguage": "en-IN",
+        "author": { "@type": "Organization", "name": "Skillyug", "url": "https://www.skillyugedu.com" },
+        "publisher": { "@type": "Organization", "name": "Skillyug", "url": "https://www.skillyugedu.com", "logo": { "@type": "ImageObject", "url": "https://www.skillyugedu.com/skillyug.png" } },
+        "keywords": blog.keywords.join(", "),
+        "articleSection": blog.category,
+        "about": { "@type": "Thing", "name": "Artificial Intelligence Education for Students" },
+        "audience": { "@type": "EducationalAudience", "educationalRole": "student", "audienceType": "Class 6\u201312 students in India, aged 11\u201318" },
+        "mainEntityOfPage": { "@type": "WebPage", "@id": `https://www.skillyugedu.com/blog/${slug}` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.skillyugedu.com" },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.skillyugedu.com/blog" },
+          { "@type": "ListItem", "position": 3, "name": blog.title, "item": `https://www.skillyugedu.com/blog/${slug}` },
+        ],
+      },
+    ],
+  };
+
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative pb-0">
-      
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }} />
+
       {/* Background Gradients */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[0%] left-[50%] -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-purple-900/5 to-transparent rounded-b-[100%]" />
@@ -89,13 +127,13 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             <span className="font-bold tracking-widest text-xs uppercase pt-0.5">Back to Blog</span>
           </Link>
         </div>
-        
+
         {/* Top Section */}
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center text-sm font-medium text-slate-400 gap-2">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <span className="text-slate-600">/</span>
-            <Link 
+            <Link
               href="/blog"
               className="hover:text-white transition-colors"
             >
@@ -122,10 +160,10 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           <h1 className="text-3xl md:text-5xl lg:text-5xl font-black text-white mb-8 leading-[1.2] drop-shadow-sm">
             {blog.title}
           </h1>
-          
+
           <div className="w-full h-64 md:h-96 rounded-[24px] overflow-hidden border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] mb-12">
-            <img 
-              src={blog.thumbnail} 
+            <img
+              src={blog.thumbnail}
               alt={blog.title}
               loading="lazy"
               className="w-full h-full object-cover"
@@ -136,75 +174,81 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
         {/* Content Body */}
         <div className="prose prose-invert prose-lg max-w-none text-slate-300">
           
-          <p className="text-xl md:text-2xl text-slate-200 leading-relaxed font-light mb-12 border-l-4 border-blue-500 pl-6 bg-blue-500/5 py-4 rounded-r-lg whitespace-pre-wrap">
-            {blog.content.intro}
-          </p>
-
-          <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-6">
-            {blog.content.whatIsTopicHeader || "What is the Topic"}
-          </h2>
-          <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-300">
-            {blog.content.whatIsTopic}
-          </div>
-
-          <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-6">
-            {blog.content.whyItMattersHeader || "Why It Matters for Students"}
-          </h2>
-          <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-300">
-            {blog.content.whyItMatters}
-          </div>
-
-          {/* Dynamic Content: List or standard content */}
-          {requiresToolsList && blog.content.tools ? (
+          {MdxContent ? (
+            <MdxContent />
+          ) : (
             <>
-              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-8">
-                Top AI Tools for Students
-              </h2>
-              <div className="space-y-6 mb-12">
-                {blog.content.tools.map((tool, idx) => (
-                  <div key={idx} className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] backdrop-blur-sm rounded-[16px] p-6 hover:bg-white/5 transition-colors">
-                    <h3 className="text-xl font-bold text-white mb-2 flex items-center">
-                      <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm mr-3 font-mono border border-blue-500/30">
-                        {idx + 1}
-                      </span>
-                      {tool.name}
-                    </h3>
-                    <div className="pl-11">
-                      <p className="text-sm font-semibold text-purple-400 mb-2 uppercase tracking-wide">
-                        Best For: {tool.useCase}
-                      </p>
-                      <p className="text-slate-300 leading-relaxed text-base m-0 whitespace-pre-wrap">
-                        {tool.explanation}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : blog.content.mainContent ? (
-            <>
+              <p className="text-xl md:text-2xl text-slate-200 leading-relaxed font-light mb-12 border-l-4 border-blue-500 pl-6 bg-blue-500/5 py-4 rounded-r-lg whitespace-pre-wrap">
+                {blog.content.intro}
+              </p>
+
               <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-6">
-                {blog.content.mainContentHeader || "Deep Dive Tutorial"}
+                {blog.content.whatIsTopicHeader || "What is the Topic"}
               </h2>
               <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-300">
-                {blog.content.mainContent}
+                {blog.content.whatIsTopic}
+              </div>
+
+              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-6">
+                {blog.content.whyItMattersHeader || "Why It Matters for Students"}
+              </h2>
+              <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-300">
+                {blog.content.whyItMatters}
+              </div>
+
+              {/* Dynamic Content: List or standard content */}
+              {requiresToolsList && blog.content.tools ? (
+                <>
+                  <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-8">
+                    Top AI Tools for Students
+                  </h2>
+                  <div className="space-y-6 mb-12">
+                    {blog.content.tools.map((tool, idx) => (
+                      <div key={idx} className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] backdrop-blur-sm rounded-[16px] p-6 hover:bg-white/5 transition-colors">
+                        <h3 className="text-xl font-bold text-white mb-2 flex items-center">
+                          <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm mr-3 font-mono border border-blue-500/30">
+                            {idx + 1}
+                          </span>
+                          {tool.name}
+                        </h3>
+                        <div className="pl-11">
+                          <p className="text-sm font-semibold text-purple-400 mb-2 uppercase tracking-wide">
+                            Best For: {tool.useCase}
+                          </p>
+                          <p className="text-slate-300 leading-relaxed text-base m-0 whitespace-pre-wrap">
+                            {tool.explanation}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : blog.content.mainContent ? (
+                <>
+                  <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-6">
+                    {blog.content.mainContentHeader || "Deep Dive Tutorial"}
+                  </h2>
+                  <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-300">
+                    {blog.content.mainContent}
+                  </div>
+                </>
+              ) : null}
+
+              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-6">
+                {blog.content.practicalUsageHeader || "Practical Usage"}
+              </h2>
+              <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-300">
+                {blog.content.practicalUsage}
+              </div>
+
+              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-6">
+                {blog.content.conclusionHeader || "Conclusion"}
+              </h2>
+              <div className="mb-12 leading-relaxed whitespace-pre-wrap text-slate-300">
+                {blog.content.conclusion}
               </div>
             </>
-          ) : null}
-
-          <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-6">
-            {blog.content.practicalUsageHeader || "Practical Usage"}
-          </h2>
-          <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-300">
-            {blog.content.practicalUsage}
-          </div>
-
-          <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-12 mb-6">
-            {blog.content.conclusionHeader || "Conclusion"}
-          </h2>
-          <div className="mb-12 leading-relaxed whitespace-pre-wrap text-slate-300">
-            {blog.content.conclusion}
-          </div>
+          )}
 
           {/* Reaction Bar */}
           <div className="mt-12 mb-8 py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -214,7 +258,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
               <ShareButton url={`/blog/${slug}`} title={blog.title} />
             </div>
           </div>
-          
+
           {/* Related Articles */}
           {relatedBlogs.length > 0 && (
             <div className="mt-16 pt-12 border-t border-white/10">
@@ -229,7 +273,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
               </div>
             </div>
           )}
-          
+
         </div>
       </article>
       <FloatingCTA />
@@ -237,7 +281,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
       {/* Mandatory CTA Section */}
       <section className="relative w-full py-20 mt-10 bg-[rgba(255,255,255,0.02)] border-t border-white/5">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent opacity-60" />
-        
+
         <div className="container mx-auto px-6 relative z-10 text-center max-w-4xl">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-blue-500/30 mb-8 bg-blue-500/5">
             <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
@@ -247,25 +291,13 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text mb-6">
             Join the Skillyug AI Bootcamp for Students (Classes 6–12)
           </h2>
-          
+
           <p className="text-lg md:text-xl text-slate-300 font-light max-w-2xl mx-auto mb-12">
-            {blog.content.ctaParagraph || "Help your child learn AI tools the right way with structured guidance and real projects."} {!blog.content.ctaParagraph && <><Link href="/#curriculum" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 decoration-blue-500/30">View our curriculum</Link> or check out <Link href="/#projects" className="text-purple-400 hover:text-purple-300 underline underline-offset-4 decoration-purple-500/30">student projects</Link> to see what they can build.</>}
+            {blog.content.ctaParagraph || "Help your child learn AI tools the right way with structured guidance and real projects."}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full sm:w-auto">
-            <Link 
-              href="/#curriculum"
-              className="px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center"
-            >
-              Explore Bootcamp
-            </Link>
-            <Link 
-              href="/#projects"
-              className="px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center"
-            >
-              Student Projects
-            </Link>
-            <Link 
+            <Link
               href="/book-demo"
               className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] block border border-white/10"
             >
@@ -274,7 +306,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           </div>
         </div>
       </section>
-      
+
       {/* Minimal Footer consistency */}
       <footer className="relative z-10 w-full bg-[#020617] border-t border-slate-900/80 py-12 flex flex-col items-center">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center opacity-70 mb-4 cyber-glow">

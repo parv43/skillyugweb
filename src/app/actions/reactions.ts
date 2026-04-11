@@ -96,7 +96,7 @@ export async function getReactionCounts(itemId: string): Promise<Record<string, 
     .eq("item_id", itemId);
 
   if (error) {
-    console.error("Error fetching reaction counts:", error);
+    console.warn("Supabase reaction counts unavailable:", error?.message ?? error);
     return {};
   }
 
