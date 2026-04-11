@@ -29,7 +29,6 @@ export default async function BlogListingPage() {
   const featuredBlog = blogs.find(blog => blog.featured) || blogs[0];
   const regularBlogs = blogs.filter(blog => blog.slug !== featuredBlog.slug);
 
-  // Fetch reaction counts for all blogs
   const reactionCountsArray = await Promise.all(
     regularBlogs.map(async (blog) => ({
       slug: blog.slug,
@@ -50,9 +49,46 @@ export default async function BlogListingPage() {
     "Bootcamp Insights"
   ];
 
+  const blogListSchema = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Skillyug AI Learning Blog",
+    "description": "Guides, tutorials, and insights on AI tools and education for Class 6\u201312 students in India.",
+    "url": "https://www.skillyugedu.com/blog",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Skillyug",
+      "url": "https://www.skillyugedu.com",
+    },
+    "blogPost": blogs.map((blog) => ({
+      "@type": "BlogPosting",
+      "headline": blog.title,
+      "description": blog.metaDescription,
+      "url": `https://www.skillyugedu.com/blog/${blog.slug}`,
+      "image": `https://www.skillyugedu.com${blog.thumbnail}`,
+      "author": {
+        "@type": "Organization",
+        "name": "Skillyug",
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Skillyug",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.skillyugedu.com/skillyug.png",
+        },
+      },
+      "keywords": blog.keywords.join(", "),
+    })),
+  };
+
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative pb-20">
-      
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListSchema) }}
+      />
+
       {/* Background Gradients */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent rounded-full" />
@@ -62,7 +98,7 @@ export default async function BlogListingPage() {
       <Navbar />
 
       <div className="container mx-auto px-6 relative z-10 pt-32 lg:pt-40">
-        
+
         {/* Hero Section */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text mb-6 tracking-tight leading-[1.1]">
@@ -78,8 +114,8 @@ export default async function BlogListingPage() {
           <div className="mb-20 group relative rounded-[24px] overflow-hidden bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] backdrop-blur-sm transition-all duration-300 hover:border-blue-500/30 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
             <div className="flex flex-col lg:flex-row">
               <div className="w-full lg:w-1/2 aspect-video lg:aspect-auto h-64 lg:h-auto overflow-hidden relative">
-                <img 
-                  src={featuredBlog.thumbnail} 
+                <img
+                  src={featuredBlog.thumbnail}
                   alt={featuredBlog.title}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -102,7 +138,7 @@ export default async function BlogListingPage() {
                 <p className="text-slate-300 mb-8 leading-relaxed text-base md:text-lg opacity-90">
                   {featuredBlog.shortDescription}
                 </p>
-                <Link 
+                <Link
                   href={`/blog/${featuredBlog.slug}`}
                   className="inline-flex max-w-max items-center justify-center px-6 py-3 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600/80 to-purple-600/80 hover:from-blue-500 hover:to-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] transition-all duration-300 border border-white/10"
                 >

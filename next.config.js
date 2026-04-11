@@ -1,3 +1,4 @@
+const withMDX = require('@next/mdx')();
 const isDev = process.env.NODE_ENV !== "production";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : null;
@@ -97,4 +98,7 @@ const nextConfig = {
     ],
   },
 }; 
-module.exports = nextConfig;
+module.exports = withMDX({
+  ...nextConfig,
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
+});
