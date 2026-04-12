@@ -9,21 +9,15 @@ import {
   ArrowRight,
   BadgeCheck,
   BookOpen,
-  Bot,
-  BrainCircuit,
-  CalendarDays,
-  Clock3,
   Download,
   FolderOpen,
   Loader2,
-  MessageSquare,
   Sparkles,
-  Target,
-  Trophy,
   Users,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
+import BatchCalendar from "@/components/BatchCalendar";
 
 type BatchUser = {
   avatarUrl: string | null;
@@ -49,35 +43,9 @@ const resourceCards = [
   },
 ];
 
-const progressRows = [
-  { label: "Prompt Engineering", value: 100, status: "Complete" },
-  { label: "AI Research Workflow", value: 78, status: "78%" },
-  { label: "Content Automation", value: 64, status: "64%" },
-];
 
-const taskRows = [
-  {
-    title: "Publish your AI explainer reel",
-    due: "Today, 8:00 PM",
-    urgency: "High priority",
-  },
-  {
-    title: "Refine the chatbot prompt stack",
-    due: "In 2 days",
-    urgency: "Upcoming",
-  },
-  {
-    title: "Upload your portfolio case study",
-    due: "This week",
-    urgency: "On track",
-  },
-];
 
-const cohortSignals = [
-  { label: "Live Sessions", value: "12", icon: CalendarDays },
-  { label: "Projects Built", value: "07", icon: BrainCircuit },
-  { label: "Cohort Rank", value: "Top 5%", icon: Trophy },
-];
+
 
 export default function MyBatchPage() {
   const router = useRouter();
@@ -155,45 +123,50 @@ export default function MyBatchPage() {
       <section className="relative z-10 px-6 pt-32 pb-16 lg:px-12">
         <div className="max-w-7xl mx-auto space-y-10">
           <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)]">
-              <div className="flex flex-wrap items-center gap-3 mb-6 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
                 <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2">
                   My Batch Workspace
                 </span>
                 <span className="text-slate-500">Live cohort dashboard</span>
               </div>
-
-              <div className="max-w-3xl">
-                <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[0.95]">
-                  Track your batch,
-                  <span className="block bg-gradient-to-r from-blue-300 via-violet-300 to-pink-300 bg-clip-text text-transparent">
-                    projects, and momentum
-                  </span>
-                </h1>
-                <p className="mt-6 max-w-2xl text-base md:text-lg text-slate-300 leading-relaxed">
-                  This is your cohort command center. Review curriculum assets, monitor progress,
-                  and stay on top of the next deliverables without leaving the Skillyug flow.
-                </p>
+              <div className="mt-8 pt-8 border-t border-white/5">
+                <div className="flex items-center gap-4">
+                  {user?.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={`${user.fullName} profile`}
+                      className="h-14 w-14 rounded-full border border-white/10 object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-blue-500/10 text-lg font-black text-blue-200">
+                      {user?.fullName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-lg font-black text-white">{user?.fullName}</p>
+                    <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-400">
+                      {user?.batchLabel}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-5 text-sm text-slate-300 break-all">{user?.email}</p>
               </div>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                {cohortSignals.map((signal) => {
-                  const Icon = signal.icon;
-                  return (
-                    <div
-                      key={signal.label}
-                      className="rounded-[1.5rem] border border-white/8 bg-slate-950/40 px-5 py-5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">
-                          {signal.label}
-                        </span>
-                        <Icon className="w-4 h-4 text-blue-300" />
-                      </div>
-                      <p className="mt-4 text-3xl font-black text-white">{signal.value}</p>
-                    </div>
-                  );
-                })}
+              <div className="mt-8 pt-8 border-t border-white/5">
+                <div className="flex items-center gap-3">
+                  <Users className="h-5 w-5 text-blue-300" />
+                  <h2 className="text-xl font-black tracking-tight">Batch pulse</h2>
+                </div>
+                <div className="mt-6 rounded-[1.35rem] border border-white/8 bg-slate-950/30 p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">
+                    Next live session
+                  </p>
+                  <p className="mt-3 text-lg font-bold text-white">Thursday, 7:00 PM IST</p>
+                  <p className="mt-2 text-sm text-slate-300">
+                    AI video workflows and performance hooks.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -237,7 +210,7 @@ export default function MyBatchPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 xl:grid-cols-[0.72fr_0.28fr]">
+          <div className="grid grid-cols-1 gap-8">
             <section className="space-y-8">
               <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
@@ -290,117 +263,10 @@ export default function MyBatchPage() {
                   })}
                 </div>
               </div>
-
-              <div className="grid gap-8 lg:grid-cols-2">
-                <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-8">
-                  <div className="flex items-center gap-3">
-                    <Target className="h-5 w-5 text-blue-300" />
-                    <h2 className="text-2xl font-black tracking-tight">Progress map</h2>
-                  </div>
-
-                  <div className="mt-8 space-y-6">
-                    {progressRows.map((row) => (
-                      <div key={row.label}>
-                        <div className="mb-2 flex items-center justify-between gap-4 text-xs font-bold uppercase tracking-[0.22em]">
-                          <span className="text-slate-300">{row.label}</span>
-                          <span className="text-blue-300">{row.status}</span>
-                        </div>
-                        <div className="h-2 rounded-full bg-white/8">
-                          <div
-                            className="h-2 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-pink-500"
-                            style={{ width: `${row.value}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-8">
-                  <div className="flex items-center gap-3">
-                    <Clock3 className="h-5 w-5 text-violet-300" />
-                    <h2 className="text-2xl font-black tracking-tight">Active tasks</h2>
-                  </div>
-
-                  <div className="mt-8 space-y-5">
-                    {taskRows.map((task) => (
-                      <article
-                        key={task.title}
-                        className="rounded-[1.35rem] border border-white/8 bg-slate-950/30 px-5 py-4"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <h3 className="text-sm font-bold text-white">{task.title}</h3>
-                            <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">
-                              {task.due}
-                            </p>
-                          </div>
-                          <span className="rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-violet-200">
-                            {task.urgency}
-                          </span>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              </div>
+              
+              <BatchCalendar />
             </section>
 
-            <aside className="space-y-8">
-              <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-7">
-                <div className="flex items-center gap-4">
-                  {user?.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt={`${user.fullName} profile`}
-                      className="h-14 w-14 rounded-full border border-white/10 object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-blue-500/10 text-lg font-black text-blue-200">
-                      {user?.fullName.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-lg font-black text-white">{user?.fullName}</p>
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-                      {user?.batchLabel}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-5 text-sm text-slate-300 break-all">{user?.email}</p>
-              </section>
-
-              <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-7">
-                <div className="flex items-center gap-3">
-                  <Users className="h-5 w-5 text-blue-300" />
-                  <h2 className="text-xl font-black tracking-tight">Batch pulse</h2>
-                </div>
-                <div className="mt-7 space-y-5">
-                  <div className="rounded-[1.35rem] border border-white/8 bg-slate-950/30 p-5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">
-                      Next live session
-                    </p>
-                    <p className="mt-3 text-lg font-bold text-white">Thursday, 7:00 PM IST</p>
-                    <p className="mt-2 text-sm text-slate-300">
-                      AI video workflows and performance hooks.
-                    </p>
-                  </div>
-                  <div className="rounded-[1.35rem] border border-white/8 bg-slate-950/30 p-5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">
-                      Cohort discussion
-                    </p>
-                    <div className="mt-4 flex items-center gap-3 text-sm text-slate-200">
-                      <MessageSquare className="h-4 w-4 text-violet-300" />
-                      Latest prompt breakdowns shared by mentors
-                    </div>
-                    <div className="mt-3 flex items-center gap-3 text-sm text-slate-200">
-                      <Bot className="h-4 w-4 text-blue-300" />
-                      Weekly AI challenge results published
-                    </div>
-                  </div>
-                </div>
-              </section>
-            </aside>
           </div>
         </div>
       </section>
