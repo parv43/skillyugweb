@@ -262,7 +262,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           {/* Related Articles */}
           {relatedBlogs.length > 0 && (
             <div className="mt-16 pt-12 border-t border-white/10">
-              <h2 className="text-2xl font-bold text-white mb-6">Related Articles</h2>
+              <h2 className="text-2xl font-bold text-white mb-6">Suggested Articles</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {relatedBlogs.map(related => (
                   <Link href={`/blog/${related.slug}`} key={related.slug} className="group block p-5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition duration-300">
@@ -323,7 +323,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
         </nav>
 
         <p className="text-sm font-mono text-slate-500 tracking-widest text-center">
-          © 2026 SKILLYUG NEURAL SYSTEMS<br />
+          © 2026 SKILLYUG<br />
           ALL RIGHTS RESERVED.
         </p>
       </footer>

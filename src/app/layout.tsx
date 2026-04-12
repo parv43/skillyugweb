@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.skillyugedu.com"),
   title: "Skillyug | AI Creator Bootcamp",
   description: "Equip your child with the AI skills they need to shape the world tomorrow.",
+  icons: {
+    icon: "/favicon-sy.png",
+    shortcut: "/favicon-sy.png",
+    apple: "/favicon-sy.png",
+  },
   openGraph: {
     title: "Skillyug | AI Creator Bootcamp",
     description: "Equip your child with the AI skills they need to shape the world tomorrow.",
