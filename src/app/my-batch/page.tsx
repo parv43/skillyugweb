@@ -152,6 +152,22 @@ export default function MyBatchPage() {
                 </div>
                 <p className="mt-5 text-sm text-slate-300 break-all">{user?.email}</p>
               </div>
+
+              <div className="mt-8 pt-8 border-t border-white/5">
+                <div className="flex items-center gap-3">
+                  <Users className="h-5 w-5 text-blue-300" />
+                  <h2 className="text-xl font-black tracking-tight">Batch pulse</h2>
+                </div>
+                <div className="mt-6 rounded-[1.35rem] border border-white/8 bg-slate-950/30 p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">
+                    Next live session
+                  </p>
+                  <p className="mt-3 text-lg font-bold text-white">Thursday, 7:00 PM IST</p>
+                  <p className="mt-2 text-sm text-slate-300">
+                    AI video workflows and performance hooks.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)]">
@@ -194,7 +210,7 @@ export default function MyBatchPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 xl:grid-cols-[0.72fr_0.28fr]">
+          <div className="grid grid-cols-1 gap-8">
             <section className="space-y-8">
               <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
@@ -251,26 +267,6 @@ export default function MyBatchPage() {
               <BatchCalendar />
             </section>
 
-            <aside className="space-y-8">
-              <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-7">
-                <div className="flex items-center gap-3">
-                  <Users className="h-5 w-5 text-blue-300" />
-                  <h2 className="text-xl font-black tracking-tight">Batch pulse</h2>
-                </div>
-                <div className="mt-7 space-y-5">
-                  <div className="rounded-[1.35rem] border border-white/8 bg-slate-950/30 p-5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">
-                      Next live session
-                    </p>
-                    <p className="mt-3 text-lg font-bold text-white">Thursday, 7:00 PM IST</p>
-                    <p className="mt-2 text-sm text-slate-300">
-                      AI video workflows and performance hooks.
-                    </p>
-                  </div>
-
-                </div>
-              </section>
-            </aside>
           </div>
         </div>
       </section>
