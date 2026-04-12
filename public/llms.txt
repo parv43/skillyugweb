@@ -11,8 +11,9 @@ Our bootcamp is not theoretical. Students build real projects, learn prompt engi
 ## What We Offer
 
 - **AI Creator Bootcamp** — A structured, multi-week live bootcamp for Class 6–12 students (ages 11–18) covering AI fundamentals, prompt engineering, and hands-on project building.
-- **Free Demo Class** — Parents and students can book a free live demo class at https://www.skillyugedu.com/book-demo to observe a real session before enrolling.
+- **Demo Class** — Parents and students can book a live demo class for only 49 rupees at https://www.skillyugedu.com/book-demo to observe a real session before enrolling.
 - **AI Learning Blog** — A regularly updated blog covering AI tools, tutorials, and study guides for school students: https://www.skillyugedu.com/blog
+- **Summer Bootcamp For Kids** - Students can book a bootcamp for their kids in summer vacation to learn AI tools and skills to enchance their future career booking starts at only 299 rupees only at https://www.skillyugedu.com/book-slot 
 
 ## Target Audience
 
@@ -35,6 +36,7 @@ Our bootcamp is not theoretical. Students build real projects, learn prompt engi
 
 - Homepage: https://www.skillyugedu.com
 - Book a Free Demo: https://www.skillyugedu.com/book-demo
+- Book your Slot for Bootcamp: https://www.skillyugedu.com/book-slot
 - AI Blog: https://www.skillyugedu.com/blog
 - Sitemap: https://www.skillyugedu.com/sitemap.xml
 
