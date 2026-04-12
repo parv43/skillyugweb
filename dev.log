@@ -15,3 +15,10 @@
  GET /api/my-batch/access 200 in 294ms (compile: 4ms, render: 291ms)
 ✓ Compiled in 51ms
  GET /api/my-batch/access 200 in 652ms (compile: 19ms, render: 633ms)
+ GET /my-batch 200 in 119ms (compile: 42ms, render: 76ms)
+ GET /api/my-batch/access 200 in 728ms (compile: 1414µs, render: 727ms)
+ GET /api/my-batch/access 200 in 290ms (compile: 1672µs, render: 288ms)
+ GET /api/my-batch/access 200 in 331ms (compile: 3ms, render: 328ms)
+✓ Compiled in 63ms
+ GET /api/my-batch/access 200 in 726ms (compile: 4ms, render: 723ms)
+ GET /api/my-batch/access 200 in 894ms (compile: 9ms, render: 884ms)

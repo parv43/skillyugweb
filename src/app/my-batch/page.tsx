@@ -130,8 +130,28 @@ export default function MyBatchPage() {
                 </span>
                 <span className="text-slate-500">Live cohort dashboard</span>
               </div>
-
-
+              <div className="mt-8 pt-8 border-t border-white/5">
+                <div className="flex items-center gap-4">
+                  {user?.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={`${user.fullName} profile`}
+                      className="h-14 w-14 rounded-full border border-white/10 object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-blue-500/10 text-lg font-black text-blue-200">
+                      {user?.fullName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-lg font-black text-white">{user?.fullName}</p>
+                    <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-400">
+                      {user?.batchLabel}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-5 text-sm text-slate-300 break-all">{user?.email}</p>
+              </div>
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)]">
@@ -232,29 +252,6 @@ export default function MyBatchPage() {
             </section>
 
             <aside className="space-y-8">
-              <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-7">
-                <div className="flex items-center gap-4">
-                  {user?.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt={`${user.fullName} profile`}
-                      className="h-14 w-14 rounded-full border border-white/10 object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-blue-500/10 text-lg font-black text-blue-200">
-                      {user?.fullName.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-lg font-black text-white">{user?.fullName}</p>
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-                      {user?.batchLabel}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-5 text-sm text-slate-300 break-all">{user?.email}</p>
-              </section>
-
               <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-7">
                 <div className="flex items-center gap-3">
                   <Users className="h-5 w-5 text-blue-300" />
