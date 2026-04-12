@@ -9,21 +9,18 @@ import {
   ArrowRight,
   BadgeCheck,
   BookOpen,
-  Bot,
   BrainCircuit,
   CalendarDays,
-  Clock3,
   Download,
   FolderOpen,
   Loader2,
-  MessageSquare,
   Sparkles,
-  Target,
   Trophy,
   Users,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
+import BatchCalendar from "@/components/BatchCalendar";
 
 type BatchUser = {
   avatarUrl: string | null;
@@ -49,29 +46,7 @@ const resourceCards = [
   },
 ];
 
-const progressRows = [
-  { label: "Prompt Engineering", value: 100, status: "Complete" },
-  { label: "AI Research Workflow", value: 78, status: "78%" },
-  { label: "Content Automation", value: 64, status: "64%" },
-];
 
-const taskRows = [
-  {
-    title: "Publish your AI explainer reel",
-    due: "Today, 8:00 PM",
-    urgency: "High priority",
-  },
-  {
-    title: "Refine the chatbot prompt stack",
-    due: "In 2 days",
-    urgency: "Upcoming",
-  },
-  {
-    title: "Upload your portfolio case study",
-    due: "This week",
-    urgency: "On track",
-  },
-];
 
 const cohortSignals = [
   { label: "Live Sessions", value: "12", icon: CalendarDays },
@@ -290,60 +265,8 @@ export default function MyBatchPage() {
                   })}
                 </div>
               </div>
-
-              <div className="grid gap-8 lg:grid-cols-2">
-                <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-8">
-                  <div className="flex items-center gap-3">
-                    <Target className="h-5 w-5 text-blue-300" />
-                    <h2 className="text-2xl font-black tracking-tight">Progress map</h2>
-                  </div>
-
-                  <div className="mt-8 space-y-6">
-                    {progressRows.map((row) => (
-                      <div key={row.label}>
-                        <div className="mb-2 flex items-center justify-between gap-4 text-xs font-bold uppercase tracking-[0.22em]">
-                          <span className="text-slate-300">{row.label}</span>
-                          <span className="text-blue-300">{row.status}</span>
-                        </div>
-                        <div className="h-2 rounded-full bg-white/8">
-                          <div
-                            className="h-2 rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-pink-500"
-                            style={{ width: `${row.value}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-8">
-                  <div className="flex items-center gap-3">
-                    <Clock3 className="h-5 w-5 text-violet-300" />
-                    <h2 className="text-2xl font-black tracking-tight">Active tasks</h2>
-                  </div>
-
-                  <div className="mt-8 space-y-5">
-                    {taskRows.map((task) => (
-                      <article
-                        key={task.title}
-                        className="rounded-[1.35rem] border border-white/8 bg-slate-950/30 px-5 py-4"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <h3 className="text-sm font-bold text-white">{task.title}</h3>
-                            <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">
-                              {task.due}
-                            </p>
-                          </div>
-                          <span className="rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-violet-200">
-                            {task.urgency}
-                          </span>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              </div>
+              
+              <BatchCalendar />
             </section>
 
             <aside className="space-y-8">
@@ -385,19 +308,7 @@ export default function MyBatchPage() {
                       AI video workflows and performance hooks.
                     </p>
                   </div>
-                  <div className="rounded-[1.35rem] border border-white/8 bg-slate-950/30 p-5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">
-                      Cohort discussion
-                    </p>
-                    <div className="mt-4 flex items-center gap-3 text-sm text-slate-200">
-                      <MessageSquare className="h-4 w-4 text-violet-300" />
-                      Latest prompt breakdowns shared by mentors
-                    </div>
-                    <div className="mt-3 flex items-center gap-3 text-sm text-slate-200">
-                      <Bot className="h-4 w-4 text-blue-300" />
-                      Weekly AI challenge results published
-                    </div>
-                  </div>
+
                 </div>
               </section>
             </aside>
