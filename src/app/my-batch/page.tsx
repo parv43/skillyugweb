@@ -9,13 +9,10 @@ import {
   ArrowRight,
   BadgeCheck,
   BookOpen,
-  BrainCircuit,
-  CalendarDays,
   Download,
   FolderOpen,
   Loader2,
   Sparkles,
-  Trophy,
   Users,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -48,11 +45,7 @@ const resourceCards = [
 
 
 
-const cohortSignals = [
-  { label: "Live Sessions", value: "12", icon: CalendarDays },
-  { label: "Projects Built", value: "07", icon: BrainCircuit },
-  { label: "Cohort Rank", value: "Top 5%", icon: Trophy },
-];
+
 
 export default function MyBatchPage() {
   const router = useRouter();
@@ -130,46 +123,15 @@ export default function MyBatchPage() {
       <section className="relative z-10 px-6 pt-32 pb-16 lg:px-12">
         <div className="max-w-7xl mx-auto space-y-10">
           <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)]">
-              <div className="flex flex-wrap items-center gap-3 mb-6 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
                 <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2">
                   My Batch Workspace
                 </span>
                 <span className="text-slate-500">Live cohort dashboard</span>
               </div>
 
-              <div className="max-w-3xl">
-                <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[0.95]">
-                  Track your batch,
-                  <span className="block bg-gradient-to-r from-blue-300 via-violet-300 to-pink-300 bg-clip-text text-transparent">
-                    projects, and momentum
-                  </span>
-                </h1>
-                <p className="mt-6 max-w-2xl text-base md:text-lg text-slate-300 leading-relaxed">
-                  This is your cohort command center. Review curriculum assets, monitor progress,
-                  and stay on top of the next deliverables without leaving the Skillyug flow.
-                </p>
-              </div>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                {cohortSignals.map((signal) => {
-                  const Icon = signal.icon;
-                  return (
-                    <div
-                      key={signal.label}
-                      className="rounded-[1.5rem] border border-white/8 bg-slate-950/40 px-5 py-5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">
-                          {signal.label}
-                        </span>
-                        <Icon className="w-4 h-4 text-blue-300" />
-                      </div>
-                      <p className="mt-4 text-3xl font-black text-white">{signal.value}</p>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)]">

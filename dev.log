@@ -2,4 +2,16 @@
 > skillyugweb1.0@0.1.0 dev
 > next dev
 
-sh: next: command not found
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.176:3000
+- Environments: .env.local
+
+✓ Starting...
+✓ Ready in 558ms
+ GET /my-batch 200 in 657ms (compile: 566ms, render: 91ms)
+ GET /api/my-batch/access 200 in 922ms (compile: 94ms, render: 828ms)
+ GET /api/my-batch/access 200 in 289ms (compile: 9ms, render: 281ms)
+ GET /api/my-batch/access 200 in 294ms (compile: 4ms, render: 291ms)
+✓ Compiled in 51ms
+ GET /api/my-batch/access 200 in 652ms (compile: 19ms, render: 633ms)
