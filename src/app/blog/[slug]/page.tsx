@@ -9,35 +9,19 @@ import AnonymousReactionBar from "@/components/AnonymousReactionBar";
 import ShareButton from "@/components/ShareButton";
 import { getReactionCounts } from "@/app/actions/reactions";
 import FloatingCTA from "@/components/FloatingCTA";
+import { createMetadata, getBlogPostingSchema } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const blog = blogs.find(b => b.slug === slug);
   if (!blog) return { title: "Blog Not Found" };
 
-  return {
-    title: `${blog.title} | Skillyug AI Blog`,
+  return createMetadata({
+    title: blog.title,
     description: blog.metaDescription,
-    keywords: blog.keywords.join(", "),
-    alternates: {
-      canonical: `https://www.skillyugedu.com/blog/${slug}`,
-    },
-    openGraph: {
-      title: `${blog.title} | Skillyug AI Blog`,
-      description: blog.metaDescription,
-      url: `https://www.skillyugedu.com/blog/${slug}`,
-      siteName: 'Skillyug',
-      images: [
-        {
-          url: blog.thumbnail,
-          width: 1200,
-          height: 630,
-        },
-      ],
-      locale: 'en_IN',
-      type: 'article',
-    },
-  };
+    path: `/blog/${slug}`,
+    type: "article",
+  });
 }
 
 export async function generateStaticParams() {
@@ -58,7 +42,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
   try {
     const mdxModule = await import(`@/content/blogs/${slug}.mdx`);
     MdxContent = mdxModule.default;
-  } catch (e) {
+  } catch {
     // No MDX file found, we will fallback to blogData.ts
   }
 
@@ -77,34 +61,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
   const titleLower = blog.title.toLowerCase();
   const requiresToolsList = ["best", "top", "tools", "apps"].some(keyword => titleLower.includes(keyword));
 
-  const blogPostingSchema = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BlogPosting",
-        "headline": blog.title,
-        "description": blog.metaDescription,
-        "image": `https://www.skillyugedu.com${blog.thumbnail}`,
-        "url": `https://www.skillyugedu.com/blog/${slug}`,
-        "inLanguage": "en-IN",
-        "author": { "@type": "Organization", "name": "Skillyug", "url": "https://www.skillyugedu.com" },
-        "publisher": { "@type": "Organization", "name": "Skillyug", "url": "https://www.skillyugedu.com", "logo": { "@type": "ImageObject", "url": "https://www.skillyugedu.com/skillyug.png" } },
-        "keywords": blog.keywords.join(", "),
-        "articleSection": blog.category,
-        "about": { "@type": "Thing", "name": "Artificial Intelligence Education for Students" },
-        "audience": { "@type": "EducationalAudience", "educationalRole": "student", "audienceType": "Class 6\u201312 students in India, aged 11\u201318" },
-        "mainEntityOfPage": { "@type": "WebPage", "@id": `https://www.skillyugedu.com/blog/${slug}` },
-      },
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.skillyugedu.com" },
-          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.skillyugedu.com/blog" },
-          { "@type": "ListItem", "position": 3, "name": blog.title, "item": `https://www.skillyugedu.com/blog/${slug}` },
-        ],
-      },
-    ],
-  };
+  const blogPostingSchema = getBlogPostingSchema(blog);
 
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative pb-0">
@@ -250,6 +207,41 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             </>
           )}
 
+          <div className="rounded-[1.75rem] border border-blue-500/20 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10 p-6 md:p-8">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-300">
+              Continue With Skillyug
+            </p>
+            <h2 className="mt-4 text-2xl md:text-3xl font-black text-white">
+              Go from reading about AI to using it with real structure.
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-slate-300">
+              {blog.content.ctaParagraph ||
+                "Use the live demo to see how the bootcamp works, then reserve a spot when you are ready to start building with AI."}
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/book-demo"
+                className="inline-flex items-center justify-center rounded-full border border-white/10 bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(59,130,246,0.35)]"
+              >
+                Book the ₹49 Demo Class
+              </Link>
+              <Link
+                href="/book-slot"
+                className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.05] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white/[0.1]"
+              >
+                Reserve the ₹299 Bootcamp Spot
+              </Link>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3 text-sm">
+              <Link href="/#curriculum" className="text-blue-300 transition-colors hover:text-white">
+                Explore the bootcamp curriculum
+              </Link>
+              <Link href="/blog" className="text-blue-300 transition-colors hover:text-white">
+                Browse all AI learning guides
+              </Link>
+            </div>
+          </div>
+
           {/* Reaction Bar */}
           <div className="mt-12 mb-8 py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-lg font-bold text-slate-200">What did you think of this article?</div>
@@ -293,7 +285,8 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           </h2>
 
           <p className="text-lg md:text-xl text-slate-300 font-light max-w-2xl mx-auto mb-12">
-            {blog.content.ctaParagraph || "Help your child learn AI tools the right way with structured guidance and real projects."}
+            Use the ₹49 demo class to experience the format first, then use the
+            ₹299 booking flow when you are ready to reserve a bootcamp seat.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full sm:w-auto">
@@ -301,7 +294,13 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
               href="/book-demo"
               className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] block border border-white/10"
             >
-              Book Your Demo
+              Book the ₹49 Demo Class
+            </Link>
+            <Link
+              href="/book-slot"
+              className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center inline-block"
+            >
+              Reserve the ₹299 Spot
             </Link>
           </div>
         </div>

@@ -1,13 +1,14 @@
 import { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { createMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions | Skillyug",
-  description: "Read Skillyug terms and conditions for using our services.",
-  alternates: {
-    canonical: "https://www.skillyugedu.com/terms-and-conditions",
-  },
+  ...createMetadata({
+    title: "Terms and Conditions",
+    description: "Read the Skillyug terms and conditions for using our website and services.",
+    path: "/terms-and-conditions",
+  }),
 };
 
 export default function TermsAndConditions() {

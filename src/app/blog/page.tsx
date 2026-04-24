@@ -7,22 +7,15 @@ import BlogListing from "@/components/BlogListing";
 import { Metadata } from "next";
 import { getReactionCounts } from "@/app/actions/reactions";
 import FloatingCTA from "@/components/FloatingCTA";
+import { createMetadata, getBlogCollectionSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "AI Learning Blog for Students and Parents | Skillyug",
-  description: "Learn AI tools, study smarter, and prepare for the future. Discover the best AI apps and tutorials for students.",
-  keywords: "AI Tools for Students, AI Learning for Kids, AI Bootcamp for Students, Summer AI Bootcamp",
-  alternates: {
-    canonical: 'https://www.skillyugedu.com/blog',
-  },
-  openGraph: {
-    title: 'AI Learning Blog for Students and Parents | Skillyug',
-    description: 'Learn AI tools, study smarter, and prepare for the future. Discover the best AI apps and tutorials for students.',
-    url: 'https://www.skillyugedu.com/blog',
-    siteName: 'Skillyug',
-    locale: 'en_IN',
-    type: 'website',
-  },
+  ...createMetadata({
+    title: "AI Learning Blog for Students and Parents",
+    description:
+      "Explore guides on ChatGPT, Canva AI, presentations, project workflows, and AI study tools for Class 6–12 students and parents.",
+    path: "/blog",
+  }),
 };
 
 export default async function BlogListingPage() {
@@ -49,38 +42,7 @@ export default async function BlogListingPage() {
     "Bootcamp Insights"
   ];
 
-  const blogListSchema = {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    "name": "Skillyug AI Learning Blog",
-    "description": "Guides, tutorials, and insights on AI tools and education for Class 6\u201312 students in India.",
-    "url": "https://www.skillyugedu.com/blog",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Skillyug",
-      "url": "https://www.skillyugedu.com",
-    },
-    "blogPost": blogs.map((blog) => ({
-      "@type": "BlogPosting",
-      "headline": blog.title,
-      "description": blog.metaDescription,
-      "url": `https://www.skillyugedu.com/blog/${blog.slug}`,
-      "image": `https://www.skillyugedu.com${blog.thumbnail}`,
-      "author": {
-        "@type": "Organization",
-        "name": "Skillyug",
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Skillyug",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://www.skillyugedu.com/skillyug.png",
-        },
-      },
-      "keywords": blog.keywords.join(", "),
-    })),
-  };
+  const blogListSchema = getBlogCollectionSchema(blogs);
 
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative pb-20">
@@ -105,7 +67,7 @@ export default async function BlogListingPage() {
             AI Learning Blog for Students and Parents
           </h1>
           <p className="text-lg md:text-xl text-slate-300 font-light leading-relaxed">
-            Learn AI tools, study smarter, and prepare for the future.
+            Learn AI tools, study smarter, and build future-ready project skills.
           </p>
         </div>
 

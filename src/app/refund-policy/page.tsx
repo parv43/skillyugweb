@@ -1,13 +1,14 @@
 import { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { createMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Refund Policy | Skillyug",
-  description: "Read Skillyug refund policy for AI bootcamps and services.",
-  alternates: {
-    canonical: "https://www.skillyugedu.com/refund-policy",
-  },
+  ...createMetadata({
+    title: "Refund Policy",
+    description: "Read the Skillyug refund and cancellation policy for services and bookings.",
+    path: "/refund-policy",
+  }),
 };
 
 export default function RefundPolicy() {
