@@ -70,13 +70,14 @@ function MobileHero() {
 
       <div className="px-6 relative z-20 w-full flex flex-col items-start text-left">
         {/* Header Copy */}
-        <h1 className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-white">
-          Empower your child&apos;s learning and creativity with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-fuchsia-400">
-            future-ready AI skills.
+        <h2 className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-white">
+          Help your child build <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-fuchsia-400">
+            AI skills that improve study, projects, and creative confidence.
           </span>
-        </h1>
+        </h2>
         <p className="text-slate-300 text-[17px] leading-relaxed max-w-sm mb-10 font-normal">
-          Master AI, build projects, and automate tasks in this hands-on bootcamp.
+          A practical AI bootcamp for Class 6–12 students with a ₹49 demo class
+          before the ₹299 bootcamp booking.
         </p>
 
         {/* CTAs */}
@@ -187,19 +188,22 @@ export default function HeroSection() {
               <span className="text-[11px] sm:text-xs font-bold text-blue-200 uppercase tracking-widest">Skillyug Summer AI Bootcamp • Classes 6–12</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
-              Give Your Child the AI Skills<br />
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
+              Give Your Child the AI Tools<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text">
-                That Will Shape Their Future
+                They Need to Build Real Projects
               </span>
-            </h1>
+            </h2>
 
             <p className="text-lg md:text-xl font-medium text-pink-400 mb-4">
-              Your child&apos;s learning, creativity, and future readiness are our top priorities.
+              Built for Class 6–12 students who should learn AI with structure,
+              not guesswork.
             </p>
 
             <p className="text-base md:text-lg text-slate-300 max-w-xl mb-10 font-light leading-relaxed">
-              In this hands-on bootcamp, students learn how to use modern AI tools to build real projects, automate tasks, and develop future-ready skills.
+              Students learn ChatGPT, Canva AI, Gamma, and practical project
+              workflows through guided sessions, a ₹49 demo class, and a ₹299
+              bootcamp spot booking flow.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">

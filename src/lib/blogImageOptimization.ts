@@ -4,9 +4,6 @@
  * Dramatically improves performance and reduces bandwidth usage
  */
 
-import fs from 'fs';
-import path from 'path';
-
 // Map of slug to optimized local image path
 // These will be generated during build if not already cached
 export const blogThumbnailMap: Record<string, string> = {

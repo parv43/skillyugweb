@@ -2,6 +2,7 @@
 
 import React from "react"
 import { motion } from "framer-motion"
+import Link from "next/link"
 import {
   MessageSquare,
   Image,
@@ -311,6 +312,40 @@ export default function AIToolsSection() {
             desc="A complete, functioning website, game, or presentation is created."
             delay={0.8}
           />
+        </div>
+      </div>
+
+      <div className="relative z-20 mt-14 flex w-full max-w-5xl flex-col items-center px-6">
+        <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500">
+          Read the Guides
+        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
+          {[
+            {
+              href: "/blog/how-to-use-chatgpt-for-homework",
+              label: "ChatGPT for Homework",
+            },
+            {
+              href: "/blog/how-to-use-canva-ai-for-projects",
+              label: "Canva AI for Projects",
+            },
+            {
+              href: "/blog/best-ai-tools-for-presentations",
+              label: "AI Tools for Presentations",
+            },
+            {
+              href: "/blog/how-to-learn-ai-as-a-school-student",
+              label: "How to Learn AI",
+            },
+          ].map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-blue-400/30 hover:text-white"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
       </div>
     </section>

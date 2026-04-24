@@ -15,26 +15,25 @@ import FloatingCTA from "@/components/FloatingCTA"
 import PaymentSupportNotice from "@/components/PaymentSupportNotice"
 import SlidingCTA from "@/components/SlidingCTA"
 import ContactUs from "@/components/ContactUs"
+import { createMetadata, getHomeFaqSchema } from "@/lib/seo"
 
 export const metadata: Metadata = {
-  title: 'Skillyug | AI Education & Bootcamps for Students',
-  description: 'Empowering Class 6-12 students with Future AI Skills. Learn ChatGPT, Canva AI, Gamma, and more through our hands-on AI Creator Bootcamp.',
-  alternates: {
-    canonical: 'https://www.skillyugedu.com',
-  },
-  openGraph: {
-    title: 'Skillyug | AI Education & Bootcamps for Students',
-    description: 'Empowering Class 6-12 students with Future AI Skills. Learn ChatGPT, Canva AI, Gamma, and more through our hands-on AI Creator Bootcamp.',
-    url: 'https://www.skillyugedu.com',
-    siteName: 'Skillyug',
-    locale: 'en_IN',
-    type: 'website',
-  },
+  ...createMetadata({
+    title: "AI Education Bootcamp for Students in Classes 6–12",
+    description:
+      "Skillyug helps Class 6–12 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp, a ₹49 demo class, and a ₹299 bootcamp spot booking.",
+  }),
 }
+
+const homeFaqSchema = getHomeFaqSchema()
 
 export default function Home() {
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeFaqSchema) }}
+      />
       
       {/* Global Background Connection Lines */}
       <div className="fixed inset-0 pointer-events-none z-0 opacity-20 hidden md:block">
@@ -62,6 +61,11 @@ export default function Home() {
 
       <Navbar />
       <PaymentSupportNotice />
+      <h1 className="sr-only">
+        AI education bootcamp for students in Classes 6 to 12 with ChatGPT,
+        Canva AI, Gamma, project skills, a ₹49 demo class, and a ₹299 bootcamp
+        spot booking.
+      </h1>
       <HeroSection />
       
       {/* Promotional Ribbon */}
@@ -73,6 +77,7 @@ export default function Home() {
       </div>
 
       {/* Interactive Chat Demo — mobile only, shown after gallery */}
+      <div id="ask-ai" className="relative -top-24 h-0" />
       <div className="md:hidden">
         <InteractiveChatDemo id="ask-ai-mobile" />
       </div>

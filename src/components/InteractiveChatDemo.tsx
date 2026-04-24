@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Bot, User, Send, Sparkles } from "lucide-react"
+import HomeFaqSection from "@/components/HomeFaqSection"
 
 interface InteractiveChatDemoProps {
   id?: string
@@ -41,20 +42,24 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
   const quickPrompts = [
     "What exactly will my child learn?",
     "Is this suitable for a Class 8 student?",
-    "What kind of projects do students build?"
+    "What kind of projects do students build?",
+    "How does the ₹49 demo class work?"
   ]
 
   const getMockAIResponse = (input: string) => {
     const text = input.toLowerCase()
     
     if (text.includes("learn") || text.includes("tool") || text.includes("teach") || text.includes("curriculum")) {
-      return "Students learn to use ChatGPT, Canva AI, Midjourney, and automation tools to build creative projects. You can also see this in action during the live demo class."
+      return "Students learn to use ChatGPT, Canva AI, Midjourney, and automation tools to build creative projects. You can also see this in action during the ₹49 live demo class."
     }
     if (text.includes("age") || text.includes("class") || text.includes("who") || text.includes("old") || text.includes("suitable")) {
       return "Skillyug is designed perfectly for students from Class 6 to 12. Many parents attend the demo before deciding if it's the right fit for their child."
     }
+    if (text.includes("49") || (text.includes("demo") && text.includes("work"))) {
+      return "The ₹49 demo class is a live introductory session where parents and students see the teaching style, tools, and overall bootcamp format before moving ahead."
+    }
     if (text.includes("book") || text.includes("demo") || text.includes("join") || text.includes("enroll") || text.includes("start")) {
-      return "The best way to understand the program is to attend the demo session. You can book your demo using the button below."
+      return "The best way to understand the program is to attend the ₹49 demo session first. Families who are ready to continue can then use the ₹299 spot-booking flow."
     }
     if (text.includes("project") || text.includes("build") || text.includes("create") || text.includes("make")) {
       return "Students build real-world AI chatbots, AI generated designs, and automation workflows. The best way to understand the program is to attend the demo session."
@@ -248,6 +253,10 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
 
         </div>
       </motion.div>
+
+      <div className="max-w-4xl mx-auto px-4 relative z-10">
+        <HomeFaqSection />
+      </div>
 
     </section>
   )

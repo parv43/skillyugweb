@@ -1,4 +1,6 @@
-const withMDX = require('@next/mdx')();
+import createMDX from "@next/mdx";
+
+const withMDX = createMDX();
 const isDev = process.env.NODE_ENV !== "production";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : null;
@@ -40,8 +42,8 @@ const cspDirectives = [
   "media-src 'self' blob: data:",
 ].join("; ");
 
-const nextConfig = { 
-  reactStrictMode: false, 
+const nextConfig = {
+  reactStrictMode: false,
   typescript: { ignoreBuildErrors: true },
   async headers() {
     return [
@@ -97,8 +99,9 @@ const nextConfig = {
         : []),
     ],
   },
-}; 
-module.exports = withMDX({
+};
+
+export default withMDX({
   ...nextConfig,
-  pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
+  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
 });
