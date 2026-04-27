@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { createServerClient } from "@supabase/ssr"
+import { cookies } from "next/headers"
 import { getAuthRedirectUrl } from "@/lib/authUrls"
 import { validateEmail } from "@/lib/emailValidation"
 
@@ -89,14 +90,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: GENERIC_MESSAGE })
     }
 
-    const supabase = createClient(
+    // Use createServerClient (PKCE flow) so Supabase sends ?code= in the redirect
+    // instead of #access_token= in the hash (which the server can never read).
+    // The PKCE code verifier is stored as a cookie here and read by /auth/recovery.
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
       getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
       getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
       {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-          detectSessionInUrl: false,
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch {
+              // Ignore cookie writes from unsupported execution contexts.
+            }
+          },
         },
       }
     )
