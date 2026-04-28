@@ -169,9 +169,9 @@ export default function MyBatchPage() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">
                     Next live session
                   </p>
-                  <p className="mt-3 text-lg font-bold text-white">Thursday, 7:00 PM IST</p>
+                  <p className="mt-3 text-lg font-bold text-white">10th May, 8:00 PM IST</p>
                   <p className="mt-2 text-sm text-slate-300">
-                    AI video workflows and performance hooks.
+                    Demo Session
                   </p>
                 </div>
               </div>

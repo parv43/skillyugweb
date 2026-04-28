@@ -21,9 +21,14 @@ const formatDate = (date: Date) => {
 // Define the bootcamp active period (May 20, 2026 - June 20, 2026)
 const BOOTCAMP_START = new Date(2026, 4, 20); // Month is 0-indexed (4 = May)
 const BOOTCAMP_END = new Date(2026, 5, 20); // 5 = June
+const DEMO_START = new Date(2026, 4, 10); // Month is 0-indexed (4 = May)
+const DEMO_END = new Date(2026, 4, 10); // 5 = June
 
 const isBootcampDay = (date: Date) => {
-  return date >= BOOTCAMP_START && date <= BOOTCAMP_END;
+  return (
+    (date >= BOOTCAMP_START && date <= BOOTCAMP_END) ||
+    (date >= DEMO_START && date <= DEMO_END)
+  );
 };
 
 // Mock Events Data
@@ -58,6 +63,9 @@ const mockEvents: Record<
   ],
   "2026-06-20": [
     { title: "Graduation & Showcase", time: "5:00 PM IST", type: "live" },
+  ],
+  "2026-05-10": [
+    { title: "Demo Session", time: "8:00 PM IST", type: "live" },
   ],
 };
 
