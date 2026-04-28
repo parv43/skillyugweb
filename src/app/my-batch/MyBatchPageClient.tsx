@@ -43,14 +43,9 @@ const resourceCards = [
   },
 ];
 
-
-
-
-
 export default function MyBatchPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [accessDenied, setAccessDenied] = useState(false);
   const [user, setUser] = useState<BatchUser | null>(null);
 
   useEffect(() => {
@@ -64,24 +59,44 @@ export default function MyBatchPage() {
         return;
       }
 
+      // Check if user has access — use cached result from sessionStorage if available
+      // (Navbar already fetched this, so we avoid a duplicate network call)
+      let hasAccess = false;
+      try {
+        const cached = sessionStorage.getItem("mybatch_access");
+        if (cached) {
+          const { value, expiry } = JSON.parse(cached) as { value: boolean; expiry: number };
+          if (Date.now() < expiry) {
+            hasAccess = value;
+          }
+        }
+      } catch { /* ignore */ }
+
+      // If not in cache, fetch from API
+      if (!hasAccess) {
+        try {
+          const res = await fetch("/api/my-batch/access");
+          if (res.ok) {
+            const data = (await res.json()) as { hasAccess?: boolean };
+            hasAccess = Boolean(data.hasAccess);
+            // Update cache
+            try {
+              sessionStorage.setItem(
+                "mybatch_access",
+                JSON.stringify({ value: hasAccess, expiry: Date.now() + 5 * 60 * 1000 })
+              );
+            } catch { /* ignore */ }
+          }
+        } catch { /* ignore */ }
+      }
+
+      if (!hasAccess) {
+        router.replace("/");
+        return;
+      }
+
       const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
       const avatarUrl = session.user.user_metadata?.avatar_url || null;
-      const accessResponse = await fetch("/api/my-batch/access", { cache: "no-store" });
-
-      if (!accessResponse.ok) {
-        setAccessDenied(true);
-        setLoading(false);
-        router.replace("/");
-        return;
-      }
-
-      const accessData = (await accessResponse.json()) as { hasAccess?: boolean };
-      if (!accessData.hasAccess) {
-        setAccessDenied(true);
-        setLoading(false);
-        router.replace("/");
-        return;
-      }
 
       setUser({
         avatarUrl,
@@ -95,15 +110,7 @@ export default function MyBatchPage() {
     loadSession();
   }, [router]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center text-slate-200">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
-      </div>
-    );
-  }
-
-  if (accessDenied || !user) {
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-slate-200">
         <Loader2 className="w-8 h-8 animate-spin text-blue-400" />

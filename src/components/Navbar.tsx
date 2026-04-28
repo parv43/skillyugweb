@@ -45,6 +45,11 @@ export default function Navbar() {
       setSession(session) // Only called when auth state actually changes
       if (!session) {
         setHasMyBatchAccess(false)
+        // Clear cache on logout
+        try { sessionStorage.removeItem("mybatch_access") } catch { /* ignore */ }
+      } else {
+        // Clear cache on new login so fresh check runs
+        try { sessionStorage.removeItem("mybatch_access") } catch { /* ignore */ }
       }
     })
     
@@ -57,22 +62,44 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!session) {
+      // Clear cached access when logged out
+      try { sessionStorage.removeItem("mybatch_access") } catch { /* ignore */ }
       return
     }
 
     let cancelled = false
 
     const loadAccess = async () => {
+      // Check sessionStorage cache first (5 min TTL) to avoid extra API call on every navigation
       try {
-        const response = await fetch("/api/my-batch/access", { cache: "no-store" })
+        const cached = sessionStorage.getItem("mybatch_access")
+        if (cached) {
+          const { value, expiry } = JSON.parse(cached) as { value: boolean; expiry: number }
+          if (Date.now() < expiry) {
+            if (!cancelled) setHasMyBatchAccess(value)
+            return
+          }
+        }
+      } catch { /* ignore bad cache */ }
+
+      try {
+        const response = await fetch("/api/my-batch/access")
         if (!response.ok) {
           if (!cancelled) setHasMyBatchAccess(false)
           return
         }
 
         const data = (await response.json()) as { hasAccess?: boolean }
+        const hasAccess = Boolean(data.hasAccess)
         if (!cancelled) {
-          setHasMyBatchAccess(Boolean(data.hasAccess))
+          setHasMyBatchAccess(hasAccess)
+          // Cache for 5 minutes
+          try {
+            sessionStorage.setItem(
+              "mybatch_access",
+              JSON.stringify({ value: hasAccess, expiry: Date.now() + 5 * 60 * 1000 })
+            )
+          } catch { /* ignore quota errors */ }
         }
       } catch {
         if (!cancelled) {
