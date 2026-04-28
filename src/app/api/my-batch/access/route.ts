@@ -25,7 +25,9 @@ async function getAuthenticatedUser() {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
           } catch {
             // No-op in route handlers.
           }
@@ -35,66 +37,82 @@ async function getAuthenticatedUser() {
   );
 
   const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
-    return null;
-  }
-
+  if (error || !data.user) return null;
   return data.user;
 }
 
-async function tableHasCapturedPayment(
-  table: "demo_bookings" | "slot_bookings",
-  userId: string,
-  email: string | null
-) {
-  const supabaseAdmin = createSupabaseAdmin();
+/**
+ * Returns true if the given user has a captured payment in `demo_bookings`
+ * OR `slot_bookings`. Matches by user_id first, then falls back to email.
+ * Users who only signed up / logged in (no payment) get false.
+ */
+async function hasCapturedPayment(userId: string, email: string | null): Promise<boolean> {
+  const admin = createSupabaseAdmin();
 
-  const userIdMatch = await supabaseAdmin
-    .from(table)
-    .select("razorpay_payment_id")
-    .eq("payment_status", "captured")
-    .eq("user_id", userId)
-    .limit(1);
+  // Run both table checks in parallel for speed
+  const [slotResult, demoResult] = await Promise.all([
+    (async () => {
+      // Check by user_id
+      const { data: byId } = await admin
+        .from("slot_bookings")
+        .select("id")
+        .eq("payment_status", "captured")
+        .eq("user_id", userId)
+        .limit(1);
+      if ((byId?.length ?? 0) > 0) return true;
 
-  if (userIdMatch.error) {
-    throw userIdMatch.error;
-  }
+      // Fallback: check by email (covers bookings made before login)
+      if (!email) return false;
+      const { data: byEmail } = await admin
+        .from("slot_bookings")
+        .select("id")
+        .eq("payment_status", "captured")
+        .eq("email", email)
+        .limit(1);
+      return (byEmail?.length ?? 0) > 0;
+    })(),
 
-  if ((userIdMatch.data?.length ?? 0) > 0) {
-    return true;
-  }
+    (async () => {
+      // Check by user_id
+      const { data: byId } = await admin
+        .from("demo_bookings")
+        .select("id")
+        .eq("payment_status", "captured")
+        .eq("user_id", userId)
+        .limit(1);
+      if ((byId?.length ?? 0) > 0) return true;
 
-  if (!email) {
-    return false;
-  }
+      // Fallback: check by email (covers bookings made before login)
+      if (!email) return false;
+      const { data: byEmail } = await admin
+        .from("demo_bookings")
+        .select("id")
+        .eq("payment_status", "captured")
+        .eq("email", email)
+        .limit(1);
+      return (byEmail?.length ?? 0) > 0;
+    })(),
+  ]);
 
-  const emailMatch = await supabaseAdmin
-    .from(table)
-    .select("razorpay_payment_id")
-    .eq("payment_status", "captured")
-    .eq("email", email)
-    .limit(1);
-
-  if (emailMatch.error) {
-    throw emailMatch.error;
-  }
-
-  return (emailMatch.data?.length ?? 0) > 0;
+  return slotResult || demoResult;
 }
 
 export async function GET() {
   try {
     const user = await getAuthenticatedUser();
+
+    // Not logged in → no access
     if (!user) {
       return NextResponse.json({ hasAccess: false }, { status: 401 });
     }
 
-    const [hasDemoAccess, hasSlotAccess] = await Promise.all([
-      tableHasCapturedPayment("demo_bookings", user.id, user.email ?? null),
-      tableHasCapturedPayment("slot_bookings", user.id, user.email ?? null),
-    ]);
+    // Logged in but hasn't paid → no access
+    const hasAccess = await hasCapturedPayment(user.id, user.email ?? null);
 
-    return NextResponse.json({ hasAccess: hasDemoAccess || hasSlotAccess });
+    const response = NextResponse.json({ hasAccess });
+    // Cache privately for 2 min, revalidate in background (avoids hitting DB on every page nav)
+    response.headers.set("Cache-Control", "private, max-age=120, stale-while-revalidate=60");
+    return response;
   } catch (error) {
     console.error("My Batch access check failed:", error);
     return NextResponse.json(
