@@ -74,9 +74,9 @@ export default function Navbar() {
       try {
         const cached = sessionStorage.getItem("mybatch_access")
         if (cached) {
-          const { value, expiry } = JSON.parse(cached) as { value: boolean; expiry: number }
+          const { value, expiry } = JSON.parse(cached) as { value: { hasAccess: boolean; hasSlot: boolean; hasDemo: boolean }; expiry: number }
           if (Date.now() < expiry) {
-            if (!cancelled) setHasMyBatchAccess(value)
+            if (!cancelled) setHasMyBatchAccess(value.hasAccess)
             return
           }
         }
@@ -89,7 +89,7 @@ export default function Navbar() {
           return
         }
 
-        const data = (await response.json()) as { hasAccess?: boolean }
+        const data = (await response.json()) as { hasAccess?: boolean; hasSlot?: boolean; hasDemo?: boolean }
         const hasAccess = Boolean(data.hasAccess)
         if (!cancelled) {
           setHasMyBatchAccess(hasAccess)
@@ -97,7 +97,14 @@ export default function Navbar() {
           try {
             sessionStorage.setItem(
               "mybatch_access",
-              JSON.stringify({ value: hasAccess, expiry: Date.now() + 5 * 60 * 1000 })
+              JSON.stringify({ 
+                value: { 
+                  hasAccess: hasAccess, 
+                  hasSlot: Boolean(data.hasSlot), 
+                  hasDemo: Boolean(data.hasDemo) 
+                }, 
+                expiry: Date.now() + 5 * 60 * 1000 
+              })
             )
           } catch { /* ignore quota errors */ }
         }
@@ -119,8 +126,9 @@ export default function Navbar() {
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     setMobileMenuOpen(false)
 
-    // Handle smooth scroll for hash links
-    if (href.includes("#")) {
+    // Only intercept hash links for smooth scroll when already on the homepage.
+    // On other pages (e.g. /my-batch), let the browser navigate normally to /#section.
+    if (href.includes("#") && pathname === "/") {
       e.preventDefault()
       let hash = href.split("#")[1]
       
@@ -177,29 +185,16 @@ export default function Navbar() {
               
               return (
                 <li key={link.name}>
-                  {link.href.includes("#") ? (
-                    <button 
-                      type="button"
-                      onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
-                      className={`text-sm font-medium transition-all cursor-pointer ${
-                        active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                      }`}
-                      aria-label={link.ariaLabel || `Go to ${link.name}`}
-                    >
-                      {link.name}
-                    </button>
-                  ) : (
-                    <Link 
-                      href={link.href} 
-                      onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
-                      className={`text-sm font-medium transition-all ${
-                        active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                      }`}
-                      aria-label={link.ariaLabel || `Go to ${link.name}`}
-                    >
-                      {link.name}
-                    </Link>
-                  )}
+                  <Link 
+                    href={link.href} 
+                    onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
+                    className={`text-sm font-medium transition-all ${
+                      active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                    }`}
+                    aria-label={link.ariaLabel || `Go to ${link.name}`}
+                  >
+                    {link.name}
+                  </Link>
                 </li>
               );
             })}

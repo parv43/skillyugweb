@@ -21,10 +21,10 @@ const formatDate = (date: Date) => {
 // Define the bootcamp active period (May 20, 2026 - June 20, 2026)
 const BOOTCAMP_START = new Date(2026, 4, 20); // Month is 0-indexed (4 = May)
 const BOOTCAMP_END = new Date(2026, 5, 20); // 5 = June
+const DEMO_START = new Date(2026, 4, 10); // Month is 0-indexed (4 = May)
+const DEMO_END = new Date(2026, 4, 10); // 5 = June
 
-const isBootcampDay = (date: Date) => {
-  return date >= BOOTCAMP_START && date <= BOOTCAMP_END;
-};
+// Removed global isBootcampDay to use prop-based logic inside component
 
 // Mock Events Data
 const mockEvents: Record<
@@ -59,11 +59,14 @@ const mockEvents: Record<
   "2026-06-20": [
     { title: "Graduation & Showcase", time: "5:00 PM IST", type: "live" },
   ],
+  "2026-05-10": [
+    { title: "Demo Session", time: "8:00 PM IST", type: "live" },
+  ],
 };
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export default function BatchCalendar() {
+export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean }) {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 4, 1));
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(2026, 4, 20));
 
@@ -96,9 +99,11 @@ export default function BatchCalendar() {
       );
     } else {
       const dateObj = new Date(year, month, day);
-      const isBootcamp = isBootcampDay(dateObj);
+      const isBootcamp = hasSlot
+        ? (dateObj >= BOOTCAMP_START && dateObj <= BOOTCAMP_END) || (dateObj >= DEMO_START && dateObj <= DEMO_END)
+        : (dateObj >= DEMO_START && dateObj <= DEMO_END);
       const dateStr = formatDate(dateObj);
-      const hasEvents = !!mockEvents[dateStr];
+      const hasEvents = !!mockEvents[dateStr] && (hasSlot || dateStr === "2026-05-10");
       const isSelected = selectedDate != null && formatDate(selectedDate) === dateStr;
 
       calendarCells.push(
@@ -131,7 +136,7 @@ export default function BatchCalendar() {
   }
 
   const selectedDateStr = selectedDate ? formatDate(selectedDate) : null;
-  const dayEvents = selectedDateStr ? mockEvents[selectedDateStr] ?? null : null;
+  const dayEvents = selectedDateStr && (hasSlot || selectedDateStr === "2026-05-10") ? mockEvents[selectedDateStr] ?? null : null;
 
   return (
     <div className="space-y-5">

@@ -42,15 +42,14 @@ async function getAuthenticatedUser() {
 }
 
 /**
- * Returns true if the given user has a captured payment in `demo_bookings`
- * OR `slot_bookings`. Matches by user_id first, then falls back to email.
- * Users who only signed up / logged in (no payment) get false.
+ * Returns whether the user has captured payments for slot and demo bookings.
+ * Matches by user_id first, then falls back to email.
  */
-async function hasCapturedPayment(userId: string, email: string | null): Promise<boolean> {
+async function getAccessDetails(userId: string, email: string | null): Promise<{ hasSlot: boolean; hasDemo: boolean }> {
   const admin = createSupabaseAdmin();
 
   // Run both table checks in parallel for speed
-  const [slotResult, demoResult] = await Promise.all([
+  const [hasSlot, hasDemo] = await Promise.all([
     (async () => {
       // Check by user_id
       const { data: byId } = await admin
@@ -94,7 +93,7 @@ async function hasCapturedPayment(userId: string, email: string | null): Promise
     })(),
   ]);
 
-  return slotResult || demoResult;
+  return { hasSlot, hasDemo };
 }
 
 export async function GET() {
@@ -103,13 +102,14 @@ export async function GET() {
 
     // Not logged in → no access
     if (!user) {
-      return NextResponse.json({ hasAccess: false }, { status: 401 });
+      return NextResponse.json({ hasAccess: false, hasSlot: false, hasDemo: false }, { status: 401 });
     }
 
     // Logged in but hasn't paid → no access
-    const hasAccess = await hasCapturedPayment(user.id, user.email ?? null);
+    const { hasSlot, hasDemo } = await getAccessDetails(user.id, user.email ?? null);
+    const hasAccess = hasSlot || hasDemo;
 
-    const response = NextResponse.json({ hasAccess });
+    const response = NextResponse.json({ hasAccess, hasSlot, hasDemo });
     // Cache privately for 2 min, revalidate in background (avoids hitting DB on every page nav)
     response.headers.set("Cache-Control", "private, max-age=120, stale-while-revalidate=60");
     return response;
