@@ -47,6 +47,7 @@ export default function MyBatchPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<BatchUser | null>(null);
+  const [hasSlotAccess, setHasSlotAccess] = useState(false);
 
   useEffect(() => {
     const loadSession = async () => {
@@ -62,12 +63,14 @@ export default function MyBatchPage() {
       // Check if user has access — use cached result from sessionStorage if available
       // (Navbar already fetched this, so we avoid a duplicate network call)
       let hasAccess = false;
+      let slotAccess = false;
       try {
         const cached = sessionStorage.getItem("mybatch_access");
         if (cached) {
-          const { value, expiry } = JSON.parse(cached) as { value: boolean; expiry: number };
+          const { value, expiry } = JSON.parse(cached) as { value: { hasAccess: boolean; hasSlot: boolean; hasDemo: boolean }; expiry: number };
           if (Date.now() < expiry) {
-            hasAccess = value;
+            hasAccess = value.hasAccess;
+            slotAccess = value.hasSlot;
           }
         }
       } catch { /* ignore */ }
@@ -77,13 +80,14 @@ export default function MyBatchPage() {
         try {
           const res = await fetch("/api/my-batch/access");
           if (res.ok) {
-            const data = (await res.json()) as { hasAccess?: boolean };
+            const data = (await res.json()) as { hasAccess?: boolean; hasSlot?: boolean; hasDemo?: boolean };
             hasAccess = Boolean(data.hasAccess);
+            slotAccess = Boolean(data.hasSlot);
             // Update cache
             try {
               sessionStorage.setItem(
                 "mybatch_access",
-                JSON.stringify({ value: hasAccess, expiry: Date.now() + 5 * 60 * 1000 })
+                JSON.stringify({ value: { hasAccess, hasSlot: slotAccess, hasDemo: Boolean(data.hasDemo) }, expiry: Date.now() + 5 * 60 * 1000 })
               );
             } catch { /* ignore */ }
           }
@@ -98,6 +102,7 @@ export default function MyBatchPage() {
       const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
       const avatarUrl = session.user.user_metadata?.avatar_url || null;
 
+      setHasSlotAccess(slotAccess);
       setUser({
         avatarUrl,
         batchLabel: "Summer AI Creator Cohort",
@@ -271,7 +276,7 @@ export default function MyBatchPage() {
                 </div>
               </div>
               
-              <BatchCalendar />
+              <BatchCalendar hasSlot={hasSlotAccess} />
             </section>
 
           </div>
