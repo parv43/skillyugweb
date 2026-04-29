@@ -19,10 +19,6 @@ export default function DemoBookingSection() {
   const isInView = useInView(sectionRef, { amount: 0.3, once: true })
   const [percent, setPercent] = useState(0)
 
-  if (!loading && hasDemo) {
-    return null
-  }
-
   // Animated counter from 0 to 84 whenever the section enters view
   useEffect(() => {
     if (isInView) {
@@ -35,8 +31,12 @@ export default function DemoBookingSection() {
     }
   }, [isInView])
 
+  if (!loading && hasDemo) {
+    return null;
+  }
+
   return (
-    <section id="demo-booking" className="relative w-full py-32 bg-[#020617] overflow-hidden border-t border-slate-900" ref={sectionRef}>
+    <section id="demo-booking" className="relative w-full py-24 md:py-32 bg-[#020617] overflow-hidden border-t border-slate-900" ref={sectionRef}>
       
       {/* Performant Ambient Background (no massive blur filters) */}
       <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent rounded-full pointer-events-none" />
