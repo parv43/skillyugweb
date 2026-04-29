@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import AnonymousReactionBar from "@/components/AnonymousReactionBar";
 import ShareButton from "@/components/ShareButton";
-import { getReactionCounts } from "@/app/actions/reactions";
+
 import FloatingCTA from "@/components/FloatingCTA";
 import { createMetadata, getBlogPostingSchema } from "@/lib/seo";
 import { headers } from "next/headers";
@@ -47,7 +47,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
     // No MDX file found, we will fallback to blogData.ts
   }
 
-  const initialCounts = await getReactionCounts(slug);
+
 
   // Find related blogs (same category, different slug)
   const relatedBlogs = blogs
@@ -121,7 +121,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             {blog.title}
           </h1>
 
-          <div className="w-full h-64 md:h-96 rounded-[24px] overflow-hidden border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] mb-12">
+          <div className="relative w-full h-64 md:h-96 rounded-[24px] overflow-hidden border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] mb-12">
             <Image
               src={blog.thumbnail}
               alt={blog.title}
@@ -251,7 +251,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           <div className="mt-12 mb-8 py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-lg font-bold text-slate-200">What did you think of this article?</div>
             <div className="flex flex-wrap items-center gap-3">
-              <AnonymousReactionBar itemId={slug} initialCounts={initialCounts} />
+              <AnonymousReactionBar itemId={slug} />
               <ShareButton url={`/blog/${slug}`} title={blog.title} />
             </div>
           </div>
