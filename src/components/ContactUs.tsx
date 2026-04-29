@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 export default function ContactUs() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    company: "",
+    _bot_check: "",
     name: "",
     message: "",
     phone: "",
@@ -96,7 +96,7 @@ export default function ContactUs() {
       }
 
       setSuccess(true);
-      setFormData({ company: "", name: "", message: "", phone: "", role: "Select Option" });
+      setFormData({ _bot_check: "", name: "", message: "", phone: "", role: "Select Option" });
     } catch (error) {
       console.error("Error submitting contact form:", error);
       setErrorMsg(
@@ -136,14 +136,14 @@ export default function ContactUs() {
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
 
               <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-                <label htmlFor="contact-company" className="sr-only">
-                  Company
+                <label htmlFor="contact-bot-check" className="sr-only">
+                  Ignore this field
                 </label>
                 <input
                   type="text"
-                  id="contact-company"
-                  name="company"
-                  value={formData.company}
+                  id="contact-bot-check"
+                  name="_bot_check"
+                  value={formData._bot_check}
                   onChange={handleChange}
                   autoComplete="off"
                   tabIndex={-1}
