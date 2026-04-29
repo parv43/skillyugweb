@@ -47,6 +47,19 @@ export function middleware(request: NextRequest) {
   response.headers.set("Content-Security-Policy", csp);
   response.headers.set("X-Frame-Options", "SAMEORIGIN");
   response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+
+  // Implement the safe compromise for Cache-Control to fix bfcache failures.
+  const path = request.nextUrl.pathname;
+  const isPrivate = path.startsWith("/api") || path.startsWith("/my-batch") || path.startsWith("/profile") || path.startsWith("/checkout");
+
+  if (isPrivate) {
+    // Keep strict for logged-in user dashboards and APIs
+    response.headers.set("Cache-Control", "no-store, max-age=0");
+  } else {
+    // Safe compromise for public landing pages to boost performance
+    response.headers.set("Cache-Control", "public, max-age=3600, s-maxage=86400, stale-while-revalidate");
+  }
 
   return response;
 }
