@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react"
 import { Menu, X } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import type { Session } from "@supabase/supabase-js"
 import { supabase } from "@/lib/supabaseClient"
@@ -168,7 +169,7 @@ export default function Navbar() {
         
         {/* Logo */}
         <Link href="/" className="flex items-center group transition-all" aria-label="Skillyug Home">
-          <img src="/skillyug-optimized.svg" alt="Skillyug Logo" className="h-14 md:h-20 object-contain scale-[1.8] transform-gpu hover:scale-[1.9] transition-transform duration-300" />
+          <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" width={200} height={80} priority className="h-14 md:h-20 w-auto object-contain scale-[1.8] transform-gpu hover:scale-[1.9] transition-transform duration-300" />
         </Link>
 
         {/* Desktop Navigation */}
