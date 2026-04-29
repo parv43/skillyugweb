@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { supabase } from "@/lib/supabaseClient"
+import { useAccessControl } from "@/hooks/useAccessControl"
 
 // The tool cards orbiting the central badge
 interface OrbitingToolProps {
@@ -50,17 +51,8 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: OrbitingTo
 
 // ─── Mobile-Only Hero ───────────────────────────────────────────────────────
 function MobileHero() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const { isLoggedIn, hasDemo, hasSlot, loading } = useAccessControl();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsLoggedIn(!!session)
-    })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setIsLoggedIn(!!session)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
   return (
     <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-[#020617] overflow-hidden">
       {/* Subtle Background Glows matching the screenshot */}
@@ -82,22 +74,26 @@ function MobileHero() {
 
         {/* CTAs */}
         <div className="w-full flex flex-col gap-4 mb-6">
-          <Link
-            href="/book-demo"
-            className="w-full py-4 px-8 rounded-full border border-white/20 bg-transparent text-white font-semibold text-[17px] active:scale-95 transition-colors text-center inline-block"
-          >
-            Book your Demo
-          </Link>
-          <Link
-            href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
-            className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
-            style={{ 
-              background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
-              boxShadow: "0 4px 20px rgba(139,92,246,0.3)" 
-            }}
-          >
-            Join the Bootcamp
-          </Link>
+          {!loading && !hasDemo && (
+            <Link
+              href="/book-demo"
+              className="w-full py-4 px-8 rounded-full border border-white/20 bg-transparent text-white font-semibold text-[17px] active:scale-95 transition-colors text-center inline-block"
+            >
+              Book your Demo
+            </Link>
+          )}
+          {!loading && !hasSlot && (
+            <Link
+              href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
+              className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
+              style={{ 
+                background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
+                boxShadow: "0 4px 20px rgba(139,92,246,0.3)" 
+              }}
+            >
+              Join the Bootcamp
+            </Link>
+          )}
         </div>
       </div>
 
@@ -124,17 +120,7 @@ function MobileHero() {
 // ─── Main Export ─────────────────────────────────────────────────────────────
 export default function HeroSection() {
   const [orbitRadius, setOrbitRadius] = useState(230)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsLoggedIn(!!session)
-    })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setIsLoggedIn(!!session)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
+  const { isLoggedIn, hasDemo, hasSlot, loading } = useAccessControl();
 
   useEffect(() => {
     const updateRadius = () => {
@@ -207,18 +193,22 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
-              <Link
-                href="/book-demo"
-                className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center inline-block"
-              >
-                Book your Demo
-              </Link>
-              <Link 
-                href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
-                className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
-              >
-                Join the Bootcamp
-              </Link>
+              {!loading && !hasDemo && (
+                <Link
+                  href="/book-demo"
+                  className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center inline-block"
+                >
+                  Book your Demo
+                </Link>
+              )}
+              {!loading && !hasSlot && (
+                <Link 
+                  href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
+                  className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
+                >
+                  Join the Bootcamp
+                </Link>
+              )}
             </div>
           </motion.div>
 

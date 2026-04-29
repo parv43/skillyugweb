@@ -2,8 +2,12 @@
 
 import React from "react"
 import { motion } from "framer-motion"
+import { useAccessControl } from "@/hooks/useAccessControl"
 
 export default function SlidingCTA() {
+  const { hasDemo, loading } = useAccessControl()
+
+  if (!loading && hasDemo) return null;
   const content = (
     <div className="flex items-center gap-6 md:gap-12 px-6 whitespace-nowrap">
       <span className="text-white font-medium text-sm md:text-base tracking-wide">

@@ -8,14 +8,17 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import type { Session } from "@supabase/supabase-js"
 import { supabase } from "@/lib/supabaseClient"
+import { useAccessControl } from "@/hooks/useAccessControl"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [session, setSession] = useState<Session | null>(null)
-  const [hasMyBatchAccess, setHasMyBatchAccess] = useState(false)
+  
   const pathname = usePathname()
   const rafRef = React.useRef<number | null>(null)
+  
+  // Use the shared access control hook
+  const { isLoggedIn, hasAccess: hasMyBatchAccess, hasSlot, loading } = useAccessControl()
 
   useEffect(() => {
     // ✅ Use requestAnimationFrame for optimal performance (syncs with 60fps)
@@ -31,97 +34,12 @@ export default function Navbar() {
     
     window.addEventListener("scroll", handleScroll, { passive: true })
     handleScroll() // Initial check
-
-    // Check user session - happens ONCE on mount, not on every scroll
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      if (!session) {
-        setHasMyBatchAccess(false)
-      }
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session) // Only called when auth state actually changes
-      if (!session) {
-        setHasMyBatchAccess(false)
-        // Clear cache on logout
-        try { sessionStorage.removeItem("mybatch_access") } catch { /* ignore */ }
-      } else {
-        // Clear cache on new login so fresh check runs
-        try { sessionStorage.removeItem("mybatch_access") } catch { /* ignore */ }
-      }
-    })
     
     return () => {
       window.removeEventListener("scroll", handleScroll)
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
-      subscription.unsubscribe()
     }
   }, [])
-
-  useEffect(() => {
-    if (!session) {
-      // Clear cached access when logged out
-      try { sessionStorage.removeItem("mybatch_access") } catch { /* ignore */ }
-      return
-    }
-
-    let cancelled = false
-
-    const loadAccess = async () => {
-      // Check sessionStorage cache first (5 min TTL) to avoid extra API call on every navigation
-      try {
-        const cached = sessionStorage.getItem("mybatch_access")
-        if (cached) {
-          const { value, expiry } = JSON.parse(cached) as { value: { hasAccess: boolean; hasSlot: boolean; hasDemo: boolean }; expiry: number }
-          if (Date.now() < expiry) {
-            if (!cancelled) setHasMyBatchAccess(value.hasAccess)
-            return
-          }
-        }
-      } catch { /* ignore bad cache */ }
-
-      try {
-        const response = await fetch("/api/my-batch/access")
-        if (!response.ok) {
-          if (!cancelled) setHasMyBatchAccess(false)
-          return
-        }
-
-        const data = (await response.json()) as { hasAccess?: boolean; hasSlot?: boolean; hasDemo?: boolean }
-        const hasAccess = Boolean(data.hasAccess)
-        if (!cancelled) {
-          setHasMyBatchAccess(hasAccess)
-          // Cache for 5 minutes
-          try {
-            sessionStorage.setItem(
-              "mybatch_access",
-              JSON.stringify({ 
-                value: { 
-                  hasAccess: hasAccess, 
-                  hasSlot: Boolean(data.hasSlot), 
-                  hasDemo: Boolean(data.hasDemo) 
-                }, 
-                expiry: Date.now() + 5 * 60 * 1000 
-              })
-            )
-          } catch { /* ignore quota errors */ }
-        }
-      } catch {
-        if (!cancelled) {
-          setHasMyBatchAccess(false)
-        }
-      }
-    }
-
-    loadAccess()
-
-    return () => {
-      cancelled = true
-    }
-  }, [session])
 
   // Close mobile menu and handle smooth scroll for hash links
   const handleNavClick = (e: React.MouseEvent, href: string) => {
@@ -204,7 +122,7 @@ export default function Navbar() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-4">
-          {session ? (
+          {isLoggedIn ? (
             <Link 
               href="/profile" 
               className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-slate-800/80 hover:bg-slate-700/80 shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-105 transition-all duration-300 block border border-white/10"
@@ -269,7 +187,7 @@ export default function Navbar() {
               );
             })}
             <li className="mt-4 pt-4 border-t border-white/10">
-              {session ? (
+              {isLoggedIn ? (
                 <Link 
                   href="/profile" 
                   onClick={() => setMobileMenuOpen(false)}

@@ -1,25 +1,12 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { supabase } from "@/lib/supabaseClient"
+import { useAccessControl } from "@/hooks/useAccessControl"
 
 export default function CTASection() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setIsLoggedIn(!!session)
-    }
-    checkSession()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
+  const { isLoggedIn, hasSlot, loading } = useAccessControl()
 
   return (
     <section className="relative w-full py-40 bg-[#020617] flex items-center justify-center overflow-hidden border-t-2 border-slate-800">
@@ -54,12 +41,14 @@ export default function CTASection() {
 
           {/* Dual Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10 w-full">
-            <Link
-              href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
-              className="glow-button px-10 py-5 rounded-full text-white font-bold text-xl tracking-wide shadow-2xl hover:scale-[1.03] transition-transform w-full sm:w-auto text-center border border-blue-400/50 inline-block"
-            >
-              Join the Bootcamp
-            </Link>
+            {!loading && !hasSlot && (
+              <Link
+                href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
+                className="glow-button px-10 py-5 rounded-full text-white font-bold text-xl tracking-wide shadow-2xl hover:scale-[1.03] transition-transform w-full sm:w-auto text-center border border-blue-400/50 inline-block"
+              >
+                Join the Bootcamp
+              </Link>
+            )}
             <button className="glass-panel px-10 py-5 rounded-full text-white font-bold text-xl tracking-wide hover:bg-white/5 transition-colors w-full sm:w-auto border border-white/20 text-center">
               View Curriculum
             </button>

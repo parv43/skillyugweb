@@ -4,11 +4,24 @@ import React, { useEffect, useState, useRef } from "react"
 import { motion, useInView, animate } from "framer-motion"
 import { CheckCircle2, Zap, ArrowRight, ShieldCheck } from "lucide-react"
 import Link from "next/link"
+import { useAccessControl } from "@/hooks/useAccessControl"
+
+const features = [
+  { text: "1 Hour Live Interactive Session" },
+  { text: "Hands-on with ChatGPT & Canva AI" },
+  { text: "Actionable study framework" },
+  { text: "Q&A with Skillyug Instructors" }
+]
 
 export default function DemoBookingSection() {
+  const { hasDemo, loading } = useAccessControl()
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { amount: 0.3, once: true })
   const [percent, setPercent] = useState(0)
+
+  if (!loading && hasDemo) {
+    return null
+  }
 
   // Animated counter from 0 to 84 whenever the section enters view
   useEffect(() => {
