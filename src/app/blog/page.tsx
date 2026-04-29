@@ -5,7 +5,6 @@ import Navbar from "@/components/Navbar";
 import { blogs } from "@/lib/blogData";
 import BlogListing from "@/components/BlogListing";
 import { Metadata } from "next";
-import { getReactionCounts } from "@/app/actions/reactions";
 import FloatingCTA from "@/components/FloatingCTA";
 import { createMetadata, getBlogCollectionSchema } from "@/lib/seo";
 import { headers } from "next/headers";
@@ -23,17 +22,6 @@ export default async function BlogListingPage() {
   const featuredBlog = blogs.find(blog => blog.featured) || blogs[0];
   const regularBlogs = blogs.filter(blog => blog.slug !== featuredBlog.slug);
 
-  const reactionCountsArray = await Promise.all(
-    regularBlogs.map(async (blog) => ({
-      slug: blog.slug,
-      counts: await getReactionCounts(blog.slug),
-    }))
-  );
-
-  const reactionCounts = Object.fromEntries(
-    reactionCountsArray.map(({ slug, counts }) => [slug, counts])
-  );
-
   const categories = [
     "All",
     "AI for Students",
@@ -44,7 +32,6 @@ export default async function BlogListingPage() {
   ];
 
   const blogListSchema = getBlogCollectionSchema(blogs);
-
   const nonce = (await headers()).get("x-nonce") ?? "";
 
   return (
@@ -117,7 +104,7 @@ export default async function BlogListingPage() {
           </div>
         )}
 
-        <BlogListing categories={categories} blogs={regularBlogs} reactionCounts={reactionCounts} />
+        <BlogListing categories={categories} blogs={regularBlogs} reactionCounts={{}} />
 
       </div>
       <FloatingCTA />
