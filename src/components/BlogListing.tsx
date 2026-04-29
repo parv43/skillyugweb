@@ -1,8 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { BlogPost } from "@/lib/blogData";
 import { motion, AnimatePresence } from "framer-motion";
 import AnonymousReactionBar from "@/components/AnonymousReactionBar";
@@ -64,11 +64,12 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
                 aria-label={`Read ${blog.title}`}
               >
                 <div className="w-full h-48 overflow-hidden relative">
-                  <img 
+                  <Image 
                     src={blog.thumbnail} 
                     alt={blog.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-blue-900/10 group-hover:bg-transparent transition-colors duration-500"></div>
                 </div>

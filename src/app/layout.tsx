@@ -21,16 +21,21 @@ export const metadata: Metadata = {
 
 const organizationSchema = getOrganizationSchema()
 
-export default function RootLayout({
+import { headers } from "next/headers"
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const nonce = (await headers()).get("x-nonce") ?? ""
+
   return (
     <html lang="en">
       <head>
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
@@ -38,3 +43,4 @@ export default function RootLayout({
     </html>
   )
 }
+

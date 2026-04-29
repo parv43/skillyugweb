@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { blogs } from "@/lib/blogData";
@@ -10,6 +10,7 @@ import ShareButton from "@/components/ShareButton";
 import { getReactionCounts } from "@/app/actions/reactions";
 import FloatingCTA from "@/components/FloatingCTA";
 import { createMetadata, getBlogPostingSchema } from "@/lib/seo";
+import { headers } from "next/headers";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -63,9 +64,11 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
 
   const blogPostingSchema = getBlogPostingSchema(blog);
 
+  const nonce = (await headers()).get("x-nonce") ?? "";
+
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative pb-0">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }} />
+      <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }} />
 
       {/* Background Gradients */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -119,11 +122,13 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           </h1>
 
           <div className="w-full h-64 md:h-96 rounded-[24px] overflow-hidden border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] mb-12">
-            <img
+            <Image
               src={blog.thumbnail}
               alt={blog.title}
-              loading="lazy"
-              className="w-full h-full object-cover"
+              priority
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 1024px"
             />
           </div>
         </header>

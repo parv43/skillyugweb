@@ -1,6 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import { blogs } from "@/lib/blogData";
 import BlogListing from "@/components/BlogListing";
@@ -8,6 +8,7 @@ import { Metadata } from "next";
 import { getReactionCounts } from "@/app/actions/reactions";
 import FloatingCTA from "@/components/FloatingCTA";
 import { createMetadata, getBlogCollectionSchema } from "@/lib/seo";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   ...createMetadata({
@@ -44,10 +45,13 @@ export default async function BlogListingPage() {
 
   const blogListSchema = getBlogCollectionSchema(blogs);
 
+  const nonce = (await headers()).get("x-nonce") ?? "";
+
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative pb-20">
       <script
         type="application/ld+json"
+        nonce={nonce}
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListSchema) }}
       />
 
@@ -76,11 +80,13 @@ export default async function BlogListingPage() {
           <div className="mb-20 group relative rounded-[24px] overflow-hidden bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] backdrop-blur-sm transition-all duration-300 hover:border-blue-500/30 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
             <div className="flex flex-col lg:flex-row">
               <div className="w-full lg:w-1/2 aspect-video lg:aspect-auto h-64 lg:h-auto overflow-hidden relative">
-                <img
+                <Image
                   src={featuredBlog.thumbnail}
                   alt={featuredBlog.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  priority
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute top-4 left-4 bg-blue-600/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white">
                   Featured
