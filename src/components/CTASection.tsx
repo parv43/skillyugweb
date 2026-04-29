@@ -69,7 +69,7 @@ export default function CTASection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-8 border-t border-white/10 pt-8 mt-4 mx-auto max-w-lg">
             
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_10px_rgba(96,165,250,0.8)]"></div>
+              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
               <p className="text-sm font-semibold text-slate-300 tracking-wide">
                 Next cohort starting soon
               </p>
@@ -78,7 +78,7 @@ export default function CTASection() {
             <div className="hidden sm:block w-[1px] h-6 bg-white/10"></div>
             
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-red-500 animate-[pulse_1s_infinite] shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div>
+              <div className="w-2 h-2 rounded-full bg-red-500 animate-[pulse_1s_infinite]"></div>
               <p className="text-sm font-bold text-red-400 tracking-wide">
                 80% seats filled
               </p>
