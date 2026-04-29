@@ -68,7 +68,7 @@ declare global {
   }
 }
 
-export default function BookSlotPage() {
+export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState("");
   const [gatewayNotice, setGatewayNotice] = useState("");
@@ -297,6 +297,7 @@ export default function BookSlotPage() {
         key={razorpayScriptKey}
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="afterInteractive"
+        nonce={nonce}
         onLoad={() => {
           setRazorpayScriptStatus("ready");
           setRazorpayAutoRetryCount(0);

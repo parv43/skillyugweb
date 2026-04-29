@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import BookSlotPageClient from "@/app/book-slot/BookSlotPageClient"
 import { createMetadata, noIndexRobots } from "@/lib/seo"
+import { headers } from "next/headers"
 
 export const metadata: Metadata = {
   ...createMetadata({
@@ -11,6 +12,8 @@ export const metadata: Metadata = {
   }),
 }
 
-export default function BookSlotPage() {
-  return <BookSlotPageClient />
+export default async function BookSlotPage() {
+  const nonce = (await headers()).get("x-nonce") ?? ""
+  return <BookSlotPageClient nonce={nonce} />
 }
+

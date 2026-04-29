@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import BookDemoPageClient from "@/app/book-demo/BookDemoPageClient"
 import { createMetadata, noIndexRobots } from "@/lib/seo"
+import { headers } from "next/headers"
 
 export const metadata: Metadata = {
   ...createMetadata({
@@ -11,6 +12,8 @@ export const metadata: Metadata = {
   }),
 }
 
-export default function BookDemoPage() {
-  return <BookDemoPageClient />
+export default async function BookDemoPage() {
+  const nonce = (await headers()).get("x-nonce") ?? ""
+  return <BookDemoPageClient nonce={nonce} />
 }
+
