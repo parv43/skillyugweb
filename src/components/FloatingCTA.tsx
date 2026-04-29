@@ -3,8 +3,10 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Calendar } from "lucide-react"
 import Link from "next/link"
+import { useAccessControl } from "@/hooks/useAccessControl"
 
 export default function FloatingCTA() {
+  const { hasDemo, loading } = useAccessControl()
   const [isVisible, setIsVisible] = useState(false)
   const [isOverlapping, setIsOverlapping] = useState(false)
   const buttonRef = useRef<HTMLDivElement>(null)
@@ -12,6 +14,7 @@ export default function FloatingCTA() {
   const observedElementsRef = useRef<Element[]>([])
 
   useEffect(() => {
+    if (loading || hasDemo) return;
     const refreshObservedElements = () => {
       observedElementsRef.current = Array.from(
         document.querySelectorAll(
@@ -85,6 +88,10 @@ export default function FloatingCTA() {
       }
     }
   }, [])
+
+  if (!loading && hasDemo) {
+    return null;
+  }
 
   return (
     <div

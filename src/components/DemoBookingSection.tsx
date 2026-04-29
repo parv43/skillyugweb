@@ -4,8 +4,17 @@ import React, { useEffect, useState, useRef } from "react"
 import { motion, useInView, animate } from "framer-motion"
 import { CheckCircle2, Zap, ArrowRight, ShieldCheck } from "lucide-react"
 import Link from "next/link"
+import { useAccessControl } from "@/hooks/useAccessControl"
+
+const features = [
+  { text: "1 Hour Live Interactive Session" },
+  { text: "Hands-on with ChatGPT & Canva AI" },
+  { text: "Actionable study framework" },
+  { text: "Q&A with Skillyug Instructors" }
+]
 
 export default function DemoBookingSection() {
+  const { hasDemo, loading } = useAccessControl()
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { amount: 0.3, once: true })
   const [percent, setPercent] = useState(0)
@@ -22,8 +31,12 @@ export default function DemoBookingSection() {
     }
   }, [isInView])
 
+  if (!loading && hasDemo) {
+    return null;
+  }
+
   return (
-    <section id="demo-booking" className="relative w-full py-32 bg-[#020617] overflow-hidden border-t border-slate-900" ref={sectionRef}>
+    <section id="demo-booking" className="relative w-full py-24 md:py-32 bg-[#020617] overflow-hidden border-t border-slate-900" ref={sectionRef}>
       
       {/* Performant Ambient Background (no massive blur filters) */}
       <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent rounded-full pointer-events-none" />
