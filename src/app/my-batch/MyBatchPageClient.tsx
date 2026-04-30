@@ -48,6 +48,34 @@ export default function MyBatchPage() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<BatchUser | null>(null);
   const [hasSlotAccess, setHasSlotAccess] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleDownloadCertificate = async () => {
+    if (!user || isGenerating) return;
+
+    try {
+      setIsGenerating(true);
+      const res = await fetch("/api/certificate/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.fullName,
+          userId: (await supabase.auth.getSession()).data.session?.user.id
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to generate certificate");
+
+      // Trigger download
+      window.open(data.downloadUrl, "_blank");
+    } catch (error: any) {
+      console.error("Certificate error:", error);
+      alert(error.message || "Could not generate certificate. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   useEffect(() => {
     const loadSession = async () => {
@@ -273,6 +301,44 @@ export default function MyBatchPage() {
                       </article>
                     );
                   })}
+
+                  {/* Certificate Card */}
+                  <article className="rounded-[1.75rem] border border-blue-500/20 bg-gradient-to-br from-blue-600/20 to-purple-500/10 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] relative overflow-hidden group">
+                    <div className="absolute -right-12 -top-12 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full transition-opacity group-hover:opacity-100 opacity-50"></div>
+                    
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="rounded-2xl border border-white/10 bg-blue-500/20 p-4 shadow-inner">
+                        <BadgeCheck className="h-6 w-6 text-blue-300" />
+                      </div>
+                      <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-blue-300">
+                        OFFICIAL
+                      </span>
+                    </div>
+                    <h3 className="mt-8 text-2xl font-black tracking-tight text-white">
+                      Certificate of Attendance
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                      Claim your official Skillyug AI Education Bootcamp certificate. Includes a unique verification ID and scannable QR.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleDownloadCertificate}
+                      disabled={isGenerating}
+                      className="mt-8 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:bg-blue-500 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          Download Certificate
+                          <Download className="h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+                  </article>
                 </div>
               </div>
               
