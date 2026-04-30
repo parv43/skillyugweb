@@ -110,7 +110,6 @@ export async function POST(request: Request) {
 
     const { error } = await supabaseAdmin.from("contact_messages").insert([
       {
-        user_id: authData.user.id,
         message: message.slice(0, 2000),
         name: name.slice(0, 120),
         phone: phone.slice(0, 20),
