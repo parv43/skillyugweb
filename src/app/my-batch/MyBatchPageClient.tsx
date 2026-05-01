@@ -49,29 +49,53 @@ export default function MyBatchPage() {
   const [user, setUser] = useState<BatchUser | null>(null);
   const [hasSlotAccess, setHasSlotAccess] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  // Certificate modal state
+  const [showCertModal, setShowCertModal] = useState(false);
+  const [certStudentName, setCertStudentName] = useState("");
+  const [certParentName, setCertParentName] = useState("");
+  const [certError, setCertError] = useState("");
 
-  const handleDownloadCertificate = async () => {
+  // Opens the name-collection modal pre-filled with the user's name
+  const openCertModal = () => {
     if (!user || isGenerating) return;
+    setCertStudentName(user.fullName);
+    setCertParentName("");
+    setCertError("");
+    setShowCertModal(true);
+  };
 
+  const handleGenerateCertificates = async () => {
+    if (!certStudentName.trim()) {
+      setCertError("Please enter the student's name.");
+      return;
+    }
     try {
       setIsGenerating(true);
+      setCertError("");
+      setShowCertModal(false);
+
       const res = await fetch("/api/certificate/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: user.fullName,
-          userId: (await supabase.auth.getSession()).data.session?.user.id
-        })
+          studentName: certStudentName.trim(),
+          parentName: certParentName.trim(),
+          userId: (await supabase.auth.getSession()).data.session?.user.id,
+        }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to generate certificate");
 
-      // Trigger download
-      window.open(data.downloadUrl, "_blank");
-    } catch (error: any) {
-      console.error("Certificate error:", error);
-      alert(error.message || "Could not generate certificate. Please try again.");
+      // Open student certificate
+      window.open(data.student.downloadUrl, "_blank");
+      // Open parent certificate if generated (slight delay so browser doesn't block)
+      if (data.parent) {
+        setTimeout(() => window.open(data.parent.downloadUrl, "_blank"), 600);
+      }
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Could not generate certificates.";
+      alert(msg);
     } finally {
       setIsGenerating(false);
     }
@@ -322,7 +346,7 @@ export default function MyBatchPage() {
                     </p>
                     <button
                       type="button"
-                      onClick={handleDownloadCertificate}
+                      onClick={openCertModal}
                       disabled={isGenerating}
                       className="mt-8 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:bg-blue-500 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -348,6 +372,92 @@ export default function MyBatchPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Certificate Name Modal ──────────────────────────────────── */}
+      {showCertModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(2,6,23,0.85)", backdropFilter: "blur(12px)" }}
+        >
+          <div className="relative w-full max-w-md rounded-[2rem] border border-white/10 bg-white/[0.06] backdrop-blur-xl p-8 shadow-[0_0_80px_rgba(59,130,246,0.15)]">
+            {/* Close button */}
+            <button
+              onClick={() => setShowCertModal(false)}
+              className="absolute top-5 right-6 text-slate-400 hover:text-white transition-colors text-2xl leading-none"
+              aria-label="Close modal"
+            >
+              ×
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="rounded-xl border border-blue-400/20 bg-blue-500/15 p-3">
+                <BadgeCheck className="h-5 w-5 text-blue-300" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">Certificate</p>
+                <h3 className="text-lg font-black text-white">Enter Names</h3>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+              We&apos;ll generate <span className="text-white font-semibold">two certificates</span> — one for the student and one for the parent.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-400 mb-2">
+                  Student&apos;s Full Name <span className="text-blue-400">*</span>
+                </label>
+                <input
+                  id="cert-student-name"
+                  type="text"
+                  value={certStudentName}
+                  onChange={e => { setCertStudentName(e.target.value); setCertError(""); }}
+                  placeholder="e.g. Tanuj Pathak"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/30 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-400 mb-2">
+                  Parent&apos;s Full Name <span className="text-slate-500">(optional)</span>
+                </label>
+                <input
+                  id="cert-parent-name"
+                  type="text"
+                  value={certParentName}
+                  onChange={e => setCertParentName(e.target.value)}
+                  placeholder="e.g. Rajesh Pathak"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/30 transition-all"
+                />
+              </div>
+              {certError && (
+                <p className="text-xs text-red-400 font-medium">{certError}</p>
+              )}
+            </div>
+
+            <div className="mt-8 flex gap-3">
+              <button
+                onClick={() => setShowCertModal(false)}
+                className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] py-3 text-xs font-bold uppercase tracking-[0.22em] text-slate-300 transition-all hover:bg-white/[0.08]"
+              >
+                Cancel
+              </button>
+              <button
+                id="cert-generate-btn"
+                onClick={handleGenerateCertificates}
+                disabled={isGenerating}
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isGenerating ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
+                ) : (
+                  <><Download className="h-4 w-4" />Generate &amp; Download</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
