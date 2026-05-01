@@ -167,8 +167,20 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
     const normalizedGrade = grade.trim();
     const normalizedPromoCode = promoCode.trim().toUpperCase();
 
+    // Valid promo codes — internal reference only (do NOT display these on the UI):
+    // YUG01 → ANUSHKA
+    // YUG02 → 
+    // YUG03 → 
+    const VALID_PROMO_CODES = ['YUG01', 'YUG02', 'YUG03'];
+
     if (!normalizedStudentName || !normalizedGrade || !/^\d{10}$/.test(normalizedPhoneNumber)) {
       setErrorMsg("Enter a valid name, class, and 10-digit phone number before paying.");
+      return;
+    }
+
+    // If a promo code was entered, validate it against allowed codes
+    if (normalizedPromoCode && !VALID_PROMO_CODES.includes(normalizedPromoCode)) {
+      setErrorMsg("Invalid promo code. Please check your code and try again.");
       return;
     }
 

@@ -63,8 +63,18 @@ export async function POST(request: Request) {
     const studentName = typeof body.studentName === "string" ? body.studentName.trim() : null;
     const phoneNumber = typeof body.phoneNumber === "string" ? body.phoneNumber.trim() : null;
     const grade = typeof body.grade === "string" ? body.grade.trim() : null;
+
+    // Valid promo codes — internal reference only (do NOT display these on the UI):
+    // YUG01 → ANUSHKA
+    // YUG02 → PRIYA
+    // YUG03 → RAHUL
+    const VALID_PROMO_CODES = ["YUG01", "YUG02", "YUG03"];
+
+    const rawPromoCode =
+      typeof body.promoCode === "string" ? body.promoCode.trim().toUpperCase() : "";
+    // Only save the promo code if it matches a valid code; otherwise treat it as no code entered
     const promoCode =
-      typeof body.promoCode === "string" ? body.promoCode.trim().toUpperCase() : null;
+      rawPromoCode && VALID_PROMO_CODES.includes(rawPromoCode) ? rawPromoCode : null;
     const razorpayOrderId =
       typeof body.razorpay_order_id === "string" ? body.razorpay_order_id.trim() : "";
     const razorpayPaymentId =
