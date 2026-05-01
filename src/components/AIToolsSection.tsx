@@ -2,7 +2,6 @@
 
 import React from "react"
 import { motion } from "framer-motion"
-import Link from "next/link"
 import {
   MessageSquare,
   Image,
@@ -64,12 +63,6 @@ interface EcosystemNodeProps {
   color?: AccentColor
 }
 
-interface WorkflowStepProps {
-  step: string
-  title: string
-  desc: string
-  delay: number
-}
 
 // A connection line that draws itself when scrolled into view
 const FlowLine = ({ d, strokeDasharray, duration = 1.5, delay = 0 }: FlowLineProps) => {
@@ -115,18 +108,6 @@ const EcosystemNode = ({
   )
 }
 
-const WorkflowStep = ({ step, title, desc, delay }: WorkflowStepProps) => {
-  return (
-    <motion.div 
-      className="workflow-card flex-1 bg-[#0f172a]/90 shadow-[0_8px_16px_rgba(0,0,0,0.15)] p-6 rounded-3xl border border-white/5 relative z-10 hover:border-purple-500/30 transition-colors will-change-transform"
-      transition={{ duration: 0.6, delay }}
-    >
-      <div className="text-4xl opacity-20 absolute right-6 top-6 font-black font-mono">{step}</div>
-      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-      <p className="text-slate-400 text-sm">{desc}</p>
-    </motion.div>
-  )
-}
 
 export default function AIToolsSection() {
   return (
@@ -268,7 +249,7 @@ export default function AIToolsSection() {
               <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-white font-black text-xs">{step}</span>
               </div>
-              <div>
+               <div>
                 <h3 className="text-white font-bold text-sm mb-1">{title}</h3>
                 <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
               </div>
@@ -277,77 +258,7 @@ export default function AIToolsSection() {
         </div>
       </div>
 
-      {/* ── Desktop Workflow Steps (≥ lg) ── */}
-      <div className="w-full max-w-6xl mx-auto px-6 mt-32 z-20 hidden lg:block">
-        <div className="text-center mb-12">
-          <h3 className="text-2xl font-bold text-white mb-4">Example Student Workflow</h3>
-          <div className="h-px w-24 bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto" />
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-6 md:gap-4 lg:gap-8 relative">
-          {/* Background connector line for horizontal flow */}
-          <div className="absolute top-1/2 left-0 right-0 h-px bg-white/10 hidden md:block -z-10" />
-
-          <WorkflowStep 
-            step="01"
-            title="Prompt Design" 
-            desc="Students write a structured prompt explaining their idea to an LLM."
-            delay={0.2}
-          />
-          <WorkflowStep 
-            step="02"
-            title="AI Generation" 
-            desc="AI tools output the raw code, text, graphics, and structure required."
-            delay={0.4}
-          />
-          <WorkflowStep 
-            step="03"
-            title="Human Polish" 
-            desc="Students use Canva to refine layouts and edit out AI hallucinations."
-            delay={0.6}
-          />
-          <WorkflowStep 
-            step="04"
-            title="Final Project" 
-            desc="A complete, functioning website, game, or presentation is created."
-            delay={0.8}
-          />
-        </div>
-      </div>
-
-      <div className="relative z-20 mt-14 flex w-full max-w-5xl flex-col items-center px-6">
-        <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500">
-          Read the Guides
-        </p>
-        <div className="mt-4 flex flex-wrap justify-center gap-3">
-          {[
-            {
-              href: "/blog/how-to-use-chatgpt-for-homework",
-              label: "ChatGPT for Homework",
-            },
-            {
-              href: "/blog/how-to-use-canva-ai-for-projects",
-              label: "Canva AI for Projects",
-            },
-            {
-              href: "/blog/best-ai-tools-for-presentations",
-              label: "AI Tools for Presentations",
-            },
-            {
-              href: "/blog/how-to-learn-ai-as-a-school-student",
-              label: "How to Learn AI",
-            },
-          ].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-blue-400/30 hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-      </div>
     </section>
   )
 }
+
