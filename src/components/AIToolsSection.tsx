@@ -2,7 +2,6 @@
 
 import React from "react"
 import { motion } from "framer-motion"
-import Link from "next/link"
 import {
   MessageSquare,
   Image,
@@ -64,12 +63,6 @@ interface EcosystemNodeProps {
   color?: AccentColor
 }
 
-interface WorkflowStepProps {
-  step: string
-  title: string
-  desc: string
-  delay: number
-}
 
 // A connection line that draws itself when scrolled into view
 const FlowLine = ({ d, strokeDasharray, duration = 1.5, delay = 0 }: FlowLineProps) => {
@@ -115,18 +108,6 @@ const EcosystemNode = ({
   )
 }
 
-const WorkflowStep = ({ step, title, desc, delay }: WorkflowStepProps) => {
-  return (
-    <motion.div 
-      className="workflow-card flex-1 bg-[#0f172a]/90 shadow-[0_8px_16px_rgba(0,0,0,0.15)] p-6 rounded-3xl border border-white/5 relative z-10 hover:border-purple-500/30 transition-colors will-change-transform"
-      transition={{ duration: 0.6, delay }}
-    >
-      <div className="text-4xl opacity-20 absolute right-6 top-6 font-black font-mono">{step}</div>
-      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-      <p className="text-slate-400 text-sm">{desc}</p>
-    </motion.div>
-  )
-}
 
 export default function AIToolsSection() {
   return (
@@ -268,7 +249,7 @@ export default function AIToolsSection() {
               <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-white font-black text-xs">{step}</span>
               </div>
-              <div>
+               <div>
                 <h3 className="text-white font-bold text-sm mb-1">{title}</h3>
                 <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
               </div>
@@ -277,75 +258,115 @@ export default function AIToolsSection() {
         </div>
       </div>
 
-      {/* ── Desktop Workflow Steps (≥ lg) ── */}
-      <div className="w-full max-w-6xl mx-auto px-6 mt-32 z-20 hidden lg:block">
-        <div className="text-center mb-12">
-          <h3 className="text-2xl font-bold text-white mb-4">Example Student Workflow</h3>
+
+      {/* ── Skillyug Gallery ─────────────────────────────────────────────── */}
+      <div className="w-full max-w-6xl mx-auto px-6 mt-32 z-20">
+        {/* Section Header */}
+        <div className="text-center mb-14">
+          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-blue-400 mb-4">Our Community</p>
+          <h3 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight">
+            Skillyug Gallery
+          </h3>
           <div className="h-px w-24 bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto" />
         </div>
 
-        <div className="flex flex-col md:flex-row gap-6 md:gap-4 lg:gap-8 relative">
-          {/* Background connector line for horizontal flow */}
-          <div className="absolute top-1/2 left-0 right-0 h-px bg-white/10 hidden md:block -z-10" />
+        {/* Gallery Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {/* Large featured image */}
+          <motion.div
+            className="col-span-2 row-span-1 relative rounded-3xl overflow-hidden aspect-[16/9] md:aspect-[2/1] group"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            viewport={{ once: true }}
+          >
+            <img
+              src="/classroom.webp"
+              alt="Skillyug classroom session"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/80 via-transparent to-transparent" />
+            <div className="absolute bottom-5 left-5">
+              <span className="text-xs font-bold uppercase tracking-[0.22em] text-blue-300 bg-blue-500/20 border border-blue-400/30 rounded-full px-3 py-1">Live Session</span>
+              <p className="mt-2 text-white font-bold text-lg">Students in Action</p>
+            </div>
+          </motion.div>
 
-          <WorkflowStep 
-            step="01"
-            title="Prompt Design" 
-            desc="Students write a structured prompt explaining their idea to an LLM."
-            delay={0.2}
-          />
-          <WorkflowStep 
-            step="02"
-            title="AI Generation" 
-            desc="AI tools output the raw code, text, graphics, and structure required."
-            delay={0.4}
-          />
-          <WorkflowStep 
-            step="03"
-            title="Human Polish" 
-            desc="Students use Canva to refine layouts and edit out AI hallucinations."
-            delay={0.6}
-          />
-          <WorkflowStep 
-            step="04"
-            title="Final Project" 
-            desc="A complete, functioning website, game, or presentation is created."
-            delay={0.8}
-          />
-        </div>
-      </div>
+          {/* Team photo */}
+          <motion.div
+            className="relative rounded-3xl overflow-hidden aspect-square group"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <img
+              src="/team-photo.webp"
+              alt="Skillyug team"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/70 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <p className="text-white font-bold text-sm">Our Team</p>
+            </div>
+          </motion.div>
 
-      <div className="relative z-20 mt-14 flex w-full max-w-5xl flex-col items-center px-6">
-        <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500">
-          Read the Guides
-        </p>
-        <div className="mt-4 flex flex-wrap justify-center gap-3">
-          {[
-            {
-              href: "/blog/how-to-use-chatgpt-for-homework",
-              label: "ChatGPT for Homework",
-            },
-            {
-              href: "/blog/how-to-use-canva-ai-for-projects",
-              label: "Canva AI for Projects",
-            },
-            {
-              href: "/blog/best-ai-tools-for-presentations",
-              label: "AI Tools for Presentations",
-            },
-            {
-              href: "/blog/how-to-learn-ai-as-a-school-student",
-              label: "How to Learn AI",
-            },
-          ].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-blue-400/30 hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {/* Event photo */}
+          <motion.div
+            className="relative rounded-3xl overflow-hidden aspect-square group"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <img
+              src="/event-photo.webp"
+              alt="Skillyug event"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/70 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <p className="text-white font-bold text-sm">Community Events</p>
+            </div>
+          </motion.div>
+
+          {/* Parv / advisor photo */}
+          <motion.div
+            className="relative rounded-3xl overflow-hidden aspect-square group"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <img
+              src="/paytmAdvisor.webp"
+              alt="Skillyug advisor session"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/70 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <p className="text-white font-bold text-sm">Expert Sessions</p>
+            </div>
+          </motion.div>
+
+          {/* Dhruv Galgotia */}
+          <motion.div
+            className="relative rounded-3xl overflow-hidden aspect-square group"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <img
+              src="/dhruv-galgotia.webp"
+              alt="Dhruv Galgotia at Skillyug"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/70 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <p className="text-white font-bold text-sm">Guest Speakers</p>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
