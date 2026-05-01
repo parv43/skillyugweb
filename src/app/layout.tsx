@@ -33,6 +33,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Link to llms.txt so AI crawlers and Semrush can discover it without following internal links */}
+        <link rel="llms" href="/llms.txt" />
         <script
           type="application/ld+json"
           nonce={nonce}
