@@ -42,5 +42,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   // Combine static and dynamic URLs
-  return [...staticRoutes, ...blogUrls];
+  return [...staticRoutes, ...blogUrls, {
+    // Explicitly include llms.txt so Semrush and AI crawlers can discover it via sitemap
+    url: `${baseUrl}/llms.txt`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }];
 }
