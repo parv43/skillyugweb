@@ -89,8 +89,8 @@ export async function POST(request: Request) {
       .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
 
-    // 46% of 1414 = ~650px — right in the blank name area, just above the orange underline
-    const nameY = height * 0.46;
+    // 49% of 1414 = ~692px — a bit lower, sitting just above the orange underline
+    const nameY = height * 0.49;
     ctx.fillText(formattedName, width / 2, nameY);
 
     // 5. Generate QR Code
@@ -106,10 +106,10 @@ export async function POST(request: Request) {
     const qrImage = await loadImage(qrDataUrl);
 
     // QR positioned in the bottom-right white area of the certificate.
-    // The new template has a safe white zone approximately at x:1600-1880, y:980-1340.
-    const qrSize = 180;
-    const qrX = width - qrSize - 110;   // ~1710px from left
-    const qrY = height - qrSize - 100;  // ~1134px from top
+    // Bigger (220px), shifted left (+40px) and up (+40px) vs previous position.
+    const qrSize = 220;
+    const qrX = width - qrSize - 150;   // shifted left: ~1630px from left
+    const qrY = height - qrSize - 140;  // shifted up: ~1054px from top
 
     ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize);
 
