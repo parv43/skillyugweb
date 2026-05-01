@@ -18,9 +18,12 @@ const BACKGROUND_URL =
 const VERIFICATION_BASE_URL = "https://www.skillyugedu.com/verify/";
 
 // Alex Brush — elegant calligraphic font from Google Fonts.
-// Downloaded at runtime so it works on Vercel/Linux (no system fonts assumed).
 const FONT_URL =
   "https://fonts.gstatic.com/s/alexbrush/v23/SZc83FzrJKuqFbwMKk6EtUI.ttf";
+
+// Lato — Clean, professional font for the ID.
+const ID_FONT_URL = 
+  "https://fonts.gstatic.com/s/lato/v25/S6uyw4BMUTPHvxk.ttf";
 
 let fontRegistered = false;
 
@@ -29,21 +32,25 @@ let fontRegistered = false;
  * Cached in /tmp so it is only downloaded once per cold start.
  * Without this, fillText() silently renders invisible glyphs on Linux (Vercel).
  */
-async function ensureFontRegistered() {
-  if (fontRegistered) return;
-
   const fontPath = path.join(os.tmpdir(), "alexbrush.ttf");
+  const idFontPath = path.join(os.tmpdir(), "lato_regular_v25.ttf");
 
   if (!fs.existsSync(fontPath)) {
     const res = await fetch(FONT_URL);
     if (!res.ok) throw new Error(`Failed to download font: ${res.status}`);
     fs.writeFileSync(fontPath, Buffer.from(await res.arrayBuffer()));
   }
+  
+  if (!fs.existsSync(idFontPath)) {
+    const res = await fetch(ID_FONT_URL);
+    if (!res.ok) throw new Error(`Failed to download ID font: ${res.status}`);
+    fs.writeFileSync(idFontPath, Buffer.from(await res.arrayBuffer()));
+  }
 
-  // Register under family "AlexBrush"
+  // Register fonts
   registerFont(fontPath, { family: "AlexBrush" });
+  registerFont(idFontPath, { family: "Lato" });
   fontRegistered = true;
-}
 
 /**
  * Renders a single certificate PDF for a given name.
@@ -97,9 +104,9 @@ async function generateCertificatePdf(
   ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize);
 
   // ── Certificate ID ────────────────────────────────────────────────────────
-  // Default sans-serif — clean and readable for an alphanumeric ID string.
-  ctx.font = "bold 24px sans-serif";
-  ctx.fillStyle = "#374151";
+  // Using registered Lato font — clean, professional, and consistent across servers.
+  ctx.font = "22px 'Lato'";
+  ctx.fillStyle = "#4b5563"; // slate-600
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
   ctx.fillText(`ID: ${certId}`, qrX + qrSize / 2, qrY + qrSize + 32);

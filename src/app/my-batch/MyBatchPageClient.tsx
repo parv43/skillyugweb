@@ -54,6 +54,7 @@ export default function MyBatchPage() {
   const [certStudentName, setCertStudentName] = useState("");
   const [certParentName, setCertParentName] = useState("");
   const [certError, setCertError] = useState("");
+  const [generatedCerts, setGeneratedCerts] = useState<{ student: { downloadUrl: string }; parent?: { downloadUrl: string } } | null>(null);
 
   // Opens the name-collection modal pre-filled with the user's name
   const openCertModal = () => {
@@ -61,6 +62,7 @@ export default function MyBatchPage() {
     setCertStudentName(user.fullName);
     setCertParentName("");
     setCertError("");
+    setGeneratedCerts(null);
     setShowCertModal(true);
   };
 
@@ -87,12 +89,11 @@ export default function MyBatchPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to generate certificate");
 
-      // Open student certificate
-      window.open(data.student.downloadUrl, "_blank");
-      // Open parent certificate if generated (slight delay so browser doesn't block)
-      if (data.parent) {
-        setTimeout(() => window.open(data.parent.downloadUrl, "_blank"), 600);
-      }
+      // Set generated certs to show in the UI instead of window.open (which browsers block)
+      setGeneratedCerts({
+        student: data.student,
+        parent: data.parent || undefined,
+      });
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : "Could not generate certificates.";
       alert(msg);
@@ -253,7 +254,7 @@ export default function MyBatchPage() {
                   alt="Skillyug logo"
                   width={260}
                   height={120}
-                  className="mx-auto h-20 w-auto object-contain scale-[1.5]"
+                  className="mx-auto h-20 w-auto object-contain"
                 />
                 <p className="mt-6 text-sm leading-relaxed text-slate-300">
                   Built for focused execution across every session, milestone, and creator sprint.
@@ -400,61 +401,109 @@ export default function MyBatchPage() {
             </div>
 
             <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-              We&apos;ll generate <span className="text-white font-semibold">two certificates</span> — one for the student and one for the parent.
+              {generatedCerts 
+                ? "Your certificates are ready! Click the buttons below to download them."
+                : "We'll generate two certificates — one for the student and one for the parent."
+              }
             </p>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-400 mb-2">
-                  Student&apos;s Full Name <span className="text-blue-400">*</span>
-                </label>
-                <input
-                  id="cert-student-name"
-                  type="text"
-                  value={certStudentName}
-                  onChange={e => { setCertStudentName(e.target.value); setCertError(""); }}
-                  placeholder="e.g. Tanuj Pathak"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/30 transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-400 mb-2">
-                  Parent&apos;s Full Name <span className="text-slate-500">(optional)</span>
-                </label>
-                <input
-                  id="cert-parent-name"
-                  type="text"
-                  value={certParentName}
-                  onChange={e => setCertParentName(e.target.value)}
-                  placeholder=""
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/30 transition-all"
-                />
-              </div>
-              {certError && (
-                <p className="text-xs text-red-400 font-medium">{certError}</p>
-              )}
-            </div>
+            {generatedCerts ? (
+              <div className="space-y-4">
+                <a
+                  href={generatedCerts.student.downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between w-full rounded-xl border border-blue-400/30 bg-blue-500/10 p-4 transition-all hover:bg-blue-500/20 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-blue-500/20 p-2">
+                      <Download className="h-4 w-4 text-blue-300" />
+                    </div>
+                    <span className="text-sm font-bold text-white">Student Certificate</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                </a>
 
-            <div className="mt-8 flex gap-3">
-              <button
-                onClick={() => setShowCertModal(false)}
-                className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] py-3 text-xs font-bold uppercase tracking-[0.22em] text-slate-300 transition-all hover:bg-white/[0.08]"
-              >
-                Cancel
-              </button>
-              <button
-                id="cert-generate-btn"
-                onClick={handleGenerateCertificates}
-                disabled={isGenerating}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isGenerating ? (
-                  <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
-                ) : (
-                  <><Download className="h-4 w-4" />Generate &amp; Download</>
+                {generatedCerts.parent && (
+                  <a
+                    href={generatedCerts.parent.downloadUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between w-full rounded-xl border border-purple-400/30 bg-purple-500/10 p-4 transition-all hover:bg-purple-500/20 group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-lg bg-purple-500/20 p-2">
+                        <Download className="h-4 w-4 text-purple-300" />
+                      </div>
+                      <span className="text-sm font-bold text-white">Parent Certificate</span>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                  </a>
                 )}
-              </button>
-            </div>
+
+                <button
+                  onClick={() => setShowCertModal(false)}
+                  className="mt-6 w-full rounded-xl border border-white/10 bg-white/[0.04] py-3 text-xs font-bold uppercase tracking-[0.22em] text-slate-400 transition-all hover:bg-white/[0.08]"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-400 mb-2">
+                      Student&apos;s Full Name <span className="text-blue-400">*</span>
+                    </label>
+                    <input
+                      id="cert-student-name"
+                      type="text"
+                      value={certStudentName}
+                      onChange={e => { setCertStudentName(e.target.value); setCertError(""); }}
+                      placeholder="e.g. Tanuj Pathak"
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/30 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-400 mb-2">
+                      Parent&apos;s Full Name <span className="text-slate-500">(optional)</span>
+                    </label>
+                    <input
+                      id="cert-parent-name"
+                      type="text"
+                      value={certParentName}
+                      onChange={e => setCertParentName(e.target.value)}
+                      placeholder=""
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/30 transition-all"
+                    />
+                  </div>
+                  {certError && (
+                    <p className="text-xs text-red-400 font-medium">{certError}</p>
+                  )}
+                </div>
+
+                <div className="mt-8 flex gap-3">
+                  <button
+                    onClick={() => setShowCertModal(false)}
+                    className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] py-3 text-xs font-bold uppercase tracking-[0.22em] text-slate-300 transition-all hover:bg-white/[0.08]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    id="cert-generate-btn"
+                    onClick={handleGenerateCertificates}
+                    disabled={isGenerating}
+                    className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isGenerating ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
+                    ) : (
+                      <><Download className="h-4 w-4" />Generate &amp; Download</>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
