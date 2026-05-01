@@ -17,10 +17,10 @@ const BACKGROUND_URL =
   "https://ueexbcwngwqtgtlbnmtp.supabase.co/storage/v1/object/public/assets/Demo_Session_Certificate%20.png";
 const VERIFICATION_BASE_URL = "https://www.skillyugedu.com/verify/";
 
-// MonteCarlo – a beautiful calligraphic script font from Google Fonts.
+// Alex Brush — elegant calligraphic font from Google Fonts.
 // Downloaded at runtime so it works on Vercel/Linux (no system fonts assumed).
 const FONT_URL =
-  "https://fonts.gstatic.com/s/montecarlo/v13/buEzpo6-f9X01GadLA0G0Co.ttf";
+  "https://fonts.gstatic.com/s/alexbrush/v23/SZc83FzrJKuqFbwMKk6EtUI.ttf";
 
 let fontRegistered = false;
 
@@ -32,7 +32,7 @@ let fontRegistered = false;
 async function ensureFontRegistered() {
   if (fontRegistered) return;
 
-  const fontPath = path.join(os.tmpdir(), "montecarlo.ttf");
+  const fontPath = path.join(os.tmpdir(), "alexbrush.ttf");
 
   if (!fs.existsSync(fontPath)) {
     const res = await fetch(FONT_URL);
@@ -40,8 +40,8 @@ async function ensureFontRegistered() {
     fs.writeFileSync(fontPath, Buffer.from(await res.arrayBuffer()));
   }
 
-  // Register under family "MonteCarlo"
-  registerFont(fontPath, { family: "MonteCarlo" });
+  // Register under family "AlexBrush"
+  registerFont(fontPath, { family: "AlexBrush" });
   fontRegistered = true;
 }
 
@@ -52,13 +52,14 @@ async function ensureFontRegistered() {
 async function generateCertificatePdf(
   name: string,
   userId: string | null,
-  background: Awaited<ReturnType<typeof loadImage>>
+  background: Awaited<ReturnType<typeof loadImage>>,
+  suffix: string = ""  // e.g. "-S" for student, "-P" for parent — prevents filename collisions
 ): Promise<{ downloadUrl: string; certId: string }> {
   const width = background.width;   // 2000
   const height = background.height; // 1414
 
-  // Unique cert ID per certificate
-  const certId = `SY-${crypto.randomBytes(3).toString("hex").toUpperCase()}-${Date.now().toString().slice(-4)}`;
+  // Unique cert ID — suffix (-S / -P) ensures student and parent never share a filename
+  const certId = `SY-${crypto.randomBytes(3).toString("hex").toUpperCase()}-${Date.now().toString().slice(-4)}${suffix}`;
 
   // Canvas
   const canvas = createCanvas(width, height);
@@ -66,8 +67,8 @@ async function generateCertificatePdf(
   ctx.drawImage(background, 0, 0, width, height);
 
   // ── Name ──────────────────────────────────────────────────────────────────
-  // MonteCarlo is a calligraphic script. 110px reads beautifully on 2000px wide canvas.
-  ctx.font = "110px 'MonteCarlo'";
+  // Alex Brush — elegant calligraphic script. 110px reads beautifully on 2000px canvas.
+  ctx.font = "110px 'AlexBrush'";
   ctx.fillStyle = "#1a3a6b";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -96,8 +97,8 @@ async function generateCertificatePdf(
   ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize);
 
   // ── Certificate ID ────────────────────────────────────────────────────────
-  // Use plain monospace for the cert ID — MonteCarlo (script) is hard to read on short IDs
-  ctx.font = "bold 24px 'Courier New', Courier, monospace";
+  // Default sans-serif — clean and readable for an alphanumeric ID string.
+  ctx.font = "bold 24px sans-serif";
   ctx.fillStyle = "#374151";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
@@ -156,13 +157,16 @@ export async function POST(request: Request) {
     // Load background once — shared between both certificates
     const background = await loadImage(BACKGROUND_URL);
 
-    // Always generate student certificate
-    const studentCert = await generateCertificatePdf(studentName, userId, background);
+    // Always generate student certificate (suffix -S)
+    const studentCert = await generateCertificatePdf(studentName, userId, background, "-S");
 
-    // Generate parent certificate only if a parent name was provided
+    // Generate parent certificate only if a parent name was provided.
+    // We await student first so timestamps differ even without an explicit delay.
     let parentCert: { downloadUrl: string; certId: string } | null = null;
     if (parentName) {
-      parentCert = await generateCertificatePdf(parentName, userId, background);
+      // 1ms delay guarantees Date.now() differs from the student cert timestamp
+      await new Promise(r => setTimeout(r, 1));
+      parentCert = await generateCertificatePdf(parentName, userId, background, "-P");
     }
 
     return NextResponse.json({

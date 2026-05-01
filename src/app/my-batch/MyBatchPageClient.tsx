@@ -426,7 +426,7 @@ export default function MyBatchPage() {
                   type="text"
                   value={certParentName}
                   onChange={e => setCertParentName(e.target.value)}
-                  placeholder="e.g. Rajesh Pathak"
+                  placeholder=""
                   className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/30 transition-all"
                 />
               </div>
