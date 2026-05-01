@@ -13,6 +13,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+// Increase Vercel function timeout to 60s — cold starts download fonts + generate PDFs
+export const maxDuration = 60;
+
 const BACKGROUND_URL =
   "https://ueexbcwngwqtgtlbnmtp.supabase.co/storage/v1/object/public/assets/Demo_Session_Certificate%20.png";
 const VERIFICATION_BASE_URL = "https://www.skillyugedu.com/verify/";
@@ -134,7 +137,7 @@ async function generateCertificatePdf(
       cacheControl: "3600",
       upsert: true,
     });
-  if (storageError) throw storageError;
+  if (storageError) throw new Error(`Storage upload failed: ${storageError.message}`);
 
   const { data: { publicUrl } } = supabase.storage.from("assets").getPublicUrl(fileName);
 
@@ -146,8 +149,9 @@ async function generateCertificatePdf(
       user_id: userId || null,
     },
   ]);
-  if (dbError) throw dbError;
+  if (dbError) throw new Error(`DB insert failed: ${dbError.message}`);
 
+  console.log(`[cert] Generated ${certId} for "${name}"`);
   return { downloadUrl: publicUrl, certId };
 }
 

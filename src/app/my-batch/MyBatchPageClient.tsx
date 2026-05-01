@@ -74,7 +74,7 @@ export default function MyBatchPage() {
     try {
       setIsGenerating(true);
       setCertError("");
-      setShowCertModal(false);
+      // NOTE: do NOT close the modal here — we need it open to show results or errors
 
       const res = await fetch("/api/certificate/generate", {
         method: "POST",
@@ -88,15 +88,17 @@ export default function MyBatchPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to generate certificate");
+      if (!data.student?.downloadUrl) throw new Error("No download URL returned from server");
 
-      // Set generated certs to show in the UI instead of window.open (which browsers block)
+      // Show download buttons inside the modal
       setGeneratedCerts({
         student: data.student,
         parent: data.parent || undefined,
       });
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : "Could not generate certificates.";
-      alert(msg);
+      // Show error inline so it's always visible (modal stays open)
+      setCertError(msg);
     } finally {
       setIsGenerating(false);
     }
@@ -375,7 +377,7 @@ export default function MyBatchPage() {
       </section>
 
       {/* ── Certificate Name Modal ──────────────────────────────────── */}
-      {showCertModal && (
+      {(showCertModal || isGenerating) && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(2,6,23,0.85)", backdropFilter: "blur(12px)" }}
