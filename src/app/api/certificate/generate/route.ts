@@ -96,7 +96,8 @@ async function generateCertificatePdf(
   ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize);
 
   // ── Certificate ID ────────────────────────────────────────────────────────
-  ctx.font = "26px 'MonteCarlo'";
+  // Use plain monospace for the cert ID — MonteCarlo (script) is hard to read on short IDs
+  ctx.font = "bold 24px 'Courier New', Courier, monospace";
   ctx.fillStyle = "#374151";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
