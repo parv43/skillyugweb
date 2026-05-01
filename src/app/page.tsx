@@ -84,6 +84,11 @@ export default function Home() {
       
       <AIToolsSection />
       
+      {/* Gallery — right after AITools on desktop */}
+      <div className="hidden md:block">
+        <GallerySection />
+      </div>
+      
       {/* Section 3: Interactive Prompting Chat Demo — desktop only */}
       <div className="hidden md:block">
         <InteractiveChatDemo id="ask-ai-desktop" />
@@ -92,10 +97,6 @@ export default function Home() {
       <SkillsSection />
       <StudentProjects />
       <BootcampTimeline />
-      {/* Gallery — hidden on mobile to avoid duplication (shown at top for mobile) */}
-      <div className="hidden md:block">
-        <GallerySection />
-      </div>
       <Testimonials />
       <DemoBookingSection />
       
