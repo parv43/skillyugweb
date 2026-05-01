@@ -36,29 +36,24 @@ export async function POST(request: Request) {
     // Draw Background
     ctx.drawImage(background, 0, 0, width, height);
 
-    // 4. Layer Information - The Name (Using Snell Roundhand as requested)
-    ctx.font = "120px 'Snell Roundhand', cursive"; 
-    ctx.fillStyle = "#1e293b"; 
+    // 4. Layer Information - The Student Name
+    // NOTE: 'Snell Roundhand' is a macOS system font not available in node-canvas.
+    // We use italic Georgia instead — a reliable serif font that is always available
+    // in the canvas package and looks elegant on the certificate.
+    ctx.font = "italic 96px 'Georgia', serif";
+    ctx.fillStyle = "#1a3a6b"; // Match the dark blue used elsewhere in the certificate
     ctx.textAlign = "center";
-    
-    // Format name: Fix missing spaces and casing
-    let formattedName = name.trim();
-    
-    // If there's no space, try to find a split point or at least capitalize correctly
-    if (!formattedName.includes(' ')) {
-      // If it's all caps like TANUJPATHAK, we can't easily split, 
-      // but we can at least make it Tanujpathak. 
-      // However, usually users have a space in metadata.
-      formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1).toLowerCase();
-    } else {
-      formattedName = formattedName
-        .split(/\s+/)
-        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join('  '); // Double space for cursive clarity
-    }
 
-    // Position name slightly above the orange line (Adjusted to ~52% of height)
-    const nameY = height * 0.52; 
+    // Format name: proper title case with single space between words
+    let formattedName = name.trim();
+    formattedName = formattedName
+      .split(/\s+/)
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    // Position name in the blank area between "This is presented to:" and the orange line.
+    // At 2000x1414px the sweet spot is approximately 47% of height (~665px).
+    const nameY = height * 0.47;
     ctx.fillText(formattedName, width / 2, nameY);
 
     // 5. Generate and Layer QR Code
@@ -79,11 +74,14 @@ export async function POST(request: Request) {
     const qrY = height - qrSize - 160;
     ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize);
 
-    // 6. Layer Certificate ID (Shifted left and up to follow QR code)
-    ctx.font = "18px Courier";
-    ctx.fillStyle = "#64748b";
-    ctx.textAlign = "right";
-    ctx.fillText(`Verify at skillyugedu.com/verify | ID: ${certId}`, width - 160, height - 140);
+    // 6. Layer Certificate ID below the QR code — font size must be large enough to
+    // read on a 2000px canvas (18px was microscopic; 28px is the minimum readable size).
+    ctx.font = "28px 'Courier New', Courier, monospace";
+    ctx.fillStyle = "#475569";
+    ctx.textAlign = "center";
+    // Centre the ID under the QR code for a cleaner look
+    const qrCenterX = qrX + qrSize / 2;
+    ctx.fillText(`ID: ${certId}`, qrCenterX, height - 110);
 
     // 7. "Print" the Final PDF
     const imgData = canvas.toDataURL("image/jpeg", 0.95);
