@@ -34,26 +34,46 @@ const galleryItems = [
 export default function GallerySection() {
   const [isPaused, setIsPaused] = useState(false);
 
-  // Duplicate 3x so the loop is never empty no matter how wide the viewport
-  const items = [...galleryItems, ...galleryItems, ...galleryItems];
+  // ── Why 2× and -50%? ────────────────────────────────────────────────────────
+  // With margin-right on each item (not CSS gap), every item carries its own
+  // trailing space. So the total track width = 2 × (N items × item-width + N × gap).
+  // Translating exactly -50% moves precisely one full set, making the loop seam
+  // invisible. This is pixel-perfect — no repeating-decimal rounding like -33.333%.
+  const items = [...galleryItems, ...galleryItems];
 
   return (
     <section className="py-24 relative overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 bg-[#020617]">
 
-      {/* Inject the CSS keyframe — this is what makes the loop truly seamless.
-          The browser handles the cycle natively; there's no JS reset involved. */}
+      {/* ── CSS keyframe animation ─────────────────────────────────────────────
+          GPU-composited: only "transform" is animated (no layout or paint).
+          backface-visibility + translateZ(0) keep it on the compositor thread
+          so production throttling / paint budget don't affect it.          */}
       <style>{`
         @keyframes gallery-marquee {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-33.333%); }
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(-50%, 0, 0); }
         }
         .gallery-track {
-          animation: gallery-marquee 28s linear infinite;
+          display: flex;
+          width: max-content;
+          animation: gallery-marquee 30s linear infinite;
           will-change: transform;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+          transform: translate3d(0, 0, 0);
+          -webkit-transform: translate3d(0, 0, 0);
         }
         .gallery-track.paused {
           animation-play-state: paused;
         }
+        /* margin-right instead of gap — keeps each item's width self-contained
+           so the -50% seam calculation stays exact on every screen size.    */
+        .gallery-item {
+          flex-shrink: 0;
+          margin-right: 24px;
+        }
+        @media (min-width: 640px)  { .gallery-item { margin-right: 28px; } }
+        @media (min-width: 1024px) { .gallery-item { margin-right: 32px; } }
       `}</style>
 
       {/* Background glow */}
@@ -68,12 +88,11 @@ export default function GallerySection() {
         </p>
       </div>
 
-      {/* Track wrapper — overflow hidden clips the scroll */}
+      {/* Viewport clip — overflow-hidden hides the scroll seam */}
       <div className="relative w-full z-10 pt-4 pb-8 overflow-hidden">
 
-        {/* The marquee track — driven purely by CSS animation */}
         <div
-          className={`gallery-track flex gap-4 sm:gap-6 lg:gap-8 w-max${isPaused ? " paused" : ""}`}
+          className={`gallery-track${isPaused ? " paused" : ""}`}
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           onTouchStart={() => setIsPaused(true)}
@@ -82,11 +101,11 @@ export default function GallerySection() {
           {items.map((item, index) => (
             <div
               key={index}
-              className="w-[280px] sm:w-[320px] md:w-[400px] lg:w-[480px] flex-shrink-0 aspect-[4/3] rounded-2xl md:rounded-[3rem] overflow-hidden glass-panel border border-white/10 shadow-[0_0_40px_rgba(59,130,246,0.1)] relative group select-none transition-all duration-500 hover:border-blue-400/30"
+              className="gallery-item w-[280px] sm:w-[320px] md:w-[400px] lg:w-[480px] aspect-[4/3] rounded-2xl md:rounded-[3rem] overflow-hidden glass-panel border border-white/10 shadow-[0_0_40px_rgba(59,130,246,0.1)] relative group select-none transition-all duration-500 hover:border-blue-400/30"
             >
-              {/* Story Overlay */}
+              {/* Story overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/95 via-[#020617]/50 to-transparent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-all duration-500 z-20 pointer-events-none flex flex-col justify-end p-6 md:p-8">
-                <h3 className="text-white font-bold text-xl md:text-2xl mb-2 translate-y-4 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-500 ease-out delay-75 shadow-black text-shadow-sm">
+                <h3 className="text-white font-bold text-xl md:text-2xl mb-2 translate-y-4 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-500 ease-out delay-75">
                   {item.title}
                 </h3>
                 <p className="text-slate-300 text-sm md:text-base leading-relaxed translate-y-4 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-500 ease-out delay-100 font-medium">
@@ -101,7 +120,7 @@ export default function GallerySection() {
                 fill
                 sizes="(max-width: 640px) 280px, (max-width: 768px) 320px, (max-width: 1024px) 400px, 480px"
                 className="object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110"
-                priority={index < 3}
+                priority={index < 5}
               />
             </div>
           ))}
