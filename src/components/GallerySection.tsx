@@ -41,19 +41,24 @@ export default function GallerySection() {
   // Using 2x still creates seamless loop while reducing image load by 33%
   const duplicatedItems = [...galleryItems, ...galleryItems];
 
+  const startAutoScroll = () => {
+    void controls.start({
+      x: "-50%",
+      transition: {
+        duration: 20,
+        ease: "linear",
+        repeat: Infinity,
+      },
+    });
+  };
+
   useEffect(() => {
     if (!isHovered && !isDragging) {
-      void controls.start({
-        x: "-50%",
-        transition: {
-          duration: 20,
-          ease: "linear",
-          repeat: Infinity,
-        },
-      });
+      startAutoScroll();
     } else {
       controls.stop();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [controls, isDragging, isHovered]);
 
   return (
@@ -80,13 +85,13 @@ export default function GallerySection() {
           // Allowing drag but stopping the auto-animation while dragging
           onDragStart={() => setIsDragging(true)}
           onDragEnd={() => {
+            // Instantly reset position to 0 so auto-scroll restarts at full speed
+            // (without this, it animates from the dropped position → very slow)
+            controls.set({ x: 0 });
             setIsDragging(false);
-            // Reset to 0 if we drag too far to maintain the loop illusion
-            // controls.set({ x: 0 }); 
           }}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          dragConstraints={{ left: -2000, right: 0 }}
           dragElastic={0.05}
         >
           {duplicatedItems.map((item, index) => (
