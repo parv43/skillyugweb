@@ -32,6 +32,9 @@ let fontRegistered = false;
  * Cached in /tmp so it is only downloaded once per cold start.
  * Without this, fillText() silently renders invisible glyphs on Linux (Vercel).
  */
+async function ensureFontRegistered() {
+  if (fontRegistered) return;
+
   const fontPath = path.join(os.tmpdir(), "alexbrush.ttf");
   const idFontPath = path.join(os.tmpdir(), "lato_regular_v25.ttf");
 
@@ -51,6 +54,7 @@ let fontRegistered = false;
   registerFont(fontPath, { family: "AlexBrush" });
   registerFont(idFontPath, { family: "Lato" });
   fontRegistered = true;
+}
 
 /**
  * Renders a single certificate PDF for a given name.

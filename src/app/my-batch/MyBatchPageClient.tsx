@@ -493,12 +493,12 @@ export default function MyBatchPage() {
                     id="cert-generate-btn"
                     onClick={handleGenerateCertificates}
                     disabled={isGenerating}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                   >
                     {isGenerating ? (
-                      <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
+                      <><Loader2 className="h-4 w-4 animate-spin flex-shrink-0" />Generating...</>
                     ) : (
-                      <><Download className="h-4 w-4" />Generate &amp; Download</>
+                      <><Download className="h-4 w-4 flex-shrink-0" />Generate &amp; Download</>
                     )}
                   </button>
                 </div>
