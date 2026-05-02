@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation"
 import type { Session } from "@supabase/supabase-js"
 import { supabase } from "@/lib/supabaseClient"
 import { useAccessControl } from "@/hooks/useAccessControl"
+import Avatar from "boring-avatars"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -18,7 +19,7 @@ export default function Navbar() {
   const rafRef = React.useRef<number | null>(null)
   
   // Use the shared access control hook
-  const { isLoggedIn, hasAccess: hasMyBatchAccess, hasSlot, loading } = useAccessControl()
+  const { isLoggedIn, hasAccess: hasMyBatchAccess, hasSlot, loading, userId, userEmail } = useAccessControl()
 
   useEffect(() => {
     // ✅ Use requestAnimationFrame for optimal performance (syncs with 60fps)
@@ -125,19 +126,31 @@ export default function Navbar() {
           {isLoggedIn ? (
             <Link 
               href="/profile" 
-              className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-slate-800/80 hover:bg-slate-700/80 shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-105 transition-all duration-300 block border border-white/10"
+              className="flex items-center justify-center rounded-full border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-105 transition-all duration-300"
               aria-label="View Profile"
             >
-              My Profile
+              <Avatar
+                size={40}
+                name={userEmail || userId || "User"}
+                variant="beam"
+                colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
+              />
             </Link>
           ) : (
-            <Link 
-              href="/book-demo" 
-              className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] hover:scale-105 transition-all duration-300 block border border-white/10"
-              aria-label="Book Your Demo"
-            >
-              Book Your Demo
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link 
+                href="/login" 
+                className="text-sm font-semibold text-slate-300 hover:text-white transition-colors"
+              >
+                Log in
+              </Link>
+              <Link 
+                href="/signup" 
+                className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] hover:scale-105 transition-all duration-300 block border border-white/10"
+              >
+                Sign up
+              </Link>
+            </div>
           )}
         </div>
 
@@ -191,20 +204,34 @@ export default function Navbar() {
                 <Link 
                   href="/profile" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-slate-800/80 hover:bg-slate-700/80 shadow-[0_0_15px_rgba(255,255,255,0.05)] block border border-white/10 transition-colors"
+                  className="w-full flex items-center justify-center gap-3 py-3 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-white/10 transition-colors"
                   aria-label="View Profile"
                 >
-                  My Profile
+                  <Avatar
+                    size={32}
+                    name={userEmail || userId || "User"}
+                    variant="beam"
+                    colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
+                  />
+                  <span className="text-white font-bold text-base">My Profile</span>
                 </Link>
               ) : (
-                <Link 
-                  href="/book-demo" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] block border border-white/10"
-                  aria-label="Book Your Demo"
-                >
-                  Book Your Demo
-                </Link>
+                <div className="flex flex-col gap-3">
+                  <Link 
+                    href="/login" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-3 rounded-lg text-base font-bold text-slate-300 bg-slate-800/50 hover:text-white hover:bg-slate-700/50 transition-colors border border-white/5"
+                  >
+                    Log in
+                  </Link>
+                  <Link 
+                    href="/signup" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] block border border-white/10"
+                  >
+                    Sign up
+                  </Link>
+                </div>
               )}
             </li>
             <li className="mt-2">

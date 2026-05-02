@@ -9,6 +9,8 @@ export type AccessState = {
   hasDemo: boolean;
   hasSlot: boolean;
   loading: boolean;
+  userId?: string;
+  userEmail?: string;
 };
 
 // Module-level promise cache to deduplicate simultaneous calls
@@ -21,6 +23,8 @@ export function useAccessControl(): AccessState {
     hasDemo: false,
     hasSlot: false,
     loading: true,
+    userId: undefined,
+    userEmail: undefined,
   });
 
   useEffect(() => {
@@ -31,7 +35,7 @@ export function useAccessControl(): AccessState {
       
       if (!session) {
         if (!cancelled) {
-          setState({ isLoggedIn: false, hasAccess: false, hasDemo: false, hasSlot: false, loading: false });
+          setState({ isLoggedIn: false, hasAccess: false, hasDemo: false, hasSlot: false, loading: false, userId: undefined, userEmail: undefined });
           try { sessionStorage.removeItem("mybatch_access") } catch {}
         }
         return;
@@ -50,6 +54,8 @@ export function useAccessControl(): AccessState {
                 hasDemo: Boolean(value.hasDemo),
                 hasSlot: Boolean(value.hasSlot),
                 loading: false,
+                userId: session.user.id,
+                userEmail: session.user.email,
               });
             }
             return;
@@ -76,6 +82,8 @@ export function useAccessControl(): AccessState {
             hasDemo: Boolean(data.hasDemo),
             hasSlot: Boolean(data.hasSlot),
             loading: false,
+            userId: session.user.id,
+            userEmail: session.user.email,
           });
           try {
             sessionStorage.setItem("mybatch_access", JSON.stringify({
@@ -86,7 +94,7 @@ export function useAccessControl(): AccessState {
         }
       } catch {
         if (!cancelled) {
-          setState(s => ({ ...s, isLoggedIn: true, loading: false }));
+          setState(s => ({ ...s, isLoggedIn: true, loading: false, userId: session.user.id, userEmail: session.user.email }));
         }
       }
     };
@@ -98,7 +106,7 @@ export function useAccessControl(): AccessState {
         checkAccess();
       } else if (event === "SIGNED_OUT") {
         if (!cancelled) {
-          setState({ isLoggedIn: false, hasAccess: false, hasDemo: false, hasSlot: false, loading: false });
+          setState({ isLoggedIn: false, hasAccess: false, hasDemo: false, hasSlot: false, loading: false, userId: undefined, userEmail: undefined });
           try { sessionStorage.removeItem("mybatch_access") } catch {}
         }
       }

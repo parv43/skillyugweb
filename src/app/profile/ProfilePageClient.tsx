@@ -6,18 +6,14 @@ import Link from 'next/link'
 import { useRouter } from "next/navigation"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import { supabase } from "@/lib/supabaseClient"
-import { LogOut, ArrowLeft, Camera, User, Mail, CheckCircle2, Loader2 } from "lucide-react"
+import { LogOut, ArrowLeft, User, Mail, Loader2, AlertTriangle } from "lucide-react"
+import Avatar from "boring-avatars"
 
 export default function ProfilePage() {
   const router = useRouter()
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [loading, setLoading] = useState(true)
-  const [uploading, setUploading] = useState(false)
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-  const [successMsg, setSuccessMsg] = useState("")
-  const [errorMsg, setErrorMsg] = useState("")
-  
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   useEffect(() => {
     async function loadData() {
@@ -29,9 +25,6 @@ export default function ProfilePage() {
       }
 
       setUser(session.user)
-      if (session.user.user_metadata?.avatar_url) {
-        setAvatarUrl(session.user.user_metadata.avatar_url)
-      }
       setLoading(false)
     }
     
@@ -41,61 +34,6 @@ export default function ProfilePage() {
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push("/")
-  }
-
-  const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      setUploading(true)
-      setErrorMsg("")
-      setSuccessMsg("")
-
-      if (!event.target.files || event.target.files.length === 0) {
-        throw new Error('You must select an image to upload.')
-      }
-
-      if (!user) {
-        throw new Error("You must be logged in to upload a profile picture.")
-      }
-
-      const file = event.target.files[0]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}-${Math.random()}.${fileExt}`
-      const filePath = `${fileName}`
-
-      // Upload the file to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file)
-
-      if (uploadError) {
-        throw uploadError
-      }
-
-      // Get the public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath)
-
-      // Update the user's metadata with the new avatar URL
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: { avatar_url: publicUrl }
-      })
-
-      if (updateError) {
-        throw updateError
-      }
-
-      setAvatarUrl(publicUrl)
-      setSuccessMsg("Profile picture updated successfully!")
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccessMsg(""), 3000)
-
-    } catch (error: unknown) {
-      setErrorMsg(error instanceof Error ? error.message : "Error uploading image")
-    } finally {
-      setUploading(false)
-    }
   }
 
   if (loading) {
@@ -131,7 +69,7 @@ export default function ProfilePage() {
             <div className="flex justify-between items-start mb-8">
               <h1 className="text-3xl font-extrabold tracking-tight text-[#f9f5f8]">My Profile</h1>
               <button 
-                onClick={handleSignOut}
+                onClick={() => setShowLogoutConfirm(true)}
                 className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
                 title="Sign Out"
               >
@@ -141,49 +79,14 @@ export default function ProfilePage() {
 
             {/* Avatar Section */}
             <div className="flex flex-col items-center mb-8 relative">
-              <div className="relative group rounded-full">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt="Profile Avatar"
-                    className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-2 border-[#a4a6ff]/30 shadow-lg"
-                  />
-                ) : (
-                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-[#1b1a1f] border-2 border-[#a4a6ff]/30 flex items-center justify-center shadow-lg">
-                    <User size={48} className="text-[#adaaad]" />
-                  </div>
-                )}
-                
-                {/* Upload Button overlay */}
-                <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="absolute bottom-0 right-0 p-2.5 bg-[#a4a6ff] hover:bg-[#ac8aff] text-[#0e0e10] rounded-full shadow-md transition-colors disabled:opacity-50"
-                  aria-label="Upload profile picture"
-                >
-                  {uploading ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
-                </button>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={uploadAvatar}
-                  accept="image/png, image/jpeg, image/webp"
-                  className="hidden"
+              <div className="relative group rounded-full border-2 border-[#a4a6ff]/30 shadow-lg overflow-hidden">
+                <Avatar
+                  size={120}
+                  name={user?.email || user?.id || "User"}
+                  variant="beam"
+                  colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
                 />
               </div>
-
-              {/* Status Messages */}
-              {successMsg && (
-                <div className="mt-4 flex items-center gap-2 text-emerald-400 text-sm bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
-                  <CheckCircle2 size={16} />
-                  <span>{successMsg}</span>
-                </div>
-              )}
-              {errorMsg && (
-                <div className="mt-4 text-red-400 text-sm bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20 text-center">
-                  {errorMsg}
-                </div>
-              )}
             </div>
 
             {/* User Details */}
@@ -212,6 +115,38 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#262528] border border-[#48474a]/50 rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-400 mb-4">
+                <AlertTriangle size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Do you really want to log out?</h3>
+              <p className="text-[#adaaad] text-sm mb-6">
+                You will need to log back in to access your dashboard.
+              </p>
+              
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-white bg-slate-700 hover:bg-slate-600 transition-colors"
+                >
+                  No
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-colors"
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
