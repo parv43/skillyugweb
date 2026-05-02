@@ -9,11 +9,13 @@ import { validateEmail } from "@/lib/emailValidation"
 
 function ForgotPasswordForm() {
   const searchParams = useSearchParams()
-  const [email, setEmail] = useState("")
+  const loginEmail = searchParams.get("loginEmail") || ""
+  const [email, setEmail] = useState(loginEmail)
   const [emailSuggestion, setEmailSuggestion] = useState("")
   const [errorMsg, setErrorMsg] = useState("")
   const [successMsg, setSuccessMsg] = useState("")
   const [loading, setLoading] = useState(false)
+  const [emailMismatch, setEmailMismatch] = useState(false)
   const infoMsg =
     searchParams.get("error") === "invalid_or_expired"
       ? "That reset link is invalid or has expired. Request a fresh password reset email."
@@ -21,11 +23,16 @@ function ForgotPasswordForm() {
 
   const handleEmailBlur = () => {
     const validation = validateEmail(email)
-
     if (validation.suggestion) {
       setEmailSuggestion(validation.suggestion)
     } else {
       setEmailSuggestion("")
+    }
+    // Check mismatch if user came from login page with an email
+    if (loginEmail && email && email.trim().toLowerCase() !== loginEmail.trim().toLowerCase()) {
+      setEmailMismatch(true)
+    } else {
+      setEmailMismatch(false)
     }
   }
 
@@ -41,6 +48,13 @@ function ForgotPasswordForm() {
       if (validation.suggestion) {
         setEmailSuggestion(validation.suggestion)
       }
+      return
+    }
+
+    // Block if user entered a different email than the one they were logging in with
+    if (loginEmail && email.trim().toLowerCase() !== loginEmail.trim().toLowerCase()) {
+      setEmailMismatch(true)
+      setErrorMsg(`⚠️ That's not the email you were logging in with. You entered "${loginEmail}" on the login page. Please use the same email, or clear the field to reset a different account.`)
       return
     }
 
@@ -149,14 +163,17 @@ function ForgotPasswordForm() {
                 </label>
                 <input
                   type="email"
-                  className="w-full bg-[#262528]/30 border-none rounded-lg py-4 px-5 text-[#f9f5f8] placeholder:text-[#adaaad]/40 focus:ring-1 focus:ring-[#a4a6ff] transition-all duration-300 outline-none"
+                  className={`w-full bg-[#262528]/30 border-none rounded-lg py-4 px-5 text-[#f9f5f8] placeholder:text-[#adaaad]/40 focus:ring-1 transition-all duration-300 outline-none ${
+                    emailMismatch ? "focus:ring-red-400 ring-1 ring-red-500/50" : "focus:ring-[#a4a6ff]"
+                  }`}
                   placeholder="name@gmail.com"
                   value={email}
                   onChange={(event) => {
                     setEmail(event.target.value)
-                    if (emailSuggestion) {
-                      setEmailSuggestion("")
-                    }
+                    if (emailSuggestion) setEmailSuggestion("")
+                    // Clear mismatch as user types
+                    if (emailMismatch) setEmailMismatch(false)
+                    if (errorMsg) setErrorMsg("")
                   }}
                   onBlur={handleEmailBlur}
                   required
