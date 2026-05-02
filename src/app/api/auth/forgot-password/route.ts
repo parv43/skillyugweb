@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
 import { getAuthRedirectUrl } from "@/lib/authUrls"
 import { validateEmail } from "@/lib/emailValidation"
 
@@ -90,32 +88,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: GENERIC_MESSAGE })
     }
 
-    // Use createServerClient (PKCE flow) so Supabase sends ?code= in the redirect
-    // instead of #access_token= in the hash (which the server can never read).
-    // The PKCE code verifier is stored as a cookie here and read by /auth/recovery.
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
+    // ── Why service role instead of PKCE? ────────────────────────────────────
+    // PKCE stores a code_verifier in a cookie on the API route's JSON response.
+    // Browsers silently drop Set-Cookie on fetch() responses (only honored on
+    // navigation responses). So when the user clicks the email link — especially
+    // from Gmail's in-app WebView or a different device — the verifier cookie is
+    // missing and Supabase returns "invalid or expired".
+    //
+    // The service role admin client calls Supabase directly without PKCE. Supabase
+    // sends a token_hash link instead of a ?code= link. token_hash is verified
+    // server-side in /auth/recovery via verifyOtp() — no cookie needed — so it
+    // works from any browser, device, or email client.
+    const { createClient } = await import("@supabase/supabase-js")
+    const supabaseAdmin = createClient(
       getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-      getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // Ignore cookie writes from unsupported execution contexts.
-            }
-          },
-        },
-      }
+      getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY"),
+      { auth: { autoRefreshToken: false, persistSession: false } }
     )
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
       redirectTo: getAuthRedirectUrl("/auth/recovery"),
     })
 
