@@ -10,7 +10,7 @@ import { validateEmail } from "@/lib/emailValidation";
 
 function SignUpForm() {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/book-slot";
+  const redirectTo = searchParams.get("redirect") || "/my-batch";
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
