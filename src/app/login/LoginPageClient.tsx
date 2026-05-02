@@ -11,7 +11,7 @@ import { validateEmail } from "@/lib/emailValidation";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/book-slot';
+  const redirectTo = searchParams.get('redirect') || '/my-batch';
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
