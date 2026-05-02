@@ -162,7 +162,7 @@ function LoginForm() {
                 <div className="flex justify-between items-center">
                   <label className="block text-[#adaaad] tracking-[0.05em] uppercase font-bold text-xs">Password</label>
                   <Link
-                    href="/forgot-password"
+                    href={`/forgot-password${email ? `?loginEmail=${encodeURIComponent(email)}` : ''}`}
                     className="text-xs font-bold uppercase tracking-[0.16em] text-[#a4a6ff] hover:text-[#ac8aff] transition-colors"
                   >
                     Forgot Password?
