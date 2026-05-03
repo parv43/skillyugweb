@@ -39,25 +39,46 @@ export default function Navbar() {
     }
   }, [])
 
+  // Handle smart scrolling for "Ask AI" specifically
+  const getSmartHash = (targetHash: string) => {
+    if (targetHash === "ask-ai") {
+      return window.innerWidth < 768 ? "ask-ai-mobile" : "ask-ai-desktop"
+    }
+    return targetHash
+  }
+
+  // Handle hash navigation after page load (for cross-page links)
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "")
+    if (hash === "ask-ai") {
+      const smartHash = getSmartHash("ask-ai")
+      // Small delay to ensure the target section is rendered
+      setTimeout(() => {
+        const element = document.getElementById(smartHash)
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" })
+        }
+      }, 500)
+    }
+  }, [pathname])
+
   // Close mobile menu and handle smooth scroll for hash links
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     setMobileMenuOpen(false)
 
-    // Only intercept hash links for smooth scroll when already on the homepage.
-    // On other pages (e.g. /my-batch), let the browser navigate normally to /#section.
-    if (href.includes("#") && pathname === "/") {
-      e.preventDefault()
-      let hash = href.split("#")[1]
+    // Handle hash links
+    if (href.includes("#")) {
+      const hash = href.split("#")[1]
       
-      // If targeting ask-ai, decide which one based on screen size
-      if (hash === "ask-ai") {
-        const isMobile = window.innerWidth < 768; // md breakpoint
-        hash = isMobile ? "ask-ai-mobile" : "ask-ai-desktop";
-      }
-
-      const element = document.getElementById(hash)
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" })
+      // If we're already on the page where the hash exists
+      const targetPath = href.split("#")[0] || "/"
+      if (pathname === targetPath) {
+        e.preventDefault()
+        const smartHash = getSmartHash(hash)
+        const element = document.getElementById(smartHash)
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" })
+        }
       }
     }
   }
