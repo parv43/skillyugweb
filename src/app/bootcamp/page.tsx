@@ -249,7 +249,7 @@ export default function BootcampPage() {
                 key={instructor.name}
                 className="relative rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md transition hover:border-purple-400/30 hover:bg-white/[0.07]"
               >
-                <div className="absolute right-8 top-8 h-6 w-24 opacity-60 transition-opacity hover:opacity-100">
+                <div className="absolute right-8 top-8 h-8 w-32 opacity-80 transition-opacity hover:opacity-100">
                   <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" fill className="object-contain object-right" />
                 </div>
                 {instructor.image ? (
