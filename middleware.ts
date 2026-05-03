@@ -23,6 +23,7 @@ export function middleware(request: NextRequest) {
       "https://images.unsplash.com",
       "https://api.dicebear.com",
       "https://lh3.googleusercontent.com",
+      "https://app.spline.design",
       supabaseOrigin,
     ].filter(Boolean).join(" "),
     [
@@ -36,6 +37,7 @@ export function middleware(request: NextRequest) {
       "https://prod.spline.design",
       "https://*.spline.design",
       "https://unpkg.com",
+      "https://fonts.gstatic.com",
     ].filter(Boolean).join(" "),
     "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com https://*.razorpay.com",
     "worker-src 'self' blob:",

@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { markPaymentSupportNoticePending } from "@/lib/paymentSupportNotice";
 import { BOOK_SLOT_AMOUNT_LABEL } from "@/lib/pricing";
@@ -72,6 +72,8 @@ declare global {
 
 export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromParam = searchParams.get("from");
   const [errorMsg, setErrorMsg] = useState("");
   const [gatewayNotice, setGatewayNotice] = useState("");
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -93,7 +95,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        router.replace("/login?redirect=/book-slot");
+        const currentPath = fromParam ? `/book-slot?from=${fromParam}` : "/book-slot";
+        router.replace(`/login?redirect=${encodeURIComponent(currentPath)}`);
         setIsCheckingAuth(false);
         return;
       }
@@ -430,7 +433,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           >
             <div className="mb-6">
               <Link
-                href="/"
+                href={fromParam === "bootcamp" ? "/bootcamp" : "/"}
                 className="flex items-center gap-2 text-[#cac4cf] hover:text-[#d1c4ff] transition-colors font-headline font-bold text-sm group w-fit"
               >
                 <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">
