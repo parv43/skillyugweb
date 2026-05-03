@@ -47,9 +47,11 @@ export default function DemoBookingSection() {
           
           {/* Left Column: Copy Content */}
           <motion.div 
-            className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left"
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
+            className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left"
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/30 bg-pink-500/10 mb-8 shadow-[0_0_15px_rgba(236,72,153,0.15)]">
               <Zap className="w-4 h-4 text-pink-400" />
@@ -77,9 +79,11 @@ export default function DemoBookingSection() {
 
           {/* Right Column: Glass Booking Card */}
           <motion.div 
-            className="w-full lg:w-[480px] shrink-0"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            className="w-full lg:w-[480px] shrink-0"
           >
             <div 
               className="card bg-[#0f172a]/90 p-8 sm:p-10 rounded-[2rem] border border-slate-700/50 shadow-[0_8px_24px_rgba(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden"

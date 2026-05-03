@@ -17,11 +17,11 @@ const BootcampStep = ({ icon: Icon, title, desc, index }: BootcampStepProps) => 
       
       {/* Step Content */}
       <motion.div 
-        className="flex flex-col items-center text-center w-full"
-
-
-        
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
         transition={{ duration: 0.4, delay: index * 0.1 }}
+        className="flex flex-col items-center text-center w-full"
       >
         <div className="w-16 h-16 rounded-full bg-[#020617] border border-slate-700/50 flex items-center justify-center mb-4 text-blue-400 group-hover:border-blue-500/30 transition-colors relative z-10 shadow-[0_0_10px_rgba(2,6,23,1)] overflow-hidden">
           <Icon className="w-8 h-8 relative z-10" />
@@ -66,17 +66,20 @@ export default function BootcampTimeline() {
 
   return (
     <section id="curriculum" className="hidden md:block relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50">
-      <div className="text-center mb-16 z-20 px-6 max-w-3xl mx-auto">
-        <motion.h2 
-          className="text-3xl md:text-5xl font-bold text-slate-100 mb-4 tracking-tight"
-          
-        >
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-16 z-20 px-6 max-w-3xl mx-auto"
+      >
+        <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-4 tracking-tight">
           Learning Progression
-        </motion.h2>
+        </h2>
         <p className="text-slate-400 text-base md:text-lg font-light">
           A focused 5-step journey from beginner to active creator.
         </p>
-      </div>
+      </motion.div>
 
       <div className="w-full max-w-7xl mx-auto px-4 relative flex flex-col md:flex-row justify-between items-start gap-8 md:gap-0">
         
@@ -86,7 +89,7 @@ export default function BootcampTimeline() {
             className="w-full h-full bg-gradient-to-r from-slate-800/50 via-blue-500/80 to-slate-800/50 origin-left will-change-transform"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            
+            viewport={{ once: true }}
             transition={{ duration: 3.5, ease: "easeInOut", delay: 0.2 }}
           />
         </div>
@@ -97,7 +100,7 @@ export default function BootcampTimeline() {
             className="w-full h-full bg-gradient-to-b from-slate-800/50 via-blue-500/80 to-slate-800/50 origin-top will-change-transform"
             initial={{ scaleY: 0 }}
             whileInView={{ scaleY: 1 }}
-            
+            viewport={{ once: true }}
             transition={{ duration: 3.5, ease: "easeInOut", delay: 0.2 }}
           />
         </div>
