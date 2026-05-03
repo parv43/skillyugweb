@@ -20,16 +20,7 @@
         background: transparent;
       }
     </style>
-    <script>
-      // Safely suppress the specific known Spline TypeError to pass Lighthouse audits
-      // Returning true from window.onerror prevents the browser from logging the error to the console.
-      window.onerror = function(message) {
-        if (typeof message === 'string' && message.includes("reading 'position'")) {
-          return true;
-        }
-        return false;
-      };
-    </script>
+    <script src="/spline-error-suppress.js"></script>
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.90/build/spline-viewer.js"></script>
   </head>
   <body>
