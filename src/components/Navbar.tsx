@@ -49,13 +49,22 @@ export default function Navbar() {
 
   // Handle hash navigation after page load (for cross-page links)
   useEffect(() => {
-    const handleHash = () => {
+    const handleHashScroll = () => {
+      const pendingScroll = sessionStorage.getItem("pendingScroll")
       const hash = window.location.hash.replace("#", "")
-      if (hash === "ask-ai" || hash === "ask-ai-demo") {
-        const smartHash = getSmartHash(hash)
+      
+      let targetHash = null
+      if (pendingScroll) {
+        targetHash = pendingScroll
+        sessionStorage.removeItem("pendingScroll")
+      } else if (hash === "ask-ai" || hash === "ask-ai-demo") {
+        targetHash = getSmartHash(hash)
+      }
+
+      if (targetHash) {
         // Delay to ensure the target section is rendered and layout has settled
         setTimeout(() => {
-          const element = document.getElementById(smartHash)
+          const element = document.getElementById(targetHash)
           if (element) {
             element.scrollIntoView({ behavior: "smooth", block: "start" })
           }
@@ -63,9 +72,9 @@ export default function Navbar() {
       }
     }
 
-    handleHash()
-    window.addEventListener('hashchange', handleHash)
-    return () => window.removeEventListener('hashchange', handleHash)
+    handleHashScroll()
+    window.addEventListener('hashchange', handleHashScroll)
+    return () => window.removeEventListener('hashchange', handleHashScroll)
   }, [pathname])
 
   // Close mobile menu and handle smooth scroll for hash links
@@ -75,16 +84,19 @@ export default function Navbar() {
     // Handle hash links
     if (href.includes("#")) {
       const hash = href.split("#")[1]
-      
-      // If we're already on the page where the hash exists
       const targetPath = href.split("#")[0] || "/"
+      
       if (pathname === targetPath) {
+        // We're already on the target page, scroll immediately
         e.preventDefault()
         const smartHash = getSmartHash(hash)
         const element = document.getElementById(smartHash)
         if (element) {
           element.scrollIntoView({ behavior: "smooth", block: "start" })
         }
+      } else {
+        // Cross-page navigation: store the intended hash to scroll after load
+        sessionStorage.setItem("pendingScroll", getSmartHash(hash))
       }
     }
   }
