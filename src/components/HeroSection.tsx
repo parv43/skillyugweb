@@ -67,8 +67,7 @@ function MobileHero() {
           </span>
         </h2>
         <p className="text-slate-300 text-[17px] leading-relaxed max-w-sm mb-10 font-normal">
-          A practical AI bootcamp for Class 6–12 students with a ₹49 demo class
-          before the ₹3800 bootcamp booking.
+          In a highly competitive world, standard school education isn't enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
         </p>
 
         {/* CTAs */}
@@ -180,15 +179,10 @@ export default function HeroSection() {
               </span>
             </h2>
 
-            <p className="text-lg md:text-xl font-medium text-pink-400 mb-4">
-              Built for Class 6–12 students who should learn AI with structure,
-              not guesswork.
-            </p>
-
-            <p className="text-base md:text-lg text-slate-300 max-w-xl mb-10 font-light leading-relaxed">
-              Students learn ChatGPT, Canva AI, Gamma, and practical project
-              workflows through guided sessions, a ₹49 demo class, and a ₹3800
-              bootcamp spot booking flow.
+            <p className="text-lg md:text-xl text-slate-300 max-w-xl mb-10 font-light leading-relaxed">
+              In a highly competitive world, standard school education isn&apos;t
+              enough. We train your child to leverage advanced AI, giving them a
+              massive edge in academics and their future career.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
