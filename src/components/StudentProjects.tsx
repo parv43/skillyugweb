@@ -50,8 +50,11 @@ interface ProjectCardProps {
 const ProjectCard = ({ title, tech, desc, icon: Icon, delay }: ProjectCardProps) => {
   return (
     <motion.div
-      className="glass-panel p-6 sm:p-8 rounded-[2rem] border border-white/5 hover:border-blue-500/30 transition-all duration-300 group flex flex-col h-full cyber-glow relative overflow-hidden bg-white/[0.02]"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
       transition={{ duration: 0.6, delay, type: "spring" }}
+      className="glass-panel p-6 sm:p-8 rounded-[2rem] border border-white/5 hover:border-blue-500/30 transition-all duration-300 group flex flex-col h-full cyber-glow relative overflow-hidden bg-white/[0.02]"
     >
       {/* Subtle hover gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -122,16 +125,20 @@ export default function StudentProjects() {
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent pointer-events-none rounded-full z-0" />
 
       {/* Heading */}
-      <div className="text-center mb-10 md:mb-20 z-20 px-6 max-w-3xl mx-auto">
-        <motion.h2 
-          className="text-3xl md:text-5xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-4 md:mb-6 drop-shadow-md tracking-tight"
-        >
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-10 md:mb-20 z-20 px-6 max-w-3xl mx-auto"
+      >
+        <h2 className="text-3xl md:text-5xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-4 md:mb-6 drop-shadow-md tracking-tight">
           How This Bootcamp Gives Students an Advantage With AI
-        </motion.h2>
+        </h2>
         <p className="text-slate-400 text-base md:text-lg font-light">
           Students learn how to use modern AI tools to study faster, complete assignments efficiently, and build confidence using technology that is shaping the future of education and work.
         </p>
-      </div>
+      </motion.div>
 
       {/* ── Mobile Layout (< md): compact icon-row cards ── */}
       <div className="flex flex-col gap-3 px-4 max-w-lg mx-auto w-full z-10 relative md:hidden">

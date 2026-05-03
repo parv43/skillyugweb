@@ -93,8 +93,11 @@ const EcosystemNode = ({
   const styles = ACCENT_STYLES[color]
   return (
     <motion.div
-      className={`absolute flex flex-col items-center justify-center z-20 ${position} w-48 text-center will-change-transform`}
+      initial={{ opacity: 0, scale: 0.8, y: 20 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
+      viewport={{ once: true }}
       transition={{ duration: 0.5, delay, type: "spring" }}
+      className={`absolute flex flex-col items-center justify-center z-20 ${position} w-48 text-center will-change-transform`}
     >
       <div className={`w-16 h-16 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-4 border ${styles.border} shadow-[0_8px_16px_rgba(0,0,0,0.2)] group hover:-translate-y-2 transition-transform duration-300 relative`}>
         <Icon className={`w-8 h-8 ${styles.text} group-hover:opacity-80 transition-opacity`} />
@@ -118,16 +121,20 @@ export default function AIToolsSection() {
       <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/15 via-purple-900/5 to-transparent rounded-full pointer-events-none" />
 
       {/* Header */}
-      <div className="text-center mb-24 z-20 px-6 max-w-3xl">
-        <motion.h2 
-          className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 mb-6 drop-shadow-md tracking-tight leading-tight"
-        >
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-24 z-20 px-6 max-w-3xl"
+      >
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 mb-6 drop-shadow-md tracking-tight leading-tight">
           Tools Students Will Learn
-        </motion.h2>
+        </h2>
         <p className="text-slate-400 text-lg md:text-xl font-light">
           An interconnected ecosystem. We train students to chain powerful AI platforms together to build fully functional systems from scratch.
         </p>
-      </div>
+      </motion.div>
 
       {/* Interactive Ecosystem Layout (Desktop) */}
       <div className="relative w-full max-w-5xl h-[600px] mx-auto hidden lg:block z-10">

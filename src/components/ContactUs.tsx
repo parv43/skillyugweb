@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Linkedin, Mail, Phone } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { motion } from "framer-motion";
 export default function ContactUs() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -115,7 +116,13 @@ export default function ContactUs() {
       
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6">
         {/* Header Section */}
-        <div className="text-center mb-16 relative">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16 relative"
+        >
           <span className="inline-block px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-sm font-bold tracking-widest mb-6 uppercase shadow-[0_0_15px_rgba(59,130,246,0.2)]">
             Reach Out
           </span>
@@ -125,12 +132,18 @@ export default function ContactUs() {
           <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
             Have questions about the bootcamp? Drop us a message and our team will get right back to you.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-start">
           
           {/* Contact Form Section */}
-          <div className="lg:col-span-7">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="lg:col-span-7"
+          >
             <div className="glass-panel bg-[#0f172a]/60 backdrop-blur-md rounded-[2rem] p-8 pb-10 md:p-10 border border-white/5 relative overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.1)] group">
               {/* Internal subtle glow */}
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
@@ -233,10 +246,16 @@ export default function ContactUs() {
                 </button>
               </form>
             </div>
-          </div>
+          </motion.div>
 
           {/* Contact Info Section */}
-          <div className="lg:col-span-5 space-y-6 pt-4 lg:pt-0">
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="lg:col-span-5 space-y-6 pt-4 lg:pt-0"
+          >
             {/* Email Card */}
             <div className="glass-panel group p-8 rounded-[1.5rem] bg-[#0f172a]/40 border border-white/5 border-l-4 border-l-blue-500 hover:bg-[#0f172a]/70 hover:-translate-y-1 transition-all overflow-hidden relative">
               <div className="absolute right-0 top-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
@@ -293,7 +312,7 @@ export default function ContactUs() {
                 </div>
               </div>
             </a>
-          </div>
+          </motion.div>
 
         </div>
       </div>

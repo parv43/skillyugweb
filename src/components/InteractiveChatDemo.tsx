@@ -98,6 +98,10 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
 
       <div className="text-center mb-10 px-6 max-w-3xl mx-auto relative z-20">
         <motion.h2 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-6 drop-shadow-sm tracking-tight"
         >
           Master the Art of Prompting
@@ -112,9 +116,11 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
 
       {/* Chat Interface Container */}
       <motion.div 
-        className="max-w-4xl mx-auto px-4 relative z-10"
-        
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
         transition={{ duration: 0.6 }}
+        className="max-w-4xl mx-auto px-4 relative z-10"
       >
         <div className="w-full bg-[#0a0f1c] rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(59,130,246,0.05)] overflow-hidden flex flex-col h-[600px] cyber-glow">
           

@@ -1,13 +1,12 @@
-import createMDX from "@next/mdx";
-
-const withMDX = createMDX();
 const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).host
   : null;
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
   typescript: { ignoreBuildErrors: true },
+  pageExtensions: ["js", "jsx", "ts", "tsx"],
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 85],
@@ -44,8 +43,4 @@ const nextConfig = {
   },
 };
 
-export default withMDX({
-  ...nextConfig,
-  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
-});
-
+export default nextConfig;

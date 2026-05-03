@@ -61,17 +61,34 @@ function MobileHero() {
 
       <div className="px-6 relative z-20 w-full flex flex-col items-start text-left">
         {/* Header Copy */}
-        <h2 className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-white">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-white"
+        >
           Help your child build <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-fuchsia-400">
             AI skills that improve study, projects, and creative confidence.
           </span>
-        </h2>
-        <p className="text-slate-300 text-[17px] leading-relaxed max-w-sm mb-10 font-normal">
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.1 }}
+          className="text-slate-300 text-[17px] leading-relaxed max-w-sm mb-10 font-normal"
+        >
           In a highly competitive world, standard school education isn't enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
-        </p>
+        </motion.p>
 
         {/* CTAs */}
-        <div className="w-full flex flex-col gap-4 mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="w-full flex flex-col gap-4 mb-6"
+        >
           {!loading && !hasDemo && (
             <Link
               href="/book-demo"
@@ -92,11 +109,17 @@ function MobileHero() {
               Join the Bootcamp
             </Link>
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* Full-width Hero Image bleeding to edges */}
-      <div className="relative w-full mt-[-120px] flex items-end justify-center z-10">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.3 }}
+        className="relative w-full mt-[-120px] flex items-end justify-center z-10"
+      >
         <Image
           src="/hero-mobile-optimized.webp"
           alt="Father and son learning AI together on a laptop"
@@ -110,7 +133,7 @@ function MobileHero() {
         {/* Connection gradients: Top for text legibility, Bottom for section transition */}
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#020617] via-[#020617]/40 to-transparent pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
-      </div>
+      </motion.div>
     </section>
   )
 }
@@ -164,8 +187,11 @@ export default function HeroSection() {
           
           {/* Left Column: Copy & CTAs */}
           <motion.div 
-            className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left"
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.8 }}
+            className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-blue-500/30 mb-6 bg-blue-500/5">
               <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
@@ -207,8 +233,11 @@ export default function HeroSection() {
 
           {/* Right Column: Orbit Animation */}
           <motion.div 
-            className="w-full lg:w-1/2 h-[300px] sm:h-[600px] flex items-center justify-center relative"
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
             transition={{ duration: 1, delay: 0.2 }}
+            className="w-full lg:w-1/2 h-[300px] sm:h-[600px] flex items-center justify-center relative"
           >
             {/* Faint Orbit Ring */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
