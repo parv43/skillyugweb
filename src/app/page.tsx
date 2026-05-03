@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   ...createMetadata({
     title: "AI Education Bootcamp for Students in Classes 6–12",
     description:
-      "Skillyug helps Class 6–12 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp, a ₹49 demo class, and a ₹299 bootcamp spot booking.",
+      "Skillyug helps Class 6–12 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp, a ₹49 demo class, and a ₹3800 bootcamp spot booking.",
   }),
 }
 
@@ -63,7 +63,7 @@ export default function Home() {
       <PaymentSupportNotice />
       <h1 className="sr-only">
         AI education bootcamp for students in Classes 6 to 12 with ChatGPT,
-        Canva AI, Gamma, project skills, a ₹49 demo class, and a ₹299 bootcamp
+        Canva AI, Gamma, project skills, a ₹49 demo class, and a ₹3800 bootcamp
         spot booking.
       </h1>
       <HeroSection />
@@ -77,7 +77,6 @@ export default function Home() {
       </div>
 
       {/* Interactive Chat Demo — mobile only, shown after gallery */}
-      <div id="ask-ai" className="relative -top-24 h-0" />
       <div className="md:hidden">
         <InteractiveChatDemo id="ask-ai-mobile" />
       </div>

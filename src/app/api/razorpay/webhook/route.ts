@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { persistDemoBooking, persistSlotBooking } from "@/lib/bookingPersistence";
+import { BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
 import {
   ensureCapturedRazorpayPayment,
   fetchRazorpayOrder,
@@ -66,6 +67,14 @@ export async function POST(request: Request) {
     }
 
     if (notes.bookingType === "slot_booking") {
+      if (
+        payment.amount !== order.amount ||
+        order.amount !== BOOK_SLOT_AMOUNT_PAISE ||
+        payment.currency !== order.currency
+      ) {
+        return NextResponse.json({ error: "Unexpected slot booking payment amount." }, { status: 400 });
+      }
+
       await persistSlotBooking({
         expectedBookingType: "slot_booking",
         fallbackDetails: {

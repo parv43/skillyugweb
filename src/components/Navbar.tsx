@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import React, { useState, useEffect } from "react"
@@ -6,8 +5,6 @@ import { Menu, X } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import type { Session } from "@supabase/supabase-js"
-import { supabase } from "@/lib/supabaseClient"
 import { useAccessControl } from "@/hooks/useAccessControl"
 import Avatar from "boring-avatars"
 
@@ -19,7 +16,7 @@ export default function Navbar() {
   const rafRef = React.useRef<number | null>(null)
   
   // Use the shared access control hook
-  const { isLoggedIn, hasAccess: hasMyBatchAccess, hasSlot, loading, userId, userEmail } = useAccessControl()
+  const { isLoggedIn, hasAccess: hasMyBatchAccess, userId, userEmail } = useAccessControl()
 
   useEffect(() => {
     // ✅ Use requestAnimationFrame for optimal performance (syncs with 60fps)
@@ -42,33 +39,72 @@ export default function Navbar() {
     }
   }, [])
 
+  // Handle smart scrolling for "Ask AI" specifically
+  const getSmartHash = (targetHash: string) => {
+    if (targetHash === "ask-ai" || targetHash === "ask-ai-demo") {
+      return window.innerWidth < 768 ? "ask-ai-mobile" : "ask-ai-desktop"
+    }
+    return targetHash
+  }
+
+  // Handle hash navigation after page load (for cross-page links)
+  useEffect(() => {
+    const handleHashScroll = () => {
+      const pendingScroll = sessionStorage.getItem("pendingScroll")
+      const hash = window.location.hash.replace("#", "")
+      
+      let targetHash = null
+      if (pendingScroll) {
+        targetHash = pendingScroll
+        sessionStorage.removeItem("pendingScroll")
+      } else if (hash === "ask-ai" || hash === "ask-ai-demo") {
+        targetHash = getSmartHash(hash)
+      }
+
+      if (targetHash) {
+        // Delay to ensure the target section is rendered and layout has settled
+        setTimeout(() => {
+          const element = document.getElementById(targetHash)
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" })
+          }
+        }, 400)
+      }
+    }
+
+    handleHashScroll()
+    window.addEventListener('hashchange', handleHashScroll)
+    return () => window.removeEventListener('hashchange', handleHashScroll)
+  }, [pathname])
+
   // Close mobile menu and handle smooth scroll for hash links
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     setMobileMenuOpen(false)
 
-    // Only intercept hash links for smooth scroll when already on the homepage.
-    // On other pages (e.g. /my-batch), let the browser navigate normally to /#section.
-    if (href.includes("#") && pathname === "/") {
-      e.preventDefault()
-      let hash = href.split("#")[1]
+    // Handle hash links
+    if (href.includes("#")) {
+      const hash = href.split("#")[1]
+      const targetPath = href.split("#")[0] || "/"
       
-      // If targeting ask-ai, decide which one based on screen size
-      if (hash === "ask-ai") {
-        const isMobile = window.innerWidth < 768; // md breakpoint
-        hash = isMobile ? "ask-ai-mobile" : "ask-ai-desktop";
-      }
-
-      const element = document.getElementById(hash)
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" })
+      if (pathname === targetPath) {
+        // We're already on the target page, scroll immediately
+        e.preventDefault()
+        const smartHash = getSmartHash(hash)
+        const element = document.getElementById(smartHash)
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" })
+        }
+      } else {
+        // Cross-page navigation: store the intended hash to scroll after load
+        sessionStorage.setItem("pendingScroll", getSmartHash(hash))
       }
     }
   }
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Projects", href: "/#projects" },
-    { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
+    { name: "Bootcamp", href: "/bootcamp" },
+    { name: "Ask AI", href: "/#ask-ai-demo", ariaLabel: "Ask questions about the AI bootcamp" },
     { name: "Testimonials", href: "/#testimonials" },
     { name: "Blog", href: "/blog" },
   ]
@@ -99,9 +135,9 @@ export default function Navbar() {
                 ? pathname.startsWith("/blog") 
                 : link.name === "My Batch"
                   ? pathname === "/my-batch"
-                : link.name === "Home" 
-                  ? pathname === "/" 
-                  : false;
+                : link.name === "Home"
+                  ? pathname === "/"
+                  : link.href === pathname;
               
               return (
                 <li key={link.name}>
@@ -180,9 +216,9 @@ export default function Navbar() {
                 ? pathname.startsWith("/blog") 
                 : link.name === "My Batch"
                   ? pathname === "/my-batch"
-                : link.name === "Home" 
-                  ? pathname === "/" 
-                  : false;
+                : link.name === "Home"
+                  ? pathname === "/"
+                  : link.href === pathname;
                   
               return (
                 <li key={link.name}>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { markPaymentSupportNoticePending } from "@/lib/paymentSupportNotice";
+import { BOOK_SLOT_AMOUNT_LABEL } from "@/lib/pricing";
 import { supabase } from "@/lib/supabaseClient";
 
 interface RazorpayOrderResponse {
@@ -606,7 +607,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       ? "Loading Payment Gateway..."
                       : razorpayScriptStatus === "failed"
                         ? "Payment Gateway Unavailable"
-                        : "Pay Now - ₹299"}
+                        : `Pay Now - ${BOOK_SLOT_AMOUNT_LABEL}`}
                 </button>
               </div>
             </form>

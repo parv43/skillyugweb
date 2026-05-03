@@ -234,7 +234,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
                 href="/book-slot"
                 className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.05] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white/[0.1]"
               >
-                Reserve the ₹299 Bootcamp Spot
+                Reserve the ₹3800 Bootcamp Spot
               </Link>
             </div>
             <div className="mt-6 flex flex-wrap gap-3 text-sm">
@@ -291,7 +291,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
 
           <p className="text-lg md:text-xl text-slate-300 font-light max-w-2xl mx-auto mb-12">
             Use the ₹49 demo class to experience the format first, then use the
-            ₹299 booking flow when you are ready to reserve a bootcamp seat.
+            ₹3800 booking flow when you are ready to reserve a bootcamp seat.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full sm:w-auto">
@@ -305,7 +305,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
               href="/book-slot"
               className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center inline-block"
             >
-              Reserve the ₹299 Spot
+              Reserve the ₹3800 Spot
             </Link>
           </div>
         </div>
