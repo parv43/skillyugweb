@@ -77,7 +77,6 @@ export default function Home() {
       </div>
 
       {/* Interactive Chat Demo — mobile only, shown after gallery */}
-      <div id="ask-ai" className="relative -top-24 h-0" />
       <div className="md:hidden">
         <InteractiveChatDemo id="ask-ai-mobile" />
       </div>

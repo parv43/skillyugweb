@@ -41,7 +41,7 @@ export default function Navbar() {
 
   // Handle smart scrolling for "Ask AI" specifically
   const getSmartHash = (targetHash: string) => {
-    if (targetHash === "ask-ai") {
+    if (targetHash === "ask-ai" || targetHash === "ask-ai-demo") {
       return window.innerWidth < 768 ? "ask-ai-mobile" : "ask-ai-desktop"
     }
     return targetHash
@@ -49,17 +49,23 @@ export default function Navbar() {
 
   // Handle hash navigation after page load (for cross-page links)
   useEffect(() => {
-    const hash = window.location.hash.replace("#", "")
-    if (hash === "ask-ai") {
-      const smartHash = getSmartHash("ask-ai")
-      // Small delay to ensure the target section is rendered
-      setTimeout(() => {
-        const element = document.getElementById(smartHash)
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "start" })
-        }
-      }, 500)
+    const handleHash = () => {
+      const hash = window.location.hash.replace("#", "")
+      if (hash === "ask-ai" || hash === "ask-ai-demo") {
+        const smartHash = getSmartHash(hash)
+        // Delay to ensure the target section is rendered and layout has settled
+        setTimeout(() => {
+          const element = document.getElementById(smartHash)
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" })
+          }
+        }, 400)
+      }
     }
+
+    handleHash()
+    window.addEventListener('hashchange', handleHash)
+    return () => window.removeEventListener('hashchange', handleHash)
   }, [pathname])
 
   // Close mobile menu and handle smooth scroll for hash links
@@ -86,7 +92,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Bootcamp", href: "/bootcamp" },
-    { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
+    { name: "Ask AI", href: "/#ask-ai-demo", ariaLabel: "Ask questions about the AI bootcamp" },
     { name: "Testimonials", href: "/#testimonials" },
     { name: "Blog", href: "/blog" },
   ]
