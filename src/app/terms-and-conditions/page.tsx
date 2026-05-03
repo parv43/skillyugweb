@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import Image from "next/image";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -53,16 +54,14 @@ export default function TermsAndConditions() {
 
       {/* Shared Footer */}
       <footer className="relative z-10 w-full bg-[#020617] border-t border-slate-900/80 py-12 flex flex-col items-center">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.5)] flex items-center justify-center opacity-70 mb-4 cyber-glow">
-          <span className="text-white font-black text-xs">SY</span>
+        <div className="mb-6">
+          <Image src="/skillyug.png" alt="Skillyug Logo" width={300} height={100} className="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
         </div>
 
         <nav className="mb-6">
           <ul className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
             <li><Link href="/" className="hover:text-blue-400 transition-colors">Home</Link></li>
             <li><Link href="/blog" className="hover:text-blue-400 transition-colors">Blog</Link></li>
-            <li><Link href="/#ask-ai" className="hover:text-blue-400 transition-colors">Interactive Demo</Link></li>
-            <li><Link href="/#curriculum" className="hover:text-blue-400 transition-colors">Curriculum</Link></li>
           </ul>
         </nav>
 

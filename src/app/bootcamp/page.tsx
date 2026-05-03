@@ -184,7 +184,7 @@ function EnrollmentCard() {
             </div>
 
             <Link
-              href="/book-slot"
+              href="/book-slot?from=bootcamp"
               className="mt-9 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-5 text-lg font-bold text-white shadow-[0_0_34px_rgba(124,58,237,0.34)] transition hover:-translate-y-0.5 hover:shadow-[0_0_52px_rgba(124,58,237,0.52)]"
             >
               Enroll in Bootcamp
@@ -247,7 +247,7 @@ function DesktopBootcampHero() {
             transition={{ delay: 0.3 }}
           >
             <Link
-              href="/book-slot"
+              href="/book-slot?from=bootcamp"
               className="mt-9 inline-flex rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(168,85,247,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgba(168,85,247,0.45)]"
             >
               Enroll Now
@@ -303,7 +303,7 @@ function MobileBootcampHero() {
           className="mt-10 w-full"
         >
           <Link
-            href="/book-slot"
+            href="/book-slot?from=bootcamp"
             className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(168,85,247,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgba(168,85,247,0.45)]"
           >
             Enroll Now
@@ -342,7 +342,7 @@ export default function BootcampPage() {
                 key={instructor.name}
                 className="relative rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md transition hover:border-purple-400/30 hover:bg-white/[0.07]"
               >
-                <div className="absolute right-8 top-8 h-10 w-44 opacity-80 transition-opacity hover:opacity-100">
+                <div className="absolute right-8 top-8 h-20 w-72 opacity-80 transition-opacity hover:opacity-100">
                   <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" fill className="object-contain object-right" />
                 </div>
                 {instructor.image ? (

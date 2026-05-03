@@ -113,8 +113,6 @@ export default function Home() {
           <ul className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
             <li><Link href="/" className="hover:text-blue-400 transition-colors">Home</Link></li>
             <li><Link href="/blog" className="hover:text-blue-400 transition-colors">Blog</Link></li>
-            <li><Link href="/#ask-ai" className="hover:text-blue-400 transition-colors">Interactive Demo</Link></li>
-            <li><Link href="/#curriculum" className="hover:text-blue-400 transition-colors">Curriculum</Link></li>
           </ul>
         </nav>
 
