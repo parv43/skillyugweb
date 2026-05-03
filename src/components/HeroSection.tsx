@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
-import { supabase } from "@/lib/supabaseClient"
 import { useAccessControl } from "@/hooks/useAccessControl"
 
 // The tool cards orbiting the central badge
@@ -69,7 +68,7 @@ function MobileHero() {
         </h2>
         <p className="text-slate-300 text-[17px] leading-relaxed max-w-sm mb-10 font-normal">
           A practical AI bootcamp for Class 6–12 students with a ₹49 demo class
-          before the ₹299 bootcamp booking.
+          before the ₹3800 bootcamp booking.
         </p>
 
         {/* CTAs */}
@@ -188,7 +187,7 @@ export default function HeroSection() {
 
             <p className="text-base md:text-lg text-slate-300 max-w-xl mb-10 font-light leading-relaxed">
               Students learn ChatGPT, Canva AI, Gamma, and practical project
-              workflows through guided sessions, a ₹49 demo class, and a ₹299
+              workflows through guided sessions, a ₹49 demo class, and a ₹3800
               bootcamp spot booking flow.
             </p>
 

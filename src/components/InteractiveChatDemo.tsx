@@ -59,7 +59,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
       return "The ₹49 demo class is a live introductory session where parents and students see the teaching style, tools, and overall bootcamp format before moving ahead."
     }
     if (text.includes("book") || text.includes("demo") || text.includes("join") || text.includes("enroll") || text.includes("start")) {
-      return "The best way to understand the program is to attend the ₹49 demo session first. Families who are ready to continue can then use the ₹299 spot-booking flow."
+      return "The best way to understand the program is to attend the ₹49 demo session first. Families who are ready to continue can then use the ₹3800 spot-booking flow."
     }
     if (text.includes("project") || text.includes("build") || text.includes("create") || text.includes("make")) {
       return "Students build real-world AI chatbots, AI generated designs, and automation workflows. The best way to understand the program is to attend the demo session."

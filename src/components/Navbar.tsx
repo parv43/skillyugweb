@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import React, { useState, useEffect } from "react"
@@ -6,8 +5,6 @@ import { Menu, X } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import type { Session } from "@supabase/supabase-js"
-import { supabase } from "@/lib/supabaseClient"
 import { useAccessControl } from "@/hooks/useAccessControl"
 import Avatar from "boring-avatars"
 
@@ -19,7 +16,7 @@ export default function Navbar() {
   const rafRef = React.useRef<number | null>(null)
   
   // Use the shared access control hook
-  const { isLoggedIn, hasAccess: hasMyBatchAccess, hasSlot, loading, userId, userEmail } = useAccessControl()
+  const { isLoggedIn, hasAccess: hasMyBatchAccess, userId, userEmail } = useAccessControl()
 
   useEffect(() => {
     // ✅ Use requestAnimationFrame for optimal performance (syncs with 60fps)
@@ -67,7 +64,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Projects", href: "/#projects" },
+    { name: "Bootcamp", href: "/bootcamp" },
     { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
     { name: "Testimonials", href: "/#testimonials" },
     { name: "Blog", href: "/blog" },
@@ -99,9 +96,9 @@ export default function Navbar() {
                 ? pathname.startsWith("/blog") 
                 : link.name === "My Batch"
                   ? pathname === "/my-batch"
-                : link.name === "Home" 
-                  ? pathname === "/" 
-                  : false;
+                : link.name === "Home"
+                  ? pathname === "/"
+                  : link.href === pathname;
               
               return (
                 <li key={link.name}>
@@ -180,9 +177,9 @@ export default function Navbar() {
                 ? pathname.startsWith("/blog") 
                 : link.name === "My Batch"
                   ? pathname === "/my-batch"
-                : link.name === "Home" 
-                  ? pathname === "/" 
-                  : false;
+                : link.name === "Home"
+                  ? pathname === "/"
+                  : link.href === pathname;
                   
               return (
                 <li key={link.name}>

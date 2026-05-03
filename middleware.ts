@@ -15,7 +15,7 @@ export function middleware(request: NextRequest) {
     "object-src 'none'",
     "frame-ancestors 'self'",
     "form-action 'self'",
-    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""} https://checkout.razorpay.com https://*.razorpay.com`,
+    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""} https://checkout.razorpay.com https://*.razorpay.com https://unpkg.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' data: https://fonts.gstatic.com",
     [
@@ -33,6 +33,9 @@ export function middleware(request: NextRequest) {
       "https://checkout.razorpay.com",
       "https://api.razorpay.com",
       "https://*.razorpay.com",
+      "https://prod.spline.design",
+      "https://*.spline.design",
+      "https://unpkg.com",
     ].filter(Boolean).join(" "),
     "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com https://*.razorpay.com",
     "worker-src 'self' blob:",

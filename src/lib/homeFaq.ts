@@ -35,10 +35,10 @@ export const homeFaqItems: HomeFaqItem[] = [
     linkLabel: "Book the ₹49 demo class",
   },
   {
-    question: "What is the ₹299 course or spot booking for?",
+    question: "What is the ₹3800 course or spot booking for?",
     answer:
-      "The ₹299 booking is the paid step used to reserve a seat for the upcoming bootcamp session. It is separate from the ₹49 demo and is meant for families ready to secure a bootcamp spot.",
+      "The ₹3800 booking is the paid step used to reserve a seat for the upcoming bootcamp session. It is separate from the ₹49 demo and is meant for families ready to secure a bootcamp spot.",
     href: "/book-slot",
-    linkLabel: "Reserve the ₹299 spot",
+    linkLabel: "Reserve the ₹3800 spot",
   },
 ]

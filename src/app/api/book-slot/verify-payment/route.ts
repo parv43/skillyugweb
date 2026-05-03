@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { persistSlotBooking } from "@/lib/bookingPersistence";
+import { BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
 import {
   ensureCapturedRazorpayPayment,
   fetchRazorpayOrder,
@@ -105,7 +106,13 @@ export async function POST(request: Request) {
     const capturedPayment = await ensureCapturedRazorpayPayment(payment);
     const order = await fetchRazorpayOrder(expectedOrderId);
 
-    if (capturedPayment.order_id !== expectedOrderId || capturedPayment.amount !== order.amount || capturedPayment.currency !== order.currency) {
+    if (
+      capturedPayment.order_id !== expectedOrderId ||
+      capturedPayment.amount !== order.amount ||
+      capturedPayment.currency !== order.currency ||
+      order.amount !== BOOK_SLOT_AMOUNT_PAISE ||
+      capturedPayment.amount !== BOOK_SLOT_AMOUNT_PAISE
+    ) {
       return NextResponse.json(
         { error: "Payment amount or order details do not match the booking request." },
         { status: 400 }

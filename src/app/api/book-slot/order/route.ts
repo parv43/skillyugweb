@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getRequiredEnv, getRazorpayAuthHeader } from "@/lib/razorpayServer";
+import { BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 
-const SLOT_AMOUNT_PAISE = 29900;
 const SLOT_CURRENCY = "INR";
 const SLOT_ORDER_COOKIE = "slot_booking_order_id";
 
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        amount: SLOT_AMOUNT_PAISE,
+        amount: BOOK_SLOT_AMOUNT_PAISE,
         currency: SLOT_CURRENCY,
         receipt,
         notes: {
