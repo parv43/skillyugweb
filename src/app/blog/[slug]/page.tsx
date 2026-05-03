@@ -41,7 +41,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
 
   let MdxContent: React.ComponentType | null = null;
   try {
-    const mdxModule = await import(`@/content/blogs/${slug}.mdx`);
+    const mdxModule = await import(`@/content/blogs/${slug}.tsx`);
     MdxContent = mdxModule.default;
   } catch {
     // No MDX file found, we will fallback to blogData.ts

@@ -1,3 +1,6 @@
+export default function IsAiBootcampWorthIt() {
+  return (
+    <>
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-10">
   <div className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/5 transition-colors">
     <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-2">97M+</div>
@@ -13,19 +16,17 @@
   </div>
 </div>
 
-## Why parents are choosing AI bootcamps over traditional summer camps
+<h2>Why parents are choosing AI bootcamps over traditional summer camps</h2>
 
-An AI Bootcamp shifts the focus from writing repetitive code to solving complex problems using modern tools. Instead of learning how to spell `print('hello')`, students learn how to think critically, generate ideas, and instruct AI to do the heavy lifting.
-
+<p>An AI Bootcamp shifts the focus from writing repetitive code to solving complex problems using modern tools. Instead of learning how to spell <code>print(&apos;hello&apos;)</code>, students learn how to think critically, generate ideas, and instruct AI to do the heavy lifting.</p>
 
 <div className="my-10 p-6 border-l-4 border-blue-500 bg-blue-500/10 rounded-r-lg">
   <div className="text-xl md:text-2xl text-blue-100 font-light m-0 leading-relaxed">
-    "This is the difference between learning how to use a calculator and learning how to solve the math."
+    &ldquo;This is the difference between learning how to use a calculator and learning how to solve the math.&rdquo;
   </div>
 </div>
 
-
-## AI Bootcamp vs Traditional Coding Camps: A Direct Comparison
+<h2>AI Bootcamp vs Traditional Coding Camps: A Direct Comparison</h2>
 
 <div className="overflow-x-auto my-8">
   <table className="w-full text-left border-collapse min-w-[600px]">
@@ -66,10 +67,9 @@ An AI Bootcamp shifts the focus from writing repetitive code to solving complex 
   </table>
 </div>
 
-## What a child actually takes away from an AI Bootcamp
+<h2>What a child actually takes away from an AI Bootcamp</h2>
 
-While the technical skills are impressive, the most valuable takeaways have nothing to do with computers. They are cognitive.
-
+<p>While the technical skills are impressive, the most valuable takeaways have nothing to do with computers. They are cognitive.</p>
 
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-10">
   <div className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] backdrop-blur-sm rounded-xl p-6 hover:bg-white/5 transition-colors">
@@ -116,130 +116,97 @@ While the technical skills are impressive, the most valuable takeaways have noth
   </div>
 </div>
 
-## Does it actually improve school performance year-round
+<h2>Does it actually improve school performance year-round</h2>
 
-**Yes.** 
-
-Unlike a 2-week tennis camp, an AI bootcamp provides skills that students immediately use in their daily academic life.
-
-- **For Research:** Students apply prompt engineering to quickly structure their homework, finding accurate resources in minutes rather than hours.
-- **For Projects:** They utilize design and generative AI to create stunning visuals and presentations for school projects safely and creatively.
-- **For Complex Subjects:** Complex math or science concepts are routinely broken down by AI tutors acting under the student’s commands.
-
+<p><strong>Yes.</strong></p>
+<p>Unlike a 2-week tennis camp, an AI bootcamp provides skills that students immediately use in their daily academic life.</p>
+<ul>
+  <li><strong>For Research:</strong> Students apply prompt engineering to quickly structure their homework, finding accurate resources in minutes rather than hours.</li>
+  <li><strong>For Projects:</strong> They utilize design and generative AI to create stunning visuals and presentations for school projects safely and creatively.</li>
+  <li><strong>For Complex Subjects:</strong> Complex math or science concepts are routinely broken down by AI tutors acting under the student&apos;s commands.</li>
+</ul>
 
 <div className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-8 my-10 max-w-2xl mx-auto">
   <div className="text-lg font-bold text-white mb-6 text-center m-0">Improvement across subjects (Before vs After AI Bootcamp)</div>
-  
   <div className="space-y-6">
     <div>
-      <div className="flex justify-between mb-2">
-        <span className="text-sm font-semibold text-slate-300">Science</span>
-      </div>
+      <div className="flex justify-between mb-2"><span className="text-sm font-semibold text-slate-300">Science</span></div>
       <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden flex">
         <div className="h-full bg-slate-600 w-[40%] rounded-l-full"></div>
         <div className="h-full bg-blue-500 w-[50%] rounded-r-full shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
       </div>
     </div>
-    
     <div>
-      <div className="flex justify-between mb-2">
-        <span className="text-sm font-semibold text-slate-300">Math / Logic</span>
-      </div>
+      <div className="flex justify-between mb-2"><span className="text-sm font-semibold text-slate-300">Math / Logic</span></div>
       <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden flex">
         <div className="h-full bg-slate-600 w-[55%] rounded-l-full"></div>
         <div className="h-full bg-purple-500 w-[35%] rounded-r-full shadow-[0_0_10px_rgba(168,85,247,0.8)]"></div>
       </div>
     </div>
-    
     <div>
-      <div className="flex justify-between mb-2">
-        <span className="text-sm font-semibold text-slate-300">Writing / ELA</span>
-      </div>
+      <div className="flex justify-between mb-2"><span className="text-sm font-semibold text-slate-300">Writing / ELA</span></div>
       <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden flex">
         <div className="h-full bg-slate-600 w-[45%] rounded-l-full"></div>
         <div className="h-full bg-pink-500 w-[48%] rounded-r-full shadow-[0_0_10px_rgba(236,72,153,0.8)]"></div>
       </div>
     </div>
-    
     <div>
-      <div className="flex justify-between mb-2">
-        <span className="text-sm font-semibold text-slate-300">Creative Arts</span>
-      </div>
+      <div className="flex justify-between mb-2"><span className="text-sm font-semibold text-slate-300">Creative Arts</span></div>
       <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden flex">
         <div className="h-full bg-slate-600 w-[35%] rounded-l-full"></div>
         <div className="h-full bg-emerald-500 w-[60%] rounded-r-full shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
       </div>
     </div>
   </div>
-  
   <div className="mt-6 flex items-center justify-center text-xs text-slate-400 gap-6">
     <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-slate-600"></span> Before</div>
     <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-gradient-to-r from-blue-500 to-purple-500"></span> After Bootcamp</div>
   </div>
 </div>
 
-## How to know if a bootcamp is genuine and holds value
+<h2>How to know if a bootcamp is genuine and holds value</h2>
 
-Not all camps are created equal. Use this checklist:
+<p>Not all camps are created equal. Use this checklist:</p>
 
 <ul className="space-y-4 my-8 list-none pl-0">
   <li className="flex items-start gap-3">
     <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-1">
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
     </div>
-    <div>
-      <strong className="text-white block mb-1">Focuses on Prompt Engineering & Practical Use</strong>
-      <span className="text-slate-400">Not just copying code.</span>
-    </div>
+    <div><strong className="text-white block mb-1">Focuses on Prompt Engineering &amp; Practical Use</strong><span className="text-slate-400">Not just copying code.</span></div>
   </li>
   <li className="flex items-start gap-3">
     <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-1">
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
     </div>
-    <div>
-      <strong className="text-white block mb-1">Capstone Project Included</strong>
-      <span className="text-slate-400">Students must build something to prove their skills.</span>
-    </div>
+    <div><strong className="text-white block mb-1">Capstone Project Included</strong><span className="text-slate-400">Students must build something to prove their skills.</span></div>
   </li>
   <li className="flex items-start gap-3">
     <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-1">
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
     </div>
-    <div>
-      <strong className="text-white block mb-1">Small Batch Sizes</strong>
-      <span className="text-slate-400">AI is a personalized learning tool and requires individual attention.</span>
-    </div>
+    <div><strong className="text-white block mb-1">Small Batch Sizes</strong><span className="text-slate-400">AI is a personalized learning tool and requires individual attention.</span></div>
   </li>
   <li className="flex items-start gap-3">
     <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-1">
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
     </div>
-    <div>
-      <strong className="text-white block mb-1">Instructors are actual builders</strong>
-      <span className="text-slate-400">Not just theoretical teachers.</span>
-    </div>
+    <div><strong className="text-white block mb-1">Instructors are actual builders</strong><span className="text-slate-400">Not just theoretical teachers.</span></div>
   </li>
   <li className="flex items-start gap-3">
     <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-1">
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
     </div>
-    <div>
-      <strong className="text-white block mb-1">Ethics & AI Safety are prioritized</strong>
-      <span className="text-slate-400">Teaching students responsible curation.</span>
-    </div>
+    <div><strong className="text-white block mb-1">Ethics &amp; AI Safety are prioritized</strong><span className="text-slate-400">Teaching students responsible curation.</span></div>
   </li>
 </ul>
 
-## The ROI (Return on Investment) your child receives
+<h2>The ROI (Return on Investment) your child receives</h2>
 
-If you look exclusively at the future job market, the answer is obvious. AI literacy is becoming the equivalent of computer literacy in the 1990s.
-
-But the true return on investment is what it saves your child **today**. 
-
-It saves them the frustration of feeling lost on complex subjects. It gives them the capacity to build, experiment, and realize they are builders—not just consumers of content.
-
-If your child has ever shown a spark of digital curiosity, an AI bootcamp isn’t just worth it—it’s essential. It is setting them up for a future they will own.
-
+<p>If you look exclusively at the future job market, the answer is obvious. AI literacy is becoming the equivalent of computer literacy in the 1990s.</p>
+<p>But the true return on investment is what it saves your child <strong>today</strong>.</p>
+<p>It saves them the frustration of feeling lost on complex subjects. It gives them the capacity to build, experiment, and realize they are builders—not just consumers of content.</p>
+<p>If your child has ever shown a spark of digital curiosity, an AI bootcamp isn&apos;t just worth it—it&apos;s essential. It is setting them up for a future they will own.</p>
 
 <div className="my-14 p-10 bg-white/5 border border-white/10 rounded-2xl text-center relative overflow-hidden">
   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent pointer-events-none"></div>
@@ -248,22 +215,23 @@ If your child has ever shown a spark of digital curiosity, an AI bootcamp isn’
   <a href="/book-demo" className="inline-block no-underline bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] transition-all hover:scale-105 active:scale-95 relative z-10">Book Your Live Demo</a>
 </div>
 
-## Frequently Asked Questions
-
+<h2>Frequently Asked Questions</h2>
 
 <div className="space-y-6 my-8">
   <div className="bg-white/5 border border-white/10 rounded-xl p-6">
     <div className="text-lg font-bold text-emerald-400 mb-2 mt-0">What age is best for an AI bootcamp?</div>
     <div className="text-slate-300 m-0 leading-relaxed">We find students between the ages of 11-18 (Class 6-12) to be perfect. They start possessing the logic needed while still having the imaginative capacity to truly benefit.</div>
   </div>
-
   <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-    <div className="text-lg font-bold text-emerald-400 mb-2 mt-0">Will this just increase my child's screen time?</div>
+    <div className="text-lg font-bold text-emerald-400 mb-2 mt-0">Will this just increase my child&apos;s screen time?</div>
     <div className="text-slate-300 m-0 leading-relaxed">There is a massive difference between passive consumption (scrolling TikTok) and active creation. AI bootcamps teach purposeful screen time focused entirely on productivity and creation.</div>
   </div>
-
   <div className="bg-white/5 border border-white/10 rounded-xl p-6">
     <div className="text-lg font-bold text-emerald-400 mb-2 mt-0">Does my child need coding experience to start?</div>
-    <div className="text-slate-300 m-0 leading-relaxed">Absolutely not. In fact, many students without prior coding experience excel quickly because they aren't tied down to rigid syntax rules—they just focus on the logic and problem-solving.</div>
+    <div className="text-slate-300 m-0 leading-relaxed">Absolutely not. In fact, many students without prior coding experience excel quickly because they aren&apos;t tied down to rigid syntax rules—they just focus on the logic and problem-solving.</div>
   </div>
 </div>
+    </>
+  );
+}
+
