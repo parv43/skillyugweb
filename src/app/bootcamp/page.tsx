@@ -10,16 +10,26 @@ import { BOOK_SLOT_AMOUNT_LABEL } from "@/lib/pricing"
 
 const instructors = [
   {
-    name: "Parv Srivastava",
-    initials: "PS",
-    title: "CEO of Skillyug & AI Curriculum Architect",
-    bio: "Builds structured, future-proof learning paths that help students turn AI curiosity into practical skills, polished projects, and long-term confidence.",
+    name: "Prachi Chandra",
+    initials: "PC",
+    image: "/Prachi_mam.png",
+    title: "AI Trainer & Educator",
+    bio: [
+      "10+ Years Experience: EdTech leader with a background at Vedantu and Outschool.",
+      "CBSE Curriculum Architect: Key curator for the official CBSE AI handbooks.",
+      "Proven Impact: Trained thousands of students and teachers globally, specializing in making complex tech concepts simple and practical.",
+    ],
   },
   {
-    name: "Tanuj Pathak",
-    initials: "TP",
-    title: "AI Developer",
-    bio: "Specializes in computer vision and practical application development, teaching students how to build useful real-world AI tools from idea to launch.",
+    name: "Krupali Busa",
+    initials: "KB",
+    image: "/Krupali_mam.png",
+    title: "Senior Technical Trainer & Educator",
+    bio: [
+      "13+ Years Experience: Seasoned educator with a deep background spanning from foundational computer science tutoring to corporate tech training.",
+      "Industry & Academic Leader: Senior Technical Trainer at a leading global tech firm, backed by over four years of experience as a Senior University Lecturer.",
+      "Tech & Content Expert: Specializes in technical content creation, turning complex programming and enterprise cloud technologies into accessible, structured learning.",
+    ],
   },
 ]
 
@@ -240,15 +250,38 @@ export default function BootcampPage() {
                 className="relative rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md transition hover:border-purple-400/30 hover:bg-white/[0.07]"
               >
                 <Linkedin className="absolute right-8 top-8 h-5 w-5 text-blue-400" aria-hidden="true" />
-                <div className="mb-7 flex h-24 w-24 items-center justify-center rounded-full border border-white/15 bg-transparent text-2xl font-bold text-white shadow-[0_0_30px_rgba(59,130,246,0.14)]">
-                  {instructor.initials}
-                </div>
+                {instructor.image ? (
+                  <div className="mb-7 relative h-24 w-24 overflow-hidden rounded-full border border-white/15 shadow-[0_0_30px_rgba(59,130,246,0.14)]">
+                    <Image src={instructor.image} alt={instructor.name} fill className="object-cover" sizes="96px" />
+                  </div>
+                ) : (
+                  <div className="mb-7 flex h-24 w-24 items-center justify-center rounded-full border border-white/15 bg-transparent text-2xl font-bold text-white shadow-[0_0_30px_rgba(59,130,246,0.14)]">
+                    {instructor.initials}
+                  </div>
+                )}
                 <div className="pr-8">
                   <h3 className="text-2xl font-bold text-white">{instructor.name}</h3>
                   <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-purple-300">
                     {instructor.title}
                   </p>
-                  <p className="mt-5 text-base leading-7 text-gray-300">{instructor.bio}</p>
+                  {Array.isArray(instructor.bio) ? (
+                    <ul className="mt-5 space-y-2 text-base leading-7 text-gray-300 list-disc list-outside ml-4">
+                      {instructor.bio.map((point, idx) => {
+                        const colonIndex = point.indexOf(':');
+                        if (colonIndex !== -1) {
+                          return (
+                            <li key={idx}>
+                              <span className="font-bold text-white">{point.substring(0, colonIndex + 1)}</span>
+                              {point.substring(colonIndex + 1)}
+                            </li>
+                          );
+                        }
+                        return <li key={idx}>{point}</li>;
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="mt-5 text-base leading-7 text-gray-300">{instructor.bio}</p>
+                  )}
                 </div>
               </article>
             ))}
