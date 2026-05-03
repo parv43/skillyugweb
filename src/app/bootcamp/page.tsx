@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react"
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, CheckCircle2, Linkedin, Sparkles } from "lucide-react"
+import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react"
+import { motion } from "framer-motion"
 import Navbar from "@/components/Navbar"
 import { BOOK_SLOT_AMOUNT_LABEL } from "@/lib/pricing"
 
@@ -196,58 +197,152 @@ function EnrollmentCard() {
   )
 }
 
-export default function BootcampPage() {
+function DesktopBootcampHero() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#0a0a0a] text-white selection:bg-purple-500/30 selection:text-white">
-      <Navbar />
+    <section className="relative hidden min-h-screen items-center overflow-hidden px-6 pb-16 pt-28 md:flex md:px-10 md:py-28 lg:px-16">
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_20%_26%,rgba(88,28,135,0.22),transparent_34%),radial-gradient(circle_at_78%_30%,rgba(37,99,235,0.2),transparent_34%),radial-gradient(circle_at_78%_70%,rgba(109,40,217,0.18),transparent_38%),linear-gradient(135deg,#0a0a0a_0%,#0a0a0a_42%,#120624_72%,#070b1b_100%)]" />
+      <div className="absolute inset-0 z-0 [contain:layout_paint] md:opacity-80">
+        <BootcampSpline />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#0a0a0a_0%,#0a0a0a_34%,rgba(10,10,10,0.84)_48%,rgba(10,10,10,0.34)_68%,rgba(10,10,10,0.18)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_74%_46%,transparent_0%,transparent_28%,rgba(10,10,10,0.2)_54%,#0a0a0a_100%)]" />
+        <div className="pointer-events-none absolute bottom-5 right-5 h-14 w-44 rounded-2xl bg-[#0a0a0a]" />
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-48 bg-gradient-to-b from-transparent via-[#0a0a0a]/80 to-[#0a0a0a]" />
 
-      <section className="relative flex min-h-screen items-center overflow-hidden px-6 pb-16 pt-28 md:px-10 md:py-28 lg:px-16">
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_20%_26%,rgba(88,28,135,0.22),transparent_34%),radial-gradient(circle_at_78%_30%,rgba(37,99,235,0.2),transparent_34%),radial-gradient(circle_at_78%_70%,rgba(109,40,217,0.18),transparent_38%),linear-gradient(135deg,#0a0a0a_0%,#0a0a0a_42%,#120624_72%,#070b1b_100%)]" />
-        <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_72%_28%,rgba(168,85,247,0.22),transparent_24%),radial-gradient(circle_at_82%_58%,rgba(37,99,235,0.16),transparent_26%)] md:hidden" />
-        <div className="absolute inset-0 z-0 hidden [contain:layout_paint] md:block md:opacity-80">
-          <BootcampSpline />
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#0a0a0a_0%,#0a0a0a_34%,rgba(10,10,10,0.84)_48%,rgba(10,10,10,0.34)_68%,rgba(10,10,10,0.18)_100%)]" />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_74%_46%,transparent_0%,transparent_28%,rgba(10,10,10,0.2)_54%,#0a0a0a_100%)]" />
-          <div className="pointer-events-none absolute bottom-5 right-5 h-14 w-44 rounded-2xl bg-[#0a0a0a]" />
-        </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-48 bg-gradient-to-b from-transparent via-[#0a0a0a]/80 to-[#0a0a0a]" />
-
-        <div className="pointer-events-none relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10">
-          <div className="pointer-events-auto max-w-xl">
-            <div className="mb-6 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-purple-200 backdrop-blur-md">
-              Skillyug AI Bootcamp
-            </div>
-            <h1 className="text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Give Your Child the Advantage in the{" "}
-              <span className="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
-                Era of AI
-              </span>
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-300 sm:text-xl">
-              Students in Classes 6-12 master practical AI tools like ChatGPT and Canva AI through hands-on project building, guided feedback, and live expert sessions.
-            </p>
+      <div className="pointer-events-none relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10">
+        <div className="pointer-events-auto max-w-xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-6 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-purple-200 backdrop-blur-md"
+          >
+            Skillyug AI Bootcamp
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl"
+          >
+            Give Your Child the Advantage in the{" "}
+            <span className="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
+              Era of AI
+            </span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="mt-6 text-lg leading-8 text-gray-300 sm:text-xl"
+          >
+            Students in Classes 6-12 master practical AI tools like ChatGPT and Canva AI through hands-on project building, guided feedback, and live expert sessions.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
             <Link
               href="/book-slot"
               className="mt-9 inline-flex rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(168,85,247,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgba(168,85,247,0.45)]"
             >
               Enroll Now
             </Link>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </div>
+    </section>
+  )
+}
+
+function MobileBootcampHero() {
+  return (
+    <section className="relative flex min-h-screen flex-col justify-center overflow-hidden px-6 pb-16 pt-32 md:hidden">
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.25),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(37,99,235,0.25),transparent_40%),linear-gradient(135deg,#0a0a0a_0%,#11091e_50%,#0a0a0a_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-48 bg-gradient-to-b from-transparent via-[#0a0a0a]/80 to-[#0a0a0a]" />
+
+      <div className="relative z-10 mx-auto flex w-full max-w-xl flex-col items-center text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-6 inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-purple-200 backdrop-blur-md"
+        >
+          Skillyug AI Bootcamp
+        </motion.div>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.1 }}
+          className="text-5xl font-bold tracking-tight text-white sm:text-6xl"
+        >
+          Give Your Child the Advantage in the{" "}
+          <span className="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
+            Era of AI
+          </span>
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="mt-6 text-lg leading-8 text-gray-300"
+        >
+          Students in Classes 6-12 master practical AI tools like ChatGPT and Canva AI through hands-on project building, guided feedback, and live expert sessions.
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+          className="mt-10 w-full"
+        >
+          <Link
+            href="/book-slot"
+            className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(168,85,247,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgba(168,85,247,0.45)]"
+          >
+            Enroll Now
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+export default function BootcampPage() {
+  return (
+    <main className="min-h-screen overflow-hidden bg-[#0a0a0a] text-white selection:bg-purple-500/30 selection:text-white">
+      <Navbar />
+
+      <DesktopBootcampHero />
+      <MobileBootcampHero />
 
       <section className="relative px-6 py-20 md:px-10 lg:px-16">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center text-3xl font-bold text-white sm:text-4xl"
+          >
             Learn from the best in the industry
-          </h2>
+          </motion.h2>
           <div className="mt-12 grid gap-6 md:grid-cols-2">
-            {instructors.map((instructor) => (
-              <article
+            {instructors.map((instructor, idx) => (
+              <motion.article
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
                 key={instructor.name}
                 className="relative rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md transition hover:border-purple-400/30 hover:bg-white/[0.07]"
               >
-                <div className="absolute right-8 top-8 h-20 w-44 opacity-90 transition-opacity hover:opacity-100">
+                <div className="absolute right-8 top-8 h-10 w-44 opacity-80 transition-opacity hover:opacity-100">
                   <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" fill className="object-contain object-right" />
                 </div>
                 {instructor.image ? (
@@ -266,24 +361,24 @@ export default function BootcampPage() {
                   </p>
                   {Array.isArray(instructor.bio) ? (
                     <ul className="mt-5 space-y-2 text-base leading-7 text-gray-300 list-disc list-outside ml-4">
-                      {instructor.bio.map((point, idx) => {
+                      {instructor.bio.map((point, pointIdx) => {
                         const colonIndex = point.indexOf(':');
                         if (colonIndex !== -1) {
                           return (
-                            <li key={idx}>
+                            <li key={pointIdx}>
                               <span className="font-bold text-white">{point.substring(0, colonIndex + 1)}</span>
                               {point.substring(colonIndex + 1)}
                             </li>
                           );
                         }
-                        return <li key={idx}>{point}</li>;
+                        return <li key={pointIdx}>{point}</li>;
                       })}
                     </ul>
                   ) : (
                     <p className="mt-5 text-base leading-7 text-gray-300">{instructor.bio}</p>
                   )}
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>
@@ -292,31 +387,61 @@ export default function BootcampPage() {
       <section className="relative px-6 py-20 md:px-10 lg:px-16">
         <div className="absolute inset-x-0 top-1/2 h-[34rem] -translate-y-1/2 bg-[radial-gradient(circle,rgba(88,28,135,0.22),transparent_62%)]" />
         <div className="relative mx-auto max-w-6xl">
-          <h2 className="mb-10 text-center text-3xl font-bold text-white sm:text-4xl">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-10 text-center text-3xl font-bold text-white sm:text-4xl"
+          >
             Secure Your Child&apos;s Spot
-          </h2>
-          <EnrollmentCard />
+          </motion.h2>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <EnrollmentCard />
+          </motion.div>
         </div>
       </section>
 
       <footer className="relative border-t border-white/5 bg-[#020617] px-6 py-24 text-center sm:py-32">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(30,64,175,0.16),transparent_34%)]" />
         <div className="relative mx-auto flex max-w-4xl flex-col items-center">
-          <Image
-            src="/skillyug-optimized.svg"
-            alt="Skillyug"
-            width={520}
-            height={220}
-            className="h-auto w-64 sm:w-80 md:w-[420px]"
-          />
-          <nav className="mt-20 flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-xl font-bold text-slate-400 sm:text-2xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Image
+              src="/skillyug-optimized.svg"
+              alt="Skillyug"
+              width={520}
+              height={220}
+              className="h-auto w-64 sm:w-80 md:w-[420px]"
+            />
+          </motion.div>
+          <motion.nav
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-20 flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-xl font-bold text-slate-400 sm:text-2xl"
+          >
             {footerLinks.map((link) => (
               <Link key={link.label} href={link.href} className="transition hover:text-white">
                 {link.label}
               </Link>
             ))}
-          </nav>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-7 text-base font-medium text-slate-500 sm:text-lg">
+          </motion.nav>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="mt-10 flex flex-wrap items-center justify-center gap-7 text-base font-medium text-slate-500 sm:text-lg"
+          >
             <Link href="/refund-policy" className="transition hover:text-slate-300">
               Refund Policy
             </Link>
@@ -324,12 +449,18 @@ export default function BootcampPage() {
             <Link href="/terms-and-conditions" className="transition hover:text-slate-300">
               Terms & Conditions
             </Link>
-          </div>
-          <p className="mt-16 text-lg font-medium uppercase tracking-[0.28em] text-slate-500 sm:text-2xl">
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="mt-16 text-lg font-medium uppercase tracking-[0.28em] text-slate-500 sm:text-2xl"
+          >
             © 2026 Skillyug
             <br />
             All Rights Reserved.
-          </p>
+          </motion.p>
         </div>
       </footer>
     </main>
