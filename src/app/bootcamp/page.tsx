@@ -55,16 +55,48 @@ function BootcampSpline() {
   const [isVisible, setIsVisible] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Delay load, skip on mobile / reduced-motion
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const isMobile = window.matchMedia("(max-width: 767px)").matches
     if (reducedMotion || isMobile) return
-    const timer = window.setTimeout(() => setShouldLoad(true), 350)
-    return () => window.clearTimeout(timer)
+
+    let triggered = false
+    const trigger = () => {
+      if (triggered) return
+      triggered = true
+      cleanup() // eslint-disable-line @typescript-eslint/no-use-before-define
+      setShouldLoad(true)
+    }
+
+    // Strategy 1: load when browser is idle (doesn't compete with hydration/paint)
+    // Falls back to setTimeout for Safari which lacks requestIdleCallback
+    let idleId: number
+    if ("requestIdleCallback" in window) {
+      idleId = requestIdleCallback(trigger, { timeout: 2500 })
+    } else {
+      idleId = setTimeout(trigger, 1000) as unknown as number
+    }
+
+    // Strategy 2: also fire on first user intent so active users see it faster
+    window.addEventListener("mousemove", trigger, { once: true, passive: true })
+    window.addEventListener("scroll", trigger, { once: true, passive: true })
+    window.addEventListener("touchstart", trigger, { once: true, passive: true })
+
+    function cleanup() {
+      if ("cancelIdleCallback" in window) {
+        cancelIdleCallback(idleId as number)
+      } else {
+        clearTimeout(idleId as unknown as ReturnType<typeof setTimeout>)
+      }
+      window.removeEventListener("mousemove", trigger)
+      window.removeEventListener("scroll", trigger)
+      window.removeEventListener("touchstart", trigger)
+    }
+
+    return cleanup
   }, [])
 
-  // Pause GPU work when hero is scrolled off-screen
+  // Pause GPU work when hero is scrolled off-screen (canvas stays alive, no reload on scroll back)
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -76,15 +108,14 @@ function BootcampSpline() {
     return () => observer.disconnect()
   }, [])
 
-  // Fix scroll: intercept wheel events the canvas would swallow and
-  // forward them to the page. Hover events are unaffected.
+  // Fix scroll: forward wheel events the canvas swallows to the page.
+  // Hover / pointer events on the scene are completely unaffected.
   const handleSplineLoad = useCallback((spline: { canvas?: HTMLCanvasElement }) => {
     const canvas = spline?.canvas
     if (!canvas) return
     canvas.addEventListener(
       "wheel",
       (e: WheelEvent) => {
-        // Let the browser scroll the page naturally
         window.scrollBy({ top: e.deltaY, left: e.deltaX, behavior: "auto" })
       },
       { passive: true }
@@ -92,14 +123,24 @@ function BootcampSpline() {
   }, [])
 
   return (
-    <div ref={containerRef} className="pointer-events-auto absolute inset-0">
+    <div
+      ref={containerRef}
+      className="pointer-events-auto absolute inset-0"
+      style={{
+        // CSS containment: Spline's internal layout/paint changes won't trigger
+        // recalculations on the rest of the page DOM
+        contain: "layout paint style",
+        // Hint the GPU to composite this layer independently from page content
+        willChange: "transform",
+      }}
+    >
       {shouldLoad ? (
         <Suspense
           fallback={
             <div className="h-full w-full bg-[radial-gradient(circle_at_54%_42%,rgba(168,85,247,0.28),transparent_28%),radial-gradient(circle_at_62%_56%,rgba(37,99,235,0.22),transparent_34%)]" />
           }
         >
-          {/* visibility:hidden keeps the canvas alive (no reload on scroll back) but stops GPU rendering */}
+          {/* visibility:hidden pauses GPU rendering without unmounting (no scene reload on scroll back) */}
           <div style={{ width: "100%", height: "100%", visibility: isVisible ? "visible" : "hidden" }}>
             <SplineViewer
               scene="https://prod.spline.design/daKd8lkPoody3rjb/scene.splinecode"
@@ -114,6 +155,7 @@ function BootcampSpline() {
     </div>
   )
 }
+
 
 function EnrollmentCard() {
   const cardRef = useRef<HTMLDivElement>(null)
