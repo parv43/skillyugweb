@@ -275,7 +275,7 @@ function DesktopBootcampHero() {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg leading-8 text-gray-300 sm:text-xl"
           >
-            Students in Classes 6-12 master practical AI tools like ChatGPT and Canva AI through hands-on project building, guided feedback, and live expert sessions.
+            Students in Classes 6–12 gain mastery over industry-leading generative platforms and creative automation through hands-on project building, guided feedback, and live expert sessions.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -330,7 +330,7 @@ function MobileBootcampHero() {
           transition={{ delay: 0.2 }}
           className="mt-6 text-lg leading-8 text-gray-300"
         >
-          Students in Classes 6-12 master practical AI tools like ChatGPT and Canva AI through hands-on project building, guided feedback, and live expert sessions.
+          Students in Classes 6–12 gain mastery over industry-leading generative platforms and creative automation through hands-on project building, guided feedback, and live expert sessions.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
