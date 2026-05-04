@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+
 import { markPaymentSupportNoticePending } from "@/lib/paymentSupportNotice";
 import { BOOK_SLOT_AMOUNT_LABEL } from "@/lib/pricing";
 import { supabase } from "@/lib/supabaseClient";
@@ -425,11 +425,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
         </header>
 
         <main className="flex-grow flex items-center justify-center px-6 py-12 md:py-24 relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-white/5"
+          <div 
+            className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-white/5 animate-slide-down"
           >
             <div className="mb-6">
               <Link
@@ -626,7 +623,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 Secure payment processed via Razorpay
               </p>
             </div>
-          </motion.div>
+          </div>
         </main>
       </div>
     </>

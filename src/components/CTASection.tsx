@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { motion } from "framer-motion"
 import Link from "next/link"
 import { useAccessControl } from "@/hooks/useAccessControl"
 
@@ -15,20 +14,13 @@ export default function CTASection() {
         <div className="w-[80vw] md:w-[60vw] h-[80vw] md:h-[60vw] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-600/15 via-blue-600/5 to-transparent rounded-full animate-[pulse_4s_infinite]"></div>
       </div>
 
-      <motion.div 
+      <div 
         className="relative z-10 glass-panel max-w-5xl mx-auto px-8 py-20 rounded-[3rem] shadow-[0_0_30px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col items-center text-center w-11/12"
-        initial={{ scale: 0.9, y: 50 }}
-        whileInView={{ scale: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
       >
         {/* Subtle wireframe background inside standard glass panel */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none opacity-50"></div>
 
-        <motion.div
-           initial={{ y: 20 }}
-           whileInView={{ y: 0 }}
-           transition={{ delay: 0.2 }}
-        >
+        <div>
           <span className="inline-block px-4 py-1.5 rounded-full border border-purple-500/40 bg-purple-500/10 text-purple-300 text-sm font-bold tracking-widest mb-6 uppercase shadow-[0_0_15px_rgba(168,85,247,0.3)]">
             Final Step
           </span>
@@ -74,8 +66,8 @@ export default function CTASection() {
             </div>
             
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </section>
   )
 }

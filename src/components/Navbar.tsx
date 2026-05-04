@@ -7,7 +7,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useAccessControl } from "@/hooks/useAccessControl"
 import Avatar from "boring-avatars"
-import { motion, AnimatePresence } from "framer-motion"
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -114,11 +114,8 @@ export default function Navbar() {
     : navLinks
 
   return (
-    <motion.header 
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+    <header 
+      className={`animate-slide-down fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled 
           ? "bg-black/5 backdrop-blur-md border-b border-white/5 py-4 shadow-lg" 
           : "bg-transparent py-6"
@@ -287,6 +284,6 @@ export default function Navbar() {
           </ul>
         </nav>
       </div>
-    </motion.header>
+    </header>
   )
 }

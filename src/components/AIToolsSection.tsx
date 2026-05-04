@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { motion } from "framer-motion"
 import {
   MessageSquare,
   Image,
@@ -15,43 +14,12 @@ import {
 type AccentColor = "slate" | "blue" | "purple" | "pink" | "emerald" | "yellow"
 
 const ACCENT_STYLES: Record<AccentColor, { border: string; dot: string; text: string }> = {
-  slate: {
-    border: "border-slate-500/30",
-    dot: "bg-slate-400/50",
-    text: "text-slate-300",
-  },
-  blue: {
-    border: "border-blue-500/30",
-    dot: "bg-blue-400/50",
-    text: "text-blue-400",
-  },
-  purple: {
-    border: "border-purple-500/30",
-    dot: "bg-purple-400/50",
-    text: "text-purple-400",
-  },
-  pink: {
-    border: "border-pink-500/30",
-    dot: "bg-pink-400/50",
-    text: "text-pink-400",
-  },
-  emerald: {
-    border: "border-emerald-500/30",
-    dot: "bg-emerald-400/50",
-    text: "text-emerald-400",
-  },
-  yellow: {
-    border: "border-yellow-500/30",
-    dot: "bg-yellow-400/50",
-    text: "text-yellow-400",
-  },
-}
-
-interface FlowLineProps {
-  d: string
-  strokeDasharray?: string
-  duration?: number
-  delay?: number
+  slate: { border: "border-slate-500/30", dot: "bg-slate-400/50", text: "text-slate-300" },
+  blue:  { border: "border-blue-500/30",  dot: "bg-blue-400/50",  text: "text-blue-400"  },
+  purple:{ border: "border-purple-500/30",dot: "bg-purple-400/50",text: "text-purple-400"},
+  pink:  { border: "border-pink-500/30",  dot: "bg-pink-400/50",  text: "text-pink-400"  },
+  emerald:{border:"border-emerald-500/30",dot:"bg-emerald-400/50",text:"text-emerald-400"},
+  yellow:{ border: "border-yellow-500/30",dot: "bg-yellow-400/50",text: "text-yellow-400"},
 }
 
 interface EcosystemNodeProps {
@@ -59,87 +27,43 @@ interface EcosystemNodeProps {
   label: string
   desc: string
   position: string
-  delay?: number
   color?: AccentColor
 }
 
-
-// A connection line that draws itself when scrolled into view
-const FlowLine = ({ d, strokeDasharray, duration = 1.5, delay = 0 }: FlowLineProps) => {
-  return (
-    <motion.path
-      d={d}
-      stroke="url(#flowGradient)"
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeDasharray={strokeDasharray}
-      initial={{ pathLength: 0, opacity: 0 }}
-      whileInView={{ pathLength: 1, opacity: 0.6 }}
-      
-      transition={{ duration, delay, ease: "easeInOut" }}
-    />
-  )
-}
-
-const EcosystemNode = ({
-  icon: Icon,
-  label,
-  desc,
-  position,
-  delay = 0,
-  color = "blue",
-}: EcosystemNodeProps) => {
+const EcosystemNode = ({ icon: Icon, label, desc, position, color = "blue" }: EcosystemNodeProps) => {
   const styles = ACCENT_STYLES[color]
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8, y: 20 }}
-      whileInView={{ opacity: 1, scale: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay, type: "spring" }}
-      className={`absolute flex flex-col items-center justify-center z-20 ${position} w-48 text-center will-change-transform`}
-    >
+    <div className={`absolute flex flex-col items-center justify-center z-20 ${position} w-48 text-center`}>
       <div className={`w-16 h-16 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-4 border ${styles.border} shadow-[0_8px_16px_rgba(0,0,0,0.2)] group hover:-translate-y-2 transition-transform duration-300 relative`}>
         <Icon className={`w-8 h-8 ${styles.text} group-hover:opacity-80 transition-opacity`} />
-        {/* Input/Output port dots */}
         <div className={`absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${styles.dot}`} />
         <div className={`absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${styles.dot}`} />
       </div>
       <h4 className="text-white font-bold text-sm mb-1">{label}</h4>
       <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
-    </motion.div>
+    </div>
   )
 }
-
 
 export default function AIToolsSection() {
   return (
     <section className="relative w-full py-32 bg-[#020617] overflow-hidden flex flex-col items-center border-t border-slate-900">
-      
-      {/* Background Ambience (optimized) */}
       <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/15 via-purple-900/5 to-transparent rounded-full pointer-events-none" />
 
       {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="text-center mb-24 z-20 px-6 max-w-3xl"
-      >
+      <div className="text-center mb-24 z-20 px-6 max-w-3xl">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 mb-6 drop-shadow-md tracking-tight leading-tight">
           Tools Students Will Learn
         </h2>
         <p className="text-slate-400 text-lg md:text-xl font-light">
           An interconnected ecosystem. We train students to chain powerful AI platforms together to build fully functional systems from scratch.
         </p>
-      </motion.div>
+      </div>
 
       {/* Interactive Ecosystem Layout (Desktop) */}
       <div className="relative w-full max-w-5xl h-[600px] mx-auto hidden lg:block z-10">
-        
-        {/* Connection SVGs */}
+        {/* Connection SVGs — static paths (no animation needed) */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
           <defs>
             <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -148,58 +72,22 @@ export default function AIToolsSection() {
               <stop offset="100%" stopColor="#ec4899" opacity="1" />
             </linearGradient>
           </defs>
-
-          {/* Hardcoded network routing paths */}
-          {/* Prompt -> LLMs */}
-          <FlowLine d="M 230 260 Q 350 260 410 110" duration={1} delay={0.2} />
-          {/* Prompt -> Generators */}
-          <FlowLine d="M 230 260 Q 350 260 410 490" duration={1} delay={0.2} strokeDasharray="4 4" />
-          
-          {/* LLMs -> Design/Code */}
-          <FlowLine d="M 580 110 Q 750 110 820 190" duration={1.2} delay={0.6} />
-          {/* Generators -> Design/Code */}
-          <FlowLine d="M 580 490 Q 750 490 820 400" duration={1.2} delay={0.8} />
-
-          {/* Cross connections */}
-          <FlowLine d="M 480 160 L 480 440" duration={1.5} delay={1} strokeDasharray="2 6" />
+          <path d="M 230 260 Q 350 260 410 110" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+          <path d="M 230 260 Q 350 260 410 490" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="4 4" opacity="0.6" />
+          <path d="M 580 110 Q 750 110 820 190" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+          <path d="M 580 490 Q 750 490 820 400" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+          <path d="M 480 160 L 480 440" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="2 6" opacity="0.6" />
         </svg>
 
-        {/* Dynamic Nodes */}
-        <EcosystemNode 
-          icon={TerminalSquare} label="Initial Prompt" 
-          desc="Student defines the logic and creative vision." 
-          position="top-[220px] left-[50px]" delay={0.1} color="slate"
-        />
-        
-        <EcosystemNode 
-          icon={MessageSquare} label="ChatGPT & Claude" 
-          desc="Brainstorms features, writes copy, and generates raw code." 
-          position="top-[50px] left-[400px]" delay={0.4} color="blue"
-        />
-        
-        <EcosystemNode 
-          icon={Image} label="Midjourney & DALL-E" 
-          desc="Generates stunning UI assets and visual photography." 
-          position="bottom-[50px] left-[400px]" delay={0.6} color="purple"
-        />
-        
-        <EcosystemNode 
-          icon={Layout} label="Canva & Figma" 
-          desc="Students assemble the AI output into professional layouts." 
-          position="top-[150px] right-[50px]" delay={1.0} color="pink"
-        />
-        
-        <EcosystemNode 
-          icon={Binary} label="Live Deployment" 
-          desc="Compiling the final creative assets into a real app or presentation." 
-          position="top-[350px] right-[50px]" delay={1.2} color="emerald"
-        />
+        <EcosystemNode icon={TerminalSquare} label="Initial Prompt" desc="Student defines the logic and creative vision." position="top-[220px] left-[50px]" color="slate" />
+        <EcosystemNode icon={MessageSquare} label="ChatGPT & Claude" desc="Brainstorms features, writes copy, and generates raw code." position="top-[50px] left-[400px]" color="blue" />
+        <EcosystemNode icon={Image} label="Midjourney & DALL-E" desc="Generates stunning UI assets and visual photography." position="bottom-[50px] left-[400px]" color="purple" />
+        <EcosystemNode icon={Layout} label="Canva & Figma" desc="Students assemble the AI output into professional layouts." position="top-[150px] right-[50px]" color="pink" />
+        <EcosystemNode icon={Binary} label="Live Deployment" desc="Compiling the final creative assets into a real app or presentation." position="top-[350px] right-[50px]" color="emerald" />
       </div>
 
-      {/* ── Mobile Layout (< lg) ── */}
+      {/* Mobile Layout */}
       <div className="flex flex-col w-full px-4 lg:hidden z-10 relative gap-8">
-
-        {/* Tool Cards — 2-column grid */}
         <div className="grid grid-cols-2 gap-3 w-full">
           {[
             { icon: TerminalSquare, label: "Initial Prompt", desc: "Student defines vision & logic", color: "slate" },
@@ -212,31 +100,23 @@ export default function AIToolsSection() {
             const accentColor = color as AccentColor
             const styles = ACCENT_STYLES[accentColor]
             return (
-            <motion.div
-              key={i}
-              className="bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 flex flex-col items-center text-center gap-2"
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.07 }}
-              viewport={{ once: true }}
-            >
-              <div className={`w-12 h-12 rounded-xl bg-[#020617] flex items-center justify-center border ${styles.border} mb-1`}>
-                <Icon className={`w-6 h-6 ${styles.text}`} />
+              <div key={i} className="bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 flex flex-col items-center text-center gap-2">
+                <div className={`w-12 h-12 rounded-xl bg-[#020617] flex items-center justify-center border ${styles.border} mb-1`}>
+                  <Icon className={`w-6 h-6 ${styles.text}`} />
+                </div>
+                <h4 className="text-white font-bold text-xs leading-tight">{label}</h4>
+                <p className="text-slate-400 text-[11px] leading-relaxed">{desc}</p>
               </div>
-              <h4 className="text-white font-bold text-xs leading-tight">{label}</h4>
-              <p className="text-slate-400 text-[11px] leading-relaxed">{desc}</p>
-            </motion.div>
-          )})}
+            )
+          })}
         </div>
 
-        {/* Flow connector */}
         <div className="flex items-center gap-2 px-2">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
           <span className="text-slate-500 text-xs font-semibold tracking-widest uppercase">Student Workflow</span>
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/40 to-transparent" />
         </div>
 
-        {/* Workflow Steps — numbered list cards */}
         <div className="flex flex-col gap-3 w-full">
           {[
             { step: "01", title: "Prompt Design", desc: "Students write a structured prompt explaining their idea to an LLM.", color: "from-blue-500/20 to-blue-500/5", border: "border-blue-500/20" },
@@ -244,28 +124,19 @@ export default function AIToolsSection() {
             { step: "03", title: "Human Polish", desc: "Students use Canva to refine layouts and edit out AI hallucinations.", color: "from-pink-500/20 to-pink-500/5", border: "border-pink-500/20" },
             { step: "04", title: "Final Project", desc: "A complete, functioning website, game, or presentation is created.", color: "from-emerald-500/20 to-emerald-500/5", border: "border-emerald-500/20" },
           ].map(({ step, title, desc, color, border }, i) => (
-            <motion.div
-              key={i}
-              className={`relative bg-gradient-to-br ${color} border ${border} rounded-2xl p-4 flex items-start gap-4 overflow-hidden`}
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
-              viewport={{ once: true }}
-            >
+            <div key={i} className={`relative bg-gradient-to-br ${color} border ${border} rounded-2xl p-4 flex items-start gap-4 overflow-hidden`}>
               <span className="text-4xl font-black font-mono opacity-15 absolute right-4 top-3 select-none">{step}</span>
               <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-white font-black text-xs">{step}</span>
               </div>
-               <div>
+              <div>
                 <h3 className="text-white font-bold text-sm mb-1">{title}</h3>
                 <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
-
     </section>
   )
 }
-

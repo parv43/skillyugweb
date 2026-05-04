@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { BlogPost } from "@/lib/blogData";
-import { motion, AnimatePresence } from "framer-motion";
+
 import AnonymousReactionBar from "@/components/AnonymousReactionBar";
 import ShareButton from "@/components/ShareButton";
 
@@ -44,20 +44,9 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
       </div>
 
       {/* Blog Grid */}
-      <motion.div 
-        layout
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-      >
-        <AnimatePresence mode="popLayout">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredBlogs.map((blog) => (
-            <motion.div
-              layout
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
-              key={blog.slug}
-            >
+            <div key={blog.slug}>
               <Link 
                 href={`/blog/${blog.slug}`} 
                 className="group flex flex-col h-full rounded-[20px] bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-purple-500/30 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] hover:-translate-y-1.5"
@@ -102,10 +91,9 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
                   </div>
                 </div>
               </Link>
-            </motion.div>
+            </div>
           ))}
-        </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 }

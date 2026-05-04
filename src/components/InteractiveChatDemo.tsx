@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+
 import { Bot, User, Send, Sparkles } from "lucide-react"
 import HomeFaqSection from "@/components/HomeFaqSection"
 
@@ -97,15 +97,9 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-900/10 blur-[150px] rounded-full pointer-events-none" />
 
       <div className="text-center mb-10 px-6 max-w-3xl mx-auto relative z-20">
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-6 drop-shadow-sm tracking-tight"
-        >
+        <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-6 drop-shadow-sm tracking-tight">
           Master the Art of Prompting
-        </motion.h2>
+        </h2>
         <p className="text-slate-400 text-lg md:text-xl font-light mb-4">
           We don&apos;t just teach students what AI is. We teach them exactly how to talk to it to get professional results.
         </p>
@@ -115,13 +109,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
       </div>
 
       {/* Chat Interface Container */}
-      <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="max-w-4xl mx-auto px-4 relative z-10"
-      >
+      <div className="max-w-4xl mx-auto px-4 relative z-10">
         <div className="w-full bg-[#0a0f1c] rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(59,130,246,0.05)] overflow-hidden flex flex-col h-[600px] cyber-glow">
           
           {/* Header */}
@@ -140,14 +128,10 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
             ref={chatContainerRef}
             className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent"
           >
-            <AnimatePresence initial={false}>
               {messages.map((msg, i) => (
-                <motion.div 
+                <div 
                   key={i}
                   className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  initial={{ y: 10, scale: 0.95 }}
-                  animate={{ y: 0, scale: 1 }}
-                  transition={{ duration: 0.3 }}
                 >
                   {/* AI Avatar */}
                   {msg.role === 'ai' && (
@@ -171,41 +155,22 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
                       <User className="w-5 h-5" />
                     </div>
                   )}
-                </motion.div>
+                </div>
               ))}
 
-              {/* Typing Indicator */}
+              {/* Typing Indicator — CSS bounce replaces framer-motion */}
               {isTyping && (
-                <motion.div 
-                  key="typing"
-                  className="flex gap-4"
-                  initial={{ y: 10 }}
-                  animate={{ y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                >
+                <div className="flex gap-4">
                   <div className="w-10 h-10 shrink-0 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mt-1 text-blue-400">
                     <Bot className="w-5 h-5" />
                   </div>
                   <div className="bg-white/5 border border-white/10 rounded-2xl rounded-tl-none p-5 flex items-center gap-2 pr-6">
-                    <motion.span 
-                      className="w-2 h-2 bg-blue-400 rounded-full" 
-                      animate={{ y: [0, -5, 0] }} 
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0 }} 
-                    />
-                    <motion.span 
-                      className="w-2 h-2 bg-blue-400 rounded-full" 
-                      animate={{ y: [0, -5, 0] }} 
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }} 
-                    />
-                    <motion.span 
-                      className="w-2 h-2 bg-blue-400 rounded-full" 
-                      animate={{ y: [0, -5, 0] }} 
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }} 
-                    />
+                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce-dot-1" />
+                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce-dot-2" />
+                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce-dot-3" />
                   </div>
-                </motion.div>
+                </div>
               )}
-            </AnimatePresence>
             <div ref={messagesEndRef} />
           </div>
 
@@ -258,7 +223,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
           </div>
 
         </div>
-      </motion.div>
+      </div>
 
       <div className="max-w-4xl mx-auto px-4 relative z-10">
         <HomeFaqSection />
