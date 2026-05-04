@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, lazy, Suspense } from "react"
+import { useEffect, useRef, useState, lazy, Suspense, useCallback } from "react"
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -52,27 +52,61 @@ const SplineViewer = lazy(() => import("@splinetool/react-spline"))
 
 function BootcampSpline() {
   const [shouldLoad, setShouldLoad] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
+  const containerRef = useRef<HTMLDivElement>(null)
 
+  // Delay load, skip on mobile / reduced-motion
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const isMobile = window.matchMedia("(max-width: 767px)").matches
-
     if (reducedMotion || isMobile) return
-
     const timer = window.setTimeout(() => setShouldLoad(true), 350)
     return () => window.clearTimeout(timer)
   }, [])
 
+  // Pause GPU work when hero is scrolled off-screen
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  // Fix scroll: intercept wheel events the canvas would swallow and
+  // forward them to the page. Hover events are unaffected.
+  const handleSplineLoad = useCallback((spline: { canvas?: HTMLCanvasElement }) => {
+    const canvas = spline?.canvas
+    if (!canvas) return
+    canvas.addEventListener(
+      "wheel",
+      (e: WheelEvent) => {
+        // Let the browser scroll the page naturally
+        window.scrollBy({ top: e.deltaY, left: e.deltaX, behavior: "auto" })
+      },
+      { passive: true }
+    )
+  }, [])
+
   return (
-    <div className="pointer-events-auto absolute inset-0">
+    <div ref={containerRef} className="pointer-events-auto absolute inset-0">
       {shouldLoad ? (
-        <Suspense fallback={
-          <div className="h-full w-full bg-[radial-gradient(circle_at_54%_42%,rgba(168,85,247,0.28),transparent_28%),radial-gradient(circle_at_62%_56%,rgba(37,99,235,0.22),transparent_34%)]" />
-        }>
-          <SplineViewer
-            scene="https://prod.spline.design/daKd8lkPoody3rjb/scene.splinecode"
-            style={{ width: "100%", height: "100%" }}
-          />
+        <Suspense
+          fallback={
+            <div className="h-full w-full bg-[radial-gradient(circle_at_54%_42%,rgba(168,85,247,0.28),transparent_28%),radial-gradient(circle_at_62%_56%,rgba(37,99,235,0.22),transparent_34%)]" />
+          }
+        >
+          {/* visibility:hidden keeps the canvas alive (no reload on scroll back) but stops GPU rendering */}
+          <div style={{ width: "100%", height: "100%", visibility: isVisible ? "visible" : "hidden" }}>
+            <SplineViewer
+              scene="https://prod.spline.design/daKd8lkPoody3rjb/scene.splinecode"
+              onLoad={handleSplineLoad}
+              style={{ width: "100%", height: "100%" }}
+            />
+          </div>
         </Suspense>
       ) : (
         <div className="h-full w-full bg-[radial-gradient(circle_at_54%_42%,rgba(168,85,247,0.28),transparent_28%),radial-gradient(circle_at_62%_56%,rgba(37,99,235,0.22),transparent_34%)]" />
