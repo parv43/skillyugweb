@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, lazy, Suspense, useCallback } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -48,13 +48,14 @@ const footerLinks = [
   { label: "Blog", href: "/blog" },
 ]
 
-const SplineViewer = lazy(() => import("@splinetool/react-spline"))
 
 function BootcampSpline() {
   const [shouldLoad, setShouldLoad] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // Load during browser idle time so Spline doesn't compete with hydration/paint.
+  // Also fires immediately on first user interaction for active users.
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const isMobile = window.matchMedia("(max-width: 767px)").matches
@@ -68,8 +69,7 @@ function BootcampSpline() {
       setShouldLoad(true)
     }
 
-    // Strategy 1: load when browser is idle (doesn't compete with hydration/paint)
-    // Falls back to setTimeout for Safari which lacks requestIdleCallback
+    // Strategy 1: idle callback (Safari falls back to 1s timeout)
     let idleId: number
     if ("requestIdleCallback" in window) {
       idleId = requestIdleCallback(trigger, { timeout: 2500 })
@@ -77,7 +77,7 @@ function BootcampSpline() {
       idleId = setTimeout(trigger, 1000) as unknown as number
     }
 
-    // Strategy 2: also fire on first user intent so active users see it faster
+    // Strategy 2: fire on first user intent
     window.addEventListener("mousemove", trigger, { once: true, passive: true })
     window.addEventListener("scroll", trigger, { once: true, passive: true })
     window.addEventListener("touchstart", trigger, { once: true, passive: true })
@@ -96,7 +96,7 @@ function BootcampSpline() {
     return cleanup
   }, [])
 
-  // Pause GPU work when hero is scrolled off-screen (canvas stays alive, no reload on scroll back)
+  // Hide iframe (not unmount) when off-screen to stop GPU work
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -108,55 +108,34 @@ function BootcampSpline() {
     return () => observer.disconnect()
   }, [])
 
-  // Fix scroll: forward wheel events the canvas swallows to the page.
-  // Hover / pointer events on the scene are completely unaffected.
-  const handleSplineLoad = useCallback((spline: { canvas?: HTMLCanvasElement }) => {
-    const canvas = spline?.canvas
-    if (!canvas) return
-    canvas.addEventListener(
-      "wheel",
-      (e: WheelEvent) => {
-        window.scrollBy({ top: e.deltaY, left: e.deltaX, behavior: "auto" })
-      },
-      { passive: true }
-    )
-  }, [])
-
   return (
     <div
       ref={containerRef}
       className="pointer-events-auto absolute inset-0"
       style={{
-        // CSS containment: Spline's internal layout/paint changes won't trigger
-        // recalculations on the rest of the page DOM
+        // Scope Spline's layout/paint changes so they never trigger page reflows
         contain: "layout paint style",
-        // Hint the GPU to composite this layer independently from page content
+        // Put Spline on its own GPU compositor layer
         willChange: "transform",
       }}
     >
       {shouldLoad ? (
-        <Suspense
-          fallback={
-            <div className="h-full w-full bg-[radial-gradient(circle_at_54%_42%,rgba(168,85,247,0.28),transparent_28%),radial-gradient(circle_at_62%_56%,rgba(37,99,235,0.22),transparent_34%)]" />
-          }
-        >
-          {/* visibility:hidden pauses GPU rendering without unmounting (no scene reload on scroll back) */}
-          <div style={{ width: "100%", height: "100%", visibility: isVisible ? "visible" : "hidden" }}>
-            <SplineViewer
-              scene="https://prod.spline.design/daKd8lkPoody3rjb/scene.splinecode"
-              onLoad={handleSplineLoad}
-              style={{ width: "100%", height: "100%" }}
-            />
-          </div>
-        </Suspense>
+        // iframe loads Spline in a completely separate browsing context —
+        // zero JS bundle impact, scroll is NOT blocked, hover effects work normally.
+        <iframe
+          title="Skillyug AI bootcamp 3D model"
+          src="/spline-bootcamp.html"
+          className="h-full w-full border-0"
+          loading="lazy"
+          allow="autoplay; fullscreen"
+          style={{ visibility: isVisible ? "visible" : "hidden" }}
+        />
       ) : (
         <div className="h-full w-full bg-[radial-gradient(circle_at_54%_42%,rgba(168,85,247,0.28),transparent_28%),radial-gradient(circle_at_62%_56%,rgba(37,99,235,0.22),transparent_34%)]" />
       )}
     </div>
   )
 }
-
-
 function EnrollmentCard() {
   const cardRef = useRef<HTMLDivElement>(null)
   const cardStyle = {
