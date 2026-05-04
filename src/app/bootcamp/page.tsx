@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, lazy, Suspense } from "react"
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -48,6 +48,8 @@ const footerLinks = [
   { label: "Blog", href: "/blog" },
 ]
 
+const SplineViewer = lazy(() => import("@splinetool/react-spline"))
+
 function BootcampSpline() {
   const [shouldLoad, setShouldLoad] = useState(false)
 
@@ -64,13 +66,14 @@ function BootcampSpline() {
   return (
     <div className="pointer-events-auto absolute inset-0">
       {shouldLoad ? (
-        <iframe
-          title="Skillyug AI bootcamp 3D model"
-          src="/spline-bootcamp.html"
-          className="h-full w-full border-0"
-          loading="lazy"
-          allow="autoplay; fullscreen"
-        />
+        <Suspense fallback={
+          <div className="h-full w-full bg-[radial-gradient(circle_at_54%_42%,rgba(168,85,247,0.28),transparent_28%),radial-gradient(circle_at_62%_56%,rgba(37,99,235,0.22),transparent_34%)]" />
+        }>
+          <SplineViewer
+            scene="https://prod.spline.design/daKd8lkPoody3rjb/scene.splinecode"
+            style={{ width: "100%", height: "100%" }}
+          />
+        </Suspense>
       ) : (
         <div className="h-full w-full bg-[radial-gradient(circle_at_54%_42%,rgba(168,85,247,0.28),transparent_28%),radial-gradient(circle_at_62%_56%,rgba(37,99,235,0.22),transparent_34%)]" />
       )}
