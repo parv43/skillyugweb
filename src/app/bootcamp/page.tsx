@@ -48,22 +48,60 @@ const footerLinks = [
   { label: "Blog", href: "/blog" },
 ]
 
+
 function BootcampSpline() {
   const [shouldLoad, setShouldLoad] = useState(false)
 
+  // Load during browser idle time so Spline doesn't compete with page hydration/paint.
+  // Also fires immediately on first user interaction so active users see it faster.
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const isMobile = window.matchMedia("(max-width: 767px)").matches
-
     if (reducedMotion || isMobile) return
 
-    const timer = window.setTimeout(() => setShouldLoad(true), 350)
-    return () => window.clearTimeout(timer)
+    let triggered = false
+    const trigger = () => {
+      if (triggered) return
+      triggered = true
+      cleanup() // eslint-disable-line @typescript-eslint/no-use-before-define
+      setShouldLoad(true)
+    }
+
+    // Strategy 1: idle callback — doesn't compete with hydration (Safari falls back to 500ms timeout)
+    let idleId: number
+    if ("requestIdleCallback" in window) {
+      idleId = requestIdleCallback(trigger, { timeout: 2000 })
+    } else {
+      idleId = setTimeout(trigger, 500) as unknown as number
+    }
+
+    // Strategy 2: also fire on first user intent for faster load on active users
+    window.addEventListener("mousemove", trigger, { once: true, passive: true })
+    window.addEventListener("scroll", trigger, { once: true, passive: true })
+    window.addEventListener("touchstart", trigger, { once: true, passive: true })
+
+    function cleanup() {
+      if ("cancelIdleCallback" in window) {
+        cancelIdleCallback(idleId as number)
+      } else {
+        clearTimeout(idleId as unknown as ReturnType<typeof setTimeout>)
+      }
+      window.removeEventListener("mousemove", trigger)
+      window.removeEventListener("scroll", trigger)
+      window.removeEventListener("touchstart", trigger)
+    }
+
+    return cleanup
   }, [])
 
   return (
-    <div className="pointer-events-auto absolute inset-0">
+    <div
+      className="pointer-events-auto absolute inset-0"
+      style={{ willChange: "transform" }}
+    >
       {shouldLoad ? (
+        // iframe loads Spline in a separate browsing context:
+        // zero JS bundle impact, scroll NOT blocked, hover effects work normally.
         <iframe
           title="Skillyug AI bootcamp 3D model"
           src="/spline-bootcamp.html"
@@ -77,7 +115,6 @@ function BootcampSpline() {
     </div>
   )
 }
-
 function EnrollmentCard() {
   const cardRef = useRef<HTMLDivElement>(null)
   const cardStyle = {
@@ -238,7 +275,7 @@ function DesktopBootcampHero() {
             transition={{ delay: 0.2 }}
             className="mt-6 text-lg leading-8 text-gray-300 sm:text-xl"
           >
-            Students in Classes 6-12 master practical AI tools like ChatGPT and Canva AI through hands-on project building, guided feedback, and live expert sessions.
+            Students in Classes 6–12 gain mastery over industry-leading generative platforms and creative automation through hands-on project building, guided feedback, and live expert sessions.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -293,7 +330,7 @@ function MobileBootcampHero() {
           transition={{ delay: 0.2 }}
           className="mt-6 text-lg leading-8 text-gray-300"
         >
-          Students in Classes 6-12 master practical AI tools like ChatGPT and Canva AI through hands-on project building, guided feedback, and live expert sessions.
+          Students in Classes 6–12 gain mastery over industry-leading generative platforms and creative automation through hands-on project building, guided feedback, and live expert sessions.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
