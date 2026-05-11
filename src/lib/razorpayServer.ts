@@ -22,6 +22,7 @@ export interface RazorpayOrder {
 
 export interface BookingOrderNotes {
   bookingType?: BookingType;
+  paymentTier?: "partial" | "full";
   email?: string | null;
   gradeClass?: string | null;
   phoneNumber?: string | null;
@@ -179,6 +180,7 @@ export function parseBookingOrderNotes(notes: unknown): BookingOrderNotes {
 
   return {
     bookingType,
+    paymentTier: record.payment_tier === "partial" || record.payment_tier === "full" ? record.payment_tier : undefined,
     email: readString(record.email),
     gradeClass: readString(record.grade_class),
     phoneNumber: readString(record.phone_number),

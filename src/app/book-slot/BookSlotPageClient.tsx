@@ -7,7 +7,7 @@ import Script from "next/script";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { markPaymentSupportNoticePending } from "@/lib/paymentSupportNotice";
-import { BOOK_SLOT_AMOUNT_LABEL } from "@/lib/pricing";
+import { PARTIAL_BOOK_SLOT_AMOUNT_RUPEES, FULL_BOOK_SLOT_AMOUNT_RUPEES } from "@/lib/pricing";
 import { supabase } from "@/lib/supabaseClient";
 
 interface RazorpayOrderResponse {
@@ -74,6 +74,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromParam = searchParams.get("from");
+  const paymentTier = fromParam === "bootcamp" ? "full" : "partial";
+  const displayAmount = paymentTier === "full" ? FULL_BOOK_SLOT_AMOUNT_RUPEES : PARTIAL_BOOK_SLOT_AMOUNT_RUPEES;
   const [errorMsg, setErrorMsg] = useState("");
   const [gatewayNotice, setGatewayNotice] = useState("");
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -202,6 +204,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           phoneNumber: normalizedPhoneNumber,
           promoCode: normalizedPromoCode,
           studentName: normalizedStudentName,
+          paymentTier: paymentTier,
         }),
       });
 
@@ -442,10 +445,12 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
 
             <div className="mb-8">
               <h1 className="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-[#e6e0e9] mb-2">
-                Book Your Spot
+                {paymentTier === "full" ? "Enroll in Bootcamp" : "Book Your Spot"}
               </h1>
               <p className="text-[#cac4cf] font-medium">
-                Complete the payment to confirm your placement for the upcoming session.
+                {paymentTier === "full"
+                  ? "Complete the full payment to enroll in the upcoming bootcamp."
+                  : "Complete this payment to reserve your spot. The total bootcamp price is ₹3800."}
               </p>
             </div>
 
@@ -613,7 +618,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       ? "Loading Payment Gateway..."
                       : razorpayScriptStatus === "failed"
                         ? "Payment Gateway Unavailable"
-                        : `Pay Now - ${BOOK_SLOT_AMOUNT_LABEL}`}
+                        : `Pay Now - ₹${displayAmount}`}
                 </button>
               </div>
             </form>
