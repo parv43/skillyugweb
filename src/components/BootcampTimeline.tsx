@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import { Compass, MessageSquare, Image as ImageIcon, Zap, Trophy, type LucideIcon } from "lucide-react"
 
 interface BootcampStepProps {
@@ -12,7 +12,10 @@ interface BootcampStepProps {
 
 const BootcampStep = ({ icon: Icon, title, desc, index }: BootcampStepProps) => {
   return (
-    <div className="flex flex-col md:flex-row items-center md:items-start group relative w-full md:w-1/5 shrink-0 px-4 md:px-2 z-10">
+    <div
+      className="timeline-step flex flex-col md:flex-row items-center md:items-start group relative w-full md:w-1/5 shrink-0 px-4 md:px-2 z-10 opacity-0"
+      style={{ transitionDelay: `${index * 130}ms` }}
+    >
       <div className="flex flex-col items-center text-center w-full">
         <div className="w-16 h-16 rounded-full bg-[#020617] border border-slate-700/50 flex items-center justify-center mb-4 text-blue-400 group-hover:border-blue-500/30 transition-colors relative z-10 shadow-[0_0_10px_rgba(2,6,23,1)] overflow-hidden">
           <Icon className="w-8 h-8 relative z-10" />
@@ -27,6 +30,39 @@ const BootcampStep = ({ icon: Icon, title, desc, index }: BootcampStepProps) => 
 }
 
 export default function BootcampTimeline() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const steps = section.querySelectorAll(".timeline-step")
+    const line = section.querySelector(".timeline-line-fill") as HTMLElement | null
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Animate the connecting line
+            if (line) {
+              line.style.transition = "transform 1.2s cubic-bezier(0.4,0,0.2,1)"
+              line.style.transform = "scaleX(1)"
+            }
+            // Stagger each step
+            steps.forEach((step) => {
+              step.classList.add("timeline-step-visible")
+            })
+            observer.disconnect()
+          }
+        })
+      },
+      { threshold: 0.25 }
+    )
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
   const steps = [
     { title: "Explore AI Tools", desc: "Learn what modern AI can actually do.", icon: Compass },
     { title: "Prompting Fundamentals", desc: "Talk to AI to get exact results.", icon: MessageSquare },
@@ -36,7 +72,11 @@ export default function BootcampTimeline() {
   ]
 
   return (
-    <section id="curriculum" className="hidden md:block relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50">
+    <section
+      ref={sectionRef}
+      id="curriculum"
+      className="hidden md:block relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50"
+    >
       <div className="text-center mb-16 z-20 px-6 max-w-3xl mx-auto">
         <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-4 tracking-tight">
           Learning Progression
@@ -47,10 +87,10 @@ export default function BootcampTimeline() {
       </div>
 
       <div className="w-full max-w-7xl mx-auto px-4 relative flex flex-col md:flex-row justify-between items-start gap-8 md:gap-0">
-        
-        {/* Horizontal connecting line (desktop) — static gradient, no animation needed */}
+
+        {/* Horizontal connecting line (desktop) — animated fill */}
         <div className="hidden md:block absolute top-[31px] left-[10%] right-[10%] h-[2px] z-0 overflow-hidden rounded-full">
-          <div className="w-full h-full bg-gradient-to-r from-slate-800/50 via-blue-500/80 to-slate-800/50 origin-left" />
+          <div className="w-full h-full bg-gradient-to-r from-slate-800/50 via-blue-500/80 to-slate-800/50 timeline-line-fill origin-left scale-x-0" />
         </div>
 
         {/* Vertical connecting line (mobile) */}
@@ -59,7 +99,7 @@ export default function BootcampTimeline() {
         </div>
 
         {steps.map((step, i) => (
-          <BootcampStep 
+          <BootcampStep
             key={i}
             index={i}
             title={step.title}

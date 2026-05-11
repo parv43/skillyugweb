@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import {
   MessageSquare,
   Layout,
@@ -34,12 +34,16 @@ interface ToolCardProps {
   title: string
   desc: string
   color?: ToolColor
+  idx?: number
 }
 
-const ToolCard = ({ icon: Icon, title, desc, color = "blue", idx = 0 }: ToolCardProps & { idx?: number }) => {
+const ToolCard = ({ icon: Icon, title, desc, color = "blue", idx = 0 }: ToolCardProps) => {
   const styles = TOOL_COLORS[color]
   return (
-    <div className="grid-item flex flex-col items-center text-center p-2 group">
+    <div
+      className="skill-card flex flex-col items-center text-center p-2 group opacity-0"
+      style={{ transitionDelay: `${idx * 80}ms` }}
+    >
       <div className={`w-14 h-14 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-5 border ${styles.border} shadow-[0_4px_12px_rgba(0,0,0,0.1)] group-hover:-translate-y-1 transition-transform duration-300 relative`}>
         <Icon className={`w-6 h-6 ${styles.text}`} />
       </div>
@@ -52,21 +56,48 @@ const ToolCard = ({ icon: Icon, title, desc, color = "blue", idx = 0 }: ToolCard
 }
 
 export default function SkillsSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const cards = section.querySelectorAll(".skill-card")
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("skill-card-visible")
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.15 }
+    )
+
+    cards.forEach((card) => observer.observe(card))
+    return () => observer.disconnect()
+  }, [])
+
   const tools = [
     { title: "ChatGPT", desc: "Students use ChatGPT to understand difficult concepts, summarize chapters, and generate study notes.", icon: MessageSquare, color: "blue" },
-    { title: "NotebookLM", desc: "Students organize research material and class notes to better understand subjects and prepare for exams.", icon: Layout, color: "blue" },
-    { title: "Canva AI", desc: "Students design presentations, posters, and visual school projects using AI-powered design tools.", icon: Image, color: "blue" },
-    { title: "Napkin AI", desc: "Students convert ideas into clear visual diagrams to explain concepts easily.", icon: PenTool, color: "blue" },
-    { title: "Perplexity AI", desc: "Students research topics faster using AI-powered search with reliable explanations and sources.", icon: Search, color: "blue" },
-    { title: "Gamma AI", desc: "Students generate professional presentations quickly for school assignments and projects.", icon: Presentation, color: "blue" },
-    { title: "Grammarly AI", desc: "Students improve writing quality for essays, assignments, and school reports.", icon: Edit3, color: "blue" },
-    { title: "AI Study Assistant", desc: "Students learn how AI can help organize study plans and prepare for exams efficiently.", icon: Sparkles, color: "blue" },
-    { title: "AI Research Tools", desc: "Students discover how AI helps them collect information and learn independently.", icon: FileText, color: "blue" }
+    { title: "NotebookLM", desc: "Students organize research material and class notes to better understand subjects and prepare for exams.", icon: Layout, color: "purple" },
+    { title: "Canva AI", desc: "Students design presentations, posters, and visual school projects using AI-powered design tools.", icon: Image, color: "pink" },
+    { title: "Napkin AI", desc: "Students convert ideas into clear visual diagrams to explain concepts easily.", icon: PenTool, color: "indigo" },
+    { title: "Perplexity AI", desc: "Students research topics faster using AI-powered search with reliable explanations and sources.", icon: Search, color: "cyan" },
+    { title: "Gamma AI", desc: "Students generate professional presentations quickly for school assignments and projects.", icon: Presentation, color: "violet" },
+    { title: "Grammarly AI", desc: "Students improve writing quality for essays, assignments, and school reports.", icon: Edit3, color: "sky" },
+    { title: "AI Study Assistant", desc: "Students learn how AI can help organize study plans and prepare for exams efficiently.", icon: Sparkles, color: "fuchsia" },
+    { title: "AI Research Tools", desc: "Students discover how AI helps them collect information and learn independently.", icon: FileText, color: "teal" }
   ]
 
   return (
-    <section id="what-they-learn" className="relative w-full py-16 md:py-32 bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 border-b">
-      
+    <section
+      ref={sectionRef}
+      id="what-they-learn"
+      className="relative w-full py-16 md:py-32 bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 border-b"
+    >
       {/* Background Layer with subtle Classroom Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img src="/classroom.webp" alt="Classroom Environment" className="w-full h-full object-cover" />
@@ -95,7 +126,11 @@ export default function SkillsSection() {
           const color = colors[idx % colors.length] as ToolColor
           const styles = TOOL_COLORS[color]
           return (
-            <div key={idx} className="flex items-start gap-4 bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 backdrop-blur-sm">
+            <div
+              key={idx}
+              className="skill-card flex items-start gap-4 bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 backdrop-blur-sm opacity-0"
+              style={{ transitionDelay: `${idx * 80}ms` }}
+            >
               <div className={`w-11 h-11 rounded-xl bg-[#020617] border ${styles.border} flex items-center justify-center flex-shrink-0`}>
                 <Icon className={`w-5 h-5 ${styles.text}`} />
               </div>
@@ -111,12 +146,13 @@ export default function SkillsSection() {
       {/* Desktop Layout */}
       <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 max-w-6xl mx-auto w-full z-10 relative">
         {tools.map((tool, idx) => (
-          <ToolCard 
+          <ToolCard
             key={idx}
             idx={idx}
             title={tool.title}
             desc={tool.desc}
             icon={tool.icon}
+            color={tool.color as ToolColor}
           />
         ))}
       </div>

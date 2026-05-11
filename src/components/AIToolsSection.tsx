@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import {
   MessageSquare,
   Image,
@@ -28,12 +28,16 @@ interface EcosystemNodeProps {
   desc: string
   position: string
   color?: AccentColor
+  delay?: number
 }
 
-const EcosystemNode = ({ icon: Icon, label, desc, position, color = "blue" }: EcosystemNodeProps) => {
+const EcosystemNode = ({ icon: Icon, label, desc, position, color = "blue", delay = 0 }: EcosystemNodeProps) => {
   const styles = ACCENT_STYLES[color]
   return (
-    <div className={`absolute flex flex-col items-center justify-center z-20 ${position} w-48 text-center`}>
+    <div
+      className={`ecosystem-node absolute flex flex-col items-center justify-center z-20 ${position} w-48 text-center opacity-0`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
       <div className={`w-16 h-16 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-4 border ${styles.border} shadow-[0_8px_16px_rgba(0,0,0,0.2)] group hover:-translate-y-2 transition-transform duration-300 relative`}>
         <Icon className={`w-8 h-8 ${styles.text} group-hover:opacity-80 transition-opacity`} />
         <div className={`absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${styles.dot}`} />
@@ -46,8 +50,35 @@ const EcosystemNode = ({ icon: Icon, label, desc, position, color = "blue" }: Ec
 }
 
 export default function AIToolsSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const nodes = section.querySelectorAll(".ecosystem-node, .mobile-tool-card, .workflow-step")
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("ai-tools-visible")
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.15 }
+    )
+
+    nodes.forEach((node) => observer.observe(node))
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section className="relative w-full py-32 bg-[#020617] overflow-hidden flex flex-col items-center border-t border-slate-900">
+    <section
+      ref={sectionRef}
+      className="relative w-full py-32 bg-[#020617] overflow-hidden flex flex-col items-center border-t border-slate-900"
+    >
       <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/15 via-purple-900/5 to-transparent rounded-full pointer-events-none" />
 
@@ -63,7 +94,7 @@ export default function AIToolsSection() {
 
       {/* Interactive Ecosystem Layout (Desktop) */}
       <div className="relative w-full max-w-5xl h-[600px] mx-auto hidden lg:block z-10">
-        {/* Connection SVGs — static paths (no animation needed) */}
+        {/* Connection SVGs — animated draw */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
           <defs>
             <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -72,18 +103,18 @@ export default function AIToolsSection() {
               <stop offset="100%" stopColor="#ec4899" opacity="1" />
             </linearGradient>
           </defs>
-          <path d="M 230 260 Q 350 260 410 110" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
-          <path d="M 230 260 Q 350 260 410 490" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="4 4" opacity="0.6" />
-          <path d="M 580 110 Q 750 110 820 190" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
-          <path d="M 580 490 Q 750 490 820 400" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
-          <path d="M 480 160 L 480 440" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="2 6" opacity="0.6" />
+          <path className="animate-draw" d="M 230 260 Q 350 260 410 110" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+          <path className="animate-draw" style={{ animationDelay: "0.3s" }} d="M 230 260 Q 350 260 410 490" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="4 4" opacity="0.6" />
+          <path className="animate-draw" style={{ animationDelay: "0.6s" }} d="M 580 110 Q 750 110 820 190" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+          <path className="animate-draw" style={{ animationDelay: "0.9s" }} d="M 580 490 Q 750 490 820 400" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+          <path className="animate-draw" style={{ animationDelay: "1.2s" }} d="M 480 160 L 480 440" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="2 6" opacity="0.6" />
         </svg>
 
-        <EcosystemNode icon={TerminalSquare} label="Initial Prompt" desc="Student defines the logic and creative vision." position="top-[220px] left-[50px]" color="slate" />
-        <EcosystemNode icon={MessageSquare} label="ChatGPT & Claude" desc="Brainstorms features, writes copy, and generates raw code." position="top-[50px] left-[400px]" color="blue" />
-        <EcosystemNode icon={Image} label="Midjourney & DALL-E" desc="Generates stunning UI assets and visual photography." position="bottom-[50px] left-[400px]" color="purple" />
-        <EcosystemNode icon={Layout} label="Canva & Figma" desc="Students assemble the AI output into professional layouts." position="top-[150px] right-[50px]" color="pink" />
-        <EcosystemNode icon={Binary} label="Live Deployment" desc="Compiling the final creative assets into a real app or presentation." position="top-[350px] right-[50px]" color="emerald" />
+        <EcosystemNode icon={TerminalSquare} label="Initial Prompt" desc="Student defines the logic and creative vision." position="top-[220px] left-[50px]" color="slate" delay={0} />
+        <EcosystemNode icon={MessageSquare} label="ChatGPT & Claude" desc="Brainstorms features, writes copy, and generates raw code." position="top-[50px] left-[400px]" color="blue" delay={180} />
+        <EcosystemNode icon={Image} label="Midjourney & DALL-E" desc="Generates stunning UI assets and visual photography." position="bottom-[50px] left-[400px]" color="purple" delay={360} />
+        <EcosystemNode icon={Layout} label="Canva & Figma" desc="Students assemble the AI output into professional layouts." position="top-[150px] right-[50px]" color="pink" delay={540} />
+        <EcosystemNode icon={Binary} label="Live Deployment" desc="Compiling the final creative assets into a real app or presentation." position="top-[350px] right-[50px]" color="emerald" delay={720} />
       </div>
 
       {/* Mobile Layout */}
@@ -100,7 +131,11 @@ export default function AIToolsSection() {
             const accentColor = color as AccentColor
             const styles = ACCENT_STYLES[accentColor]
             return (
-              <div key={i} className="bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 flex flex-col items-center text-center gap-2">
+              <div
+                key={i}
+                className="mobile-tool-card bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 flex flex-col items-center text-center gap-2 opacity-0"
+                style={{ transitionDelay: `${i * 80}ms` }}
+              >
                 <div className={`w-12 h-12 rounded-xl bg-[#020617] flex items-center justify-center border ${styles.border} mb-1`}>
                   <Icon className={`w-6 h-6 ${styles.text}`} />
                 </div>
@@ -124,7 +159,11 @@ export default function AIToolsSection() {
             { step: "03", title: "Human Polish", desc: "Students use Canva to refine layouts and edit out AI hallucinations.", color: "from-pink-500/20 to-pink-500/5", border: "border-pink-500/20" },
             { step: "04", title: "Final Project", desc: "A complete, functioning website, game, or presentation is created.", color: "from-emerald-500/20 to-emerald-500/5", border: "border-emerald-500/20" },
           ].map(({ step, title, desc, color, border }, i) => (
-            <div key={i} className={`relative bg-gradient-to-br ${color} border ${border} rounded-2xl p-4 flex items-start gap-4 overflow-hidden`}>
+            <div
+              key={i}
+              className={`workflow-step relative bg-gradient-to-br ${color} border ${border} rounded-2xl p-4 flex items-start gap-4 overflow-hidden opacity-0`}
+              style={{ transitionDelay: `${i * 100}ms` }}
+            >
               <span className="text-4xl font-black font-mono opacity-15 absolute right-4 top-3 select-none">{step}</span>
               <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-white font-black text-xs">{step}</span>
