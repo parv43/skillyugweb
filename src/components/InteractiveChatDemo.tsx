@@ -13,11 +13,11 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
   const [messages, setMessages] = useState([
     {
       role: "user",
-      content: "Hi, I'm interested in the demo. What exactly is Skillyug?"
+      content: "Hi! What exactly is Skillyug?"
     },
     {
       role: "ai",
-      content: "Welcome! Skillyug teaches Class 6–12 students how to use modern AI tools like ChatGPT and Canva AI to build creative projects. I'm here to help you understand the program before you book a demo class!"
+      content: "Welcome! Skillyug teaches Class 6–12 students how to use modern AI tools like ChatGPT and Canva AI to build creative projects. I'm here to help you understand the program!"
     }
   ])
 
@@ -43,30 +43,27 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
     "What exactly will my child learn?",
     "Is this suitable for a Class 8 student?",
     "What kind of projects do students build?",
-    "How does the ₹49 demo class work?"
+    "How do I reserve a bootcamp spot?"
   ]
 
   const getMockAIResponse = (input: string) => {
     const text = input.toLowerCase()
     
     if (text.includes("learn") || text.includes("tool") || text.includes("teach") || text.includes("curriculum")) {
-      return "Students learn to use ChatGPT, Canva AI, Midjourney, and automation tools to build creative projects. You can also see this in action during the ₹49 live demo class."
+      return "Students learn to use ChatGPT, Canva AI, Midjourney, and automation tools to build creative projects. You can explore the full curriculum on our bootcamp page!"
     }
     if (text.includes("age") || text.includes("class") || text.includes("who") || text.includes("old") || text.includes("suitable")) {
-      return "Skillyug is designed perfectly for students from Class 6 to 12. Many parents attend the demo before deciding if it's the right fit for their child."
+      return "Skillyug is designed perfectly for students from Class 6 to 12. Many parents review the curriculum before deciding if it's the right fit for their child."
     }
-    if (text.includes("49") || (text.includes("demo") && text.includes("work"))) {
-      return "The ₹49 demo class is a live introductory session where parents and students see the teaching style, tools, and overall bootcamp format before moving ahead."
-    }
-    if (text.includes("book") || text.includes("demo") || text.includes("join") || text.includes("enroll") || text.includes("start")) {
-      return "The best way to understand the program is to attend the ₹49 demo session first. Families who are ready to continue can then use the ₹3800 spot-booking flow."
+    if (text.includes("book") || text.includes("join") || text.includes("enroll") || text.includes("start") || text.includes("spot") || text.includes("reserve")) {
+      return "To secure your child's seat, use the \"Join the Bootcamp\" button to reserve a spot. Seats are limited per batch!"
     }
     if (text.includes("project") || text.includes("build") || text.includes("create") || text.includes("make")) {
-      return "Students build real-world AI chatbots, AI generated designs, and automation workflows. The best way to understand the program is to attend the demo session."
+      return "Students build real-world AI chatbots, AI generated designs, and automation workflows. Check out student project examples on the home page!"
     }
     
     // Off-topic fallback
-    return "I am here to help parents understand the Skillyug AI Creator Demo Class. Please ask questions related to the program or what students will learn."
+    return "I am here to help parents understand the Skillyug AI Bootcamp. Please ask questions related to the program or what students will learn."
   }
 
   const handleSend = (text: string) => {
@@ -104,7 +101,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
           We don&apos;t just teach students what AI is. We teach them exactly how to talk to it to get professional results.
         </p>
         <p className="text-blue-400/80 text-sm font-medium tracking-wide">
-          Have questions before booking the demo? Ask our AI assistant instantly.
+          Have questions about the bootcamp? Ask our AI assistant instantly.
         </p>
       </div>
 
@@ -118,7 +115,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h3 className="text-white font-bold text-sm tracking-wide">Interactive AI Demo</h3>
+              <h3 className="text-white font-bold text-sm tracking-wide">Interactive AI Assistant</h3>
               <p className="text-xs text-slate-400">Skillyug Simulator</p>
             </div>
           </div>

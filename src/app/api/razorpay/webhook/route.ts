@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { persistDemoBooking, persistSlotBooking } from "@/lib/bookingPersistence";
+import { persistSlotBooking } from "@/lib/bookingPersistence";
 import { BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
 import {
   ensureCapturedRazorpayPayment,
@@ -52,19 +52,6 @@ export async function POST(request: Request) {
 
     const order = await fetchRazorpayOrder(payment.order_id);
     const notes = parseBookingOrderNotes(order.notes);
-
-    if (notes.bookingType === "demo_booking") {
-      await persistDemoBooking({
-        expectedBookingType: "demo_booking",
-        fallbackDetails: {
-          email: payment.email ?? null,
-          phoneNumber: payment.contact ?? null,
-        },
-        order,
-        payment,
-      });
-      return NextResponse.json({ received: true, bookingType: "demo_booking" });
-    }
 
     if (notes.bookingType === "slot_booking") {
       if (

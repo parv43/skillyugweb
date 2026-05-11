@@ -156,21 +156,6 @@ export function getOrganizationSchema() {
         },
       },
       {
-        "@type": "Offer",
-        "@id": absoluteUrl("/#demo-class-offer"),
-        price: "49",
-        priceCurrency: "INR",
-        availability: "https://schema.org/InStock",
-        url: absoluteUrl("/book-demo"),
-        category: "Demo Class",
-        itemOffered: {
-          "@type": "Service",
-          name: "Skillyug Live Demo Class",
-          description:
-            "A live introductory demo class for parents and students to experience the Skillyug AI bootcamp format before reserving a bootcamp seat.",
-        },
-      },
-      {
         "@type": "WebSite",
         "@id": absoluteUrl("/#website"),
         url: siteConfig.url,

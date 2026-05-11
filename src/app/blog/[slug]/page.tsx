@@ -8,7 +8,6 @@ import { Metadata } from "next";
 import AnonymousReactionBar from "@/components/AnonymousReactionBar";
 import ShareButton from "@/components/ShareButton";
 
-import FloatingCTA from "@/components/FloatingCTA";
 import { createMetadata, getBlogPostingSchema } from "@/lib/seo";
 import { headers } from "next/headers";
 
@@ -221,20 +220,14 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             </h2>
             <p className="mt-4 text-base leading-relaxed text-slate-300">
               {blog.content.ctaParagraph ||
-                "Use the live demo to see how the bootcamp works, then reserve a spot when you are ready to start building with AI."}
+                "Reserve your bootcamp spot and start building with AI tools like ChatGPT, Canva AI, and more."}
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/book-demo"
+                href="/book-slot"
                 className="inline-flex items-center justify-center rounded-full border border-white/10 bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(59,130,246,0.35)]"
               >
-                Book the ₹49 Demo Class
-              </Link>
-              <Link
-                href="/book-slot"
-                className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.05] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white/[0.1]"
-              >
-                Reserve the ₹3800 Bootcamp Spot
+                Reserve Your Bootcamp Spot
               </Link>
             </div>
             <div className="mt-6 flex flex-wrap gap-3 text-sm">
@@ -273,7 +266,6 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
 
         </div>
       </article>
-      <FloatingCTA />
 
       {/* Mandatory CTA Section */}
       <section className="relative w-full py-20 mt-10 bg-[rgba(255,255,255,0.02)] border-t border-white/5">
@@ -290,22 +282,16 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           </h2>
 
           <p className="text-lg md:text-xl text-slate-300 font-light max-w-2xl mx-auto mb-12">
-            Use the ₹49 demo class to experience the format first, then use the
-            ₹3800 booking flow when you are ready to reserve a bootcamp seat.
+            Reserve your bootcamp seat and give your child the AI skills they
+            need to stand out academically and creatively.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full sm:w-auto">
             <Link
-              href="/book-demo"
+              href="/book-slot"
               className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] block border border-white/10"
             >
-              Book the ₹49 Demo Class
-            </Link>
-            <Link
-              href="/book-slot"
-              className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center inline-block"
-            >
-              Reserve the ₹3800 Spot
+              Reserve Your Bootcamp Spot
             </Link>
           </div>
         </div>

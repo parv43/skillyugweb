@@ -42,7 +42,7 @@ export default function Navbar() {
 
   // Handle smart scrolling for "Ask AI" specifically
   const getSmartHash = (targetHash: string) => {
-    if (targetHash === "ask-ai" || targetHash === "ask-ai-demo") {
+    if (targetHash === "ask-ai") {
       return window.innerWidth < 768 ? "ask-ai-mobile" : "ask-ai-desktop"
     }
     return targetHash
@@ -58,7 +58,7 @@ export default function Navbar() {
       if (pendingScroll) {
         targetHash = pendingScroll
         sessionStorage.removeItem("pendingScroll")
-      } else if (hash === "ask-ai" || hash === "ask-ai-demo") {
+      } else if (hash === "ask-ai") {
         targetHash = getSmartHash(hash)
       }
 
@@ -105,7 +105,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Bootcamp", href: "/bootcamp" },
-    { name: "Ask AI", href: "/#ask-ai-demo", ariaLabel: "Ask questions about the AI bootcamp" },
+    { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
     { name: "Testimonials", href: "/#testimonials" },
     { name: "Blog", href: "/blog" },
   ]

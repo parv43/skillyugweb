@@ -28,16 +28,9 @@ export const homeFaqItems: HomeFaqItem[] = [
     linkLabel: "View student project examples",
   },
   {
-    question: "How does the ₹49 demo class work?",
+    question: "What is the ₹3800 bootcamp spot booking for?",
     answer:
-      "The ₹49 demo class is a live introductory session that lets parents and students experience the teaching style, tools, and bootcamp format before committing to the full program.",
-    href: "/book-demo",
-    linkLabel: "Book the ₹49 demo class",
-  },
-  {
-    question: "What is the ₹3800 course or spot booking for?",
-    answer:
-      "The ₹3800 booking is the paid step used to reserve a seat for the upcoming bootcamp session. It is separate from the ₹49 demo and is meant for families ready to secure a bootcamp spot.",
+      "The ₹3800 booking is the paid step used to reserve a seat for the upcoming bootcamp session. It is meant for families ready to secure a bootcamp spot and begin the program.",
     href: "/book-slot",
     linkLabel: "Reserve the ₹3800 spot",
   },

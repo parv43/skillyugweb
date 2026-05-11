@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-export type BookingType = "demo_booking" | "slot_booking";
+export type BookingType = "slot_booking";
 
 export interface RazorpayPayment {
   amount: number;
@@ -170,7 +170,7 @@ export function parseBookingOrderNotes(notes: unknown): BookingOrderNotes {
 
   const record = notes as Record<string, unknown>;
   const bookingType =
-    record.booking_type === "demo_booking" || record.booking_type === "slot_booking"
+    record.booking_type === "slot_booking"
       ? record.booking_type
       : undefined;
 

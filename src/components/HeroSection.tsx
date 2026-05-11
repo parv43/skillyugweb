@@ -49,7 +49,7 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: OrbitingTo
 
 // ─── Mobile-Only Hero ───────────────────────────────────────────────────────
 function MobileHero() {
-  const { isLoggedIn, hasDemo, hasSlot, loading } = useAccessControl();
+  const { isLoggedIn, hasSlot, loading } = useAccessControl();
 
   return (
     <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-[#020617] overflow-hidden">
@@ -77,14 +77,6 @@ function MobileHero() {
         <div
           className="w-full flex flex-col gap-4 mb-6"
         >
-          {!loading && !hasDemo && (
-            <Link
-              href="/book-demo"
-              className="w-full py-4 px-8 rounded-full border border-white/20 bg-transparent text-white font-semibold text-[17px] active:scale-95 transition-colors text-center inline-block"
-            >
-              Book your Demo
-            </Link>
-          )}
           {!loading && !hasSlot && (
             <Link
               href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
@@ -125,7 +117,7 @@ function MobileHero() {
 // ─── Main Export ─────────────────────────────────────────────────────────────
 export default function HeroSection() {
   const [orbitRadius, setOrbitRadius] = useState(230)
-  const { isLoggedIn, hasDemo, hasSlot, loading } = useAccessControl();
+  const { isLoggedIn, hasSlot, loading } = useAccessControl();
 
   useEffect(() => {
     const updateRadius = () => {
@@ -192,14 +184,6 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
-              {!loading && !hasDemo && (
-                <Link
-                  href="/book-demo"
-                  className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center inline-block"
-                >
-                  Book your Demo
-                </Link>
-              )}
               {!loading && !hasSlot && (
                 <Link 
                   href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
