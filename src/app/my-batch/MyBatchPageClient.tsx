@@ -17,7 +17,9 @@ import {
   Lock,
   PlayCircle,
   Calendar,
-  EyeOff
+  EyeOff,
+  HelpCircle,
+  X
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
@@ -60,6 +62,44 @@ export default function MyBatchPage() {
   const [certError, setCertError] = useState("");
   const [generatedCerts, setGeneratedCerts] = useState<{ student: { downloadUrl: string }; parent?: { downloadUrl: string } } | null>(null);
   const [isBlurred, setIsBlurred] = useState(false);
+
+  // Support Ticket State
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  const [ticketSubject, setTicketSubject] = useState("");
+  const [ticketMessage, setTicketMessage] = useState("");
+  const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
+  const [ticketStatus, setTicketStatus] = useState<{type: "success" | "error", message: string} | null>(null);
+
+  const handleTicketSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ticketMessage.trim() || !ticketSubject.trim()) return;
+    
+    setIsSubmittingTicket(true);
+    setTicketStatus(null);
+    try {
+      const sessionResponse = await supabase.auth.getSession();
+      const token = sessionResponse.data.session?.access_token;
+      
+      const res = await fetch("/api/support/ticket", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ subject: ticketSubject.trim(), message: ticketMessage.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to submit ticket");
+      
+      setTicketStatus({ type: "success", message: "Ticket submitted successfully! Our team will reach out to you." });
+      setTicketSubject("");
+      setTicketMessage("");
+    } catch (err: any) {
+      setTicketStatus({ type: "error", message: err.message });
+    } finally {
+      setIsSubmittingTicket(false);
+    }
+  };
 
   useEffect(() => {
     const handleBlur = () => setIsBlurred(true);
@@ -744,6 +784,97 @@ export default function MyBatchPage() {
                   </button>
                 </div>
               </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Floating Support Button */}
+      {isPaidUser && (
+        <button
+          onClick={() => setShowTicketModal(true)}
+          className="fixed bottom-8 right-8 z-50 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-2xl backdrop-blur-md transition-all hover:scale-105 hover:bg-blue-500 border border-white/10"
+        >
+          <HelpCircle className="w-5 h-5" />
+          <span className="hidden md:inline">Need Help?</span>
+        </button>
+      )}
+
+      {/* Ticket Modal */}
+      {showTicketModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#060a1f] p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-black text-white">Raise a Ticket</h2>
+              <button 
+                onClick={() => setShowTicketModal(false)}
+                className="rounded-full bg-white/5 p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {ticketStatus?.type === 'success' ? (
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <div className="w-16 h-16 bg-green-500/20 border border-green-500/50 rounded-full flex items-center justify-center mb-4">
+                  <BadgeCheck className="w-8 h-8 text-green-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white">Ticket Created</h3>
+                <p className="mt-2 text-sm text-slate-400">{ticketStatus.message}</p>
+                <button
+                  onClick={() => setShowTicketModal(false)}
+                  className="mt-6 w-full rounded-xl bg-white/[0.05] border border-white/10 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white hover:bg-white/[0.1] transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleTicketSubmit} className="space-y-5">
+                <div>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={ticketSubject}
+                    onChange={(e) => setTicketSubject(e.target.value)}
+                    placeholder="Briefly describe the issue"
+                    className="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+                    Message
+                  </label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={ticketMessage}
+                    onChange={(e) => setTicketMessage(e.target.value)}
+                    placeholder="Provide details so our team can help you faster..."
+                    className="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                  />
+                </div>
+                
+                {ticketStatus?.type === 'error' && (
+                  <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-center text-xs font-bold text-red-400">
+                    {ticketStatus.message}
+                  </div>
+                )}
+                
+                <button
+                  type="submit"
+                  disabled={isSubmittingTicket}
+                  className="mt-2 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmittingTicket ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
+                  ) : (
+                    "Submit Ticket"
+                  )}
+                </button>
+              </form>
             )}
           </div>
         </div>
