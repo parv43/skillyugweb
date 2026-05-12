@@ -133,39 +133,24 @@ export default function MyBatchPage() {
         return;
       }
 
-      // Check if user has access — use cached result from sessionStorage if available
-      // (Navbar already fetched this, so we avoid a duplicate network call)
+      // Always fetch fresh from API — never trust stale cache for the access gate
       let hasAccess = false;
       let slotAccess = false;
       try {
-        const cached = sessionStorage.getItem("mybatch_access");
-        if (cached) {
-          const { value, expiry } = JSON.parse(cached) as { value: { hasAccess: boolean; hasSlot: boolean }; expiry: number };
-          if (Date.now() < expiry) {
-            hasAccess = value.hasAccess;
-            slotAccess = value.hasSlot;
-          }
+        const res = await fetch("/api/my-batch/access", { cache: "no-store" });
+        if (res.ok) {
+          const data = (await res.json()) as { hasAccess?: boolean; hasSlot?: boolean };
+          hasAccess = Boolean(data.hasAccess);
+          slotAccess = Boolean(data.hasSlot);
+          // Update sessionStorage so Navbar/other components can use it
+          try {
+            sessionStorage.setItem(
+              "mybatch_access",
+              JSON.stringify({ value: { hasAccess, hasSlot: slotAccess }, expiry: Date.now() + 5 * 60 * 1000 })
+            );
+          } catch { /* ignore */ }
         }
       } catch { /* ignore */ }
-
-      // If not in cache, fetch from API
-      if (!hasAccess) {
-        try {
-          const res = await fetch("/api/my-batch/access");
-          if (res.ok) {
-            const data = (await res.json()) as { hasAccess?: boolean; hasSlot?: boolean };
-            hasAccess = Boolean(data.hasAccess);
-            slotAccess = Boolean(data.hasSlot);
-            // Update cache
-            try {
-              sessionStorage.setItem(
-                "mybatch_access",
-                JSON.stringify({ value: { hasAccess, hasSlot: slotAccess }, expiry: Date.now() + 5 * 60 * 1000 })
-              );
-            } catch { /* ignore */ }
-          }
-        } catch { /* ignore */ }
-      }
 
       if (!hasAccess) {
         router.replace("/");

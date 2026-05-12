@@ -49,23 +49,19 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
   const admin = createSupabaseAdmin();
 
   const hasSlot = await (async () => {
-    // Check by user_id — any payment that isn't failed and has amount > 0
+    // Any row in slot_bookings = verified payment (rows only exist after Razorpay verification)
     const { data: byId } = await admin
       .from("slot_bookings")
       .select("id")
-      .neq("payment_status", "failed")
-      .gt("amount_paid", 0)
       .eq("user_id", userId)
       .limit(1);
     if ((byId?.length ?? 0) > 0) return true;
 
-    // Fallback: check by email (covers bookings made before login)
+    // Fallback: match by email (covers bookings made before account login)
     if (!email) return false;
     const { data: byEmail } = await admin
       .from("slot_bookings")
       .select("id")
-      .neq("payment_status", "failed")
-      .gt("amount_paid", 0)
       .eq("email", email)
       .limit(1);
     return (byEmail?.length ?? 0) > 0;
