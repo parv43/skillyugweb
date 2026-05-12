@@ -48,13 +48,13 @@ async function getAuthenticatedUser() {
 async function getAccessDetails(userId: string, email: string | null): Promise<{ hasSlot: boolean }> {
   const admin = createSupabaseAdmin();
 
-  // Run table check
   const hasSlot = await (async () => {
-    // Check by user_id
+    // Check by user_id — any payment that isn't failed and has amount > 0
     const { data: byId } = await admin
       .from("slot_bookings")
       .select("id")
-      .eq("payment_status", "captured")
+      .neq("payment_status", "failed")
+      .gt("amount_paid", 0)
       .eq("user_id", userId)
       .limit(1);
     if ((byId?.length ?? 0) > 0) return true;
@@ -64,7 +64,8 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
     const { data: byEmail } = await admin
       .from("slot_bookings")
       .select("id")
-      .eq("payment_status", "captured")
+      .neq("payment_status", "failed")
+      .gt("amount_paid", 0)
       .eq("email", email)
       .limit(1);
     return (byEmail?.length ?? 0) > 0;
