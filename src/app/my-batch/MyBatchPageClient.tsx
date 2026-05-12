@@ -34,14 +34,14 @@ type BatchUser = {
 
 const resourceCards = [
   {
-    title: "AI Toolkit V1",
+    title: "Coming Soon",
     description: "Prompt frameworks, idea systems, and creator workflows for fast execution.",
     meta: "12.4 MB PDF",
     icon: BookOpen,
     accent: "from-blue-500/20 to-cyan-400/10",
   },
   {
-    title: "Creator Project Pack",
+    title: "Coming Soon",
     description: "Templates, pitch decks, and launch briefs used across the current cohort.",
     meta: "8 Assets",
     icon: FolderOpen,
