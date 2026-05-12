@@ -21,8 +21,6 @@ const formatDate = (date: Date) => {
 // Define the bootcamp active period (May 20, 2026 - June 20, 2026)
 const BOOTCAMP_START = new Date(2026, 4, 20); // Month is 0-indexed (4 = May)
 const BOOTCAMP_END = new Date(2026, 5, 20); // 5 = June
-const DEMO_START = new Date(2026, 4, 10); // Month is 0-indexed (4 = May)
-const DEMO_END = new Date(2026, 4, 10); // 5 = June
 
 // Removed global isBootcampDay to use prop-based logic inside component
 
@@ -58,9 +56,6 @@ const mockEvents: Record<
   ],
   "2026-06-20": [
     { title: "Graduation & Showcase", time: "5:00 PM IST", type: "live" },
-  ],
-  "2026-05-10": [
-    { title: "Demo Session", time: "8:00 PM IST", type: "live" },
   ],
 };
 
@@ -100,10 +95,10 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
     } else {
       const dateObj = new Date(year, month, day);
       const isBootcamp = hasSlot
-        ? (dateObj >= BOOTCAMP_START && dateObj <= BOOTCAMP_END) || (dateObj >= DEMO_START && dateObj <= DEMO_END)
-        : (dateObj >= DEMO_START && dateObj <= DEMO_END);
+        ? (dateObj >= BOOTCAMP_START && dateObj <= BOOTCAMP_END)
+        : false;
       const dateStr = formatDate(dateObj);
-      const hasEvents = !!mockEvents[dateStr] && (hasSlot || dateStr === "2026-05-10");
+      const hasEvents = !!mockEvents[dateStr] && hasSlot;
       const isSelected = selectedDate != null && formatDate(selectedDate) === dateStr;
 
       calendarCells.push(
@@ -136,7 +131,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
   }
 
   const selectedDateStr = selectedDate ? formatDate(selectedDate) : null;
-  const dayEvents = selectedDateStr && (hasSlot || selectedDateStr === "2026-05-10") ? mockEvents[selectedDateStr] ?? null : null;
+  const dayEvents = selectedDateStr && hasSlot ? mockEvents[selectedDateStr] ?? null : null;
 
   return (
     <div className="space-y-5">

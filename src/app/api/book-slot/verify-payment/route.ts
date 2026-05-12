@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { persistSlotBooking } from "@/lib/bookingPersistence";
-import { BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
+import { PARTIAL_BOOK_SLOT_AMOUNT_PAISE, FULL_BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
 import {
   ensureCapturedRazorpayPayment,
   fetchRazorpayOrder,
   fetchRazorpayPayment,
   getRequiredEnv,
   verifyRazorpayPaymentSignature,
+  parseBookingOrderNotes,
 } from "@/lib/razorpayServer";
 
 export const runtime = "nodejs";
@@ -105,13 +106,15 @@ export async function POST(request: Request) {
     const payment = await fetchRazorpayPayment(razorpayPaymentId);
     const capturedPayment = await ensureCapturedRazorpayPayment(payment);
     const order = await fetchRazorpayOrder(expectedOrderId);
+    const notes = parseBookingOrderNotes(order.notes);
+    const expectedAmount = notes.paymentTier === "full" ? FULL_BOOK_SLOT_AMOUNT_PAISE : PARTIAL_BOOK_SLOT_AMOUNT_PAISE;
 
     if (
       capturedPayment.order_id !== expectedOrderId ||
       capturedPayment.amount !== order.amount ||
       capturedPayment.currency !== order.currency ||
-      order.amount !== BOOK_SLOT_AMOUNT_PAISE ||
-      capturedPayment.amount !== BOOK_SLOT_AMOUNT_PAISE
+      order.amount !== expectedAmount ||
+      capturedPayment.amount !== expectedAmount
     ) {
       return NextResponse.json(
         { error: "Payment amount or order details do not match the booking request." },

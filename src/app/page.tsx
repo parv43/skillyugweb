@@ -10,10 +10,7 @@ import AIToolsSection from "@/components/AIToolsSection"
 import InteractiveChatDemo from "@/components/InteractiveChatDemo"
 import GallerySection from "@/components/GallerySection"
 import Testimonials from "@/components/Testimonials"
-import DemoBookingSection from "@/components/DemoBookingSection"
-import FloatingCTA from "@/components/FloatingCTA"
 import PaymentSupportNotice from "@/components/PaymentSupportNotice"
-import SlidingCTA from "@/components/SlidingCTA"
 import ContactUs from "@/components/ContactUs"
 import { createMetadata, getHomeFaqSchema } from "@/lib/seo"
 
@@ -21,7 +18,7 @@ export const metadata: Metadata = {
   ...createMetadata({
     title: "AI Education Bootcamp for Students in Classes 6–12",
     description:
-      "Skillyug helps Class 6–12 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp, a ₹49 demo class, and a ₹3800 bootcamp spot booking.",
+      "Skillyug helps Class 6–12 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp. Reserve your bootcamp spot today.",
   }),
 }
 
@@ -63,13 +60,11 @@ export default function Home() {
       <PaymentSupportNotice />
       <h1 className="sr-only">
         AI education bootcamp for students in Classes 6 to 12 with ChatGPT,
-        Canva AI, Gamma, project skills, a ₹49 demo class, and a ₹3800 bootcamp
-        spot booking.
+        Canva AI, Gamma, project skills, and a ₹3800 bootcamp spot booking.
       </h1>
       <HeroSection />
       
-      {/* Promotional Ribbon */}
-      <SlidingCTA />
+
 
       {/* Gallery — mobile only, shown right after hero */}
       <div className="md:hidden">
@@ -97,10 +92,7 @@ export default function Home() {
       <StudentProjects />
       <BootcampTimeline />
       <Testimonials />
-      <DemoBookingSection />
-      
-      {/* Floating CTA System */}
-      <FloatingCTA />
+
       
       <ContactUs />
       

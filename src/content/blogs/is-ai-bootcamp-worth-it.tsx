@@ -212,7 +212,7 @@ export default function IsAiBootcampWorthIt() {
   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent pointer-events-none"></div>
   <div className="text-2xl font-bold text-white mb-4 relative z-10 m-0">Ready to see it in action?</div>
   <div className="text-slate-300 max-w-xl mx-auto mb-8 relative z-10">We randomly select parents to attend our classes as observers. See exactly how we transform kids from consumers to builders in just a few weeks.</div>
-  <a href="/book-demo" className="inline-block no-underline bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] transition-all hover:scale-105 active:scale-95 relative z-10">Book Your Live Demo</a>
+  <a href="/book-slot" className="inline-block no-underline bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] transition-all hover:scale-105 active:scale-95 relative z-10">Reserve Your Bootcamp Spot</a>
 </div>
 
 <h2>Frequently Asked Questions</h2>

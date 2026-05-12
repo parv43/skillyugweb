@@ -7,14 +7,11 @@ import {
   type RazorpayPayment,
 } from "@/lib/razorpayServer";
 
-interface DemoFallbackDetails {
+interface SlotFallbackDetails {
   email?: string | null;
   phoneNumber?: string | null;
   studentName?: string | null;
   userId?: string | null;
-}
-
-interface SlotFallbackDetails extends DemoFallbackDetails {
   gradeClass?: string | null;
   promoCode?: string | null;
 }
@@ -26,7 +23,7 @@ interface PersistBookingOptions<TFallback> {
   payment: RazorpayPayment;
 }
 
-type DemoBookingRow = {
+type SlotBookingRow = {
   amount_paid: number;
   currency: string;
   email: string | null;
@@ -36,9 +33,6 @@ type DemoBookingRow = {
   razorpay_order_id: string;
   razorpay_payment_id: string;
   user_id: string | null;
-};
-
-type SlotBookingRow = DemoBookingRow & {
   grade_class: string;
   promo_code: string | null;
 };
@@ -72,7 +66,7 @@ function createSupabaseAdmin() {
 }
 
 async function saveBookingRow<TBookingRow extends { razorpay_payment_id: string }>(
-  table: "demo_bookings" | "slot_bookings",
+  table: "slot_bookings",
   payload: TBookingRow
 ) {
   const supabaseAdmin = createSupabaseAdmin();
@@ -107,41 +101,7 @@ async function saveBookingRow<TBookingRow extends { razorpay_payment_id: string 
   }
 }
 
-export async function persistDemoBooking({
-  expectedBookingType,
-  fallbackDetails,
-  order,
-  payment,
-}: PersistBookingOptions<DemoFallbackDetails>) {
-  const notes = parseBookingOrderNotes(order.notes);
-  const bookingType = notes.bookingType ?? expectedBookingType;
-  if (bookingType !== expectedBookingType) {
-    throw new Error("Booking type mismatch detected during payment persistence.");
-  }
 
-  const studentName = cleanString(notes.studentName) ?? cleanString(fallbackDetails?.studentName);
-  const phoneNumber = cleanString(notes.phoneNumber) ?? cleanString(fallbackDetails?.phoneNumber);
-  const email = cleanString(notes.email) ?? cleanString(fallbackDetails?.email);
-  const userId = normalizeUserId(notes.userId) ?? normalizeUserId(fallbackDetails?.userId);
-
-  if (!studentName || !phoneNumber) {
-    throw new Error("Booking details are incomplete. Contact support with your payment ID.");
-  }
-
-  const payload: DemoBookingRow = {
-    amount_paid: payment.amount,
-    currency: payment.currency,
-    email,
-    name: studentName,
-    payment_status: payment.status,
-    phone: phoneNumber,
-    razorpay_order_id: order.id,
-    razorpay_payment_id: payment.id,
-    user_id: userId,
-  };
-
-  await saveBookingRow("demo_bookings", payload);
-}
 
 export async function persistSlotBooking({
   expectedBookingType,

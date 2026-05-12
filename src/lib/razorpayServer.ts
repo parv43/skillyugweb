@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-export type BookingType = "demo_booking" | "slot_booking";
+export type BookingType = "slot_booking";
 
 export interface RazorpayPayment {
   amount: number;
@@ -22,6 +22,7 @@ export interface RazorpayOrder {
 
 export interface BookingOrderNotes {
   bookingType?: BookingType;
+  paymentTier?: "partial" | "full";
   email?: string | null;
   gradeClass?: string | null;
   phoneNumber?: string | null;
@@ -170,7 +171,7 @@ export function parseBookingOrderNotes(notes: unknown): BookingOrderNotes {
 
   const record = notes as Record<string, unknown>;
   const bookingType =
-    record.booking_type === "demo_booking" || record.booking_type === "slot_booking"
+    record.booking_type === "slot_booking"
       ? record.booking_type
       : undefined;
 
@@ -179,6 +180,7 @@ export function parseBookingOrderNotes(notes: unknown): BookingOrderNotes {
 
   return {
     bookingType,
+    paymentTier: record.payment_tier === "partial" || record.payment_tier === "full" ? record.payment_tier : undefined,
     email: readString(record.email),
     gradeClass: readString(record.grade_class),
     phoneNumber: readString(record.phone_number),

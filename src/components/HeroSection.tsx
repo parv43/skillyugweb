@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { useAccessControl } from "@/hooks/useAccessControl"
@@ -50,7 +49,7 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: OrbitingTo
 
 // ─── Mobile-Only Hero ───────────────────────────────────────────────────────
 function MobileHero() {
-  const { isLoggedIn, hasDemo, hasSlot, loading } = useAccessControl();
+  const { isLoggedIn, hasSlot, loading } = useAccessControl();
 
   return (
     <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-[#020617] overflow-hidden">
@@ -61,42 +60,23 @@ function MobileHero() {
 
       <div className="px-6 relative z-20 w-full flex flex-col items-start text-left">
         {/* Header Copy */}
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+        <h2
           className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-white"
         >
           Help your child build <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-fuchsia-400">
             AI skills that improve study, projects, and creative confidence.
           </span>
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
+        </h2>
+        <p
           className="text-slate-300 text-[17px] leading-relaxed max-w-sm mb-10 font-normal"
         >
-          In a highly competitive world, standard school education isn't enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
-        </motion.p>
+          In a highly competitive world, standard school education isn&apos;t enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
+        </p>
 
         {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
+        <div
           className="w-full flex flex-col gap-4 mb-6"
         >
-          {!loading && !hasDemo && (
-            <Link
-              href="/book-demo"
-              className="w-full py-4 px-8 rounded-full border border-white/20 bg-transparent text-white font-semibold text-[17px] active:scale-95 transition-colors text-center inline-block"
-            >
-              Book your Demo
-            </Link>
-          )}
           {!loading && !hasSlot && (
             <Link
               href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
@@ -109,15 +89,11 @@ function MobileHero() {
               Join the Bootcamp
             </Link>
           )}
-        </motion.div>
+        </div>
       </div>
 
       {/* Full-width Hero Image bleeding to edges */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.3 }}
+      <div
         className="relative w-full mt-[-120px] flex items-end justify-center z-10"
       >
         <Image
@@ -133,7 +109,7 @@ function MobileHero() {
         {/* Connection gradients: Top for text legibility, Bottom for section transition */}
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#020617] via-[#020617]/40 to-transparent pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
-      </motion.div>
+      </div>
     </section>
   )
 }
@@ -141,7 +117,7 @@ function MobileHero() {
 // ─── Main Export ─────────────────────────────────────────────────────────────
 export default function HeroSection() {
   const [orbitRadius, setOrbitRadius] = useState(230)
-  const { isLoggedIn, hasDemo, hasSlot, loading } = useAccessControl();
+  const { isLoggedIn, hasSlot, loading } = useAccessControl();
 
   useEffect(() => {
     const updateRadius = () => {
@@ -186,11 +162,7 @@ export default function HeroSection() {
         <div className="container mx-auto px-6 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-16 lg:gap-8">
           
           {/* Left Column: Copy & CTAs */}
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+          <div
             className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-blue-500/30 mb-6 bg-blue-500/5">
@@ -212,14 +184,6 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
-              {!loading && !hasDemo && (
-                <Link
-                  href="/book-demo"
-                  className="glass-panel px-8 py-4 rounded-full text-white font-bold text-lg hover:bg-white/5 transition-colors border border-white/10 w-full sm:w-auto text-center inline-block"
-                >
-                  Book your Demo
-                </Link>
-              )}
               {!loading && !hasSlot && (
                 <Link 
                   href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
@@ -229,14 +193,10 @@ export default function HeroSection() {
                 </Link>
               )}
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Column: Orbit Animation */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.2 }}
+          <div
             className="w-full lg:w-1/2 h-[300px] sm:h-[600px] flex items-center justify-center relative"
           >
             {/* Faint Orbit Ring */}
@@ -266,7 +226,7 @@ export default function HeroSection() {
               />
             ))}
             
-          </motion.div>
+          </div>
 
         </div>
       </section>

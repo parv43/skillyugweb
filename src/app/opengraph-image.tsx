@@ -125,8 +125,7 @@ export default function OpenGraphImage() {
                 maxWidth: "920px",
               }}
             >
-              Hands-on AI education for Indian school students with a 49 INR
-              demo class and a 3800 INR bootcamp spot booking.
+              A complete AI education bootcamp for students. Reserve your spot today!
             </div>
           </div>
 

@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 export type AccessState = {
   isLoggedIn: boolean;
   hasAccess: boolean;
-  hasDemo: boolean;
+
   hasSlot: boolean;
   loading: boolean;
   userId?: string;
@@ -14,13 +14,13 @@ export type AccessState = {
 };
 
 // Module-level promise cache to deduplicate simultaneous calls
-let fetchPromise: Promise<{ hasAccess: boolean; hasSlot: boolean; hasDemo: boolean }> | null = null;
+let fetchPromise: Promise<{ hasAccess: boolean; hasSlot: boolean }> | null = null;
 
 export function useAccessControl(): AccessState {
   const [state, setState] = useState<AccessState>({
     isLoggedIn: false,
     hasAccess: false,
-    hasDemo: false,
+
     hasSlot: false,
     loading: true,
     userId: undefined,
@@ -35,7 +35,7 @@ export function useAccessControl(): AccessState {
       
       if (!session) {
         if (!cancelled) {
-          setState({ isLoggedIn: false, hasAccess: false, hasDemo: false, hasSlot: false, loading: false, userId: undefined, userEmail: undefined });
+          setState({ isLoggedIn: false, hasAccess: false, hasSlot: false, loading: false, userId: undefined, userEmail: undefined });
           try { sessionStorage.removeItem("mybatch_access") } catch {}
         }
         return;
@@ -51,7 +51,7 @@ export function useAccessControl(): AccessState {
               setState({
                 isLoggedIn: true,
                 hasAccess: Boolean(value.hasAccess),
-                hasDemo: Boolean(value.hasDemo),
+
                 hasSlot: Boolean(value.hasSlot),
                 loading: false,
                 userId: session.user.id,
@@ -79,7 +79,7 @@ export function useAccessControl(): AccessState {
           setState({
             isLoggedIn: true,
             hasAccess: Boolean(data.hasAccess),
-            hasDemo: Boolean(data.hasDemo),
+
             hasSlot: Boolean(data.hasSlot),
             loading: false,
             userId: session.user.id,
@@ -87,7 +87,7 @@ export function useAccessControl(): AccessState {
           });
           try {
             sessionStorage.setItem("mybatch_access", JSON.stringify({
-              value: { hasAccess: Boolean(data.hasAccess), hasSlot: Boolean(data.hasSlot), hasDemo: Boolean(data.hasDemo) },
+              value: { hasAccess: Boolean(data.hasAccess), hasSlot: Boolean(data.hasSlot) },
               expiry: Date.now() + 5 * 60 * 1000
             }));
           } catch {}
@@ -106,7 +106,7 @@ export function useAccessControl(): AccessState {
         checkAccess();
       } else if (event === "SIGNED_OUT") {
         if (!cancelled) {
-          setState({ isLoggedIn: false, hasAccess: false, hasDemo: false, hasSlot: false, loading: false, userId: undefined, userEmail: undefined });
+          setState({ isLoggedIn: false, hasAccess: false, hasSlot: false, loading: false, userId: undefined, userEmail: undefined });
           try { sessionStorage.removeItem("mybatch_access") } catch {}
         }
       }

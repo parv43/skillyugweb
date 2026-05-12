@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import type { BlogPost } from "@/lib/blogData"
 import { homeFaqItems } from "@/lib/homeFaq"
-import { BOOK_SLOT_AMOUNT_RUPEES } from "@/lib/pricing"
+import { FULL_BOOK_SLOT_AMOUNT_RUPEES } from "@/lib/pricing"
 
 export const siteConfig = {
   name: "Skillyug",
@@ -148,26 +148,11 @@ export function getOrganizationSchema() {
         ],
         offers: {
           "@type": "Offer",
-          price: String(BOOK_SLOT_AMOUNT_RUPEES),
+          price: String(FULL_BOOK_SLOT_AMOUNT_RUPEES),
           priceCurrency: "INR",
           availability: "https://schema.org/InStock",
           url: absoluteUrl("/book-slot"),
           category: "Bootcamp Spot Booking",
-        },
-      },
-      {
-        "@type": "Offer",
-        "@id": absoluteUrl("/#demo-class-offer"),
-        price: "49",
-        priceCurrency: "INR",
-        availability: "https://schema.org/InStock",
-        url: absoluteUrl("/book-demo"),
-        category: "Demo Class",
-        itemOffered: {
-          "@type": "Service",
-          name: "Skillyug Live Demo Class",
-          description:
-            "A live introductory demo class for parents and students to experience the Skillyug AI bootcamp format before reserving a bootcamp seat.",
         },
       },
       {

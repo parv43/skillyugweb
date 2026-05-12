@@ -5,7 +5,7 @@ import { createMetadata, noIndexRobots } from "@/lib/seo"
 export const metadata: Metadata = {
   ...createMetadata({
     title: "Student Sign Up",
-    description: "Create a Skillyug account to book demos, reserve bootcamp spots, and access student flows.",
+    description: "Create a Skillyug account to reserve bootcamp spots and access your student dashboard.",
     path: "/signup",
     robots: noIndexRobots,
   }),

@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import { blogs } from "@/lib/blogData";
 import BlogListing from "@/components/BlogListing";
 import { Metadata } from "next";
-import FloatingCTA from "@/components/FloatingCTA";
+
 import { createMetadata, getBlogCollectionSchema } from "@/lib/seo";
 import { headers } from "next/headers";
 
@@ -107,7 +107,7 @@ export default async function BlogListingPage() {
         <BlogListing categories={categories} blogs={regularBlogs} reactionCounts={{}} />
 
       </div>
-      <FloatingCTA />
+
     </main>
   );
 }

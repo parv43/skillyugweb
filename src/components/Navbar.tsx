@@ -7,7 +7,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useAccessControl } from "@/hooks/useAccessControl"
 import Avatar from "boring-avatars"
-import { motion, AnimatePresence } from "framer-motion"
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -42,7 +42,7 @@ export default function Navbar() {
 
   // Handle smart scrolling for "Ask AI" specifically
   const getSmartHash = (targetHash: string) => {
-    if (targetHash === "ask-ai" || targetHash === "ask-ai-demo") {
+    if (targetHash === "ask-ai") {
       return window.innerWidth < 768 ? "ask-ai-mobile" : "ask-ai-desktop"
     }
     return targetHash
@@ -58,7 +58,7 @@ export default function Navbar() {
       if (pendingScroll) {
         targetHash = pendingScroll
         sessionStorage.removeItem("pendingScroll")
-      } else if (hash === "ask-ai" || hash === "ask-ai-demo") {
+      } else if (hash === "ask-ai") {
         targetHash = getSmartHash(hash)
       }
 
@@ -105,7 +105,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Bootcamp", href: "/bootcamp" },
-    { name: "Ask AI", href: "/#ask-ai-demo", ariaLabel: "Ask questions about the AI bootcamp" },
+    { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
     { name: "Testimonials", href: "/#testimonials" },
     { name: "Blog", href: "/blog" },
   ]
@@ -114,11 +114,8 @@ export default function Navbar() {
     : navLinks
 
   return (
-    <motion.header 
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+    <header 
+      className={`animate-slide-down fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled 
           ? "bg-black/5 backdrop-blur-md border-b border-white/5 py-4 shadow-lg" 
           : "bg-transparent py-6"
@@ -287,6 +284,6 @@ export default function Navbar() {
           </ul>
         </nav>
       </div>
-    </motion.header>
+    </header>
   )
 }

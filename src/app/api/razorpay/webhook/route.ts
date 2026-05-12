@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { persistDemoBooking, persistSlotBooking } from "@/lib/bookingPersistence";
-import { BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
+import { persistSlotBooking } from "@/lib/bookingPersistence";
+import { PARTIAL_BOOK_SLOT_AMOUNT_PAISE, FULL_BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
 import {
   ensureCapturedRazorpayPayment,
   fetchRazorpayOrder,
@@ -53,23 +53,11 @@ export async function POST(request: Request) {
     const order = await fetchRazorpayOrder(payment.order_id);
     const notes = parseBookingOrderNotes(order.notes);
 
-    if (notes.bookingType === "demo_booking") {
-      await persistDemoBooking({
-        expectedBookingType: "demo_booking",
-        fallbackDetails: {
-          email: payment.email ?? null,
-          phoneNumber: payment.contact ?? null,
-        },
-        order,
-        payment,
-      });
-      return NextResponse.json({ received: true, bookingType: "demo_booking" });
-    }
-
     if (notes.bookingType === "slot_booking") {
+      const expectedAmount = notes.paymentTier === "full" ? FULL_BOOK_SLOT_AMOUNT_PAISE : PARTIAL_BOOK_SLOT_AMOUNT_PAISE;
       if (
         payment.amount !== order.amount ||
-        order.amount !== BOOK_SLOT_AMOUNT_PAISE ||
+        order.amount !== expectedAmount ||
         payment.currency !== order.currency
       ) {
         return NextResponse.json({ error: "Unexpected slot booking payment amount." }, { status: 400 });
