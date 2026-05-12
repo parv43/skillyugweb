@@ -58,19 +58,29 @@ export default function AIToolsSection() {
 
     const nodes = section.querySelectorAll(".ecosystem-node, .mobile-tool-card, .workflow-step")
 
+    const paths = section.querySelectorAll(".animate-draw")
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("ai-tools-visible")
-            observer.unobserve(entry.target)
+            if (entry.target.tagName === "path") {
+              entry.target.classList.add("draw-active")
+            }
+          } else {
+            entry.target.classList.remove("ai-tools-visible")
+            if (entry.target.tagName === "path") {
+              entry.target.classList.remove("draw-active")
+            }
           }
         })
       },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     )
 
     nodes.forEach((node) => observer.observe(node))
+    paths.forEach((path) => observer.observe(path))
     return () => observer.disconnect()
   }, [])
 

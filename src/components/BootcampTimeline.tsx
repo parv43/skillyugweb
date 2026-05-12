@@ -52,11 +52,19 @@ export default function BootcampTimeline() {
             steps.forEach((step) => {
               step.classList.add("timeline-step-visible")
             })
-            observer.disconnect()
+          } else {
+            // Reset for next entry
+            if (line) {
+              line.style.transition = "none"
+              line.style.transform = "scaleX(0)"
+            }
+            steps.forEach((step) => {
+              step.classList.remove("timeline-step-visible")
+            })
           }
         })
       },
-      { threshold: 0.25 }
+      { threshold: 0.15 }
     )
 
     observer.observe(section)

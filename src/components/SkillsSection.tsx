@@ -69,11 +69,12 @@ export default function SkillsSection() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("skill-card-visible")
-            observer.unobserve(entry.target)
+          } else {
+            entry.target.classList.remove("skill-card-visible")
           }
         })
       },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     )
 
     cards.forEach((card) => observer.observe(card))

@@ -89,6 +89,9 @@ body {
 .animate-draw {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
+}
+
+.draw-active {
   animation: drawLine 3s ease-in-out forwards;
 }
 
