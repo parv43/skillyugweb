@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -19,11 +19,19 @@ import {
   Calendar,
   EyeOff,
   HelpCircle,
-  X
+  X,
+  PauseCircle
 } from "lucide-react";
+import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import BatchCalendar from "@/components/BatchCalendar";
+
+const MOCK_VIDEOS = [
+  { id: 1, title: "Coming soon", date: "xx-xx-xxxx", videoId: "M7lc1UVf-VE" },
+  { id: 2, title: "Coming soon", date: "xx-xx-xxxx", videoId: "tpiyEe_CqO4" },
+  { id: 3, title: "Coming soon", date: "xx-xx-xxxx", videoId: "LXb3EKWsInQ" },
+];
 
 type BatchUser = {
   avatarUrl: string | null;
@@ -35,18 +43,11 @@ type BatchUser = {
 const resourceCards = [
   {
     title: "Coming Soon",
-    description: "Prompt frameworks, idea systems, and creator workflows for fast execution.",
+    description: "Prompt frameworks, idea systems and other resources coming soon.",
     meta: "12.4 MB PDF",
     icon: BookOpen,
     accent: "from-blue-500/20 to-cyan-400/10",
-  },
-  {
-    title: "Coming Soon",
-    description: "Templates, pitch decks, and launch briefs used across the current cohort.",
-    meta: "8 Assets",
-    icon: FolderOpen,
-    accent: "from-purple-500/20 to-pink-400/10",
-  },
+  }
 ];
 
 export default function MyBatchPage() {
@@ -65,6 +66,33 @@ export default function MyBatchPage() {
 
   // Support Ticket State
   const [showTicketModal, setShowTicketModal] = useState(false);
+  
+  // Video Player State
+  const [activeVideo, setActiveVideo] = useState(MOCK_VIDEOS[0]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playerRef = useRef<YouTubePlayer | null>(null);
+
+  const handleReady = (event: YouTubeEvent) => {
+    playerRef.current = event.target;
+  };
+
+  const handlePlayPause = () => {
+    if (!playerRef.current) return;
+    if (isPlaying) {
+      playerRef.current.pauseVideo();
+    } else {
+      playerRef.current.playVideo();
+    }
+  };
+
+  const handleStateChange = (event: YouTubeEvent) => {
+    // 1 = playing, 2 = paused, 0 = ended
+    if (event.data === 1) {
+      setIsPlaying(true);
+    } else if (event.data === 2 || event.data === 0) {
+      setIsPlaying(false);
+    }
+  };
   const [ticketSubject, setTicketSubject] = useState("");
   const [ticketMessage, setTicketMessage] = useState("");
   const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
@@ -411,7 +439,7 @@ export default function MyBatchPage() {
             </div>
           </div>
 
-          {/* Middle Section 3: Video Player */}
+          {/* Middle Section 3: Secure Video Player */}
           <div className="rounded-[2rem] border border-white/10 bg-[#060a1f] p-4 shadow-[0_0_60px_rgba(59,130,246,0.05)] overflow-hidden">
             <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[600px]">
               {/* Left Side: Video List (30%) */}
@@ -421,13 +449,20 @@ export default function MyBatchPage() {
                   <p className="text-xs text-slate-400 mt-1">Past live classes</p>
                 </div>
                 <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-                  {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <button key={i} className={`w-full text-left p-4 rounded-2xl transition-all ${i === 1 ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-white/[0.05] border border-transparent'}`}>
+                  {MOCK_VIDEOS.map((video) => (
+                    <button 
+                      key={video.id} 
+                      onClick={() => {
+                        setActiveVideo(video);
+                        setIsPlaying(false);
+                      }}
+                      className={`w-full text-left p-4 rounded-2xl transition-all ${activeVideo.id === video.id ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-white/[0.05] border border-transparent'}`}
+                    >
                       <div className="flex items-center gap-3">
-                        <PlayCircle className={`w-8 h-8 flex-shrink-0 ${i === 1 ? 'text-blue-400' : 'text-slate-500'}`} />
+                        <PlayCircle className={`w-8 h-8 flex-shrink-0 ${activeVideo.id === video.id ? 'text-blue-400' : 'text-slate-500'}`} />
                         <div>
-                          <p className={`text-sm font-bold ${i === 1 ? 'text-white' : 'text-slate-300'}`}>Session {i}: AI Basics</p>
-                          <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">May 0{i}, 2026</p>
+                          <p className={`text-sm font-bold ${activeVideo.id === video.id ? 'text-white' : 'text-slate-300'}`}>{video.title}</p>
+                          <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">{video.date}</p>
                         </div>
                       </div>
                     </button>
@@ -435,23 +470,53 @@ export default function MyBatchPage() {
                 </div>
               </div>
               
-              {/* Right Side: Video Player (70%) */}
-              <div className="lg:w-[70%] bg-black rounded-3xl relative flex items-center justify-center overflow-hidden min-h-[300px] group border border-white/5">
-                {/* Dummy Video Player UI */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none z-10" />
-                <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop" alt="Video thumbnail" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                
-                <button className="z-20 rounded-full bg-blue-600/90 text-white p-6 backdrop-blur-sm border border-white/10 shadow-2xl transition-transform transform group-hover:scale-110">
-                  <PlayCircle className="w-12 h-12" fill="currentColor" />
-                </button>
-
-                {/* Dummy Player Controls */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 z-20 flex items-center gap-4 text-white">
-                  <button><PlayCircle className="w-6 h-6" /></button>
-                  <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden relative cursor-pointer">
-                    <div className="absolute top-0 left-0 bottom-0 w-1/3 bg-blue-500 rounded-full" />
+              {/* Right Side: Secure Video Player (70%) */}
+              <div className="lg:w-[70%] bg-black rounded-3xl relative flex flex-col overflow-hidden border border-white/5">
+                {/* Watermark for Screen Recording Protection */}
+                <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden opacity-30 mix-blend-overlay flex items-center justify-center">
+                  <div className="text-white text-2xl md:text-4xl font-bold tracking-widest whitespace-nowrap transform -rotate-45 animate-pulse select-none">
+                    {user?.email || "student@skillyug.com"}
                   </div>
-                  <span className="text-xs font-mono">24:15 / 1:30:00</span>
+                </div>
+
+                {/* Invisible Shield to block YouTube UI clicks (Security Feature 2) */}
+                <div 
+                  className="absolute inset-0 z-20" 
+                  onContextMenu={(e) => e.preventDefault()}
+                ></div>
+
+                {/* React YouTube component */}
+                <div className="flex-1 w-full h-[80%] lg:h-[85%] relative bg-black">
+                  <YouTube
+                    videoId={activeVideo.videoId}
+                    onReady={handleReady}
+                    onStateChange={handleStateChange}
+                    opts={{
+                      width: '100%',
+                      height: '100%',
+                      playerVars: {
+                        autoplay: 0,
+                        controls: 0, // Security Feature 1
+                        modestbranding: 1,
+                        disablekb: 1,
+                        rel: 0,
+                        fs: 0,
+                        iv_load_policy: 3,
+                      },
+                    }}
+                    className="absolute inset-0 w-full h-full"
+                    iframeClassName="w-full h-full pointer-events-none"
+                  />
+                </div>
+
+                {/* Custom Controls */}
+                <div className="bg-[#060a1f] p-4 flex items-center justify-center z-40 border-t border-white/10 h-[20%] lg:h-[15%]">
+                  <button 
+                    onClick={handlePlayPause}
+                    className="flex items-center justify-center w-14 h-14 bg-blue-600 rounded-full hover:bg-blue-500 hover:scale-105 transition-all text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                  >
+                    {isPlaying ? <PauseCircle className="w-6 h-6" fill="currentColor" /> : <PlayCircle className="w-6 h-6" fill="currentColor" />}
+                  </button>
                 </div>
               </div>
             </div>
