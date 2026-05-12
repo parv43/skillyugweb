@@ -65,12 +65,12 @@ export default function AIToolsSection() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("ai-tools-visible")
-            if (entry.target.tagName === "path") {
+            if (entry.target.classList.contains("animate-draw")) {
               entry.target.classList.add("draw-active")
             }
           } else {
             entry.target.classList.remove("ai-tools-visible")
-            if (entry.target.tagName === "path") {
+            if (entry.target.classList.contains("animate-draw")) {
               entry.target.classList.remove("draw-active")
             }
           }
@@ -113,11 +113,11 @@ export default function AIToolsSection() {
               <stop offset="100%" stopColor="#ec4899" opacity="1" />
             </linearGradient>
           </defs>
-          <path className="animate-draw" pathLength="1" d="M 230 260 Q 350 260 410 110" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
-          <path className="animate-draw" pathLength="1" style={{ animationDelay: "0.3s" }} d="M 230 260 Q 350 260 410 490" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="4 4" opacity="0.6" />
-          <path className="animate-draw" pathLength="1" style={{ animationDelay: "0.6s" }} d="M 580 110 Q 750 110 820 190" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
-          <path className="animate-draw" pathLength="1" style={{ animationDelay: "0.9s" }} d="M 580 490 Q 750 490 820 400" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
-          <path className="animate-draw" pathLength="1" style={{ animationDelay: "1.2s" }} d="M 480 160 L 480 440" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="2 6" opacity="0.6" />
+          <path className="animate-draw" d="M 230 260 Q 350 260 410 110" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+          <path className="animate-draw" style={{ animationDelay: "0.3s" }} d="M 230 260 Q 350 260 410 490" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="4 4" opacity="0.6" />
+          <path className="animate-draw" style={{ animationDelay: "0.6s" }} d="M 580 110 Q 750 110 820 190" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+          <path className="animate-draw" style={{ animationDelay: "0.9s" }} d="M 580 490 Q 750 490 820 400" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+          <path className="animate-draw" style={{ animationDelay: "1.2s" }} d="M 480 160 L 480 440" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="2 6" opacity="0.6" />
         </svg>
 
         <EcosystemNode icon={TerminalSquare} label="Initial Prompt" desc="Student defines the logic and creative vision." position="top-[220px] left-[50px]" color="slate" delay={0} />
