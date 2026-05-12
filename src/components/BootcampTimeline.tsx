@@ -49,7 +49,7 @@ export default function BootcampTimeline() {
             })
             // Animate lines
             lines.forEach((line) => {
-              line.style.transition = "transform 1.2s cubic-bezier(0.4,0,0.2,1)"
+              line.style.transition = "transform 1.8s cubic-bezier(0.4,0,0.2,1) 0.3s"
               line.style.transform = line.classList.contains("origin-left") ? "scaleX(1)" : "scaleY(1)"
             })
           } else {
@@ -65,10 +65,16 @@ export default function BootcampTimeline() {
           }
         })
       },
-      { threshold: 0.1 }
+      { threshold: 0.2 }
     )
 
-    observer.observe(section)
+    const timelineContainer = section.querySelector(".timeline-container")
+    if (timelineContainer) {
+      observer.observe(timelineContainer)
+    } else {
+      observer.observe(section)
+    }
+    
     return () => observer.disconnect()
   }, [])
 
@@ -95,7 +101,7 @@ export default function BootcampTimeline() {
         </p>
       </div>
 
-      <div className="w-full max-w-7xl mx-auto px-4 relative flex flex-col md:flex-row justify-between items-start gap-8 md:gap-0">
+      <div className="timeline-container w-full max-w-7xl mx-auto px-4 relative flex flex-col md:flex-row justify-between items-start gap-8 md:gap-0">
 
         {/* Horizontal connecting line (desktop) — animated fill */}
         <div className="hidden md:block absolute top-[31px] left-[10%] right-[10%] h-[2px] z-0 overflow-hidden rounded-full">
