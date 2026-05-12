@@ -63,12 +63,17 @@ export function useAccessControl(): AccessState {
         }
       } catch {}
 
-      // Fetch from API
+      // Fetch from API with explicit Bearer token — avoids all cookie-forwarding issues
       try {
         if (!fetchPromise) {
+          const session = await supabase.auth.getSession();
+          const token = session.data.session?.access_token;
           fetchPromise = fetch("/api/my-batch/access", {
-            credentials: "include",
-            headers: { "Cache-Control": "no-cache, no-store" },
+            credentials: "same-origin",
+            headers: {
+              ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+              "Cache-Control": "no-cache",
+            },
           }).then(res => {
             if (!res.ok) throw new Error("Failed to fetch access");
             return res.json();
