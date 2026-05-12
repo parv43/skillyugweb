@@ -23,9 +23,11 @@ const BootcampStep = ({ icon: Icon, title, desc, index }: BootcampStepProps) => 
       <div className="w-16 h-16 rounded-full bg-[#020617] border border-slate-700/50 flex items-center justify-center mb-4 text-blue-400 group-hover:border-blue-500/30 transition-colors relative z-10 shadow-[0_0_10px_rgba(2,6,23,1)]">
         <Icon className="w-8 h-8" />
       </div>
-      <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Step 0{index + 1}</div>
-      <h3 className="text-lg font-bold text-slate-100 mb-2 leading-tight">{title}</h3>
-      <p className="text-sm text-slate-400 font-light leading-relaxed max-w-[180px]">{desc}</p>
+      <div className="bg-[#020617] relative z-10 flex flex-col items-center py-1 px-4">
+        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Step 0{index + 1}</div>
+        <h3 className="text-lg font-bold text-slate-100 mb-2 leading-tight">{title}</h3>
+        <p className="text-sm text-slate-400 font-light leading-relaxed max-w-[180px]">{desc}</p>
+      </div>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,11 +17,21 @@ import {
   Lock,
   PlayCircle,
   Calendar,
-  EyeOff
+  EyeOff,
+  HelpCircle,
+  X,
+  PauseCircle
 } from "lucide-react";
+import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import BatchCalendar from "@/components/BatchCalendar";
+
+const MOCK_VIDEOS = [
+  { id: 1, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
+  { id: 2, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
+  { id: 3, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
+];
 
 type BatchUser = {
   avatarUrl: string | null;
@@ -32,19 +42,12 @@ type BatchUser = {
 
 const resourceCards = [
   {
-    title: "AI Toolkit V1",
-    description: "Prompt frameworks, idea systems, and creator workflows for fast execution.",
+    title: "Coming Soon",
+    description: "Prompt frameworks, idea systems and other resources coming soon.",
     meta: "12.4 MB PDF",
     icon: BookOpen,
     accent: "from-blue-500/20 to-cyan-400/10",
-  },
-  {
-    title: "Creator Project Pack",
-    description: "Templates, pitch decks, and launch briefs used across the current cohort.",
-    meta: "8 Assets",
-    icon: FolderOpen,
-    accent: "from-purple-500/20 to-pink-400/10",
-  },
+  }
 ];
 
 export default function MyBatchPage() {
@@ -60,6 +63,71 @@ export default function MyBatchPage() {
   const [certError, setCertError] = useState("");
   const [generatedCerts, setGeneratedCerts] = useState<{ student: { downloadUrl: string }; parent?: { downloadUrl: string } } | null>(null);
   const [isBlurred, setIsBlurred] = useState(false);
+
+  // Support Ticket State
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  
+  // Video Player State
+  const [activeVideo, setActiveVideo] = useState(MOCK_VIDEOS[0]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playerRef = useRef<YouTubePlayer | null>(null);
+
+  const handleReady = (event: YouTubeEvent) => {
+    playerRef.current = event.target;
+  };
+
+  const handlePlayPause = () => {
+    if (!playerRef.current) return;
+    if (isPlaying) {
+      playerRef.current.pauseVideo();
+    } else {
+      playerRef.current.playVideo();
+    }
+  };
+
+  const handleStateChange = (event: YouTubeEvent) => {
+    // 1 = playing, 2 = paused, 0 = ended
+    if (event.data === 1) {
+      setIsPlaying(true);
+    } else if (event.data === 2 || event.data === 0) {
+      setIsPlaying(false);
+    }
+  };
+  const [ticketSubject, setTicketSubject] = useState("");
+  const [ticketMessage, setTicketMessage] = useState("");
+  const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
+  const [ticketStatus, setTicketStatus] = useState<{type: "success" | "error", message: string} | null>(null);
+
+  const handleTicketSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ticketMessage.trim() || !ticketSubject.trim()) return;
+    
+    setIsSubmittingTicket(true);
+    setTicketStatus(null);
+    try {
+      const sessionResponse = await supabase.auth.getSession();
+      const token = sessionResponse.data.session?.access_token;
+      
+      const res = await fetch("/api/support/ticket", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ subject: ticketSubject.trim(), message: ticketMessage.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to submit ticket");
+      
+      setTicketStatus({ type: "success", message: "Ticket submitted successfully! Our team will reach out to you." });
+      setTicketSubject("");
+      setTicketMessage("");
+    } catch (err: any) {
+      setTicketStatus({ type: "error", message: err.message });
+    } finally {
+      setIsSubmittingTicket(false);
+    }
+  };
 
   useEffect(() => {
     const handleBlur = () => setIsBlurred(true);
@@ -282,17 +350,10 @@ export default function MyBatchPage() {
                 <Calendar className="h-6 w-6 text-blue-300" />
                 <h2 className="text-2xl font-black tracking-tight">Next Live Session</h2>
               </div>
-              <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-slate-950/40 p-8">
-                <p className="text-sm font-bold uppercase tracking-[0.26em] text-blue-400">
-                  May 10, 2026 • 8:00 PM IST
+              <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-slate-950/40 p-8 flex flex-col items-center justify-center min-h-[200px]">
+                <p className="text-xl font-black text-slate-500 uppercase tracking-widest">
+                  None
                 </p>
-                <p className="mt-4 text-3xl font-black text-white">Advanced AI Workflows</p>
-                <p className="mt-3 text-lg text-slate-300">
-                  Module 4: Automating content creation at scale.
-                </p>
-                <button className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white/[0.05] border border-white/10 px-6 py-3 text-sm font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-white/[0.1]">
-                  Join Zoom Link <ArrowRight className="h-4 w-4" />
-                </button>
               </div>
             </div>
 
@@ -378,7 +439,7 @@ export default function MyBatchPage() {
             </div>
           </div>
 
-          {/* Middle Section 3: Video Player */}
+          {/* Middle Section 3: Secure Video Player */}
           <div className="rounded-[2rem] border border-white/10 bg-[#060a1f] p-4 shadow-[0_0_60px_rgba(59,130,246,0.05)] overflow-hidden">
             <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[600px]">
               {/* Left Side: Video List (30%) */}
@@ -388,13 +449,20 @@ export default function MyBatchPage() {
                   <p className="text-xs text-slate-400 mt-1">Past live classes</p>
                 </div>
                 <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-                  {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <button key={i} className={`w-full text-left p-4 rounded-2xl transition-all ${i === 1 ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-white/[0.05] border border-transparent'}`}>
+                  {MOCK_VIDEOS.map((video) => (
+                    <button 
+                      key={video.id} 
+                      onClick={() => {
+                        setActiveVideo(video);
+                        setIsPlaying(false);
+                      }}
+                      className={`w-full text-left p-4 rounded-2xl transition-all ${activeVideo.id === video.id ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-white/[0.05] border border-transparent'}`}
+                    >
                       <div className="flex items-center gap-3">
-                        <PlayCircle className={`w-8 h-8 flex-shrink-0 ${i === 1 ? 'text-blue-400' : 'text-slate-500'}`} />
+                        <PlayCircle className={`w-8 h-8 flex-shrink-0 ${activeVideo.id === video.id ? 'text-blue-400' : 'text-slate-500'}`} />
                         <div>
-                          <p className={`text-sm font-bold ${i === 1 ? 'text-white' : 'text-slate-300'}`}>Session {i}: AI Basics</p>
-                          <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">May 0{i}, 2026</p>
+                          <p className={`text-sm font-bold ${activeVideo.id === video.id ? 'text-white' : 'text-slate-300'}`}>{video.title}</p>
+                          <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">{video.date}</p>
                         </div>
                       </div>
                     </button>
@@ -402,23 +470,61 @@ export default function MyBatchPage() {
                 </div>
               </div>
               
-              {/* Right Side: Video Player (70%) */}
-              <div className="lg:w-[70%] bg-black rounded-3xl relative flex items-center justify-center overflow-hidden min-h-[300px] group border border-white/5">
-                {/* Dummy Video Player UI */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none z-10" />
-                <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop" alt="Video thumbnail" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                
-                <button className="z-20 rounded-full bg-blue-600/90 text-white p-6 backdrop-blur-sm border border-white/10 shadow-2xl transition-transform transform group-hover:scale-110">
-                  <PlayCircle className="w-12 h-12" fill="currentColor" />
-                </button>
-
-                {/* Dummy Player Controls */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 z-20 flex items-center gap-4 text-white">
-                  <button><PlayCircle className="w-6 h-6" /></button>
-                  <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden relative cursor-pointer">
-                    <div className="absolute top-0 left-0 bottom-0 w-1/3 bg-blue-500 rounded-full" />
+              {/* Right Side: Secure Video Player (70%) */}
+              <div className="lg:w-[70%] bg-black rounded-3xl relative flex flex-col overflow-hidden border border-white/5">
+                {/* Watermark for Screen Recording Protection */}
+                <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden opacity-30 mix-blend-overlay flex items-center justify-center">
+                  <div className="text-white text-2xl md:text-4xl font-bold tracking-widest whitespace-nowrap transform -rotate-45 animate-pulse select-none">
+                    {user?.email || "student@skillyug.com"}
                   </div>
-                  <span className="text-xs font-mono">24:15 / 1:30:00</span>
+                </div>
+
+                {/* Invisible Shield to block YouTube UI clicks (Security Feature 2) */}
+                <div 
+                  className="absolute inset-0 z-20" 
+                  onContextMenu={(e) => e.preventDefault()}
+                ></div>
+
+                {/* React YouTube component */}
+                <div className="flex-1 w-full h-[80%] lg:h-[85%] relative bg-black flex items-center justify-center">
+                  {activeVideo.videoId ? (
+                    <YouTube
+                      videoId={activeVideo.videoId}
+                      onReady={handleReady}
+                      onStateChange={handleStateChange}
+                      opts={{
+                        width: '100%',
+                        height: '100%',
+                        playerVars: {
+                          autoplay: 0,
+                          controls: 0, // Security Feature 1
+                          modestbranding: 1,
+                          disablekb: 1,
+                          rel: 0,
+                          fs: 0,
+                          iv_load_policy: 3,
+                        },
+                      }}
+                      className="absolute inset-0 w-full h-full"
+                      iframeClassName="w-full h-full pointer-events-none"
+                    />
+                  ) : (
+                    <div className="text-center z-40 relative">
+                      <Lock className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Recording Unavailable</p>
+                      <p className="text-xs text-slate-500 mt-2">Session recording will appear here once ready.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Custom Controls */}
+                <div className="bg-[#060a1f] p-4 flex items-center justify-center z-40 border-t border-white/10 h-[20%] lg:h-[15%]">
+                  <button 
+                    onClick={handlePlayPause}
+                    className="flex items-center justify-center w-14 h-14 bg-blue-600 rounded-full hover:bg-blue-500 hover:scale-105 transition-all text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                  >
+                    {isPlaying ? <PauseCircle className="w-6 h-6" fill="currentColor" /> : <PlayCircle className="w-6 h-6" fill="currentColor" />}
+                  </button>
                 </div>
               </div>
             </div>
@@ -751,6 +857,97 @@ export default function MyBatchPage() {
                   </button>
                 </div>
               </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Floating Support Button */}
+      {isPaidUser && (
+        <button
+          onClick={() => setShowTicketModal(true)}
+          className="fixed bottom-8 right-8 z-50 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-2xl backdrop-blur-md transition-all hover:scale-105 hover:bg-blue-500 border border-white/10"
+        >
+          <HelpCircle className="w-5 h-5" />
+          <span className="hidden md:inline">Need Help?</span>
+        </button>
+      )}
+
+      {/* Ticket Modal */}
+      {showTicketModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#060a1f] p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-black text-white">Raise a Ticket</h2>
+              <button 
+                onClick={() => setShowTicketModal(false)}
+                className="rounded-full bg-white/5 p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {ticketStatus?.type === 'success' ? (
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <div className="w-16 h-16 bg-green-500/20 border border-green-500/50 rounded-full flex items-center justify-center mb-4">
+                  <BadgeCheck className="w-8 h-8 text-green-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white">Ticket Created</h3>
+                <p className="mt-2 text-sm text-slate-400">{ticketStatus.message}</p>
+                <button
+                  onClick={() => setShowTicketModal(false)}
+                  className="mt-6 w-full rounded-xl bg-white/[0.05] border border-white/10 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white hover:bg-white/[0.1] transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleTicketSubmit} className="space-y-5">
+                <div>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={ticketSubject}
+                    onChange={(e) => setTicketSubject(e.target.value)}
+                    placeholder="Briefly describe the issue"
+                    className="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+                    Message
+                  </label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={ticketMessage}
+                    onChange={(e) => setTicketMessage(e.target.value)}
+                    placeholder="Provide details so our team can help you faster..."
+                    className="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                  />
+                </div>
+                
+                {ticketStatus?.type === 'error' && (
+                  <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-center text-xs font-bold text-red-400">
+                    {ticketStatus.message}
+                  </div>
+                )}
+                
+                <button
+                  type="submit"
+                  disabled={isSubmittingTicket}
+                  className="mt-2 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmittingTicket ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
+                  ) : (
+                    "Submit Ticket"
+                  )}
+                </button>
+              </form>
             )}
           </div>
         </div>
