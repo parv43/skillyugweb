@@ -66,10 +66,10 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
   const admin = createSupabaseAdmin();
 
   const hasSlot = await (async () => {
-    // Check by user_id
+    // Check by user_id — select an actual column (table has no 'id' column)
     const { data: byId, error: err1 } = await admin
       .from("slot_bookings")
-      .select("id")
+      .select("razorpay_payment_id")
       .eq("user_id", userId)
       .limit(1);
 
@@ -80,7 +80,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
     if (!email) return false;
     const { data: byEmail, error: err2 } = await admin
       .from("slot_bookings")
-      .select("id")
+      .select("razorpay_payment_id")
       .eq("email", email)
       .limit(1);
 
