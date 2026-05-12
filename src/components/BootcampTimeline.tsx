@@ -37,34 +37,33 @@ export default function BootcampTimeline() {
     if (!section) return
 
     const steps = section.querySelectorAll(".timeline-step")
-    const line = section.querySelector(".timeline-line-fill") as HTMLElement | null
+    const paths = section.querySelectorAll(".animate-draw")
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Animate the connecting line
-            if (line) {
-              line.style.transition = "transform 1.2s cubic-bezier(0.4,0,0.2,1)"
-              line.style.transform = "scaleX(1)"
-            }
-            // Stagger each step
+            // Reveal steps
             steps.forEach((step) => {
               step.classList.add("timeline-step-visible")
             })
+            // Animate paths
+            paths.forEach((path) => {
+              path.classList.add("draw-active")
+            })
           } else {
-            // Reset for next entry
-            if (line) {
-              line.style.transition = "none"
-              line.style.transform = "scaleX(0)"
-            }
+            // Reset steps
             steps.forEach((step) => {
               step.classList.remove("timeline-step-visible")
+            })
+            // Reset paths
+            paths.forEach((path) => {
+              path.classList.remove("draw-active")
             })
           }
         })
       },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     )
 
     observer.observe(section)
@@ -83,7 +82,7 @@ export default function BootcampTimeline() {
     <section
       ref={sectionRef}
       id="curriculum"
-      className="hidden md:block relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50"
+      className="relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50"
     >
       <div className="text-center mb-16 z-20 px-6 max-w-3xl mx-auto">
         <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-4 tracking-tight">
@@ -96,14 +95,52 @@ export default function BootcampTimeline() {
 
       <div className="w-full max-w-7xl mx-auto px-4 relative flex flex-col md:flex-row justify-between items-start gap-8 md:gap-0">
 
-        {/* Horizontal connecting line (desktop) — animated fill */}
-        <div className="hidden md:block absolute top-[31px] left-[10%] right-[10%] h-[2px] z-0 overflow-hidden rounded-full">
-          <div className="w-full h-full bg-gradient-to-r from-slate-800/50 via-blue-500/80 to-slate-800/50 timeline-line-fill origin-left scale-x-0" />
+        {/* Horizontal connecting line (desktop) — SVG Path for smooth drawing */}
+        <div className="hidden md:block absolute top-[32px] left-[10%] right-[10%] h-[2px] z-0">
+          <svg width="100%" height="2" fill="none" className="overflow-visible">
+            <path
+              d="M 0 1 H 1000"
+              pathLength="1"
+              stroke="url(#timelineGradient)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeDasharray="1"
+              strokeDashoffset="1"
+              className="animate-draw transition-all duration-1000"
+              vectorEffect="non-scaling-stroke"
+            />
+            <defs>
+              <linearGradient id="timelineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#1e293b" stopOpacity="0" />
+                <stop offset="50%" stopColor="#3b82f6" stopOpacity="1" />
+                <stop offset="100%" stopColor="#1e293b" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
 
-        {/* Vertical connecting line (mobile) */}
-        <div className="md:hidden absolute top-[32px] bottom-[32px] left-1/2 -translate-x-1/2 w-[2px] z-0 overflow-hidden rounded-full">
-          <div className="w-full h-full bg-gradient-to-b from-slate-800/50 via-blue-500/80 to-slate-800/50 origin-top" />
+        {/* Vertical connecting line (mobile) — SVG Path for smooth drawing */}
+        <div className="md:hidden absolute top-[32px] bottom-[32px] left-1/2 -translate-x-1/2 w-[2px] z-0">
+          <svg width="2" height="100%" fill="none" className="overflow-visible">
+            <path
+              d="M 1 0 V 1000"
+              pathLength="1"
+              stroke="url(#timelineGradientVertical)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeDasharray="1"
+              strokeDashoffset="1"
+              className="animate-draw transition-all duration-1000"
+              vectorEffect="non-scaling-stroke"
+            />
+            <defs>
+              <linearGradient id="timelineGradientVertical" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#1e293b" stopOpacity="0" />
+                <stop offset="50%" stopColor="#3b82f6" stopOpacity="1" />
+                <stop offset="100%" stopColor="#1e293b" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
 
         {steps.map((step, i) => (
