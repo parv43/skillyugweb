@@ -137,7 +137,10 @@ export default function MyBatchPage() {
       let hasAccess = false;
       let slotAccess = false;
       try {
-        const res = await fetch("/api/my-batch/access", { cache: "no-store" });
+        const res = await fetch("/api/my-batch/access", {
+          credentials: "include",
+          headers: { "Cache-Control": "no-cache, no-store" },
+        });
         if (res.ok) {
           const data = (await res.json()) as { hasAccess?: boolean; hasSlot?: boolean };
           hasAccess = Boolean(data.hasAccess);
@@ -149,8 +152,12 @@ export default function MyBatchPage() {
               JSON.stringify({ value: { hasAccess, hasSlot: slotAccess }, expiry: Date.now() + 5 * 60 * 1000 })
             );
           } catch { /* ignore */ }
+        } else {
+          console.error("Access API returned:", res.status, await res.text().catch(() => ""));
         }
-      } catch { /* ignore */ }
+      } catch (e) {
+        console.error("Access fetch failed:", e);
+      }
 
       if (!hasAccess) {
         router.replace("/");
