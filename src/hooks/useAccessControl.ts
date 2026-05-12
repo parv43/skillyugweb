@@ -66,7 +66,10 @@ export function useAccessControl(): AccessState {
       // Fetch from API
       try {
         if (!fetchPromise) {
-          fetchPromise = fetch("/api/my-batch/access").then(res => {
+          fetchPromise = fetch("/api/my-batch/access", {
+            credentials: "include",
+            headers: { "Cache-Control": "no-cache, no-store" },
+          }).then(res => {
             if (!res.ok) throw new Error("Failed to fetch access");
             return res.json();
           }).finally(() => {
