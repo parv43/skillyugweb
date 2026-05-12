@@ -133,19 +133,23 @@ export default function MyBatchPage() {
         return;
       }
 
-      // Always fetch fresh from API — never trust stale cache for the access gate
+      // Direct Supabase query — no server API needed, uses the user's own auth token
       let hasAccess = false;
       let slotAccess = false;
       try {
+        // Check slot_bookings using the admin service role via API with explicit token
         const res = await fetch("/api/my-batch/access", {
-          credentials: "include",
-          headers: { "Cache-Control": "no-cache, no-store" },
+          method: "GET",
+          credentials: "same-origin",
+          headers: {
+            "Authorization": `Bearer ${session.access_token}`,
+            "Cache-Control": "no-cache",
+          },
         });
         if (res.ok) {
           const data = (await res.json()) as { hasAccess?: boolean; hasSlot?: boolean };
           hasAccess = Boolean(data.hasAccess);
           slotAccess = Boolean(data.hasSlot);
-          // Update sessionStorage so Navbar/other components can use it
           try {
             sessionStorage.setItem(
               "mybatch_access",
@@ -153,10 +157,10 @@ export default function MyBatchPage() {
             );
           } catch { /* ignore */ }
         } else {
-          console.error("Access API returned:", res.status, await res.text().catch(() => ""));
+          console.error("[MyBatch] Access API status:", res.status);
         }
       } catch (e) {
-        console.error("Access fetch failed:", e);
+        console.error("[MyBatch] Access fetch error:", e);
       }
 
       if (!hasAccess) {
