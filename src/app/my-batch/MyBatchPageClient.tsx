@@ -28,9 +28,9 @@ import { supabase } from "@/lib/supabaseClient";
 import BatchCalendar from "@/components/BatchCalendar";
 
 const MOCK_VIDEOS = [
-  { id: 1, title: "Coming soon", date: "xx-xx-xxxx", videoId: "M7lc1UVf-VE" },
-  { id: 2, title: "Coming soon", date: "xx-xx-xxxx", videoId: "tpiyEe_CqO4" },
-  { id: 3, title: "Coming soon", date: "xx-xx-xxxx", videoId: "LXb3EKWsInQ" },
+  { id: 1, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
+  { id: 2, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
+  { id: 3, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
 ];
 
 type BatchUser = {
@@ -486,27 +486,35 @@ export default function MyBatchPage() {
                 ></div>
 
                 {/* React YouTube component */}
-                <div className="flex-1 w-full h-[80%] lg:h-[85%] relative bg-black">
-                  <YouTube
-                    videoId={activeVideo.videoId}
-                    onReady={handleReady}
-                    onStateChange={handleStateChange}
-                    opts={{
-                      width: '100%',
-                      height: '100%',
-                      playerVars: {
-                        autoplay: 0,
-                        controls: 0, // Security Feature 1
-                        modestbranding: 1,
-                        disablekb: 1,
-                        rel: 0,
-                        fs: 0,
-                        iv_load_policy: 3,
-                      },
-                    }}
-                    className="absolute inset-0 w-full h-full"
-                    iframeClassName="w-full h-full pointer-events-none"
-                  />
+                <div className="flex-1 w-full h-[80%] lg:h-[85%] relative bg-black flex items-center justify-center">
+                  {activeVideo.videoId ? (
+                    <YouTube
+                      videoId={activeVideo.videoId}
+                      onReady={handleReady}
+                      onStateChange={handleStateChange}
+                      opts={{
+                        width: '100%',
+                        height: '100%',
+                        playerVars: {
+                          autoplay: 0,
+                          controls: 0, // Security Feature 1
+                          modestbranding: 1,
+                          disablekb: 1,
+                          rel: 0,
+                          fs: 0,
+                          iv_load_policy: 3,
+                        },
+                      }}
+                      className="absolute inset-0 w-full h-full"
+                      iframeClassName="w-full h-full pointer-events-none"
+                    />
+                  ) : (
+                    <div className="text-center z-40 relative">
+                      <Lock className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Recording Unavailable</p>
+                      <p className="text-xs text-slate-500 mt-2">Session recording will appear here once ready.</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Custom Controls */}
