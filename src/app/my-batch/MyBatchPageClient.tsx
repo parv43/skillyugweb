@@ -282,17 +282,10 @@ export default function MyBatchPage() {
                 <Calendar className="h-6 w-6 text-blue-300" />
                 <h2 className="text-2xl font-black tracking-tight">Next Live Session</h2>
               </div>
-              <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-slate-950/40 p-8">
-                <p className="text-sm font-bold uppercase tracking-[0.26em] text-blue-400">
-                  May 10, 2026 • 8:00 PM IST
+              <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-slate-950/40 p-8 flex flex-col items-center justify-center min-h-[200px]">
+                <p className="text-xl font-black text-slate-500 uppercase tracking-widest">
+                  None
                 </p>
-                <p className="mt-4 text-3xl font-black text-white">Advanced AI Workflows</p>
-                <p className="mt-3 text-lg text-slate-300">
-                  Module 4: Automating content creation at scale.
-                </p>
-                <button className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white/[0.05] border border-white/10 px-6 py-3 text-sm font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-white/[0.1]">
-                  Join Zoom Link <ArrowRight className="h-4 w-4" />
-                </button>
               </div>
             </div>
 
