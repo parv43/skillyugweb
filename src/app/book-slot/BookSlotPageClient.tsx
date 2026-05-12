@@ -279,6 +279,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             setGrade("");
             setPromoCode("");
             setStudentName(prefilledName || "");
+            // Clear cached access state so My Batch re-checks and grants access
+            try { sessionStorage.removeItem("mybatch_access"); } catch { /* ignore */ }
             router.replace("/my-batch");
           } catch (error) {
             console.error("Payment verification error:", error);
