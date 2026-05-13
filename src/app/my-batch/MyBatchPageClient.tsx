@@ -345,20 +345,20 @@ export default function MyBatchPage() {
                 Bootcamp Progress
               </p>
               <div className="relative mt-8 w-40 h-40 flex items-center justify-center">
-                {/* SVG Circle for Pie Graph (45% completion) */}
+                {/* SVG Circle for Pie Graph (0% completion) */}
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   {/* Background Circle */}
                   <circle cx="50" cy="50" r="40" fill="transparent" stroke="rgba(255,255,255,0.1)" strokeWidth="12" />
-                  {/* Progress Circle (45% of 251.2 circumference = 113) */}
+                  {/* Progress Circle (0% of 251.2 circumference = 0) */}
                   <circle 
                     cx="50" cy="50" r="40" fill="transparent" stroke="#3b82f6" strokeWidth="12"
-                    strokeDasharray="251.2" strokeDashoffset="138.16"
+                    strokeDasharray="251.2" strokeDashoffset="251.2"
                     className="drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]"
                     strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl md:text-3xl font-black text-white">45%</span>
+                  <span className="text-2xl md:text-3xl font-black text-white">0%</span>
                 </div>
               </div>
             </div>
