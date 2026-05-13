@@ -26,6 +26,7 @@ import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import BatchCalendar from "@/components/BatchCalendar";
+import VoucherCard from "@/components/VoucherCard";
 
 const MOCK_VIDEOS = [
   { id: 1, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
@@ -554,6 +555,9 @@ export default function MyBatchPage() {
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8">
             <BatchCalendar hasSlot={hasSlotAccess} />
           </div>
+
+          {/* Voucher Card Section */}
+          <VoucherCard />
         
             </>
           ) : (
