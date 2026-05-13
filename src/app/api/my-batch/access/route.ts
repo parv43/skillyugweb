@@ -65,30 +65,18 @@ async function getAuthenticatedUser(request: NextRequest) {
 async function getAccessDetails(userId: string, email: string | null): Promise<{ hasSlot: boolean }> {
   const admin = createSupabaseAdmin();
 
-  const hasSlot = await (async () => {
-    // Check by user_id — select an actual column (table has no 'id' column)
-    const { data: byId, error: err1 } = await admin
-      .from("slot_bookings")
-      .select("razorpay_payment_id")
-      .eq("user_id", userId)
-      .limit(1);
+  // Single query using OR — avoids a second round trip
+  const query = admin
+    .from("slot_bookings")
+    .select("razorpay_payment_id", { count: "exact", head: true })
+    .or(`user_id.eq.${userId}${email ? `,email.eq.${email}` : ""}`)
+    .limit(1);
 
-    if (err1) console.error("[Access] slot_bookings user_id query error:", err1);
-    if ((byId?.length ?? 0) > 0) return true;
+  const { count, error } = await query;
 
-    // Fallback: match by email
-    if (!email) return false;
-    const { data: byEmail, error: err2 } = await admin
-      .from("slot_bookings")
-      .select("razorpay_payment_id")
-      .eq("email", email)
-      .limit(1);
+  if (error) console.error("[Access] slot_bookings query error:", error);
 
-    if (err2) console.error("[Access] slot_bookings email query error:", err2);
-    return (byEmail?.length ?? 0) > 0;
-  })();
-
-  return { hasSlot };
+  return { hasSlot: (count ?? 0) > 0 };
 }
 
 export async function GET(request: NextRequest) {
