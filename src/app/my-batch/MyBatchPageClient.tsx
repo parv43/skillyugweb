@@ -201,11 +201,31 @@ export default function MyBatchPage() {
         return;
       }
 
-      // Direct Supabase query — no server API needed, uses the user's own auth token
+      // ── Fast path: serve from sessionStorage cache (5-min TTL) ──
+      try {
+        const cached = sessionStorage.getItem("mybatch_access");
+        if (cached) {
+          const { value, expiry } = JSON.parse(cached);
+          if (expiry > Date.now() && value.hasAccess) {
+            const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
+            const avatarUrl = session.user.user_metadata?.avatar_url || null;
+            setHasSlotAccess(Boolean(value.hasSlot));
+            setUser({
+              avatarUrl,
+              batchLabel: "Summer AI Creator Cohort",
+              email: session.user.email ?? "",
+              fullName,
+            });
+            setLoading(false);
+            return; // skip the API call entirely
+          }
+        }
+      } catch { /* ignore */ }
+
+      // ── Slow path: call API (first visit or cache expired) ──
       let hasAccess = false;
       let slotAccess = false;
       try {
-        // Check slot_bookings using the admin service role via API with explicit token
         const res = await fetch("/api/my-batch/access", {
           method: "GET",
           credentials: "same-origin",
