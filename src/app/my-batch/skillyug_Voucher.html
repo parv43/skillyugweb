@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Skillyug Voucher</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#818cf8",
+                        "primary-fixed-dim": "#a5b4fc",
+                        "surface-tint": "#6366f1",
+                        "surface-container-highest": "#d6d8de",
+                        "primary": "#6366f1",
+                        "surface-container-lowest": "#f0f2f8",
+                        "on-primary-fixed-variant": "#4338ca",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#c4b5fd",
+                        "on-surface-variant": "#585a68",
+                        "secondary": "#6c6e7e",
+                        "on-tertiary-fixed": "#2e1065",
+                        "tertiary": "#7c3aed",
+                        "on-secondary-container": "#585a68",
+                        "on-error-container": "#991b1b",
+                        "surface-dim": "#d4d6dc",
+                        "surface-container-high": "#dcdee4",
+                        "on-primary-fixed": "#1e1b4b",
+                        "secondary-fixed": "#d8dae6",
+                        "inverse-surface": "#2e3040",
+                        "background": "#e8eaf0",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#e0e2ff",
+                        "tertiary-container": "#a78bfa",
+                        "surface": "#e8eaf0",
+                        "on-primary-container": "#e0e2ff",
+                        "error-container": "#fee2e2",
+                        "secondary-fixed-dim": "#b8baca",
+                        "surface-bright": "#edeef4",
+                        "tertiary-fixed": "#ede9fe",
+                        "secondary-container": "#d8dae6",
+                        "inverse-on-surface": "#e8eaf0",
+                        "on-secondary-fixed-variant": "#404252",
+                        "surface-container": "#e2e4ea",
+                        "on-background": "#2e3040",
+                        "surface-variant": "#dcdee4",
+                        "on-surface": "#2e3040",
+                        "on-tertiary-container": "#3b1f63",
+                        "error": "#dc2626",
+                        "on-secondary-fixed": "#1a1b26",
+                        "on-tertiary-fixed-variant": "#5b21b6",
+                        "surface-container-low": "#e5e7ed",
+                        "inverse-primary": "#a5b4fc",
+                        "outline-variant": "#d0d2dc",
+                        "on-primary": "#ffffff",
+                        "outline": "#8a8c9a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #e8eaf0; /* matching background color */
+        }
+        
+        .neomorphic-card {
+            background-color: #e8eaf0;
+            box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.08), -12px -12px 24px rgba(255, 255, 255, 0.7);
+            border-radius: 1.5rem;
+        }
+
+        .glass-overlay {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.8) 0%, rgba(124, 58, 237, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        .organic-shape {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(165, 180, 252, 0.4) 0%, rgba(196, 181, 253, 0.4) 100%);
+            border-radius: 40% 0 1.5rem 60%;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+<style data-stitch-cursor="">*{cursor:crosshair!important}[contenteditable="true"]:focus,.cursor-text:focus{cursor:text!important}</style><style data-stitch-scroll-lock="">html,body{overflow:hidden!important}</style><style data-stitch-cursor="">*{cursor:crosshair!important}[contenteditable="true"]:focus,.cursor-text:focus{cursor:text!important}</style><style data-stitch-scroll-lock="">html,body{overflow:hidden!important}</style></head>
+<body class="min-h-screen flex items-center justify-center p-6 text-on-surface">
+<!-- Standalone Voucher Card -->
+<div class="relative w-full aspect-[1.6/1] neomorphic-card overflow-hidden max-w-4xl">
+<!-- Glassmorphism Gradient Layer -->
+<div class="absolute inset-0 glass-overlay z-10 flex flex-col justify-between text-white rounded-xl p-16">
+<!-- Organic Shape Background Element -->
+<div class="organic-shape"></div>
+<!-- Top Section: Logo & Brand -->
+<div class="relative z-20 flex items-center gap-3">
+<img alt="Skillyug Logo" class="w-auto h-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaLDtPLJdtYtLv7h3BpCI-2V0TEyavDu-CIZlHmTw9NZCET4Hrl6Gwuat-8zMLTXdmmu1RbxmFKw8cg8jLDhGCxNJqUaAS6SC5bYSrx_S65Ie7dBr0RQJEbECi1jLaI6A8zej8M2j_tHZ-fFDiHFgKKrJyBUd25poMnXG5OGtfSt7GH55mted7jFGDQl21ReJ2Tj17RCSDQ5uAzhGIC4HR6PkGy0xjPX7L-dyuMJa8olbTjYXZSmERXVrkAN0GdvkShTSX9PiCIPkH"/>
+</div>
+<!-- Middle Section: Value Proposition -->
+<div class="relative z-20 mt-auto mb-6">
+<h2 class="font-bold tracking-tight mb-2 drop-shadow-md text-8xl">₹500 DISCOUNT</h2>
+<p class="text-white/80 font-medium tracking-wide uppercase text-xl">Special Offer Voucher</p>
+</div>
+<!-- Bottom Section: Terms/Code -->
+<div class="relative z-20 flex justify-between items-end border-t border-white/20 pt-4">
+<p class="text-white/70 text-xl">Valid on Upcoming Premium Courses.</p>
+<div class="bg-white/20 rounded-lg backdrop-blur-md border border-white/20 px-16 py-8">
+<span class="font-mono tracking-widest font-semibold text-xl"><span class="material-symbols-outlined align-bottom mr-2 !text-2xl">lock</span>USE CODE: </span>
+</div>
+</div>
+<!-- Decorative geometric element inside the card -->
+<div class="absolute bottom-[-10%] right-[-5%] w-32 h-32 bg-white/5 rounded-full blur-2xl z-0"></div>
+</div>
+</div>
+</body></html>

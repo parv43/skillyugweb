@@ -12,7 +12,6 @@ const REACTIONS = [
   { type: "love", emoji: "❤️" },
   { type: "like", emoji: "👍" },
   { type: "dislike", emoji: "👎" },
-  { type: "laugh", emoji: "😂" },
 ];
 
 function generateGuestId(): string {
