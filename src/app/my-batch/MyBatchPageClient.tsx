@@ -302,14 +302,14 @@ export default function MyBatchPage() {
 
       <Navbar />
 
-      <section className="relative z-10 px-6 pt-32 pb-16 lg:px-12">
+      <section className="relative z-10 px-6 pt-24 md:pt-32 pb-12 md:pb-16 lg:px-12">
         <div className="max-w-7xl mx-auto space-y-10">
           {isPaidUser ? (
             <>
 
           {/* Top Section: Profile & Circular Progress */}
-          <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
+          <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-6 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
               <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
                 <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2">
                   My Batch Workspace
@@ -340,8 +340,8 @@ export default function MyBatchPage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] flex flex-col items-center justify-center relative">
-              <p className="absolute top-8 left-8 text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
+            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] flex flex-col items-center justify-center relative">
+              <p className="absolute top-6 left-6 md:top-8 md:left-8 text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
                 Bootcamp Progress
               </p>
               <div className="relative mt-8 w-40 h-40 flex items-center justify-center">
@@ -358,20 +358,20 @@ export default function MyBatchPage() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-3xl font-black text-white">45%</span>
+                  <span className="text-2xl md:text-3xl font-black text-white">45%</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Middle Section 1: Next Live Session & Locked Certificate */}
-          <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8 shadow-[0_0_60px_rgba(59,130,246,0.08)]">
+          <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-2">
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-8 shadow-[0_0_60px_rgba(59,130,246,0.08)]">
               <div className="flex items-center gap-3">
                 <Calendar className="h-6 w-6 text-blue-300" />
                 <h2 className="text-2xl font-black tracking-tight">Next Live Session</h2>
               </div>
-              <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-slate-950/40 p-8 flex flex-col items-center justify-center min-h-[200px]">
+              <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-slate-950/40 p-6 md:p-8 flex flex-col items-center justify-center min-h-[200px]">
                 <p className="text-xl font-black text-slate-500 uppercase tracking-widest">
                   None
                 </p>
@@ -379,9 +379,9 @@ export default function MyBatchPage() {
             </div>
 
             {/* Locked Certificate */}
-            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] relative overflow-hidden flex flex-col justify-center">
+            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] relative overflow-hidden flex flex-col justify-center">
               {/* Blurred background content */}
-              <div className="absolute inset-0 p-8 blur-[10px] opacity-40 pointer-events-none select-none flex flex-col justify-center transition-all duration-500 hover:blur-[6px] hover:opacity-60">
+              <div className="absolute inset-0 p-6 md:p-8 blur-[10px] opacity-40 pointer-events-none select-none flex flex-col justify-center transition-all duration-500 hover:blur-[6px] hover:opacity-60">
                 <div className="flex items-start justify-between gap-4">
                   <div className="rounded-2xl border border-white/10 bg-blue-500/20 p-4">
                     <BadgeCheck className="h-6 w-6 text-blue-300" />
@@ -415,13 +415,13 @@ export default function MyBatchPage() {
           </div>
 
           {/* Middle Section 2: Resource Library */}
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-8">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-6 md:p-8">
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
                   Curriculum Resources
                 </p>
-                <h2 className="mt-3 text-3xl font-black tracking-tight">Your resource library</h2>
+                <h2 className="mt-3 text-2xl md:text-3xl font-black tracking-tight">Your resource library</h2>
               </div>
             </div>
 
@@ -496,7 +496,7 @@ export default function MyBatchPage() {
               </div>
               
               {/* Right Side: Secure Video Player (70%) */}
-              <div className="lg:w-[70%] bg-black rounded-3xl relative flex flex-col overflow-hidden border border-white/5">
+              <div className="lg:w-[70%] bg-black rounded-3xl relative flex flex-col overflow-hidden border border-white/5 min-h-[350px] lg:min-h-0">
                 {/* Watermark for Screen Recording Protection */}
                 <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden opacity-30 mix-blend-overlay flex items-center justify-center">
                   <div className="text-white text-2xl md:text-4xl font-bold tracking-widest whitespace-nowrap transform -rotate-45 animate-pulse select-none">
@@ -556,15 +556,15 @@ export default function MyBatchPage() {
           </div>
 
           {/* Bottom Section: Bootcamp Calendar */}
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-8">
             <BatchCalendar hasSlot={hasSlotAccess} />
           </div>
         
             </>
           ) : (
             <>
-          <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
+          <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-6 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
               <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
                 <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2">
                   My Batch Workspace
@@ -611,7 +611,7 @@ export default function MyBatchPage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)]">
+            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)]">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
@@ -651,15 +651,15 @@ export default function MyBatchPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-8">
+          <div className="grid grid-cols-1 gap-6 md:gap-8">
             <section className="space-y-8">
-              <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-8">
+              <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-6 md:p-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
                   <div>
                     <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
                       Curriculum Resources
                     </p>
-                    <h2 className="mt-3 text-3xl font-black tracking-tight">Your resource library</h2>
+                    <h2 className="mt-3 text-2xl md:text-3xl font-black tracking-tight">Your resource library</h2>
                   </div>
                   <Link
                     href="/#projects"
@@ -759,7 +759,7 @@ export default function MyBatchPage() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(2,6,23,0.85)", backdropFilter: "blur(12px)" }}
         >
-          <div className="relative w-full max-w-md rounded-[2rem] border border-white/10 bg-white/[0.06] backdrop-blur-xl p-8 shadow-[0_0_80px_rgba(59,130,246,0.15)]">
+          <div className="relative w-full max-w-md rounded-[2rem] border border-white/10 bg-white/[0.06] backdrop-blur-xl p-6 md:p-8 shadow-[0_0_80px_rgba(59,130,246,0.15)]">
             {/* Close button */}
             <button
               onClick={() => setShowCertModal(false)}
@@ -901,7 +901,7 @@ export default function MyBatchPage() {
       {/* Ticket Modal */}
       {showTicketModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#060a1f] p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
+          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#060a1f] p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-black text-white">Raise a Ticket</h2>
               <button 
