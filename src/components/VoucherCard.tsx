@@ -34,10 +34,10 @@ export default function VoucherCard() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full my-12 px-4 md:px-8">
+    <div className="flex flex-col items-center justify-center w-full h-full">
       <div 
         style={{ perspective: "1500px" }}
-        className="w-full max-w-4xl"
+        className="w-full h-full flex flex-col justify-between"
       >
         <div
           ref={cardRef}
@@ -51,9 +51,8 @@ export default function VoucherCard() {
           }}
           className="relative w-full aspect-[1.6/1] bg-[#020617] rounded-[1.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(99,102,241,0.2)] transform-gpu group cursor-crosshair"
         >
-          {/* Glassmorphism Gradient Layer */}
           <div 
-            className="absolute inset-0 z-10 flex flex-col justify-between text-white p-6 md:p-12 lg:p-16 rounded-[1.5rem] border border-white/10"
+            className="absolute inset-0 z-10 flex flex-col justify-between text-white p-5 md:p-8 rounded-[1.5rem] border border-white/10"
             style={{
               background: "linear-gradient(135deg, rgba(99, 102, 241, 0.8) 0%, rgba(124, 58, 237, 0.8) 100%)",
               backdropFilter: "blur(10px)",
@@ -74,30 +73,30 @@ export default function VoucherCard() {
             <div className="relative z-20 flex items-center gap-3 transform-gpu" style={{ transform: "translateZ(30px)" }}>
               <img 
                 alt="Skillyug Logo" 
-                className="w-auto h-20 md:h-32 lg:h-40 object-contain drop-shadow-xl" 
+                className="w-auto h-12 md:h-16 object-contain drop-shadow-xl" 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaLDtPLJdtYtLv7h3BpCI-2V0TEyavDu-CIZlHmTw9NZCET4Hrl6Gwuat-8zMLTXdmmu1RbxmFKw8cg8jLDhGCxNJqUaAS6SC5bYSrx_S65Ie7dBr0RQJEbECi1jLaI6A8zej8M2j_tHZ-fFDiHFgKKrJyBUd25poMnXG5OGtfSt7GH55mted7jFGDQl21ReJ2Tj17RCSDQ5uAzhGIC4HR6PkGy0xjPX7L-dyuMJa8olbTjYXZSmERXVrkAN0GdvkShTSX9PiCIPkH"
               />
             </div>
             
             {/* Middle Section: Value Proposition */}
-            <div className="relative z-20 mt-auto mb-4 md:mb-6 transform-gpu" style={{ transform: "translateZ(40px)" }}>
-              <h2 className="font-black tracking-tight mb-1 md:mb-2 drop-shadow-lg text-4xl md:text-6xl lg:text-[5rem] xl:text-8xl leading-none">
+            <div className="relative z-20 mt-auto mb-2 md:mb-4 transform-gpu" style={{ transform: "translateZ(40px)" }}>
+              <h2 className="font-black tracking-tight mb-1 drop-shadow-lg text-3xl md:text-4xl lg:text-5xl leading-none">
                 ₹500 DISCOUNT
               </h2>
-              <p className="text-white/80 font-semibold tracking-widest uppercase text-xs md:text-sm lg:text-lg">
+              <p className="text-white/80 font-semibold tracking-widest uppercase text-[10px] md:text-xs">
                 Special Offer Voucher
               </p>
             </div>
             
             {/* Bottom Section: Terms/Code */}
-            <div className="relative z-20 flex flex-col md:flex-row justify-between items-start md:items-end border-t border-white/20 pt-4 gap-4 md:gap-0 transform-gpu" style={{ transform: "translateZ(20px)" }}>
-              <p className="text-white/80 text-sm md:text-base lg:text-xl font-medium">
+            <div className="relative z-20 flex flex-col md:flex-row justify-between items-start md:items-end border-t border-white/20 pt-3 gap-3 transform-gpu" style={{ transform: "translateZ(20px)" }}>
+              <p className="text-white/80 text-[10px] md:text-xs font-medium max-w-[120px] md:max-w-[150px]">
                 Valid on Upcoming Premium Courses.
               </p>
-              <div className="bg-white/10 rounded-xl backdrop-blur-md border border-white/20 px-6 py-3 md:px-10 md:py-6 lg:px-16 lg:py-8 flex items-center shadow-lg">
-                <span className="font-mono tracking-[0.2em] font-bold text-sm md:text-lg lg:text-xl flex items-center text-white/90">
-                  <Lock className="w-4 h-4 md:w-5 md:h-5 mr-2 opacity-80" />
-                  USE CODE: <span className="text-white/40 ml-2">XXXXX</span>
+              <div className="bg-white/10 rounded-lg backdrop-blur-md border border-white/20 px-3 py-2 md:px-4 md:py-3 flex items-center shadow-lg">
+                <span className="font-mono tracking-widest font-bold text-[10px] md:text-xs flex items-center text-white/90">
+                  <Lock className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 opacity-80" />
+                  CODE: <span className="text-white/40 ml-1 md:ml-2">XXXXX</span>
                 </span>
               </div>
             </div>
@@ -110,8 +109,8 @@ export default function VoucherCard() {
       </div>
       
       {/* Required Text below the 3D card layout */}
-      <div className="mt-12 opacity-80 transition-opacity hover:opacity-100">
-        <h3 className="text-sm md:text-base lg:text-lg font-bold text-slate-400 uppercase tracking-[0.3em] text-center">
+      <div className="mt-6 opacity-80 transition-opacity hover:opacity-100 pb-2">
+        <h3 className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-[0.25em] text-center">
           Complete the course to get code
         </h3>
       </div>

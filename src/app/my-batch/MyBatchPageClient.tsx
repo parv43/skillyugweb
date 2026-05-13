@@ -457,6 +457,10 @@ export default function MyBatchPage() {
                   </article>
                 );
               })}
+              
+              <div className="flex flex-col items-center justify-center w-full">
+                <VoucherCard />
+              </div>
             </div>
           </div>
 
@@ -555,9 +559,6 @@ export default function MyBatchPage() {
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-8">
             <BatchCalendar hasSlot={hasSlotAccess} />
           </div>
-
-          {/* Voucher Card Section */}
-          <VoucherCard />
         
             </>
           ) : (
