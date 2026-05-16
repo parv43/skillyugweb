@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import AnonymousReactionBar from "@/components/AnonymousReactionBar";
 import ShareButton from "@/components/ShareButton";
+import CommentSection from "@/components/comments/CommentSection";
 
 import { createMetadata, getBlogPostingSchema } from "@/lib/seo";
 import { headers } from "next/headers";
@@ -248,6 +249,9 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
               <ShareButton url={`/blog/${slug}`} title={blog.title} />
             </div>
           </div>
+
+          {/* Comment Section */}
+          <CommentSection blogSlug={slug} />
 
           {/* Related Articles */}
           {relatedBlogs.length > 0 && (
