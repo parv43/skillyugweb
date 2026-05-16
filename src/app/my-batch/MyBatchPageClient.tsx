@@ -894,7 +894,7 @@ export default function MyBatchPage() {
           className="fixed bottom-8 right-8 z-50 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-2xl backdrop-blur-md transition-all hover:scale-105 hover:bg-blue-500 border border-white/10"
         >
           <HelpCircle className="w-5 h-5" />
-          <span className="hidden md:inline">Need Help?</span>
+          <span className="hidden md:inline">Raise a Ticket</span>
         </button>
       )}
 
