@@ -55,20 +55,20 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
       (text.includes("what") && text.includes("child") && text.includes("learn")) ||
       (text.includes("what will") && text.includes("learn"))
     ) {
-      return `Great question! Here's a sneak peek at what's covered across the bootcamp:\n\n📅 Week 1 — Introduction to AI\nStudents discover what AI really is, how it works in daily life, and get hands-on with fun AI activities.\n\n📅 Week 2 — AI Tools & Prompting\nDeep dives into industry-standard AI tools. Students learn how to craft powerful prompts to get professional results.\n\n📅 Week 3 — Creative Projects with AI\nStudents start building real projects using AI — from designs to written content to smart workflows.\n\n📅 Week 4 — Showcase & Certification\nStudents present their final AI project and earn an official Skillyug Certificate of Attendance.\n\n🔒 The full week-by-week curriculum (with all sub-topics and outcomes) is shared exclusively with enrolled students.\n\n👉 Enrol in the bootcamp to access the complete curriculum and secure your child's spot before seats fill up!`
+      return `Great question! Here's a sneak peek at what's covered across the bootcamp:\n\n📅 Week 1 — Introduction to AI\nStudents discover what AI really is, how it works in daily life, and get hands-on with fun AI activities.\n\n🔒 The full week-by-week curriculum (with all sub-topics and outcomes) is shared exclusively with enrolled students.\n\n👉 Enrol in the bootcamp to access the complete curriculum and secure your child's spot before seats fill up!`
     }
 
     if (text.includes("learn") || text.includes("tool") || text.includes("teach") || text.includes("curriculum")) {
-      return "Students learn to use ChatGPT, Canva AI, Midjourney, and automation tools to build creative projects. You can explore the full curriculum on our bootcamp page!"
+      return "Students learn to use ChatGPT, Canva AI, Midjourney, and automation tools to build creative projects."
     }
     if (text.includes("age") || text.includes("class") || text.includes("who") || text.includes("old") || text.includes("suitable")) {
-      return "Skillyug is designed perfectly for students from Class 6 to 12. Many parents review the curriculum before deciding if it's the right fit for their child."
+      return "Skillyug is designed perfectly for students from Class 6 to 12."
     }
     if (text.includes("book") || text.includes("join") || text.includes("enroll") || text.includes("start") || text.includes("spot") || text.includes("reserve")) {
-      return "To secure your child's seat, use the \"Join the Bootcamp\" button to reserve a spot. Seats are limited per batch!"
+      return "To secure your child's seat, use the Bootcamp page to reserve a spot. Seats are limited per batch!"
     }
     if (text.includes("project") || text.includes("build") || text.includes("create") || text.includes("make")) {
-      return "Students build real-world AI chatbots, AI generated designs, and automation workflows. Check out student project examples on the home page!"
+      return "Students build real-world AI chatbots, AI generated designs, and automation workflows."
     }
     
     // Off-topic fallback
