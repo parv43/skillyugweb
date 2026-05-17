@@ -25,39 +25,6 @@ const BOOTCAMP_END = new Date(2026, 5, 20); // 5 = June
 // Removed global isBootcampDay to use prop-based logic inside component
 
 // Mock Events Data
-const mockEvents: Record<
-  string,
-  { title: string; time: string; type: "live" | "task"; urgency?: string }[]
-> = {
-  "2026-05-20": [
-    { title: "Bootcamp Kickoff & Orientation", time: "6:00 PM IST", type: "live", urgency: "Mandatory" },
-    { title: "Set up Discord & Tooling", time: "Self-paced", type: "task", urgency: "High priority" },
-  ],
-  "2026-05-22": [
-    { title: "ChatGPT Basics & Prompt Frameworks", time: "7:00 PM IST", type: "live" },
-  ],
-  "2026-05-25": [
-    { title: "Submit 5 Custom Prompts", time: "By 11:59 PM", type: "task", urgency: "Due today" },
-  ],
-  "2026-05-28": [
-    { title: "Image Generation Masterclass (Midjourney/DALL-E)", time: "6:30 PM IST", type: "live" },
-  ],
-  "2026-06-03": [
-    { title: "Building AI Workflows", time: "7:00 PM IST", type: "live" },
-  ],
-  "2026-06-05": [
-    { title: "Submit Project Blueprint", time: "By 10:00 AM", type: "task", urgency: "Crucial" },
-  ],
-  "2026-06-12": [
-    { title: "AI Explainers & Video Creation", time: "7:00 PM IST", type: "live" },
-  ],
-  "2026-06-18": [
-    { title: "Final Deliverable Review", time: "6:00 PM IST", type: "live", urgency: "Mandatory" },
-  ],
-  "2026-06-20": [
-    { title: "Graduation & Showcase", time: "5:00 PM IST", type: "live" },
-  ],
-};
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -98,7 +65,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
         ? (dateObj >= BOOTCAMP_START && dateObj <= BOOTCAMP_END)
         : false;
       const dateStr = formatDate(dateObj);
-      const hasEvents = !!mockEvents[dateStr] && hasSlot;
+      const hasEvents = false;
       const isSelected = selectedDate != null && formatDate(selectedDate) === dateStr;
 
       calendarCells.push(
@@ -131,7 +98,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
   }
 
   const selectedDateStr = selectedDate ? formatDate(selectedDate) : null;
-  const dayEvents = selectedDateStr && hasSlot ? mockEvents[selectedDateStr] ?? null : null;
+  const dayEvents: { title: string; time: string; type: "live" | "task"; urgency?: string }[] = [];
 
   return (
     <div className="space-y-5">
@@ -221,7 +188,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
             </span>
           </h3>
 
-          {dayEvents ? (
+          {dayEvents.length > 0 ? (
             <div className="space-y-4">
               {dayEvents.map((event, idx) => (
                 <article
