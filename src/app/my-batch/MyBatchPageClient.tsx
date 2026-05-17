@@ -55,6 +55,7 @@ export default function MyBatchPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<BatchUser | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [hasSlotAccess, setHasSlotAccess] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   // Certificate modal state
@@ -211,6 +212,7 @@ export default function MyBatchPage() {
             const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
             const avatarUrl = session.user.user_metadata?.avatar_url || null;
             setHasSlotAccess(Boolean(value.hasSlot));
+            setUserId(session.user.id);
             setUser({
               avatarUrl,
               batchLabel: "Summer AI Creator Cohort",
@@ -261,6 +263,7 @@ export default function MyBatchPage() {
       const avatarUrl = session.user.user_metadata?.avatar_url || null;
 
       setHasSlotAccess(slotAccess);
+      setUserId(session.user.id);
       setUser({
         avatarUrl,
         batchLabel: "Summer AI Creator Cohort",
@@ -282,6 +285,11 @@ export default function MyBatchPage() {
   }
 
   const isPaidUser = hasSlotAccess || user.email === "eternallytanuj@gmail.com";
+  // Only allowlisted users can download the certificate
+  const CERT_ALLOWED_UIDS = ["9627ec86-c86d-4fce-8e13-6e8f3f157a83"];
+  const canDownloadCert =
+    user.email === "eternallytanuj@gmail.com" ||
+    (userId !== null && CERT_ALLOWED_UIDS.includes(userId));
 
   return (
     <main className="min-h-screen bg-[#020617] text-slate-50 relative overflow-x-hidden select-none">
@@ -378,43 +386,80 @@ export default function MyBatchPage() {
               </div>
             </div>
 
-            {/* Certificate Card */}
-            <div className="rounded-[2rem] border border-blue-500/20 bg-gradient-to-br from-blue-600/20 to-purple-500/10 p-6 md:p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] relative overflow-hidden flex flex-col justify-center group">
-              <div className="absolute -right-12 -top-12 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full transition-opacity group-hover:opacity-100 opacity-50"></div>
-              
-              <div className="flex items-start justify-between gap-4">
-                <div className="rounded-2xl border border-white/10 bg-blue-500/20 p-4 shadow-inner">
-                  <BadgeCheck className="h-6 w-6 text-blue-300" />
+            {/* Certificate Card — unlocked only for allowlisted users */}
+            {canDownloadCert ? (
+              <div className="rounded-[2rem] border border-blue-500/20 bg-gradient-to-br from-blue-600/20 to-purple-500/10 p-6 md:p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] relative overflow-hidden flex flex-col justify-center group">
+                <div className="absolute -right-12 -top-12 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full transition-opacity group-hover:opacity-100 opacity-50"></div>
+                
+                <div className="flex items-start justify-between gap-4">
+                  <div className="rounded-2xl border border-white/10 bg-blue-500/20 p-4 shadow-inner">
+                    <BadgeCheck className="h-6 w-6 text-blue-300" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-blue-300">
+                    OFFICIAL
+                  </span>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-blue-300">
-                  OFFICIAL
-                </span>
+                <h3 className="mt-8 text-2xl font-black tracking-tight text-white">
+                  Certificate of Attendance
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                  Claim your official Skillyug AI Education Bootcamp certificate. Includes a unique verification ID and scannable QR.
+                </p>
+                <button
+                  type="button"
+                  onClick={openCertModal}
+                  disabled={isGenerating}
+                  className="mt-8 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:bg-blue-500 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      Download Certificate
+                      <Download className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
               </div>
-              <h3 className="mt-8 text-2xl font-black tracking-tight text-white">
-                Certificate of Attendance
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                Claim your official Skillyug AI Education Bootcamp certificate. Includes a unique verification ID and scannable QR.
-              </p>
-              <button
-                type="button"
-                onClick={openCertModal}
-                disabled={isGenerating}
-                className="mt-8 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:bg-blue-500 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    Download Certificate
-                    <Download className="h-4 w-4" />
-                  </>
-                )}
-              </button>
-            </div>
+            ) : (
+              /* Locked Certificate — shown to everyone else */
+              <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] relative overflow-hidden flex flex-col justify-center">
+                {/* Blurred background content */}
+                <div className="absolute inset-0 p-6 md:p-8 blur-[10px] opacity-40 pointer-events-none select-none flex flex-col justify-center transition-all duration-500 hover:blur-[6px] hover:opacity-60">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="rounded-2xl border border-white/10 bg-blue-500/20 p-4">
+                      <BadgeCheck className="h-6 w-6 text-blue-300" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-blue-300">
+                      OFFICIAL
+                    </span>
+                  </div>
+                  <h3 className="mt-8 text-2xl font-black tracking-tight text-white">
+                    Certificate of Attendance
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                    Claim your official Skillyug AI Education Bootcamp certificate.
+                  </p>
+                  <div className="mt-8 w-full rounded-xl bg-blue-600/50 py-5" />
+                </div>
+
+                {/* Lock overlay */}
+                <div className="relative z-10 flex flex-col items-center justify-center text-center">
+                  <div className="rounded-full bg-slate-950/90 p-5 border border-white/10 mb-6 shadow-2xl relative drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]">
+                    <Lock className="w-8 h-8 text-slate-300" />
+                    {/* Chain element */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-1.5 bg-slate-600/80 rotate-45 pointer-events-none rounded-full blur-[0.5px]" />
+                  </div>
+                  <h3 className="text-xl font-black text-white tracking-tight">Certificate Locked</h3>
+                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-300 max-w-[200px] mx-auto leading-relaxed">
+                    Complete the course to download certificate
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Middle Section 2: Resource Library */}
