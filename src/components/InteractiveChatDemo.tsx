@@ -48,7 +48,16 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
 
   const getMockAIResponse = (input: string) => {
     const text = input.toLowerCase()
-    
+
+    // Specific match: "what exactly will my child learn?"
+    if (
+      (text.includes("exactly") && text.includes("learn")) ||
+      (text.includes("what") && text.includes("child") && text.includes("learn")) ||
+      (text.includes("what will") && text.includes("learn"))
+    ) {
+      return `Great question! Here's a sneak peek at what's covered across the bootcamp:\n\n📅 Week 1 — Introduction to AI\nStudents discover what AI really is, how it works in daily life, and get hands-on with fun AI activities.\n\n📅 Week 2 — AI Tools & Prompting\nDeep dives into industry-standard AI tools. Students learn how to craft powerful prompts to get professional results.\n\n📅 Week 3 — Creative Projects with AI\nStudents start building real projects using AI — from designs to written content to smart workflows.\n\n📅 Week 4 — Showcase & Certification\nStudents present their final AI project and earn an official Skillyug Certificate of Attendance.\n\n🔒 The full week-by-week curriculum (with all sub-topics and outcomes) is shared exclusively with enrolled students.\n\n👉 Enrol in the bootcamp to access the complete curriculum and secure your child's spot before seats fill up!`
+    }
+
     if (text.includes("learn") || text.includes("tool") || text.includes("teach") || text.includes("curriculum")) {
       return "Students learn to use ChatGPT, Canva AI, Midjourney, and automation tools to build creative projects. You can explore the full curriculum on our bootcamp page!"
     }
