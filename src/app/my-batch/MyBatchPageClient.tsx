@@ -167,6 +167,7 @@ export default function MyBatchPage() {
           disablekb: 1,
           fs: 0,
           iv_load_policy: 3,
+          origin: typeof window !== 'undefined' ? window.location.origin : '',
         },
         events: {
           onReady: (event: any) => {
@@ -886,14 +887,15 @@ export default function MyBatchPage() {
               
               {/* Right Side: Secure Video Player (70%) */}
               <div className="lg:w-[70%] bg-black rounded-3xl relative flex flex-col overflow-hidden border border-white/5 min-h-[350px] lg:min-h-0">
-                {/* Invisible Shield to block YouTube UI clicks (Security Feature 2) */}
-                <div 
-                  className="absolute inset-0 z-20" 
-                  onContextMenu={(e) => e.preventDefault()}
-                ></div>
 
                 {/* React YouTube component mount point */}
                 <div className="flex-1 w-full h-[75%] lg:h-[80%] relative bg-black flex items-center justify-center overflow-hidden">
+                  {/* Invisible Shield to block YouTube UI clicks (Security Feature 2) */}
+                  <div 
+                    className="absolute inset-0 z-20" 
+                    onContextMenu={(e) => e.preventDefault()}
+                  ></div>
+
                   <style dangerouslySetInnerHTML={{__html: `
                     @keyframes float-watermark {
                       0% { transform: translate(-30%, -30%) rotate(-12deg); }
