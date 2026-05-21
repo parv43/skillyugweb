@@ -135,94 +135,147 @@ export default function MyBatchPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
 
+  const [playerError, setPlayerError] = useState<string | null>(null);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+
+  const addDebugLog = (msg: string) => {
+    setDebugLogs(prev => [...prev.slice(-9), `[${new Date().toLocaleTimeString()}] ${msg}`]);
+  };
+
+  // Track global errors for diagnostics
+  useEffect(() => {
+    const handleGlobalError = (event: ErrorEvent) => {
+      addDebugLog(`Global Error: ${event.message}`);
+    };
+    window.addEventListener("error", handleGlobalError);
+    return () => window.removeEventListener("error", handleGlobalError);
+  }, []);
+
   // Dynamically load YouTube script & initialize player
   useEffect(() => {
     setCurrentTime(0);
     setDuration(0);
     setBufferedFraction(0);
     setIsPlaying(false);
+    setPlayerError(null);
 
     if (!activeVideo.videoId) {
       playerRef.current = null;
+      addDebugLog("No active videoId, skipping initialization.");
       return;
     }
 
+    addDebugLog(`Starting initialization for videoId: ${activeVideo.videoId}`);
     let player: any = null;
+    let checkTimeoutId: any = null;
 
     const initPlayer = () => {
-      if (!containerRef.current) return;
+      if (!containerRef.current) {
+        addDebugLog("initPlayer: containerRef.current is null.");
+        return;
+      }
 
+      addDebugLog("Initializing YT.Player instance...");
       // Clear existing HTML to prevent React duplicate mounts
       containerRef.current.innerHTML = '<div id="youtube-player-element" class="w-full h-full pointer-events-none"></div>';
 
-      player = new (window as any).YT.Player('youtube-player-element', {
-        height: '100%',
-        width: '100%',
-        videoId: activeVideo.videoId,
-        playerVars: {
-          autoplay: 0,
-          controls: 0, // chromeless
-          rel: 0,
-          modestbranding: 1,
-          disablekb: 1,
-          fs: 0,
-          iv_load_policy: 3,
-          origin: typeof window !== 'undefined' ? window.location.origin : '',
-        },
-        events: {
-          onReady: (event: any) => {
-            playerRef.current = event.target;
-            event.target.setVolume(volume);
-            if (isMuted) {
-              event.target.mute();
-            } else {
-              event.target.unMute();
-            }
-            setDuration(event.target.getDuration() || 0);
+      try {
+        player = new (window as any).YT.Player('youtube-player-element', {
+          height: '100%',
+          width: '100%',
+          videoId: activeVideo.videoId,
+          playerVars: {
+            autoplay: 0,
+            controls: 0, // chromeless
+            rel: 0,
+            modestbranding: 1,
+            disablekb: 1,
+            fs: 0,
+            iv_load_policy: 3,
+            origin: typeof window !== 'undefined' ? window.location.origin : '',
           },
-          onStateChange: (event: any) => {
-            const state = event.data;
-            // 1 = playing, 2 = paused, 0 = ended, 3 = buffering
-            if (state === 1) {
-              setIsPlaying(true);
-            } else {
-              setIsPlaying(false);
-            }
-
-            if (event.target && typeof event.target.getDuration === 'function') {
+          events: {
+            onReady: (event: any) => {
+              addDebugLog("Player Event: onReady");
+              setPlayerError(null);
+              playerRef.current = event.target;
+              event.target.setVolume(volume);
+              if (isMuted) {
+                event.target.mute();
+              } else {
+                event.target.unMute();
+              }
               setDuration(event.target.getDuration() || 0);
+            },
+            onStateChange: (event: any) => {
+              const state = event.data;
+              addDebugLog(`Player State Changed: ${state}`);
+              // 1 = playing, 2 = paused, 0 = ended, 3 = buffering
+              if (state === 1) {
+                setIsPlaying(true);
+              } else {
+                setIsPlaying(false);
+              }
+
+              if (event.target && typeof event.target.getDuration === 'function') {
+                setDuration(event.target.getDuration() || 0);
+              }
+            },
+            onError: (event: any) => {
+              addDebugLog(`Player Event: onError (${event.data})`);
+              let errMsg = "An error occurred loading the video.";
+              if (event.data === 2) errMsg = "Invalid video ID parameter.";
+              if (event.data === 5) errMsg = "HTML5 player playback error.";
+              if (event.data === 100) errMsg = "Video not found / removed.";
+              if (event.data === 101 || event.data === 150) {
+                errMsg = "Playback restricted by owner (embedding disabled).";
+              }
+              setPlayerError(errMsg);
             }
           },
-        },
-      });
+        });
+      } catch (err: any) {
+        addDebugLog(`YT.Player instantiation failed: ${err.message || err}`);
+      }
     };
 
-    if (!(window as any).YT || !(window as any).YT.Player) {
-      // Check if tag is already there
-      let tag = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
-      if (!tag) {
-        tag = document.createElement('script');
-        (tag as HTMLScriptElement).src = 'https://www.youtube.com/iframe_api';
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
-      }
-
-      // Bind ready callback
-      const previousCallback = (window as any).onYouTubeIframeAPIReady;
-      (window as any).onYouTubeIframeAPIReady = () => {
-        if (previousCallback) previousCallback();
+    const checkAndInit = () => {
+      const win = window as any;
+      if (win.YT && win.YT.Player && win.YT.Player.prototype) {
+        addDebugLog("YT.Player prototype is ready.");
         initPlayer();
-      };
+      } else if (win.YT && typeof win.YT.ready === 'function') {
+        addDebugLog("YT namespace exists, waiting via YT.ready...");
+        win.YT.ready(initPlayer);
+      } else {
+        addDebugLog("Waiting for YT library to download...");
+        checkTimeoutId = setTimeout(checkAndInit, 150);
+      }
+    };
+
+    // Ensure the script is injected
+    let tag = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
+    if (!tag) {
+      addDebugLog("Injecting YouTube IFrame API script tag...");
+      tag = document.createElement('script');
+      (tag as HTMLScriptElement).src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
     } else {
-      initPlayer();
+      addDebugLog("YouTube API script tag already present.");
     }
 
+    checkAndInit();
+
     return () => {
+      addDebugLog("Cleaning up player...");
+      if (checkTimeoutId) clearTimeout(checkTimeoutId);
       if (player && typeof player.destroy === 'function') {
         try {
           player.destroy();
-        } catch (e) {
-          console.error("Error destroying player:", e);
+          addDebugLog("Player destroyed successfully.");
+        } catch (e: any) {
+          addDebugLog(`Error destroying player: ${e.message || e}`);
         }
       }
       playerRef.current = null;
@@ -919,6 +972,32 @@ export default function MyBatchPage() {
                           {user?.email || "student@skillyug.com"}
                         </div>
                       </div>
+
+                      {/* Diagnostic Overlay for Admins */}
+                      {isAdmin && (
+                        <div className="absolute top-4 left-4 z-40 bg-black/90 text-[10px] text-green-400 p-2.5 rounded-xl font-mono border border-green-500/20 max-w-[280px] pointer-events-auto select-text max-h-[140px] overflow-y-auto custom-scrollbar">
+                          <div className="font-bold border-b border-green-500/20 pb-1 mb-1 flex justify-between items-center">
+                            <span>DIAGNOSTICS PANEL</span>
+                            <button onClick={() => setDebugLogs([])} className="text-red-400 hover:underline">Clear</button>
+                          </div>
+                          {debugLogs.length === 0 ? (
+                            <div className="text-gray-500">No logs captured...</div>
+                          ) : (
+                            debugLogs.map((log, idx) => (
+                              <div key={idx} className="leading-tight mb-0.5 break-all">{log}</div>
+                            ))
+                          )}
+                        </div>
+                      )}
+
+                      {/* Video Load/Error States */}
+                      {playerError && (
+                        <div className="absolute inset-0 bg-black/95 z-35 flex flex-col items-center justify-center text-center p-4">
+                          <HelpCircle className="w-10 h-10 text-red-500 mb-2" />
+                          <p className="text-white text-sm font-bold">{playerError}</p>
+                          <p className="text-slate-500 text-xs mt-1">Please verify YouTube channel embedding permissions.</p>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <div className="text-center z-40 relative">
