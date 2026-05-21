@@ -20,9 +20,12 @@ import {
   EyeOff,
   HelpCircle,
   X,
-  PauseCircle
+  PauseCircle,
+  Volume2,
+  VolumeX,
+  Maximize2,
+  Minimize2
 } from "lucide-react";
-import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import BatchCalendar from "@/components/BatchCalendar";
@@ -71,29 +74,258 @@ export default function MyBatchPage() {
   
   // Video Player State
   const [activeVideo, setActiveVideo] = useState(MOCK_VIDEOS[0]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const playerRef = useRef<YouTubePlayer | null>(null);
+  const [videos, setVideos] = useState<any[]>(MOCK_VIDEOS);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  const handleReady = (event: YouTubeEvent) => {
-    playerRef.current = event.target;
-  };
+  useEffect(() => {
+    if (!user) return;
+
+    const isPaid = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin;
+    if (!isPaid) return;
+
+    const fetchVideos = async () => {
+      try {
+        const { data: recordings, error } = await supabase
+          .from("session_recordings")
+          .select("id, title, custom_date, youtube_video_id")
+          .order("published_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching session recordings:", error);
+          return;
+        }
+
+        const mappedRecordings = (recordings || []).map((rec: any, idx: number) => ({
+          id: rec.id || `db-${idx}`,
+          title: rec.title,
+          date: rec.custom_date || "Unknown Date",
+          videoId: rec.youtube_video_id
+        }));
+
+        const combined = [...mappedRecordings];
+        if (combined.length < MOCK_VIDEOS.length) {
+          for (let i = combined.length; i < MOCK_VIDEOS.length; i++) {
+            combined.push({
+              ...MOCK_VIDEOS[i],
+              id: `mock-${i}`
+            });
+          }
+        }
+
+        setVideos(combined);
+        const firstPlayable = combined.find(v => v.videoId) || combined[0];
+        setActiveVideo(firstPlayable);
+      } catch (err) {
+        console.error("Failed to load videos from Supabase:", err);
+      }
+    };
+
+    fetchVideos();
+  }, [user, hasSlotAccess, isAdmin]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [bufferedFraction, setBufferedFraction] = useState(0);
+  const [volume, setVolume] = useState(50);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<any>(null);
+
+  // Dynamically load YouTube script & initialize player
+  useEffect(() => {
+    setCurrentTime(0);
+    setDuration(0);
+    setBufferedFraction(0);
+    setIsPlaying(false);
+
+    if (!activeVideo.videoId) {
+      playerRef.current = null;
+      return;
+    }
+
+    let player: any = null;
+
+    const initPlayer = () => {
+      if (!containerRef.current) return;
+
+      // Clear existing HTML to prevent React duplicate mounts
+      containerRef.current.innerHTML = '<div id="youtube-player-element" class="w-full h-full pointer-events-none"></div>';
+
+      player = new (window as any).YT.Player('youtube-player-element', {
+        height: '100%',
+        width: '100%',
+        videoId: activeVideo.videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0, // chromeless
+          rel: 0,
+          modestbranding: 1,
+          disablekb: 1,
+          fs: 0,
+          iv_load_policy: 3,
+        },
+        events: {
+          onReady: (event: any) => {
+            playerRef.current = event.target;
+            event.target.setVolume(volume);
+            if (isMuted) {
+              event.target.mute();
+            } else {
+              event.target.unMute();
+            }
+            setDuration(event.target.getDuration() || 0);
+          },
+          onStateChange: (event: any) => {
+            const state = event.data;
+            // 1 = playing, 2 = paused, 0 = ended, 3 = buffering
+            if (state === 1) {
+              setIsPlaying(true);
+            } else {
+              setIsPlaying(false);
+            }
+
+            if (event.target && typeof event.target.getDuration === 'function') {
+              setDuration(event.target.getDuration() || 0);
+            }
+          },
+        },
+      });
+    };
+
+    if (!(window as any).YT || !(window as any).YT.Player) {
+      // Check if tag is already there
+      let tag = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
+      if (!tag) {
+        tag = document.createElement('script');
+        (tag as HTMLScriptElement).src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+      }
+
+      // Bind ready callback
+      const previousCallback = (window as any).onYouTubeIframeAPIReady;
+      (window as any).onYouTubeIframeAPIReady = () => {
+        if (previousCallback) previousCallback();
+        initPlayer();
+      };
+    } else {
+      initPlayer();
+    }
+
+    return () => {
+      if (player && typeof player.destroy === 'function') {
+        try {
+          player.destroy();
+        } catch (e) {
+          console.error("Error destroying player:", e);
+        }
+      }
+      playerRef.current = null;
+    };
+  }, [activeVideo.videoId]);
+
+  // Continuously read currentTime and videoLoadedFraction when playing
+  useEffect(() => {
+    let intervalId: any = null;
+
+    if (isPlaying && playerRef.current) {
+      intervalId = setInterval(() => {
+        const player = playerRef.current;
+        if (player && typeof player.getCurrentTime === 'function') {
+          setCurrentTime(player.getCurrentTime());
+          setBufferedFraction(player.getVideoLoadedFraction() || 0);
+        }
+      }, 250);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isPlaying]);
+
+  // Track fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
 
   const handlePlayPause = () => {
-    if (!playerRef.current) return;
+    const player = playerRef.current;
+    if (!player) return;
     if (isPlaying) {
-      playerRef.current.pauseVideo();
+      player.pauseVideo();
     } else {
-      playerRef.current.playVideo();
+      player.playVideo();
     }
   };
 
-  const handleStateChange = (event: YouTubeEvent) => {
-    // 1 = playing, 2 = paused, 0 = ended
-    if (event.data === 1) {
-      setIsPlaying(true);
-    } else if (event.data === 2 || event.data === 0) {
-      setIsPlaying(false);
+  const handleToggleMute = () => {
+    const player = playerRef.current;
+    if (!player) return;
+    if (isMuted) {
+      player.unMute();
+      setIsMuted(false);
+    } else {
+      player.mute();
+      setIsMuted(true);
     }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = Number(e.target.value);
+    setVolume(newVolume);
+    const player = playerRef.current;
+    if (player && typeof player.setVolume === 'function') {
+      player.setVolume(newVolume);
+    }
+    if (newVolume > 0 && isMuted) {
+      if (player && typeof player.unMute === 'function') {
+        player.unMute();
+      }
+      setIsMuted(false);
+    }
+  };
+
+  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = Number(e.target.value);
+    setCurrentTime(newTime);
+    const player = playerRef.current;
+    if (player && typeof player.seekTo === 'function') {
+      player.seekTo(newTime, true);
+    }
+  };
+
+  const handleFullscreen = () => {
+    const container = containerRef.current?.parentElement;
+    if (!container) return;
+    if (!document.fullscreenElement) {
+      container.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    if (isNaN(timeInSeconds)) return "0:00";
+    const hrs = Math.floor(timeInSeconds / 3600);
+    const mins = Math.floor((timeInSeconds % 3600) / 60);
+    const secs = Math.floor(timeInSeconds % 60);
+
+    if (hrs > 0) {
+      return `${hrs}:${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
   const [ticketSubject, setTicketSubject] = useState("");
   const [ticketMessage, setTicketMessage] = useState("");
@@ -192,6 +424,76 @@ export default function MyBatchPage() {
     }
   };
 
+  const handleSyncVideos = async () => {
+    setIsSyncing(true);
+    setSyncStatus(null);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Session not found. Please log in.");
+      }
+
+      const res = await fetch("/api/videos/sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        }
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Sync request failed.");
+      }
+
+      setSyncStatus({
+        type: "success",
+        message: `Synced ${data.count} videos successfully!`
+      });
+
+      // Fetch the updated recordings lists immediately
+      const { data: recordings, error } = await supabase
+        .from("session_recordings")
+        .select("id, title, custom_date, youtube_video_id")
+        .order("published_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching updated recordings:", error);
+      } else if (recordings) {
+        const mappedRecordings = recordings.map((rec: any, idx: number) => ({
+          id: rec.id || `db-${idx}`,
+          title: rec.title,
+          date: rec.custom_date || "Unknown Date",
+          videoId: rec.youtube_video_id
+        }));
+
+        const combined = [...mappedRecordings];
+        if (combined.length < MOCK_VIDEOS.length) {
+          for (let i = combined.length; i < MOCK_VIDEOS.length; i++) {
+            combined.push({
+              ...MOCK_VIDEOS[i],
+              id: `mock-${i}`
+            });
+          }
+        }
+        setVideos(combined);
+        const firstPlayable = combined.find(v => v.videoId) || combined[0];
+        setActiveVideo(firstPlayable);
+      }
+    } catch (err: any) {
+      setSyncStatus({
+        type: "error",
+        message: err.message || "Failed to synchronize videos."
+      });
+    } finally {
+      setIsSyncing(false);
+      setTimeout(() => {
+        setSyncStatus(null);
+      }, 5000);
+    }
+  };
+
   useEffect(() => {
     const loadSession = async () => {
       const {
@@ -203,12 +505,26 @@ export default function MyBatchPage() {
         return;
       }
 
+      // Check admin status immediately
+      let isAdminUser = false;
+      try {
+        const { data: adminRow } = await supabase
+          .from("admins")
+          .select("id")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+        isAdminUser = !!adminRow;
+        setIsAdmin(isAdminUser);
+      } catch (err) {
+        console.error("Error checking admin status:", err);
+      }
+
       // ── Fast path: serve from sessionStorage cache (5-min TTL) ──
       try {
         const cached = sessionStorage.getItem("mybatch_access");
         if (cached) {
           const { value, expiry } = JSON.parse(cached);
-          if (expiry > Date.now() && value.hasAccess) {
+          if ((expiry > Date.now() && value.hasAccess) || isAdminUser) {
             const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
             const avatarUrl = session.user.user_metadata?.avatar_url || null;
             setHasSlotAccess(Boolean(value.hasSlot));
@@ -254,7 +570,7 @@ export default function MyBatchPage() {
         console.error("[MyBatch] Access fetch error:", e);
       }
 
-      if (!hasAccess) {
+      if (!hasAccess && !isAdminUser) {
         router.replace("/");
         return;
       }
@@ -517,12 +833,37 @@ export default function MyBatchPage() {
             <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[600px]">
               {/* Left Side: Video List (30%) */}
               <div className="lg:w-[30%] bg-white/[0.02] rounded-3xl border border-white/5 p-4 flex flex-col h-[300px] lg:h-full">
-                <div className="px-4 py-3 border-b border-white/5 mb-4">
-                  <h3 className="text-lg font-black text-white">Session Recordings</h3>
-                  <p className="text-xs text-slate-400 mt-1">Past live classes</p>
+                <div className="px-4 py-3 border-b border-white/5 mb-4 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-black text-white">Session Recordings</h3>
+                    <p className="text-xs text-slate-400 mt-1">Past live classes</p>
+                  </div>
+                  {isAdmin && (
+                    <button
+                      onClick={handleSyncVideos}
+                      disabled={isSyncing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600/80 hover:bg-blue-600 disabled:bg-slate-800 disabled:text-slate-500 text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:scale-100 cursor-pointer shadow-md"
+                    >
+                      {isSyncing ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Sparkles className="w-3.5 h-3.5" />
+                      )}
+                      Sync
+                    </button>
+                  )}
                 </div>
+                {syncStatus && (
+                  <div className={`mx-4 mb-3 px-3 py-2 rounded-xl text-center text-xs font-semibold border ${
+                    syncStatus.type === "success" 
+                      ? "bg-green-500/10 border-green-500/20 text-green-400" 
+                      : "bg-red-500/10 border-red-500/20 text-red-400"
+                  }`}>
+                    {syncStatus.message}
+                  </div>
+                )}
                 <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-                  {MOCK_VIDEOS.map((video) => (
+                  {videos.map((video) => (
                     <button 
                       key={video.id} 
                       onClick={() => {
@@ -545,42 +886,38 @@ export default function MyBatchPage() {
               
               {/* Right Side: Secure Video Player (70%) */}
               <div className="lg:w-[70%] bg-black rounded-3xl relative flex flex-col overflow-hidden border border-white/5 min-h-[350px] lg:min-h-0">
-                {/* Watermark for Screen Recording Protection */}
-                <div className="absolute inset-0 z-30 pointer-events-none overflow-hidden opacity-30 mix-blend-overlay flex items-center justify-center">
-                  <div className="text-white text-2xl md:text-4xl font-bold tracking-widest whitespace-nowrap transform -rotate-45 animate-pulse select-none">
-                    {user?.email || "student@skillyug.com"}
-                  </div>
-                </div>
-
                 {/* Invisible Shield to block YouTube UI clicks (Security Feature 2) */}
                 <div 
                   className="absolute inset-0 z-20" 
                   onContextMenu={(e) => e.preventDefault()}
                 ></div>
 
-                {/* React YouTube component */}
-                <div className="flex-1 w-full h-[80%] lg:h-[85%] relative bg-black flex items-center justify-center">
+                {/* React YouTube component mount point */}
+                <div className="flex-1 w-full h-[75%] lg:h-[80%] relative bg-black flex items-center justify-center overflow-hidden">
+                  <style dangerouslySetInnerHTML={{__html: `
+                    @keyframes float-watermark {
+                      0% { transform: translate(-30%, -30%) rotate(-12deg); }
+                      25% { transform: translate(30%, -15%) rotate(12deg); }
+                      50% { transform: translate(15%, 30%) rotate(-8deg); }
+                      75% { transform: translate(-25%, 20%) rotate(8deg); }
+                      100% { transform: translate(-30%, -30%) rotate(-12deg); }
+                    }
+                    .animate-float-watermark {
+                      animation: float-watermark 25s infinite linear;
+                    }
+                  `}} />
+
                   {activeVideo.videoId ? (
-                    <YouTube
-                      videoId={activeVideo.videoId}
-                      onReady={handleReady}
-                      onStateChange={handleStateChange}
-                      opts={{
-                        width: '100%',
-                        height: '100%',
-                        playerVars: {
-                          autoplay: 0,
-                          controls: 0, // Security Feature 1
-                          modestbranding: 1,
-                          disablekb: 1,
-                          rel: 0,
-                          fs: 0,
-                          iv_load_policy: 3,
-                        },
-                      }}
-                      className="absolute inset-0 w-full h-full"
-                      iframeClassName="w-full h-full pointer-events-none"
-                    />
+                    <>
+                      <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+                      
+                      {/* Floating Watermark for Screen Recording Protection */}
+                      <div className="absolute inset-0 z-30 pointer-events-none select-none flex items-center justify-center opacity-30">
+                        <div className="text-white text-xs md:text-sm font-semibold tracking-wider bg-black/45 px-3 py-1.5 rounded-full border border-white/10 whitespace-nowrap animate-float-watermark">
+                          {user?.email || "student@skillyug.com"}
+                        </div>
+                      </div>
+                    </>
                   ) : (
                     <div className="text-center z-40 relative">
                       <Lock className="w-10 h-10 text-slate-600 mx-auto mb-3" />
@@ -591,13 +928,116 @@ export default function MyBatchPage() {
                 </div>
 
                 {/* Custom Controls */}
-                <div className="bg-[#060a1f] p-4 flex items-center justify-center z-40 border-t border-white/10 h-[20%] lg:h-[15%]">
-                  <button 
-                    onClick={handlePlayPause}
-                    className="flex items-center justify-center w-14 h-14 bg-blue-600 rounded-full hover:bg-blue-500 hover:scale-105 transition-all text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-                  >
-                    {isPlaying ? <PauseCircle className="w-6 h-6" fill="currentColor" /> : <PlayCircle className="w-6 h-6" fill="currentColor" />}
-                  </button>
+                <div className="bg-[#060a1f] p-4 flex flex-col justify-center z-40 border-t border-white/10 h-[25%] lg:h-[20%]">
+                  {activeVideo.videoId ? (
+                    <div className="w-full flex flex-col gap-3">
+                      {/* Timeline Slider with custom tracks */}
+                      <div className="relative w-full group flex items-center h-4">
+                        {/* Background Track */}
+                        <div className="absolute left-0 right-0 h-1 rounded-full bg-white/10 pointer-events-none" />
+                        
+                        {/* Buffer Bar */}
+                        <div 
+                          className="absolute left-0 h-1 rounded-full bg-white/20 pointer-events-none transition-all duration-300"
+                          style={{ width: `${bufferedFraction * 100}%` }}
+                        />
+                        
+                        {/* Progress Bar */}
+                        <div 
+                          className="absolute left-0 h-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 pointer-events-none"
+                          style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                        />
+
+                        {/* Slider Thumb */}
+                        <div 
+                          className="absolute w-3 h-3 rounded-full bg-blue-400 border border-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none transform -translate-x-1/2"
+                          style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                        />
+
+                        {/* Input Range for Seeking */}
+                        <input 
+                          type="range"
+                          min={0}
+                          max={duration || 100}
+                          value={currentTime}
+                          onChange={handleSeekChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                      </div>
+
+                      {/* Controls Toolbar Row */}
+                      <div className="flex items-center justify-between w-full">
+                        {/* Left side: Play, Mute, Volume, Time */}
+                        <div className="flex items-center gap-4">
+                          <button 
+                            onClick={handlePlayPause}
+                            className="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-full hover:bg-blue-500 hover:scale-105 transition-all text-white shadow-[0_0_15px_rgba(37,99,235,0.3)] cursor-pointer"
+                            title={isPlaying ? "Pause" : "Play"}
+                          >
+                            {isPlaying ? (
+                              <PauseCircle className="w-5 h-5" fill="currentColor" />
+                            ) : (
+                              <PlayCircle className="w-5 h-5" fill="currentColor" />
+                            )}
+                          </button>
+
+                          {/* Mute/Volume controls */}
+                          <div className="flex items-center gap-2 group/volume relative">
+                            <button 
+                              onClick={handleToggleMute}
+                              className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                              title={isMuted ? "Unmute" : "Mute"}
+                            >
+                              {isMuted || volume === 0 ? (
+                                <VolumeX className="w-5 h-5" />
+                              ) : (
+                                <Volume2 className="w-5 h-5" />
+                              )}
+                            </button>
+                            
+                            {/* Sleek volume slider that expands on hover/focus */}
+                            <input 
+                              type="range"
+                              min={0}
+                              max={100}
+                              value={isMuted ? 0 : volume}
+                              onChange={handleVolumeChange}
+                              className="w-0 group-hover/volume:w-20 transition-all duration-300 h-1 bg-white/20 accent-blue-500 rounded-full cursor-pointer"
+                            />
+                          </div>
+
+                          {/* Time Display */}
+                          <div className="text-xs font-medium text-slate-400 tracking-wider">
+                            {formatTime(currentTime)} <span className="text-slate-600">/</span> {formatTime(duration)}
+                          </div>
+                        </div>
+
+                        {/* Right side: branding & fullscreen */}
+                        <div className="flex items-center gap-3">
+                          <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 select-none">
+                            Skillyug Player
+                          </span>
+                          <button 
+                            onClick={handleFullscreen}
+                            className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                          >
+                            {isFullscreen ? (
+                              <Minimize2 className="w-5 h-5" />
+                            ) : (
+                              <Maximize2 className="w-5 h-5" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center w-full">
+                      <span className="text-xs text-slate-500 font-bold uppercase tracking-widest select-none">
+                        No active recording
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
