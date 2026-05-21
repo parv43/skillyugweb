@@ -24,7 +24,11 @@ import {
   Volume2,
   VolumeX,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Play,
+  Pause,
+  RotateCcw,
+  RotateCw
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
@@ -136,6 +140,7 @@ export default function MyBatchPage() {
   const [volume, setVolume] = useState(50);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
@@ -163,6 +168,7 @@ export default function MyBatchPage() {
     setBufferedFraction(0);
     setIsPlaying(false);
     setPlayerError(null);
+    setPlaybackSpeed(1); // Reset speed on video change
 
     if (!activeVideo.videoId) {
       playerRef.current = null;
@@ -205,6 +211,12 @@ export default function MyBatchPage() {
               setPlayerError(null);
               playerRef.current = event.target;
               event.target.setVolume(volume);
+              
+              // Set initial playback speed
+              if (typeof event.target.setPlaybackRate === 'function') {
+                event.target.setPlaybackRate(playbackSpeed);
+              }
+
               if (isMuted) {
                 event.target.mute();
               } else {
@@ -324,6 +336,45 @@ export default function MyBatchPage() {
       player.pauseVideo();
     } else {
       player.playVideo();
+    }
+  };
+
+  const skipBackward = () => {
+    const player = playerRef.current;
+    if (!player) return;
+    try {
+      const newTime = Math.max(0, player.getCurrentTime() - 10);
+      player.seekTo(newTime, true);
+      setCurrentTime(newTime);
+      addDebugLog("Skipped back 10s");
+    } catch (e: any) {
+      addDebugLog(`Skip backward failed: ${e.message || e}`);
+    }
+  };
+
+  const skipForward = () => {
+    const player = playerRef.current;
+    if (!player) return;
+    try {
+      const newTime = Math.min(duration, player.getCurrentTime() + 10);
+      player.seekTo(newTime, true);
+      setCurrentTime(newTime);
+      addDebugLog("Skipped forward 10s");
+    } catch (e: any) {
+      addDebugLog(`Skip forward failed: ${e.message || e}`);
+    }
+  };
+
+  const handleSpeedChange = (speed: number) => {
+    setPlaybackSpeed(speed);
+    const player = playerRef.current;
+    if (player && typeof player.setPlaybackRate === 'function') {
+      try {
+        player.setPlaybackRate(speed);
+        addDebugLog(`Speed changed to: ${speed}x`);
+      } catch (e: any) {
+        addDebugLog(`Set playback rate failed: ${e.message || e}`);
+      }
     }
   };
 
@@ -1053,19 +1104,40 @@ export default function MyBatchPage() {
 
                       {/* Controls Toolbar Row */}
                       <div className="flex items-center justify-between w-full">
-                        {/* Left side: Play, Mute, Volume, Time */}
+                        {/* Left side: Play/Pause/Skip controls, Mute, Volume, Time */}
                         <div className="flex items-center gap-4">
-                          <button 
-                            onClick={handlePlayPause}
-                            className="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-full hover:bg-blue-500 hover:scale-105 transition-all text-white shadow-[0_0_15px_rgba(37,99,235,0.3)] cursor-pointer"
-                            title={isPlaying ? "Pause" : "Play"}
-                          >
-                            {isPlaying ? (
-                              <PauseCircle className="w-5 h-5" fill="currentColor" />
-                            ) : (
-                              <PlayCircle className="w-5 h-5" fill="currentColor" />
-                            )}
-                          </button>
+                          <div className="flex items-center gap-3.5">
+                            {/* Skip Backward 10s */}
+                            <button
+                              onClick={skipBackward}
+                              className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                              title="Skip Backward 10s"
+                            >
+                              <RotateCcw className="w-5 h-5" />
+                            </button>
+
+                            {/* Play/Pause Button */}
+                            <button 
+                              onClick={handlePlayPause}
+                              className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                              title={isPlaying ? "Pause" : "Play / Continue"}
+                            >
+                              {isPlaying ? (
+                                <Pause className="w-5 h-5" />
+                              ) : (
+                                <Play className="w-5 h-5" fill="currentColor" />
+                              )}
+                            </button>
+
+                            {/* Skip Forward 10s */}
+                            <button
+                              onClick={skipForward}
+                              className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                              title="Skip Forward 10s"
+                            >
+                              <RotateCw className="w-5 h-5" />
+                            </button>
+                          </div>
 
                           {/* Mute/Volume controls */}
                           <div className="flex items-center gap-2 group/volume relative">
@@ -1098,8 +1170,24 @@ export default function MyBatchPage() {
                           </div>
                         </div>
 
-                        {/* Right side: branding & fullscreen */}
+                        {/* Right side: playback speed, branding & fullscreen */}
                         <div className="flex items-center gap-3">
+                          <select
+                            value={playbackSpeed}
+                            onChange={(e) => handleSpeedChange(Number(e.target.value))}
+                            className="bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-300 outline-none cursor-pointer transition-colors"
+                            title="Playback Speed"
+                          >
+                            <option value={0.25} className="bg-[#060a1f] text-slate-300">0.25x</option>
+                            <option value={0.5} className="bg-[#060a1f] text-slate-300">0.5x</option>
+                            <option value={0.75} className="bg-[#060a1f] text-slate-300">0.75x</option>
+                            <option value={1} className="bg-[#060a1f] text-slate-300">1.0x (Normal)</option>
+                            <option value={1.25} className="bg-[#060a1f] text-slate-300">1.25x</option>
+                            <option value={1.5} className="bg-[#060a1f] text-slate-300">1.5x</option>
+                            <option value={1.75} className="bg-[#060a1f] text-slate-300">1.75x</option>
+                            <option value={2} className="bg-[#060a1f] text-slate-300">2.0x</option>
+                          </select>
+
                           <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 select-none">
                             Skillyug Player
                           </span>
