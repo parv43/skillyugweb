@@ -98,7 +98,19 @@ export async function POST(request: NextRequest) {
       playlistId
     )}&maxResults=50&key=${apiKey}`;
 
-    const ytRes = await fetch(ytUrl);
+    // Extract the host and protocol to construct a valid Referer.
+    // This is required because server-side fetches don't automatically send a Referer,
+    // which causes Google API Key restrictions to return 403 Forbidden (<empty> referer).
+    const host = request.headers.get("host") || "skillyugedu.com";
+    const protocol = request.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
+    const referer = `${protocol}://${host}/`;
+
+    const ytRes = await fetch(ytUrl, {
+      headers: {
+        "Referer": referer,
+      }
+    });
+
     if (!ytRes.ok) {
       const errorText = await ytRes.text();
       console.error("[Sync API] YouTube API error:", errorText);
