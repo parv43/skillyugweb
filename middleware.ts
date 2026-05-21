@@ -15,7 +15,7 @@ export function middleware(request: NextRequest) {
     "object-src 'none'",
     "frame-ancestors 'self'",
     "form-action 'self'",
-    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""} https://checkout.razorpay.com https://*.razorpay.com https://unpkg.com`,
+    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""} https://checkout.razorpay.com https://*.razorpay.com https://unpkg.com https://www.youtube.com https://s.ytimg.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' data: https://fonts.gstatic.com",
     [
@@ -24,6 +24,7 @@ export function middleware(request: NextRequest) {
       "https://api.dicebear.com",
       "https://lh3.googleusercontent.com",
       "https://app.spline.design",
+      "https://*.ytimg.com",
       supabaseOrigin,
     ].filter(Boolean).join(" "),
     [
@@ -39,7 +40,7 @@ export function middleware(request: NextRequest) {
       "https://unpkg.com",
       "https://fonts.gstatic.com",
     ].filter(Boolean).join(" "),
-    "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com https://*.razorpay.com",
+    "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com https://*.razorpay.com https://www.youtube.com https://www.youtube-nocookie.com",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
     "media-src 'self' blob: data:",
