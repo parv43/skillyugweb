@@ -97,12 +97,17 @@ export default function MyBatchPage() {
           return;
         }
 
-        const mappedRecordings = (recordings || []).map((rec: any, idx: number) => ({
-          id: rec.id || `db-${idx}`,
-          title: rec.title,
-          date: rec.custom_date || "Unknown Date",
-          videoId: rec.youtube_video_id
-        }));
+        const mappedRecordings = (recordings || [])
+          .filter((rec: any) => {
+            const titleLower = (rec.title || "").toLowerCase();
+            return titleLower !== "deleted video" && titleLower !== "private video";
+          })
+          .map((rec: any, idx: number) => ({
+            id: rec.id || `db-${idx}`,
+            title: rec.title,
+            date: rec.custom_date || "Unknown Date",
+            videoId: rec.youtube_video_id
+          }));
 
         const combined = [...mappedRecordings];
         if (combined.length < MOCK_VIDEOS.length) {

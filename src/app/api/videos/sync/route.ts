@@ -140,24 +140,49 @@ export async function POST(request: NextRequest) {
         published_at: publishedAt,
         custom_date: formatCustomDate(publishedAt)
       };
-    }).filter((rec: any) => rec.youtube_video_id !== ""); // omit items without a videoId
+    }).filter((rec: any) => {
+      const titleLower = rec.title.toLowerCase();
+      return rec.youtube_video_id !== "" && 
+             titleLower !== "deleted video" && 
+             titleLower !== "private video";
+    });
 
-    if (recordings.length === 0) {
-      return NextResponse.json({ message: "No valid video IDs found in playlist items.", count: 0 });
-    }
-
-    // 5. Upsert to Supabase using Admin client to bypass read-only policies
+    // 5. Upsert active recordings and clean up deleted records
     const admin = createSupabaseAdmin();
-    const { error: upsertError } = await admin
-      .from("session_recordings")
-      .upsert(recordings, { onConflict: "youtube_video_id" });
 
-    if (upsertError) {
-      console.error("[Sync API] Supabase upsert error:", upsertError);
-      return NextResponse.json(
-        { error: "Failed to write recordings to database." },
-        { status: 500 }
-      );
+    if (recordings.length > 0) {
+      const { error: upsertError } = await admin
+        .from("session_recordings")
+        .upsert(recordings, { onConflict: "youtube_video_id" });
+
+      if (upsertError) {
+        console.error("[Sync API] Supabase upsert error:", upsertError);
+        return NextResponse.json(
+          { error: "Failed to write recordings to database." },
+          { status: 500 }
+        );
+      }
+
+      // Delete any database recordings that are no longer in the active playlist
+      const activeIds = recordings.map((r: any) => r.youtube_video_id);
+      const { error: deleteError } = await admin
+        .from("session_recordings")
+        .delete()
+        .not("youtube_video_id", "in", `(${activeIds.join(",")})`);
+
+      if (deleteError) {
+        console.error("[Sync API] Supabase delete inactive error:", deleteError);
+      }
+    } else {
+      // If the playlist has no valid/active videos, clear the database table
+      const { error: deleteError } = await admin
+        .from("session_recordings")
+        .delete()
+        .neq("youtube_video_id", ""); // matches all
+
+      if (deleteError) {
+        console.error("[Sync API] Supabase clear table error:", deleteError);
+      }
     }
 
     return NextResponse.json({
