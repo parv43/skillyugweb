@@ -173,7 +173,7 @@ export default function HeroSection() {
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
               Give Your Child the AI Tools<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text">
-                They Need to Build Real Projects
+                They Need to Build Real World Things
               </span>
             </h2>
 
