@@ -2,6 +2,7 @@ import React from "react";
 import { createClient } from "@supabase/supabase-js";
 import { BadgeCheck, Calendar, ShieldCheck, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 
 // Initialize Supabase (Public access)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -99,9 +100,9 @@ export default async function VerifyCertificatePage({ params }: { params: { cert
           )}
 
           <div className="mt-12">
-            <a href="/" className="text-blue-400 hover:text-blue-300 text-sm font-bold uppercase tracking-widest underline underline-offset-8">
+            <Link href="/" className="text-blue-400 hover:text-blue-300 text-sm font-bold uppercase tracking-widest underline underline-offset-8">
               Return to Skillyug
-            </a>
+            </Link>
           </div>
         </div>
       </div>
