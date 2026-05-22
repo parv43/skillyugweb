@@ -1,6 +1,9 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import { createMetadata, getOrganizationSchema, siteConfig } from "@/lib/seo"
+import { PostHogProvider } from './providers'
+import PostHogPageView from './PostHogPageView'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   ...createMetadata({
@@ -30,18 +33,34 @@ export default async function RootLayout({
 }) {
   const nonce = (await headers()).get("x-nonce") ?? ""
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseHost = supabaseUrl ? new URL(supabaseUrl).host : null
+
   return (
     <html lang="en">
       <head>
         {/* Link to llms.txt so AI crawlers and Semrush can discover it without following internal links */}
         <link rel="llms" href="/llms.txt" />
+        {supabaseHost && (
+          <>
+            <link rel="preconnect" href={`https://${supabaseHost}`} />
+            <link rel="dns-prefetch" href={`https://${supabaseHost}`} />
+          </>
+        )}
         <script
           type="application/ld+json"
           nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <PostHogProvider>
+          <Suspense fallback={null}>
+            <PostHogPageView />
+          </Suspense>
+          {children}
+        </PostHogProvider>
+      </body>
     </html>
   )
 }

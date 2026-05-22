@@ -7,6 +7,9 @@ const nextConfig = {
   reactStrictMode: false,
   typescript: { ignoreBuildErrors: true },
   pageExtensions: ["js", "jsx", "ts", "tsx"],
+  experimental: {
+    optimizePackageImports: ["lucide-react", "@supabase/supabase-js"],
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 85],
