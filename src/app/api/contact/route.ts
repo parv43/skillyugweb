@@ -50,12 +50,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as {
+        const body = (await request.json()) as {
       company?: string;
       message?: string;
       name?: string;
       phone?: string;
       role?: string;
+      _bot_check?: string;
     };
 
     const authHeader = request.headers.get("authorization");
@@ -82,7 +83,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const botField = typeof (body as any)._bot_check === "string" ? (body as any)._bot_check.trim() : "";
+    const botField = typeof body._bot_check === "string" ? body._bot_check.trim() : "";
     if (botField) {
       return NextResponse.json({ success: true });
     }

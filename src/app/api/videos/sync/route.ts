@@ -4,6 +4,24 @@ import { getRequiredEnv } from "@/lib/razorpayServer";
 
 export const runtime = "nodejs";
 
+interface YouTubePlaylistItem {
+  snippet?: {
+    title?: string;
+    publishedAt?: string;
+    resourceId?: {
+      videoId?: string;
+    };
+  };
+}
+
+interface Recording {
+  youtube_video_id: string;
+  title: string;
+  published_at: string;
+  custom_date: string;
+}
+
+
 function createSupabaseAdmin() {
   return createClient(
     getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
@@ -128,7 +146,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Map YouTube data to database structure
-    const recordings = items.map((item: any) => {
+    const recordings: Recording[] = (items as YouTubePlaylistItem[]).map((item) => {
       const snippet = item.snippet || {};
       const videoId = snippet.resourceId?.videoId || "";
       const title = snippet.title || "Untitled Video";
@@ -140,7 +158,7 @@ export async function POST(request: NextRequest) {
         published_at: publishedAt,
         custom_date: formatCustomDate(publishedAt)
       };
-    }).filter((rec: any) => {
+    }).filter((rec) => {
       const titleLower = rec.title.toLowerCase();
       return rec.youtube_video_id !== "" && 
              titleLower !== "deleted video" && 
@@ -164,7 +182,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Delete any database recordings that are no longer in the active playlist
-      const activeIds = recordings.map((r: any) => r.youtube_video_id);
+      const activeIds = recordings.map((r) => r.youtube_video_id);
       const { error: deleteError } = await admin
         .from("session_recordings")
         .delete()
@@ -190,10 +208,11 @@ export async function POST(request: NextRequest) {
       count: recordings.length,
       recordings
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[Sync API] Sync failed with unexpected error:", error);
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred during sync.";
     return NextResponse.json(
-      { error: error.message || "An unexpected error occurred during sync." },
+      { error: errorMessage },
       { status: 500 }
     );
   }
