@@ -54,7 +54,7 @@ export default function BootcampTimeline() {
         }
         return prev + 1
       })
-    }, 1000) // 1-second delay between steps
+    }, 1500) // 1.5-second delay for a slower, dramatic glow effect
 
     return () => clearInterval(timer)
   }, [isAutoPlaying, steps.length])
@@ -77,6 +77,25 @@ export default function BootcampTimeline() {
       id="curriculum"
       className="relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50 flex flex-col items-center select-none"
     >
+      {/* Custom Animations for Glowing Nodes */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 15px rgba(59,130,246,0.4); transform: scale(1.05); }
+          50% { box-shadow: 0 0 35px rgba(59,130,246,0.8); transform: scale(1.15); }
+        }
+        @keyframes fade-in-glow {
+          from { box-shadow: 0 0 0px rgba(59,130,246,0); }
+          to { box-shadow: 0 0 15px rgba(59,130,246,0.3); }
+        }
+        .node-current {
+          animation: pulse-glow 2s infinite ease-in-out;
+          z-index: 20;
+        }
+        .node-completed {
+          animation: fade-in-glow 1s forwards;
+        }
+      `}} />
+
       {/* Header Section */}
       <div className="text-center mb-16 px-6 max-w-3xl mx-auto">
         <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-4 tracking-tight">
@@ -90,7 +109,7 @@ export default function BootcampTimeline() {
       {/* Winding Timeline Section */}
       <div className="w-full flex justify-center mt-6">
         <div 
-          className="relative animate-fade-in" 
+          className="relative" 
           style={{ width: timelineWidth, height: timelineHeight }}
         >
           {/* Background SVG for Connecting Lines */}
@@ -110,20 +129,47 @@ export default function BootcampTimeline() {
               const midY = (startY + endY) / 2
               const pathData = `M ${startX},${startY} C ${startX},${midY} ${endX},${midY} ${endX},${endY}`
               
-              // Path is blue if the node it leads to has been reached/completed
+              // Path is active if the node it leads to has been reached/completed
               const isActivePath = i < activeStep
 
               return (
-                <path
-                  key={`path-${i}`}
-                  d={pathData}
-                  fill="none"
-                  stroke={isActivePath ? "#3b82f6" : "#1e293b"}
-                  strokeWidth="3"
-                  strokeDasharray="8 8"
-                  className="transition-colors duration-500"
-                  style={isActivePath ? { filter: 'drop-shadow(0 0 6px rgba(59,130,246,0.4))' } : {}}
-                />
+                <g key={`path-group-${i}`}>
+                  {/* Base dark dashed path (always visible) */}
+                  <path
+                    d={pathData}
+                    fill="none"
+                    stroke="#1e293b"
+                    strokeWidth="3"
+                    strokeDasharray="8 8"
+                  />
+
+                  {/* Mask that creates the progressive drawing effect */}
+                  <mask id={`glow-mask-${i}`}>
+                    <path
+                      d={pathData}
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="10" // Thicker than the visible line to ensure full coverage
+                      pathLength="100" // Normalizes the path length to 100 for easy CSS percentages
+                      strokeDasharray="100"
+                      style={{
+                        strokeDashoffset: isActivePath ? 0 : 100,
+                        transition: "stroke-dashoffset 1.2s ease-in-out",
+                      }}
+                    />
+                  </mask>
+
+                  {/* Glowing active path (revealed slowly by the mask above) */}
+                  <path
+                    d={pathData}
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth="3"
+                    strokeDasharray="8 8"
+                    mask={`url(#glow-mask-${i})`}
+                    style={{ filter: "drop-shadow(0 0 8px rgba(59,130,246,0.6))" }}
+                  />
+                </g>
               )
             })}
           </svg>
@@ -141,31 +187,31 @@ export default function BootcampTimeline() {
             const Icon = step.icon
 
             // Dynamic Styling based on state
-            const ringColor = isCompleted || isCurrent ? 'border-[#3b82f6]' : 'border-slate-800'
-            const bgColor = isCurrent ? 'bg-[#0f172a]' : 'bg-[#020617]'
+            const ringColor = isCompleted || isCurrent ? "border-[#3b82f6]" : "border-slate-800"
+            const bgColor = isCurrent ? "bg-[#0f172a]" : "bg-[#020617]"
             const iconColor = isCompleted || isCurrent 
-                                ? (i === 4 ? 'text-yellow-400' : 'text-[#3b82f6]') 
-                                : 'text-slate-600'
+                                ? (i === 4 ? "text-yellow-400" : "text-[#3b82f6]") 
+                                : "text-slate-600"
             
-            const textOpacity = isLocked ? 'opacity-40' : 'opacity-100'
+            const textOpacity = isLocked ? "opacity-40" : "opacity-100"
 
             return (
               <React.Fragment key={`node-${i}`}>
                 {/* Text Block */}
                 <div
-                  className={`absolute flex flex-col justify-center h-16 transition-all duration-300 ${textOpacity}`}
+                  className={`absolute flex flex-col justify-center h-16 transition-opacity duration-300 ${textOpacity}`}
                   style={{
                     top: cy - 32,
-                    left: isLeft ? cx + 48 : 'auto',
-                    right: !isLeft ? (timelineWidth - cx) + 48 : 'auto',
+                    left: isLeft ? cx + 48 : "auto",
+                    right: !isLeft ? (timelineWidth - cx) + 48 : "auto",
                     width: 170,
-                    textAlign: isLeft ? 'left' : 'right',
+                    textAlign: isLeft ? "left" : "right",
                   }}
                 >
                   <span className="text-[10px] font-bold tracking-[0.15em] text-[#3b82f6] uppercase mb-1 drop-shadow-sm">
                     {step.week}
                   </span>
-                  <h3 className={`text-base font-bold leading-tight mb-1 transition-colors ${isLocked ? 'text-slate-500' : 'text-white'}`}>
+                  <h3 className={`text-base font-bold leading-tight mb-1 ${isLocked ? "text-slate-300" : "text-white"}`}>
                     {step.title}
                   </h3>
                   <p className="text-xs text-slate-400 leading-snug">
@@ -175,16 +221,15 @@ export default function BootcampTimeline() {
 
                 {/* Circular Icon Node */}
                 <div
-                  className={`absolute w-16 h-16 rounded-full border-2 ${ringColor} ${bgColor} flex items-center justify-center cursor-pointer transition-all duration-300 z-10 shadow-lg hover:scale-105 hover:bg-slate-900/60`}
+                  className={`absolute w-16 h-16 rounded-full border-2 ${ringColor} ${bgColor} flex items-center justify-center cursor-pointer transition-colors duration-500 z-10 hover:bg-blue-950/40 ${isCurrent ? "node-current" : ""} ${isCompleted ? "node-completed" : ""}`}
                   style={{ 
                     top: cy - 32, 
-                    left: cx - 32,
-                    boxShadow: isCurrent ? '0 0 20px rgba(59,130,246,0.2)' : 'none'
+                    left: cx - 32
                   }}
                   onClick={() => handleNodeClick(i)}
                   title={`Jump to ${step.week}`}
                 >
-                  <Icon className={`w-7 h-7 ${iconColor} transition-colors duration-300`} />
+                  <Icon className={`w-7 h-7 ${iconColor} transition-colors duration-500`} />
                   
                   {/* Current Step Indicator Badge (like the yellow star in screenshot 2) */}
                   {isCurrent && (
