@@ -1,6 +1,9 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import { createMetadata, getOrganizationSchema, siteConfig } from "@/lib/seo"
+import { PostHogProvider } from './providers'
+import PostHogPageView from './PostHogPageView'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   ...createMetadata({
@@ -50,7 +53,14 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <PostHogProvider>
+          <Suspense fallback={null}>
+            <PostHogPageView />
+          </Suspense>
+          {children}
+        </PostHogProvider>
+      </body>
     </html>
   )
 }
