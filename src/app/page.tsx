@@ -1,18 +1,20 @@
 import { Metadata } from "next"
 import Link from "next/link"
 import Image from "next/image"
+import dynamic from "next/dynamic"
 import Navbar from "@/components/Navbar"
 import HeroSection from "@/components/HeroSection"
-import SkillsSection from "@/components/SkillsSection"
-import StudentProjects from "@/components/StudentProjects"
-import BootcampTimeline from "@/components/BootcampTimeline"
-import AIToolsSection from "@/components/AIToolsSection"
-import InteractiveChatDemo from "@/components/InteractiveChatDemo"
-import GallerySection from "@/components/GallerySection"
-import Testimonials from "@/components/Testimonials"
 import PaymentSupportNotice from "@/components/PaymentSupportNotice"
-import ContactUs from "@/components/ContactUs"
 import { createMetadata, getHomeFaqSchema } from "@/lib/seo"
+
+const SkillsSection = dynamic(() => import("@/components/SkillsSection"))
+const StudentProjects = dynamic(() => import("@/components/StudentProjects"))
+const BootcampTimeline = dynamic(() => import("@/components/BootcampTimeline"))
+const AIToolsSection = dynamic(() => import("@/components/AIToolsSection"))
+const InteractiveChatDemo = dynamic(() => import("@/components/InteractiveChatDemo"))
+const GallerySection = dynamic(() => import("@/components/GallerySection"))
+const Testimonials = dynamic(() => import("@/components/Testimonials"))
+const ContactUs = dynamic(() => import("@/components/ContactUs"))
 
 export const metadata: Metadata = {
   ...createMetadata({

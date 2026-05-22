@@ -13,31 +13,31 @@ export default function BootcampTimeline() {
     { 
       week: "Week 01", 
       title: "The AI Universe", 
-      desc: "Uncover what modern AI can truly achieve.", 
+      desc: "Prompt AI tools to create stunning art, stories, and sound.", 
       icon: Compass 
     },
     { 
       week: "Week 02", 
       title: "Mind & Machine", 
-      desc: "Study smarter, compute faster, and create responsibly.", 
+      desc: "Learn mental math, smart study habits, and safe AI rules.", 
       icon: Brain 
     },
     { 
       week: "Week 03", 
-      title: "Logic & Systems", 
-      desc: "Draw the invisible lines of digital thought.", 
+      title: "The Blueprint of Thought", 
+      desc: "Map out flowcharts and learn how computers solve problems.", 
       icon: GitMerge 
     },
     { 
       week: "Week 04", 
-      title: "The First Keystroke", 
-      desc: "Speak the machine's language through code.", 
+      title: "The Builder's First Steps", 
+      desc: "Use simple commands to build your first coding project.", 
       icon: TerminalSquare 
     },
     { 
       week: "Week 05", 
-      title: "Creative Mastery", 
-      desc: "Generate stunning multimedia and claim your crown.", 
+      title: "The Creative Masterpiece", 
+      desc: "Design presentations, launch your project, and claim your crown.", 
       icon: Crown 
     },
   ]
