@@ -1,12 +1,13 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { Compass, Brain, GitMerge, TerminalSquare, Crown, Star } from "lucide-react"
 
 export default function BootcampTimeline() {
   // Start at 0 and track auto-playing state
   const [activeStep, setActiveStep] = useState(0)
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
 
   const steps = [
     { 
@@ -59,6 +60,29 @@ export default function BootcampTimeline() {
     return () => clearInterval(timer)
   }, [isAutoPlaying, steps.length])
 
+  // Scroll and intersection tracking to play animation on scroll into view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveStep(0)
+            setIsAutoPlaying(true)
+          } else {
+            setIsAutoPlaying(false)
+          }
+        })
+      },
+      { threshold: 0.15 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   const handleNodeClick = (index: number) => {
     setIsAutoPlaying(false) // Stop animation on user interaction
     setActiveStep(index)
@@ -74,6 +98,7 @@ export default function BootcampTimeline() {
 
   return (
     <section
+      ref={sectionRef}
       id="curriculum"
       className="relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50 flex flex-col items-center select-none"
     >
