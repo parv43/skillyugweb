@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useAccessControl } from "@/hooks/useAccessControl"
+import FirstClassCountdown from "@/components/FirstClassCountdown"
 
 // The tool cards orbiting the central badge
 interface OrbitingToolProps {
@@ -72,6 +73,11 @@ function MobileHero() {
         >
           In a highly competitive world, standard school education isn&apos;t enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
         </p>
+
+        {/* Countdown CTA */}
+        <div className="w-full mb-6 max-w-sm">
+          <FirstClassCountdown />
+        </div>
 
         {/* CTAs */}
         <div
@@ -182,6 +188,11 @@ export default function HeroSection() {
               enough. We train your child to leverage advanced AI, giving them a
               massive edge in academics and their future career.
             </p>
+
+            {/* Countdown CTA */}
+            <div className="w-full mb-8 max-w-xl">
+              <FirstClassCountdown />
+            </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
               {!loading && !hasSlot && (
