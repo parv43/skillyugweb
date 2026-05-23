@@ -1120,18 +1120,36 @@ export default function MyBatchPage() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 relative overflow-x-hidden select-none">
       {isParentViewOnly && (
-        <div className="bg-blue-600/25 border-b border-blue-500/20 px-6 py-3 text-center text-xs font-black uppercase tracking-[0.24em] text-blue-300 flex flex-wrap items-center justify-center gap-4 relative z-50">
-          <div className="flex items-center gap-2">
-            <BadgeCheck className="w-4 h-4 flex-shrink-0" />
-            Parent View-Only Oversight Mode: Viewing {viewOnlyStudentName}&apos;s Batch Workspace
+        <>
+          <style dangerouslySetInnerHTML={{ __html: `
+            header.fixed, header {
+              top: 2.75rem !important;
+              transition: top 0.3s ease !important;
+            }
+            .parent-banner-btn:hover .arrow-icon {
+              transform: translateX(-3px);
+            }
+          `}} />
+          <div className="fixed top-0 inset-x-0 h-11 bg-[#090d1a]/95 backdrop-blur-md border-b border-blue-500/30 z-[100] flex items-center justify-between px-6 shadow-lg select-none">
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center flex-shrink-0 animate-pulse">
+                <BadgeCheck className="w-4 h-4 text-blue-400" />
+              </div>
+              <div className="text-left">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 block font-mono">Parent Oversight</span>
+                <span className="text-xs font-semibold text-slate-200 block">Viewing {viewOnlyStudentName}&apos;s batch workspace</span>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => router.push("/parent-portal")}
+              className="parent-banner-btn flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/30 hover:border-blue-500/50 text-[10px] font-bold uppercase tracking-widest text-blue-300 hover:text-white transition-all shadow-[0_2px_8px_rgba(59,130,246,0.05)] cursor-pointer active:scale-95 duration-200"
+            >
+              <span className="arrow-icon transition-transform duration-200 text-xs">←</span>
+              Back to Parent Portal
+            </button>
           </div>
-          <button
-            onClick={() => router.push("/parent-portal")}
-            className="px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-[10px] font-bold uppercase tracking-wider text-white transition-all shadow-md flex items-center gap-1.5 cursor-pointer ml-2 hover:scale-105 active:scale-95"
-          >
-            ← Back to Parent Portal
-          </button>
-        </div>
+        </>
       )}
       {/* Screen recording deterrence overlay */}
       {isBlurred && (
