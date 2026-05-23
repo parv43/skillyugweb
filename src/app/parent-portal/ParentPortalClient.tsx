@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Users, Plus, CreditCard, Mail, Key, Share2, CheckCircle, ArrowRight, Loader2, LogOut, Copy, ShieldAlert } from "lucide-react";
+import { Users, Plus, CreditCard, Mail, Key, Share2, CheckCircle, ArrowRight, Loader2, LogOut, Copy, ShieldAlert, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import Script from "next/script";
@@ -182,6 +182,16 @@ function ParentPortalContent() {
         },
         theme: {
           color: "#4f46e5",
+        },
+        modal: {
+          confirm_close: true,
+          ondismiss: () => {
+            if (!paymentFinalized) {
+              setEnrollError("Payment was cancelled before completion.");
+              setPaymentStep("checkout");
+              setEnrollingKid(false);
+            }
+          },
         },
         handler: async (paymentPayload: RazorpaySuccessPayload) => {
           paymentFinalized = true;
@@ -389,22 +399,30 @@ function ParentPortalContent() {
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="rounded-xl border border-purple-100 bg-purple-50 p-3">
-                    <CreditCard className="h-5 w-5 text-purple-600" />
+                    <ShieldCheck className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900">Checkout</h3>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-mono">Secure Payment</p>
+                    <h3 className="text-lg font-black text-slate-900">Secure Checkout</h3>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-mono">100% Encrypted Payment</p>
                   </div>
                 </div>
 
-                <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">AI Creator Bootcamp Slot</span>
-                    <span className="text-slate-800 font-bold">₹399.00</span>
+                <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 space-y-2.5">
+                  <div className="flex justify-between text-xs text-slate-500 font-medium">
+                    <span>Bootcamp Co-pay Amount</span>
+                    <span className="font-semibold text-slate-700">₹399.00</span>
                   </div>
-                  <div className="flex justify-between text-sm pt-2.5 border-t border-slate-100 font-black text-lg">
-                    <span className="text-slate-900">Total Amount</span>
-                    <span className="text-purple-600">₹399.00</span>
+                  <div className="flex justify-between text-xs text-slate-500 font-medium">
+                    <span>Platform Convenience Fee</span>
+                    <span className="font-semibold text-green-600 font-mono tracking-wider text-[10px] uppercase">FREE</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-500 font-medium">
+                    <span>Taxes (GST Included)</span>
+                    <span className="font-semibold text-slate-700">₹0.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm pt-3 border-t border-slate-200 font-black text-base">
+                    <span className="text-slate-900">Total Payable</span>
+                    <span className="text-purple-650">₹399.00</span>
                   </div>
                 </div>
 
@@ -425,8 +443,10 @@ function ParentPortalContent() {
                           type="email"
                           required
                           value={kidEmailInput}
-                          onChange={(e) => setKidEmailInput(e.target.value)}
+                          onChange={(e) => setKidEmailInput(e.target.value.trim().toLowerCase())}
                           placeholder="kid@gmail.com"
+                          autoComplete="email"
+                          spellCheck="false"
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                         />
                       </div>
@@ -435,23 +455,37 @@ function ParentPortalContent() {
                 )}
 
                 {enrollError && (
-                  <p className="text-xs text-red-500 font-semibold text-center">{enrollError}</p>
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold text-center leading-relaxed">
+                    ⚠️ {enrollError}
+                  </div>
                 )}
 
                 <button
                   onClick={(e) => triggerPayment(e)}
                   disabled={enrollingKid}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:scale-[1.02] shadow-md disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:scale-[1.02] shadow-md disabled:opacity-50 cursor-pointer active:scale-[0.98]"
                 >
                   {enrollingKid ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Opening Payment...
+                      Opening Secure Payment...
                     </>
                   ) : (
-                    "Pay ₹399.00"
+                    "Pay ₹399.00 Securely"
                   )}
                 </button>
+
+                <div className="pt-4 border-t border-slate-100 flex flex-col items-center justify-center space-y-2">
+                  <div className="flex items-center gap-1.5 text-[9px] text-slate-400 font-bold font-mono uppercase tracking-widest">
+                    <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
+                    Secure Payments Secured by Razorpay
+                  </div>
+                  <div className="flex items-center gap-2.5 text-[9px] font-mono text-slate-400 font-bold uppercase tracking-widest bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
+                    <span>SSL Encrypted</span>
+                    <span className="text-slate-300">•</span>
+                    <span>PCI-DSS Compliant</span>
+                  </div>
+                </div>
               </div>
             )}
 
