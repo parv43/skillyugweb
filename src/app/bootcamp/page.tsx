@@ -154,15 +154,15 @@ function EnrollmentCard() {
         style={cardStyle}
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
-        className="group relative overflow-hidden rounded-[2rem] border border-purple-400/30 bg-[#090a12]/90 shadow-[0_30px_90px_rgba(0,0,0,0.55),0_0_55px_rgba(124,58,237,0.18)] backdrop-blur-xl transition-transform duration-200 ease-out will-change-transform [transform:perspective(1400px)_rotateX(var(--rx))_rotateY(var(--ry))] [transform-style:preserve-3d]"
+        className="group relative overflow-hidden rounded-[2rem] border border-purple-100 dark:border-white/5 bg-white dark:bg-[#090d1f] shadow-[0_20px_50px_rgba(99,102,241,0.05)] transition-transform duration-200 ease-out will-change-transform [transform:perspective(1400px)_rotateX(var(--rx))_rotateY(var(--ry))] [transform-style:preserve-3d]"
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_var(--mx)_var(--my),rgba(168,85,247,0.24),transparent_34%)] opacity-90" />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.1),transparent_28%,rgba(59,130,246,0.08)_68%,transparent)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_var(--mx)_var(--my),rgba(168,85,247,0.08),transparent_34%)] opacity-90" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(99,102,241,0.03),transparent_28%,rgba(59,130,246,0.03)_68%,transparent)]" />
         <div className="relative p-4 sm:p-6">
-          <div className="relative h-72 overflow-hidden rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_50%_40%,rgba(99,102,241,0.28),transparent_30%),linear-gradient(135deg,#030712_0%,#111037_55%,#2e1065_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] [transform:translateZ(42px)]">
-            <div className="absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:34px_34px]" />
-            <div className="absolute left-1/2 top-[46%] h-48 w-[34rem] -translate-x-1/2 -translate-y-1/2 rotate-[-12deg] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.2),rgba(37,99,235,0.18)_38%,rgba(168,85,247,0.12)_55%,transparent_72%)] blur-sm transition duration-500 group-hover:rotate-[-7deg]" />
-            <div className="absolute left-1/2 top-[47%] h-44 w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/35 blur-2xl" />
+          <div className="relative h-72 overflow-hidden rounded-[1.5rem] border border-purple-100 dark:border-white/5 bg-[radial-gradient(circle_at_50%_40%,rgba(168,85,247,0.12),transparent_30%),linear-gradient(135deg,#f5f3ff_0%,#e0e7ff_55%,#dbeafe_100%)] dark:bg-[radial-gradient(circle_at_50%_40%,rgba(168,85,247,0.12),transparent_30%),linear-gradient(135deg,#0b0a0f_0%,#050a1e_55%,#020617_100%)] shadow-sm [transform:translateZ(42px)]">
+            <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(139,92,246,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.08)_1px,transparent_1px)] [background-size:34px_34px]" />
+            <div className="absolute left-1/2 top-[46%] h-48 w-[34rem] -translate-x-1/2 -translate-y-1/2 rotate-[-12deg] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.06),rgba(37,99,235,0.06)_38%,rgba(168,85,247,0.04)_55%,transparent_72%)] blur-sm transition duration-500 group-hover:rotate-[-7deg]" />
+            <div className="absolute left-1/2 top-[47%] h-44 w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/5 blur-2xl" />
             <div className="absolute left-1/2 top-[43%] w-[21rem] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] opacity-20 blur-md transition duration-500 group-hover:translate-y-[-54%] group-hover:rotate-[-1deg] sm:w-[29rem]">
               <Image
                 src="/skillyug.png"
@@ -190,37 +190,37 @@ function EnrollmentCard() {
                 className="h-auto w-full drop-shadow-[0_0_28px_rgba(59,130,246,0.22)]"
               />
             </div>
-            <div className="absolute left-1/2 top-[65%] h-10 w-[24rem] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.24),rgba(168,85,247,0.14)_46%,transparent_72%)] blur-md transition duration-500 group-hover:w-[28rem]" />
-            <div className="absolute left-1/2 top-[43%] h-52 w-[34rem] -translate-x-1/2 -translate-y-1/2 rotate-[-10deg] rounded-full border border-blue-400/15 transition duration-500 group-hover:rotate-[-4deg]" />
-            <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-[#090a12] to-transparent" />
-            <div className="absolute right-5 top-5 flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-2 text-xs font-semibold text-purple-100 backdrop-blur-md">
-              <Sparkles className="h-4 w-4 text-purple-300" />
+            <div className="absolute left-1/2 top-[65%] h-10 w-[24rem] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.15),rgba(168,85,247,0.08)_46%,transparent_72%)] blur-md transition duration-500 group-hover:w-[28rem]" />
+            <div className="absolute left-1/2 top-[43%] h-52 w-[34rem] -translate-x-1/2 -translate-y-1/2 rotate-[-10deg] rounded-full border border-purple-200/40 transition duration-500 group-hover:rotate-[-4deg]" />
+            <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-white/95 dark:from-[#090d1f]/95 to-transparent" />
+            <div className="absolute right-5 top-5 flex items-center gap-2 rounded-full border border-purple-200 dark:border-purple-500/30 bg-white/90 dark:bg-purple-950/90 px-3 py-2 text-xs font-semibold text-purple-700 dark:text-purple-300 backdrop-blur-md">
+              <Sparkles className="h-4 w-4 text-purple-600" />
               Early Bird
             </div>
           </div>
 
-          <div className="relative mx-auto -mt-16 max-w-xl rounded-[1.5rem] border border-white/10 bg-[#11121c]/88 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-8 [transform:translateZ(86px)]">
+          <div className="relative mx-auto -mt-16 max-w-xl rounded-[1.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-[#020617] p-6 shadow-xl sm:p-8 [transform:translateZ(86px)]">
             <div className="text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.26em] text-purple-300">
+              <p className="text-xs font-bold uppercase tracking-[0.26em] text-purple-600 dark:text-purple-400">
                 Skillyug AI Bootcamp
               </p>
               <div className="mt-4 flex items-end justify-center gap-4">
-                <span className="text-xl text-gray-500 line-through">₹4000</span>
-                <span className="text-5xl font-bold text-white">{BOOK_SLOT_AMOUNT_LABEL}</span>
+                <span className="text-xl text-gray-500 dark:text-slate-400 line-through">₹4000</span>
+                <span className="text-5xl font-bold text-slate-900 dark:text-white">{BOOK_SLOT_AMOUNT_LABEL}</span>
               </div>
             </div>
 
             <div className="mt-8 flex flex-col gap-4">
               {benefits.map((benefit) => (
-                <div key={benefit} className="flex items-start gap-3 text-gray-300">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-purple-400" aria-hidden="true" />
+                <div key={benefit} className="flex items-start gap-3 text-slate-600 dark:text-slate-300">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-purple-600" aria-hidden="true" />
                   <span>{benefit}</span>
                 </div>
               ))}
             </div>
 
             <Link
-              href="/book-slot?from=bootcamp"
+              href="/onboarding?from=bootcamp"
               className="mt-9 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-5 text-lg font-bold text-white shadow-[0_0_34px_rgba(124,58,237,0.34)] transition hover:-translate-y-0.5 hover:shadow-[0_0_52px_rgba(124,58,237,0.52)]"
             >
               Enroll in Bootcamp
@@ -236,24 +236,24 @@ function EnrollmentCard() {
 function DesktopBootcampHero() {
   return (
     <section className="relative hidden min-h-screen items-center overflow-hidden px-6 pb-16 pt-28 md:flex md:px-10 md:py-28 lg:px-16">
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_20%_26%,rgba(88,28,135,0.22),transparent_34%),radial-gradient(circle_at_78%_30%,rgba(37,99,235,0.2),transparent_34%),radial-gradient(circle_at_78%_70%,rgba(109,40,217,0.18),transparent_38%),linear-gradient(135deg,#0a0a0a_0%,#0a0a0a_42%,#120624_72%,#070b1b_100%)]" />
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_20%_26%,rgba(168,85,247,0.12),transparent_34%),radial-gradient(circle_at_78%_30%,rgba(37,99,235,0.12),transparent_34%),radial-gradient(circle_at_78%_70%,rgba(139,92,246,0.1),transparent_38%),linear-gradient(135deg,#f8fafc_0%,#f8fafc_42%,#f5f3ff_72%,#e0e7ff_100%)] dark:bg-[radial-gradient(circle_at_20%_26%,rgba(168,85,247,0.15),transparent_34%),radial-gradient(circle_at_78%_30%,rgba(37,99,235,0.15),transparent_34%),radial-gradient(circle_at_78%_70%,rgba(139,92,246,0.1),transparent_38%),linear-gradient(135deg,#020617_0%,#020617_42%,#0b0a0f_72%,#050a1e_100%)]" />
       <div className="absolute inset-0 z-0 [contain:layout_paint] md:opacity-80">
         <BootcampSpline />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#0a0a0a_0%,#0a0a0a_34%,rgba(10,10,10,0.84)_48%,rgba(10,10,10,0.34)_68%,rgba(10,10,10,0.18)_100%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_74%_46%,transparent_0%,transparent_28%,rgba(10,10,10,0.2)_54%,#0a0a0a_100%)]" />
-        <div className="pointer-events-none absolute bottom-5 right-5 h-14 w-44 rounded-2xl bg-[#0a0a0a]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_34%,rgba(248,250,252,0.84)_48%,rgba(248,250,252,0.34)_68%,rgba(248,250,252,0.18)_100%)] dark:bg-[linear-gradient(90deg,#020617_0%,#020617_34%,rgba(2,6,23,0.84)_48%,rgba(2,6,23,0.34)_68%,rgba(2,6,23,0.18)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_74%_46%,transparent_0%,transparent_28%,rgba(248,250,252,0.2)_54%,#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_74%_46%,transparent_0%,transparent_28%,rgba(2,6,23,0.2)_54%,#020617_100%)]" />
+        <div className="pointer-events-none absolute bottom-5 right-5 h-14 w-44 rounded-2xl bg-[#f8fafc] dark:bg-[#020617]" />
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-48 bg-gradient-to-b from-transparent via-[#0a0a0a]/80 to-[#0a0a0a]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-48 bg-gradient-to-b from-transparent via-[#f8fafc]/80 to-[#f8fafc] dark:via-[#020617]/80 dark:to-[#020617]" />
 
       <div className="pointer-events-none relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10">
         <div className="pointer-events-auto max-w-xl">
           <div
-            className="mb-6 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-purple-200 backdrop-blur-md"
+            className="mb-6 inline-flex items-center rounded-full border border-purple-200 bg-purple-55 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-purple-700 backdrop-blur-md dark:border-purple-500/30 dark:bg-purple-950/20 dark:text-purple-300"
           >
             Skillyug AI Bootcamp
           </div>
           <h1
-            className="text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl"
+            className="text-5xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-6xl lg:text-7xl"
           >
             Give Your Child the Advantage in the{" "}
             <span className="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
@@ -261,13 +261,13 @@ function DesktopBootcampHero() {
             </span>
           </h1>
           <p
-            className="mt-6 text-lg leading-8 text-gray-300 sm:text-xl"
+            className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300 sm:text-xl"
           >
             Students in Classes 6–12 gain mastery over industry-leading generative platforms and creative automation through hands-on project building, guided feedback, and live expert sessions.
           </p>
           <div>
             <Link
-              href="/book-slot?from=bootcamp"
+              href="/onboarding?from=bootcamp"
               className="mt-9 inline-flex rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(168,85,247,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgba(168,85,247,0.45)]"
             >
               Enroll Now
@@ -282,17 +282,17 @@ function DesktopBootcampHero() {
 function MobileBootcampHero() {
   return (
     <section className="relative flex min-h-screen flex-col justify-center overflow-hidden px-6 pb-16 pt-32 md:hidden">
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.25),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(37,99,235,0.25),transparent_40%),linear-gradient(135deg,#0a0a0a_0%,#11091e_50%,#0a0a0a_100%)]" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-48 bg-gradient-to-b from-transparent via-[#0a0a0a]/80 to-[#0a0a0a]" />
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(37,99,235,0.15),transparent_40%),linear-gradient(135deg,#f8fafc_0%,#f5f3ff_50%,#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(37,99,235,0.15),transparent_40%),linear-gradient(135deg,#020617_0%,#0b0a0f_50%,#020617_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-48 bg-gradient-to-b from-transparent via-[#f8fafc]/80 to-[#f8fafc] dark:via-[#020617]/80 dark:to-[#020617]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-xl flex-col items-center text-center">
         <div
-          className="mb-6 inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-purple-200 backdrop-blur-md"
+          className="mb-6 inline-flex items-center justify-center rounded-full border border-purple-200 bg-purple-55 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-purple-700 backdrop-blur-md dark:border-purple-500/30 dark:bg-purple-950/20 dark:text-purple-300"
         >
           Skillyug AI Bootcamp
         </div>
         <h1
-          className="text-5xl font-bold tracking-tight text-white sm:text-6xl"
+          className="text-5xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-6xl"
         >
           Give Your Child the Advantage in the{" "}
           <span className="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
@@ -300,7 +300,7 @@ function MobileBootcampHero() {
           </span>
         </h1>
         <p
-          className="mt-6 text-lg leading-8 text-gray-300"
+          className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300"
         >
           Students in Classes 6–12 gain mastery over industry-leading generative platforms and creative automation through hands-on project building, guided feedback, and live expert sessions.
         </p>
@@ -308,7 +308,7 @@ function MobileBootcampHero() {
           className="mt-10 w-full"
         >
           <Link
-            href="/book-slot?from=bootcamp"
+            href="/onboarding?from=bootcamp"
             className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(168,85,247,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgba(168,85,247,0.45)]"
           >
             Enroll Now

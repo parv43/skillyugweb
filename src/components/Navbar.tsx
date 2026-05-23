@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Sun, Moon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
@@ -18,6 +18,57 @@ export default function Navbar() {
   
   // Use the shared access control hook
   const { isLoggedIn, hasAccess: hasMyBatchAccess, userId, userEmail } = useAccessControl()
+
+  const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [mounted, setMounted] = useState(false)
+
+  // Initialize theme on mount to match document class to prevent SSR hydration mismatches
+  useEffect(() => {
+    setMounted(true)
+    const hasDarkClass = document.documentElement.classList.contains("dark")
+    setTheme(hasDarkClass ? "dark" : "light")
+  }, [])
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "light" ? "dark" : "light"
+    setTheme(nextTheme)
+    localStorage.setItem("theme", nextTheme)
+    if (nextTheme === "dark") {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+  }
+
+  const renderThemeToggle = () => {
+    if (!mounted) return <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10" />
+
+    return (
+      <button
+        onClick={toggleTheme}
+        className="relative w-10 h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 group overflow-hidden cursor-pointer shadow-[0_0_15px_rgba(255,255,255,0.02)]"
+        aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      >
+        <span className="sr-only">Toggle dark mode</span>
+        <div className="relative w-5 h-5 flex items-center justify-center">
+          <Sun 
+            className={`w-5 h-5 text-yellow-400 absolute transition-all duration-500 transform-gpu ${
+              theme === "dark" 
+                ? "rotate-90 scale-0 opacity-0" 
+                : "rotate-0 scale-100 opacity-100"
+            }`}
+          />
+          <Moon 
+            className={`w-5 h-5 text-indigo-400 absolute transition-all duration-500 transform-gpu ${
+              theme === "dark" 
+                ? "rotate-0 scale-100 opacity-100" 
+                : "-rotate-90 scale-0 opacity-0"
+            }`}
+          />
+        </div>
+      </button>
+    )
+  }
 
   useEffect(() => {
     // ✅ Use requestAnimationFrame for optimal performance (syncs with 60fps)
@@ -160,6 +211,7 @@ export default function Navbar() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-4">
+          {renderThemeToggle()}
           {isLoggedIn ? (
             <Link 
               href="/profile" 
@@ -236,6 +288,10 @@ export default function Navbar() {
                 </li>
               );
             })}
+            <li className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+              <span className="text-sm font-medium text-slate-300">Theme</span>
+              {renderThemeToggle()}
+            </li>
             <li className="mt-4 pt-4 border-t border-white/10">
               {isLoggedIn ? (
                 <Link 

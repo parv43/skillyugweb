@@ -35,7 +35,7 @@ export default function CTASection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10 w-full">
             {!loading && !hasSlot && (
               <Link
-                href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
+                href="/onboarding?from=bootcamp"
                 className="glow-button px-10 py-5 rounded-full text-white font-bold text-xl tracking-wide shadow-2xl hover:scale-[1.03] transition-transform w-full sm:w-auto text-center border border-blue-400/50 inline-block"
               >
                 Join the Bootcamp

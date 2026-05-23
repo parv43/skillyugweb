@@ -3,7 +3,7 @@
 
 import React, { useState, Suspense } from "react";
 import Link from 'next/link';
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2, User } from "lucide-react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from "@/lib/supabaseClient";
 import { validateEmail } from "@/lib/emailValidation";
@@ -12,12 +12,15 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/my-batch';
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [emailSuggestion, setEmailSuggestion] = useState("");
+  
   const authInfoMsg =
     searchParams.get("reset") === "success"
       ? "Your password has been updated. Log in with your new password."
@@ -28,22 +31,22 @@ function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
+    setSuccessMsg("");
     setEmailSuggestion("");
 
-    // Strict Email Validation
+    // Email validation
     const validation = validateEmail(email);
     if (validation.error) {
       setErrorMsg(validation.error);
       if (validation.suggestion) {
         setEmailSuggestion(validation.suggestion);
       }
-      setLoading(false);
       return;
     }
 
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: authData, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -54,14 +57,41 @@ function LoginForm() {
         error.message.toLowerCase().includes("invalid login credentials")
       ) {
         setErrorMsg(
-          "Please verify your email first. Check your Mail inbox for a verification link from Skillyug."
+          "Invalid email or password. Please make sure your credentials are correct."
         );
       } else {
         setErrorMsg(error.message);
       }
       setLoading(false);
-    } else {
-      router.push(redirectTo);
+    } else if (authData.user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          // Check role to route correctly
+          const res = await fetch("/api/onboarding/role", {
+            headers: {
+              "Authorization": `Bearer ${session.access_token}`
+            }
+          });
+          if (res.ok) {
+            const roleData = await res.json();
+            if (roleData.user?.role === "parent") {
+              setSuccessMsg("Success! Routing to Parent Portal...");
+              setTimeout(() => router.push("/parent-portal"), 800);
+              return;
+            } else if (roleData.user?.role === "student") {
+              setSuccessMsg("Success! Routing to Student Batch...");
+              setTimeout(() => router.push("/my-batch"), 800);
+              return;
+            }
+          }
+        }
+      } catch (roleErr) {
+        console.error("Error fetching user role on login:", roleErr);
+      }
+      
+      setSuccessMsg("Success! Loading dashboard...");
+      setTimeout(() => router.push(redirectTo), 800);
     }
   };
 
@@ -75,170 +105,170 @@ function LoginForm() {
   };
 
   return (
-    <div className="bg-[#0e0e10] text-[#f9f5f8] min-h-screen selection:bg-[#a4a6ff]/30 relative overflow-hidden font-sans">
-      {/* Background Layer */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-[#0e0e10]/80 z-10" />
-        <img 
-          alt="Abstract flow" 
-          className="w-full h-full object-cover opacity-20 scale-110 blur-3xl" 
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKcLNe4nCx6jDQ4EVV_02UM6m6QJi_0LiI7l7BOYGCvUfePGpBf-4iq0oD97lRJqplgkKfvQWD0GBG99GEyd5o7D02N-7QpzqTdXC4UupM-OfyKFoKrQi8DHlPUrvTCvJQQ4DSYmJHKMrwmmGcspe4XyEhsPcvtyRW5UHFUk1gh7Oq1ax02nkjQ7vXBzrilSRlKcbMzcGwTuJpnS6BO9md1N6C7rmanrP1-JFEYbcgO-oyUxhepXupvaNomp79iKCHAibUpyvnVGU" 
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(85,22,190,0.15)_0%,_transparent_70%)] z-20"></div>
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col md:flex-row relative font-sans select-none overflow-x-hidden">
+      
+      {/* Left Column Sidebar (Deep Purple-Blue) */}
+      <div className="md:w-[40%] bg-gradient-to-b from-[#2a1b6d] to-[#100735] text-white p-8 flex flex-col justify-between relative md:min-h-screen">
+        <div className="absolute -right-20 -top-20 w-60 h-60 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
+        <div>
+          <button onClick={() => router.push("/")} className="hover:scale-105 transition-transform duration-300 bg-transparent border-none cursor-pointer">
+            <img src="/skillyug-optimized.svg" alt="Skillyug Logo" className="h-16 w-auto object-contain brightness-0 invert" />
+          </button>
+        </div>
+        <div className="flex-grow flex items-center justify-center py-12">
+          <img src="/onboarding-illustration.png" alt="Skillyug" className="w-full max-w-[320px] md:max-w-full h-auto object-contain rounded-3xl shadow-2xl" />
+        </div>
+        <div className="text-[10px] font-mono tracking-widest text-slate-400 uppercase text-center md:text-left">
+          © 2026 Skillyug • AI Bootcamp Portal
+        </div>
       </div>
 
-      {/* Layout Shell */}
-      <main className="relative z-10 flex min-h-screen items-center justify-center px-6 py-12">
-        <div className="w-full max-w-[480px]">
-          {/* Brand Anchor */}
-          <div className="flex justify-center mb-12">
-            <Link href="/" className="hover:scale-105 transition-transform duration-300">
-              <img src="/skillyug-optimized.svg" alt="Skillyug Logo" className="h-36 md:h-56 w-auto object-contain" />
+      {/* Right Column Login Form */}
+      <div className="flex-1 bg-white p-6 md:p-12 lg:p-20 flex flex-col justify-center items-center md:items-start min-h-[500px]">
+        <div className="w-full max-w-md space-y-10">
+          
+          {/* Header */}
+          <div className="space-y-3 text-center md:text-left">
+            <Link href="/onboarding" className="inline-flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-colors text-xs font-bold uppercase tracking-wider mb-2">
+              ← Back
             </Link>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+              Welcome Back
+            </h1>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Login to access your student batch or parent portal.
+            </p>
           </div>
 
-          {/* Login Card */}
-          <div className="bg-[#262528]/40 backdrop-blur-3xl border-t border-l border-[#48474a]/25 rounded-xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
-            {/* Internal Glow */}
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#ac8aff]/10 blur-[80px] rounded-full pointer-events-none"></div>
+          {errorMsg && (
+            <div className="p-3 bg-red-50 text-red-700 rounded-xl text-center text-xs font-semibold border border-red-200">
+              {errorMsg}
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="p-3 bg-green-50 text-green-700 rounded-xl text-center text-xs font-semibold border border-green-200">
+              {successMsg}
+            </div>
+          )}
+
+          {authInfoMsg && (
+            <div className="p-3 bg-blue-50 text-blue-700 rounded-xl text-center text-xs font-semibold border border-blue-200">
+              {authInfoMsg}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
             
-            <header className="mb-10 relative z-10">
-              <Link href="/" className="inline-flex items-center gap-2 text-[#adaaad] hover:text-[#f9f5f8] bg-[#f9f5f8]/5 hover:bg-[#f9f5f8]/10 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm mb-6 w-fit">
-                <span className="font-bold tracking-widest text-xs uppercase pl-2">← BACK</span>
-              </Link>
-              <h1 className="text-4xl font-extrabold tracking-tight text-[#f9f5f8] mb-2">Welcome Back</h1>
-            </header>
-
-            {errorMsg && (
-              <div className="p-4 mb-6 bg-red-500/20 text-red-300 rounded-xl text-center text-sm font-semibold border border-red-500/30 relative z-10">
-                {errorMsg}
+            {/* Email Address */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500" htmlFor="email">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); if (emailSuggestion) setEmailSuggestion(""); }}
+                  onBlur={handleEmailBlur}
+                  placeholder="name@example.com"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                />
               </div>
-            )}
-
-            {authInfoMsg && (
-              <div className="p-4 mb-6 bg-[#a4a6ff]/10 text-[#d7d8ff] rounded-xl text-center text-sm font-semibold border border-[#a4a6ff]/20 relative z-10">
-                {authInfoMsg}
-              </div>
-            )}
-
-            <form className="space-y-6 relative z-10" onSubmit={handleLogin}>
-              {/* Email Input */}
-              <div className="space-y-2">
-                <label className="block text-[#adaaad] tracking-[0.05em] uppercase font-bold text-xs">Email Address</label>
-                <div className="group">
-                  <input 
-                    type="email"
-                    className="w-full bg-[#262528]/30 border-none rounded-lg py-4 px-5 text-[#f9f5f8] placeholder:text-[#adaaad]/40 focus:ring-1 focus:ring-[#a4a6ff] transition-all duration-300 outline-none" 
-                    placeholder="name@gmail.com"
-                    value={email}
-                    onChange={e => {
-                      setEmail(e.target.value);
-                      if (emailSuggestion) setEmailSuggestion("");
-                    }}
-                    onBlur={handleEmailBlur}
-                    required
-                  />
-                </div>
-                {emailSuggestion && (
-                  <div className="mt-2 text-sm text-[#ac8aff] flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
-                    <span>💡 Did you mean </span>
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        const [name] = email.split("@");
-                        setEmail(`${name}@${emailSuggestion}`);
-                        setEmailSuggestion("");
-                      }}
-                      className="font-bold underline hover:text-[#f9f5f8] transition-colors"
-                    >
-                      {emailSuggestion}?
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Password Input */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label className="block text-[#adaaad] tracking-[0.05em] uppercase font-bold text-xs">Password</label>
-                  <Link
-                    href={`/forgot-password${email ? `?loginEmail=${encodeURIComponent(email)}` : ''}`}
-                    className="text-xs font-bold uppercase tracking-[0.16em] text-[#a4a6ff] hover:text-[#ac8aff] transition-colors"
-                  >
-                    Forgot Password?
-                  </Link>
-                </div>
-                <div className="group relative">
-                  <input 
-                    type={showPassword ? "text" : "password"}
-                    className="w-full bg-[#262528]/30 border-none rounded-lg py-4 px-5 pr-12 text-[#f9f5f8] placeholder:text-[#adaaad]/40 focus:ring-1 focus:ring-[#a4a6ff] transition-all duration-300 outline-none" 
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#adaaad]/40 hover:text-[#a4a6ff] transition-colors"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              {emailSuggestion && (
+                <div className="mt-2 text-xs text-purple-600 flex items-center gap-1.5 animate-in fade-in duration-200">
+                  <span>💡 Did you mean </span>
+                  <button type="button" onClick={() => { const [name] = email.split("@"); setEmail(`${name}@${emailSuggestion}`); setEmailSuggestion(""); }} className="font-bold underline hover:text-purple-800 transition-colors">
+                    {emailSuggestion}?
                   </button>
                 </div>
-              </div>
+              )}
+            </div>
 
-              {/* CTA */}
-              <div className="pt-4">
-                <button 
-                  type="submit" 
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-[#ac8aff] to-[#a4a6ff] text-black font-bold py-4 rounded-full shadow-lg hover:opacity-90 active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+            {/* Password */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500" htmlFor="password">Password</label>
+                <Link
+                  href={`/forgot-password${email ? `?loginEmail=${encodeURIComponent(email)}` : ''}`}
+                  className="text-[10px] font-bold uppercase tracking-[0.15em] text-blue-600 hover:text-blue-500 hover:underline transition-all"
                 >
-                  {loading ? "Logging in..." : "Login"}
+                  Forgot Password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 transition-colors">
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+            </div>
 
-              <div className="relative flex items-center py-2">
-                <div className="flex-grow border-t border-[#48474a]/50"></div>
-                <span className="flex-shrink-0 mx-4 text-[#adaaad] text-xs font-semibold uppercase tracking-wider">Or</span>
-                <div className="flex-grow border-t border-[#48474a]/50"></div>
-              </div>
-              
-              <button
-                type="button"
-                onClick={async () => {
-                  setErrorMsg("");
-                  const { error } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
-                    },
-                  });
-                  if (error) setErrorMsg(error.message);
-                }}
-                className="w-full bg-[#262528]/50 hover:bg-[#262528] border border-[#48474a]/25 text-[#f9f5f8] font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-3"
-              >
-                <img src="/Google.png" alt="Google" className="w-5 h-5" />
-                Continue with Google
-              </button>
-            </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-[0.2em] shadow-lg hover:bg-blue-500 active:scale-[0.98] transition-all disabled:opacity-50 mt-4 flex items-center justify-center gap-2"
+            >
+              {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              Login
+            </button>
+          </form>
 
-            <footer className="mt-10 text-center relative z-10">
-              <p className="text-[#adaaad]">
-                Don&apos;t have an account? 
-                <Link href={`/signup?redirect=${encodeURIComponent(redirectTo)}`} className="text-[#a4a6ff] font-bold hover:text-[#ac8aff] transition-colors duration-200 ml-1">Sign Up</Link>
-              </p>
-            </footer>
+          <div className="relative flex items-center py-2">
+            <div className="flex-grow border-t border-slate-100"></div>
+            <span className="flex-shrink-0 mx-4 text-slate-400 text-[10px] font-bold uppercase tracking-wider">Or</span>
+            <div className="flex-grow border-t border-slate-100"></div>
           </div>
+
+          {/* Google Sign In */}
+          <button
+            type="button"
+            onClick={async () => {
+              setErrorMsg("");
+              const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                  redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/onboarding/resolve?role=student`)}`,
+                },
+              });
+              if (error) setErrorMsg(error.message);
+            }}
+            className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3.5 rounded-xl text-xs uppercase tracking-[0.18em] transition-all flex items-center justify-center gap-2.5 active:scale-[0.98]"
+          >
+            <img src="/Google.png" alt="Google" className="w-4 h-4" />
+            Continue with Google
+          </button>
+
+          <div className="pt-4 text-center">
+            <p className="text-slate-400 text-sm">
+              Don&apos;t have an account? 
+              <Link href={`/onboarding`} className="text-blue-600 font-bold hover:underline ml-1">Sign Up</Link>
+            </p>
+          </div>
+
         </div>
-      </main>
+      </div>
     </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center text-slate-500">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    }>
       <LoginForm />
     </Suspense>
   );

@@ -149,7 +149,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
                   {/* Message Bubble */}
                   <div className={`max-w-[80%] rounded-2xl p-5 ${
                     msg.role === 'user' 
-                      ? 'bg-blue-600/20 border border-blue-500/30 text-blue-50 rounded-tr-none' 
+                      ? 'bg-purple-600 text-white rounded-tr-none' 
                       : 'bg-white/5 border border-white/10 text-slate-300 rounded-tl-none'
                   }`}>
                     <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>

@@ -86,17 +86,32 @@ export async function GET(request: NextRequest) {
     // Not authenticated → no access
     if (!user) {
       console.error("[Access] No authenticated user found");
-      return NextResponse.json({ hasAccess: false, hasSlot: false }, { status: 401 });
+      return NextResponse.json({ hasAccess: false, hasSlot: false, role: null }, { status: 401 });
     }
 
     console.log("[Access] Checking access for user:", user.id, user.email);
 
+    const admin = createSupabaseAdmin();
+    
+    // Fetch user profile and role
+    const { data: userProfile } = await admin
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const role = userProfile?.role || "student"; // Default to student
+
+    // Check slot bookings
     const { hasSlot } = await getAccessDetails(user.id, user.email ?? null);
-    const hasAccess = hasSlot;
+    
+    // Students can access dashboard even if not paid (in locked mode)
+    // Admins have full access. Parents can access their child's batch via query params.
+    const hasAccess = hasSlot || role === "student" || role === "admin";
 
-    console.log("[Access] Result — hasSlot:", hasSlot, "hasAccess:", hasAccess);
+    console.log("[Access] Result — role:", role, "hasSlot:", hasSlot, "hasAccess:", hasAccess);
 
-    const response = NextResponse.json({ hasAccess, hasSlot });
+    const response = NextResponse.json({ hasAccess, hasSlot, role });
     response.headers.set("Cache-Control", "no-store, max-age=0");
     return response;
   } catch (error) {
