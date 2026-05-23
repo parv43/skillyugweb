@@ -102,14 +102,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: profilesError.message }, { status: 500 });
     }
 
-    // Combine relation enrollment date with user details
-    const mappedChildren = children.map(child => {
-      const rel = relations.find(r => r.student_id === child.id);
-      return {
-        ...child,
-        enrolledAt: rel ? rel.created_at : child.created_at
-      };
-    });
+    // Combine relation enrollment date with user details and fetch temp_password from auth metadata
+    const mappedChildren = await Promise.all(
+      children.map(async (child) => {
+        const rel = relations.find(r => r.student_id === child.id);
+        let tempPassword = null;
+        try {
+          const { data: authUser } = await admin.auth.admin.getUserById(child.id);
+          if (authUser?.user) {
+            tempPassword = authUser.user.user_metadata?.temp_password || null;
+          }
+        } catch (err) {
+          console.error("[Parent Children API] Auth fetch error for student:", child.id, err);
+        }
+        return {
+          ...child,
+          temp_password: tempPassword,
+          enrolledAt: rel ? rel.created_at : child.created_at
+        };
+      })
+    );
 
     return NextResponse.json({ children: mappedChildren });
   } catch (error) {

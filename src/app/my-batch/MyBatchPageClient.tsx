@@ -1160,24 +1160,30 @@ export default function MyBatchPage() {
             .parent-banner-btn:hover .arrow-icon {
               transform: translateX(-3px);
             }
+            /* Add top padding shift to the main container if parent banner is visible */
+            main {
+              padding-top: 2.75rem !important;
+            }
           `}} />
-          <div className="fixed top-0 inset-x-0 h-11 bg-[#090d1a]/95 backdrop-blur-md border-b border-blue-500/30 z-[100] flex items-center justify-between px-6 shadow-lg select-none">
-            <div className="flex items-center gap-2.5">
-              <div className="w-6 h-6 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center flex-shrink-0 animate-pulse">
+          <div className="fixed top-0 inset-x-0 h-11 bg-[#090d1a]/95 backdrop-blur-md border-b border-blue-500/30 z-[100] flex items-center justify-between px-4 sm:px-6 shadow-lg select-none">
+            <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
+              <div className="hidden sm:flex w-6 h-6 rounded-lg bg-blue-500/15 border border-blue-500/30 items-center justify-center flex-shrink-0 animate-pulse">
                 <BadgeCheck className="w-4 h-4 text-blue-400" />
               </div>
-              <div className="text-left">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 block font-mono">Parent Oversight</span>
-                <span className="text-xs font-semibold text-slate-200 block">Viewing {viewOnlyStudentName}&apos;s batch workspace</span>
+              <div className="text-left min-w-0">
+                <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-wider text-blue-400 block font-mono">Parent Oversight</span>
+                <span className="text-[10px] sm:text-xs font-semibold text-slate-200 block truncate">
+                  <span className="hidden sm:inline">Viewing </span>{viewOnlyStudentName}
+                </span>
               </div>
             </div>
             
             <button
               onClick={() => router.push("/parent-portal")}
-              className="parent-banner-btn flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/30 hover:border-blue-500/50 text-[10px] font-bold uppercase tracking-widest text-blue-300 hover:text-white transition-all shadow-[0_2px_8px_rgba(59,130,246,0.05)] cursor-pointer active:scale-95 duration-200"
+              className="parent-banner-btn flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 rounded-full bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/30 hover:border-blue-500/50 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-blue-300 hover:text-white transition-all shadow-[0_2px_8px_rgba(59,130,246,0.05)] cursor-pointer active:scale-95 duration-200 flex-shrink-0"
             >
               <span className="arrow-icon transition-transform duration-200 text-xs">←</span>
-              Back to Parent Portal
+              <span className="hidden sm:inline">Back to </span>Parent Portal
             </button>
           </div>
         </>
