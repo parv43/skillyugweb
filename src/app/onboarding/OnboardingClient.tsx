@@ -132,7 +132,7 @@ function OnboardingContent() {
           if (studentEmail) params.set("kidEmail", studentEmail);
           const queryString = params.toString();
           if (queryString) nextUrl += `?${queryString}`;
-          setTimeout(() => router.push(nextUrl), 1500);
+          setTimeout(() => router.push(nextUrl), 50);
         } else {
           setSuccessMsg("Check your inbox/spam for a verification link to activate your parent account.");
           setLoading(false);
@@ -161,7 +161,7 @@ function OnboardingContent() {
           if (studentEmail) params.set("kidEmail", studentEmail);
           const queryString = params.toString();
           if (queryString) nextUrl += `?${queryString}`;
-          setTimeout(() => router.push(nextUrl), 1500);
+          setTimeout(() => router.push(nextUrl), 50);
         }
       }
     } catch (err: any) {

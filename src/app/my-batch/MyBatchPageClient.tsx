@@ -62,116 +62,27 @@ const resourceCards = [
   }
 ];
 
-export default function MyBatchPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<BatchUser | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [hasSlotAccess, setHasSlotAccess] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  // Certificate modal state
-  const [showCertModal, setShowCertModal] = useState(false);
-  const [certStudentName, setCertStudentName] = useState("");
-  const [certParentName, setCertParentName] = useState("");
-  const [certError, setCertError] = useState("");
-  const [generatedCerts, setGeneratedCerts] = useState<{ student: { downloadUrl: string }; parent?: { downloadUrl: string } } | null>(null);
-  const [isBlurred, setIsBlurred] = useState(false);
+interface SecureVideoPlayerProps {
+  videos: any[];
+  activeVideo: any;
+  setActiveVideo: (v: any) => void;
+  isAdmin: boolean;
+  isSyncing: boolean;
+  syncStatus: any;
+  handleSyncVideos: () => void;
+  userEmail: string;
+}
 
-  // Support Ticket State
-  const [showTicketModal, setShowTicketModal] = useState(false);
-  
-  // Video Player State
-  const [activeVideo, setActiveVideo] = useState(MOCK_VIDEOS[0]);
-  const [videos, setVideos] = useState<any[]>(MOCK_VIDEOS);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
-
-  // Custom states for onboarding & sponsorship flow
-  const [isParentViewOnly, setIsParentViewOnly] = useState(false);
-  const [viewOnlyStudentName, setViewOnlyStudentName] = useState("");
-  const [sponsorLoading, setSponsorLoading] = useState(false);
-  const [sponsorToken, setSponsorToken] = useState("");
-  const [showSponsorModal, setShowSponsorModal] = useState(false);
-  const [liveSession, setLiveSession] = useState<{
-    title: string;
-    scheduled_at: string;
-    join_url: string;
-  } | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const isPaid = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin || isParentViewOnly;
-    if (!isPaid) return;
-
-    const fetchVideos = async () => {
-      try {
-        const { data: recordings, error } = await supabase
-          .from("session_recordings")
-          .select("id, title, custom_date, youtube_video_id")
-          .order("published_at", { ascending: false });
-
-        if (error) {
-          console.error("Error fetching session recordings:", error);
-          return;
-        }
-
-        const mappedRecordings = (recordings || [])
-          .filter((rec: any) => {
-            const titleLower = (rec.title || "").toLowerCase();
-            return titleLower !== "deleted video" && titleLower !== "private video";
-          })
-          .map((rec: any, idx: number) => ({
-            id: rec.id || `db-${idx}`,
-            title: rec.title,
-            date: rec.custom_date || "Unknown Date",
-            videoId: rec.youtube_video_id
-          }));
-
-        const combined = [...mappedRecordings];
-        if (combined.length < MOCK_VIDEOS.length) {
-          for (let i = combined.length; i < MOCK_VIDEOS.length; i++) {
-            combined.push({
-              ...MOCK_VIDEOS[i],
-              id: `mock-${i}`
-            });
-          }
-        }
-
-        setVideos(combined);
-        const firstPlayable = combined.find(v => v.videoId) || combined[0];
-        setActiveVideo(firstPlayable);
-      } catch (err) {
-        console.error("Failed to load videos from Supabase:", err);
-      }
-    };
-
-    fetchVideos();
-  }, [user, hasSlotAccess, isAdmin]);
-
-  useEffect(() => {
-    if (!user) return;
-    const isPaid = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin || isParentViewOnly;
-    if (!isPaid) return;
-
-    const fetchLiveSession = async () => {
-      try {
-        const res = await fetch("/api/my-batch/live-session");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.session) {
-            setLiveSession(data.session);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load live session details:", err);
-      }
-    };
-
-    fetchLiveSession();
-  }, [user, hasSlotAccess, isAdmin, isParentViewOnly]);
-
+function SecureVideoPlayer({
+  videos,
+  activeVideo,
+  setActiveVideo,
+  isAdmin,
+  isSyncing,
+  syncStatus,
+  handleSyncVideos,
+  userEmail
+}: SecureVideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -191,7 +102,6 @@ export default function MyBatchPage() {
     setDebugLogs(prev => [...prev.slice(-9), `[${new Date().toLocaleTimeString()}] ${msg}`]);
   };
 
-  // Track global errors for diagnostics
   useEffect(() => {
     const handleGlobalError = (event: ErrorEvent) => {
       addDebugLog(`Global Error: ${event.message}`);
@@ -200,14 +110,13 @@ export default function MyBatchPage() {
     return () => window.removeEventListener("error", handleGlobalError);
   }, []);
 
-  // Dynamically load YouTube script & initialize player
   useEffect(() => {
     setCurrentTime(0);
     setDuration(0);
     setBufferedFraction(0);
     setIsPlaying(false);
     setPlayerError(null);
-    setPlaybackSpeed(1); // Reset speed on video change
+    setPlaybackSpeed(1);
 
     if (!activeVideo.videoId) {
       playerRef.current = null;
@@ -226,7 +135,6 @@ export default function MyBatchPage() {
       }
 
       addDebugLog("Initializing YT.Player instance...");
-      // Clear existing HTML to prevent React duplicate mounts
       containerRef.current.innerHTML = '<div id="youtube-player-element" class="w-full h-full pointer-events-none"></div>';
 
       try {
@@ -236,7 +144,7 @@ export default function MyBatchPage() {
           videoId: activeVideo.videoId,
           playerVars: {
             autoplay: 0,
-            controls: 0, // chromeless
+            controls: 0,
             rel: 0,
             modestbranding: 1,
             disablekb: 1,
@@ -251,7 +159,6 @@ export default function MyBatchPage() {
               playerRef.current = event.target;
               event.target.setVolume(volume);
               
-              // Set initial playback speed
               if (typeof event.target.setPlaybackRate === 'function') {
                 event.target.setPlaybackRate(playbackSpeed);
               }
@@ -266,7 +173,6 @@ export default function MyBatchPage() {
             onStateChange: (event: any) => {
               const state = event.data;
               addDebugLog(`Player State Changed: ${state}`);
-              // 1 = playing, 2 = paused, 0 = ended, 3 = buffering
               if (state === 1) {
                 setIsPlaying(true);
               } else {
@@ -309,7 +215,6 @@ export default function MyBatchPage() {
       }
     };
 
-    // Ensure the script is injected
     let tag = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
     if (!tag) {
       addDebugLog("Injecting YouTube IFrame API script tag...");
@@ -338,7 +243,6 @@ export default function MyBatchPage() {
     };
   }, [activeVideo.videoId]);
 
-  // Continuously read currentTime and videoLoadedFraction when playing
   useEffect(() => {
     let intervalId: any = null;
 
@@ -357,7 +261,6 @@ export default function MyBatchPage() {
     };
   }, [isPlaying]);
 
-  // Track fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -476,6 +379,399 @@ export default function MyBatchPage() {
     }
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
+
+  return (
+    <div className="rounded-[2rem] border border-white/10 bg-[#060a1f] p-4 shadow-[0_0_60px_rgba(59,130,246,0.05)] overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[600px]">
+        {/* Left Side: Video List (30%) */}
+        <div className="lg:w-[30%] bg-white/[0.02] rounded-3xl border border-white/5 p-4 flex flex-col h-[300px] lg:h-full">
+          <div className="px-4 py-3 border-b border-white/5 mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-black text-white">Session Recordings</h3>
+              <p className="text-xs text-slate-400 mt-1">Past live classes</p>
+            </div>
+            {isAdmin && (
+              <button
+                onClick={handleSyncVideos}
+                disabled={isSyncing}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600/80 hover:bg-blue-600 disabled:bg-slate-800 disabled:text-slate-500 text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:scale-100 cursor-pointer shadow-md"
+              >
+                {isSyncing ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Sparkles className="w-3.5 h-3.5" />
+                )}
+                Sync
+              </button>
+            )}
+          </div>
+          {syncStatus && (
+            <div className={`mx-4 mb-3 px-3 py-2 rounded-xl text-center text-xs font-semibold border ${
+              syncStatus.type === "success" 
+                ? "bg-green-500/10 border-green-500/20 text-green-400" 
+                : "bg-red-500/10 border-red-500/20 text-red-400"
+            }`}>
+              {syncStatus.message}
+            </div>
+          )}
+          <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+            {videos.map((video) => (
+              <button 
+                key={video.id} 
+                onClick={() => {
+                  setActiveVideo(video);
+                  setIsPlaying(false);
+                }}
+                className={`w-full text-left p-4 rounded-2xl transition-all ${activeVideo.id === video.id ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-white/[0.05] border border-transparent'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <PlayCircle className={`w-8 h-8 flex-shrink-0 ${activeVideo.id === video.id ? 'text-blue-400' : 'text-slate-500'}`} />
+                  <div>
+                    <p className={`text-sm font-bold ${activeVideo.id === video.id ? 'text-white' : 'text-slate-300'}`}>{video.title}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">{video.date}</p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Right Side: Secure Video Player (70%) */}
+        <div className="lg:w-[70%] bg-black rounded-3xl relative flex flex-col overflow-hidden border border-white/5 min-h-[350px] lg:min-h-0">
+
+          {/* React YouTube component mount point */}
+          <div className="flex-1 w-full h-[75%] lg:h-[80%] relative bg-black flex items-center justify-center overflow-hidden">
+            {/* Invisible Shield to block YouTube UI clicks */}
+            <div 
+              className="absolute inset-0 z-20" 
+              onContextMenu={(e) => e.preventDefault()}
+            ></div>
+
+            <style dangerouslySetInnerHTML={{__html: `
+              @keyframes float-watermark {
+                0% { transform: translate(-30%, -30%) rotate(-12deg); }
+                25% { transform: translate(30%, -15%) rotate(12deg); }
+                50% { transform: translate(15%, 30%) rotate(-8deg); }
+                75% { transform: translate(-25%, 20%) rotate(8deg); }
+                100% { transform: translate(-30%, -30%) rotate(-12deg); }
+              }
+              .animate-float-watermark {
+                animation: float-watermark 25s infinite linear;
+              }
+            `}} />
+
+            {activeVideo.videoId ? (
+              <>
+                <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+                
+                {/* Floating Watermark for Screen Recording Protection */}
+                <div className="absolute inset-0 z-30 pointer-events-none select-none flex items-center justify-center opacity-30">
+                  <div className="text-white text-xs md:text-sm font-semibold tracking-wider bg-black/45 px-3 py-1.5 rounded-full border border-white/10 whitespace-nowrap animate-float-watermark">
+                    {userEmail}
+                  </div>
+                </div>
+
+                {/* Diagnostic Overlay for Admins */}
+                {isAdmin && (
+                  <div className="absolute top-4 left-4 z-40 bg-black/90 text-[10px] text-green-400 p-2.5 rounded-xl font-mono border border-green-500/20 max-w-[280px] pointer-events-auto select-text max-h-[140px] overflow-y-auto custom-scrollbar">
+                    <div className="font-bold border-b border-green-500/20 pb-1 mb-1 flex justify-between items-center">
+                      <span>DIAGNOSTICS PANEL</span>
+                      <button onClick={() => setDebugLogs([])} className="text-red-400 hover:underline">Clear</button>
+                    </div>
+                    {debugLogs.length === 0 ? (
+                      <div className="text-gray-500">No logs captured...</div>
+                    ) : (
+                      debugLogs.map((log, idx) => (
+                        <div key={idx} className="leading-tight mb-0.5 break-all">{log}</div>
+                      ))
+                    )}
+                  </div>
+                )}
+
+                {/* Video Load/Error States */}
+                {playerError && (
+                  <div className="absolute inset-0 bg-black/95 z-35 flex flex-col items-center justify-center text-center p-4">
+                    <HelpCircle className="w-10 h-10 text-red-500 mb-2" />
+                    <p className="text-white text-sm font-bold">{playerError}</p>
+                    <p className="text-slate-500 text-xs mt-1">Please verify YouTube channel embedding permissions.</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center z-40 relative">
+                <Lock className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Recording Unavailable</p>
+                <p className="text-xs text-slate-500 mt-2">Session recording will appear here once ready.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Custom Controls */}
+          <div className="bg-[#060a1f] p-4 flex flex-col justify-center z-40 border-t border-white/10 h-[25%] lg:h-[20%]">
+            {activeVideo.videoId ? (
+              <div className="w-full flex flex-col gap-3">
+                {/* Timeline Slider with custom tracks */}
+                <div className="relative w-full group flex items-center h-4">
+                  {/* Background Track */}
+                  <div className="absolute left-0 right-0 h-1 rounded-full bg-white/10 pointer-events-none" />
+                  
+                  {/* Buffer Bar */}
+                  <div 
+                    className="absolute left-0 h-1 rounded-full bg-white/20 pointer-events-none transition-all duration-300"
+                    style={{ width: `${bufferedFraction * 100}%` }}
+                  />
+                  
+                  {/* Progress Bar */}
+                  <div 
+                    className="absolute left-0 h-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 pointer-events-none"
+                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                  />
+
+                  {/* Slider Thumb */}
+                  <div 
+                    className="absolute w-3 h-3 rounded-full bg-blue-400 border border-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none transform -translate-x-1/2"
+                    style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                  />
+
+                  {/* Input Range for Seeking */}
+                  <input 
+                    type="range"
+                    min={0}
+                    max={duration || 100}
+                    value={currentTime}
+                    onChange={handleSeekChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                </div>
+
+                {/* Controls Toolbar Row */}
+                <div className="flex items-center justify-between w-full">
+                  {/* Left side: Play/Pause/Skip controls, Mute, Volume, Time */}
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3.5">
+                      {/* Skip Backward 10s */}
+                      <button
+                        onClick={skipBackward}
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                        title="Skip Backward 10s"
+                      >
+                        <RotateCcw className="w-5 h-5" />
+                      </button>
+
+                      {/* Play/Pause Button */}
+                      <button 
+                        onClick={handlePlayPause}
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                        title={isPlaying ? "Pause" : "Play / Continue"}
+                      >
+                        {isPlaying ? (
+                          <Pause className="w-5 h-5" />
+                        ) : (
+                          <Play className="w-5 h-5" fill="currentColor" />
+                        )}
+                      </button>
+
+                      {/* Skip Forward 10s */}
+                      <button
+                        onClick={skipForward}
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                        title="Skip Forward 10s"
+                      >
+                        <RotateCw className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {/* Mute/Volume controls */}
+                    <div className="flex items-center gap-2 group/volume relative">
+                      <button 
+                        onClick={handleToggleMute}
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                        title={isMuted ? "Unmute" : "Mute"}
+                      >
+                        {isMuted || volume === 0 ? (
+                          <VolumeX className="w-5 h-5" />
+                        ) : (
+                          <Volume2 className="w-5 h-5" />
+                        )}
+                      </button>
+                      
+                      {/* Sleek volume slider that expands on hover/focus */}
+                      <input 
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={isMuted ? 0 : volume}
+                        onChange={handleVolumeChange}
+                        className="w-0 group-hover/volume:w-20 transition-all duration-300 h-1 bg-white/20 accent-blue-500 rounded-full cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Time Display */}
+                    <div className="text-xs font-medium text-slate-400 tracking-wider">
+                      {formatTime(currentTime)} <span className="text-slate-600">/</span> {formatTime(duration)}
+                    </div>
+                  </div>
+
+                  {/* Right side: playback speed, branding & fullscreen */}
+                  <div className="flex items-center gap-3">
+                    <select
+                      value={playbackSpeed}
+                      onChange={(e) => handleSpeedChange(Number(e.target.value))}
+                      className="bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-300 outline-none cursor-pointer transition-colors"
+                      title="Playback Speed"
+                    >
+                      <option value={0.25} className="bg-[#060a1f] text-slate-300">0.25x</option>
+                      <option value={0.5} className="bg-[#060a1f] text-slate-300">0.5x</option>
+                      <option value={0.75} className="bg-[#060a1f] text-slate-300">0.75x</option>
+                      <option value={1} className="bg-[#060a1f] text-slate-300">1.0x (Normal)</option>
+                      <option value={1.25} className="bg-[#060a1f] text-slate-300">1.25x</option>
+                      <option value={1.5} className="bg-[#060a1f] text-slate-300">1.5x</option>
+                      <option value={1.75} className="bg-[#060a1f] text-slate-300">1.75x</option>
+                      <option value={2} className="bg-[#060a1f] text-slate-300">2.0x</option>
+                    </select>
+
+                    <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 select-none">
+                      Skillyug Player
+                    </span>
+                    <button 
+                      onClick={handleFullscreen}
+                      className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                      title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                    >
+                      {isFullscreen ? (
+                        <Minimize2 className="w-5 h-5" />
+                      ) : (
+                        <Maximize2 className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center w-full">
+                <span className="text-xs text-slate-500 font-bold uppercase tracking-widest select-none">
+                  No active recording
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function MyBatchPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<BatchUser | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [hasSlotAccess, setHasSlotAccess] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  // Certificate modal state
+  const [showCertModal, setShowCertModal] = useState(false);
+  const [certStudentName, setCertStudentName] = useState("");
+  const [certParentName, setCertParentName] = useState("");
+  const [certError, setCertError] = useState("");
+  const [generatedCerts, setGeneratedCerts] = useState<{ student: { downloadUrl: string }; parent?: { downloadUrl: string } } | null>(null);
+  const [isBlurred, setIsBlurred] = useState(false);
+
+  // Support Ticket State
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  
+  // Video Player State
+  const [activeVideo, setActiveVideo] = useState(MOCK_VIDEOS[0]);
+  const [videos, setVideos] = useState<any[]>(MOCK_VIDEOS);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Custom states for onboarding & sponsorship flow
+  const [isParentViewOnly, setIsParentViewOnly] = useState(false);
+  const [viewOnlyStudentName, setViewOnlyStudentName] = useState("");
+  const [sponsorLoading, setSponsorLoading] = useState(false);
+  const [sponsorToken, setSponsorToken] = useState("");
+  const [showSponsorModal, setShowSponsorModal] = useState(false);
+  const [liveSession, setLiveSession] = useState<{
+    title: string;
+    scheduled_at: string;
+    join_url: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const isPaid = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin || isParentViewOnly;
+    if (!isPaid) return;
+
+    const fetchVideos = async () => {
+      try {
+        const { data: recordings, error } = await supabase
+          .from("session_recordings")
+          .select("id, title, custom_date, youtube_video_id")
+          .order("published_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching session recordings:", error);
+          return;
+        }
+
+        const mappedRecordings = (recordings || [])
+          .filter((rec: any) => {
+            const titleLower = (rec.title || "").toLowerCase();
+            return titleLower !== "deleted video" && titleLower !== "private video";
+          })
+          .map((rec: any, idx: number) => ({
+            id: rec.id || `db-${idx}`,
+            title: rec.title,
+            date: rec.custom_date || "Unknown Date",
+            videoId: rec.youtube_video_id
+          }));
+
+        const combined = [...mappedRecordings];
+        if (combined.length < MOCK_VIDEOS.length) {
+          for (let i = combined.length; i < MOCK_VIDEOS.length; i++) {
+            combined.push({
+              ...MOCK_VIDEOS[i],
+              id: `mock-${i}`
+            });
+          }
+        }
+
+        setVideos(combined);
+        const firstPlayable = combined.find(v => v.videoId) || combined[0];
+        setActiveVideo(firstPlayable);
+      } catch (err) {
+        console.error("Failed to load videos from Supabase:", err);
+      }
+    };
+
+    fetchVideos();
+  }, [user, hasSlotAccess, isAdmin]);
+
+  useEffect(() => {
+    if (!user) return;
+    const isPaid = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin || isParentViewOnly;
+    if (!isPaid) return;
+
+    const fetchLiveSession = async () => {
+      try {
+        const res = await fetch("/api/my-batch/live-session");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.session) {
+            setLiveSession(data.session);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load live session details:", err);
+      }
+    };
+
+    fetchLiveSession();
+  }, [user, hasSlotAccess, isAdmin, isParentViewOnly]);
+
+
   const [ticketSubject, setTicketSubject] = useState("");
   const [ticketMessage, setTicketMessage] = useState("");
   const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
@@ -824,9 +1120,17 @@ export default function MyBatchPage() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 relative overflow-x-hidden select-none">
       {isParentViewOnly && (
-        <div className="bg-blue-600/25 border-b border-blue-500/20 px-6 py-3 text-center text-xs font-black uppercase tracking-[0.24em] text-blue-300 flex items-center justify-center gap-2 relative z-50">
-          <BadgeCheck className="w-4 h-4 flex-shrink-0" />
-          Parent View-Only Oversight Mode: Viewing {viewOnlyStudentName}&apos;s Batch Workspace
+        <div className="bg-blue-600/25 border-b border-blue-500/20 px-6 py-3 text-center text-xs font-black uppercase tracking-[0.24em] text-blue-300 flex flex-wrap items-center justify-center gap-4 relative z-50">
+          <div className="flex items-center gap-2">
+            <BadgeCheck className="w-4 h-4 flex-shrink-0" />
+            Parent View-Only Oversight Mode: Viewing {viewOnlyStudentName}&apos;s Batch Workspace
+          </div>
+          <button
+            onClick={() => router.push("/parent-portal")}
+            className="px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-[10px] font-bold uppercase tracking-wider text-white transition-all shadow-md flex items-center gap-1.5 cursor-pointer ml-2 hover:scale-105 active:scale-95"
+          >
+            ← Back to Parent Portal
+          </button>
         </div>
       )}
       {/* Screen recording deterrence overlay */}
@@ -1097,283 +1401,16 @@ export default function MyBatchPage() {
           </div>
 
           {/* Middle Section 3: Secure Video Player */}
-          <div className="rounded-[2rem] border border-white/10 bg-[#060a1f] p-4 shadow-[0_0_60px_rgba(59,130,246,0.05)] overflow-hidden">
-            <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[600px]">
-              {/* Left Side: Video List (30%) */}
-              <div className="lg:w-[30%] bg-white/[0.02] rounded-3xl border border-white/5 p-4 flex flex-col h-[300px] lg:h-full">
-                <div className="px-4 py-3 border-b border-white/5 mb-4 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-black text-white">Session Recordings</h3>
-                    <p className="text-xs text-slate-400 mt-1">Past live classes</p>
-                  </div>
-                  {isAdmin && (
-                    <button
-                      onClick={handleSyncVideos}
-                      disabled={isSyncing}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600/80 hover:bg-blue-600 disabled:bg-slate-800 disabled:text-slate-500 text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:scale-100 cursor-pointer shadow-md"
-                    >
-                      {isSyncing ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <Sparkles className="w-3.5 h-3.5" />
-                      )}
-                      Sync
-                    </button>
-                  )}
-                </div>
-                {syncStatus && (
-                  <div className={`mx-4 mb-3 px-3 py-2 rounded-xl text-center text-xs font-semibold border ${
-                    syncStatus.type === "success" 
-                      ? "bg-green-500/10 border-green-500/20 text-green-400" 
-                      : "bg-red-500/10 border-red-500/20 text-red-400"
-                  }`}>
-                    {syncStatus.message}
-                  </div>
-                )}
-                <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-                  {videos.map((video) => (
-                    <button 
-                      key={video.id} 
-                      onClick={() => {
-                        setActiveVideo(video);
-                        setIsPlaying(false);
-                      }}
-                      className={`w-full text-left p-4 rounded-2xl transition-all ${activeVideo.id === video.id ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-white/[0.05] border border-transparent'}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <PlayCircle className={`w-8 h-8 flex-shrink-0 ${activeVideo.id === video.id ? 'text-blue-400' : 'text-slate-500'}`} />
-                        <div>
-                          <p className={`text-sm font-bold ${activeVideo.id === video.id ? 'text-white' : 'text-slate-300'}`}>{video.title}</p>
-                          <p className="text-[10px] uppercase tracking-wider text-slate-500 mt-1">{video.date}</p>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Right Side: Secure Video Player (70%) */}
-              <div className="lg:w-[70%] bg-black rounded-3xl relative flex flex-col overflow-hidden border border-white/5 min-h-[350px] lg:min-h-0">
-
-                {/* React YouTube component mount point */}
-                <div className="flex-1 w-full h-[75%] lg:h-[80%] relative bg-black flex items-center justify-center overflow-hidden">
-                  {/* Invisible Shield to block YouTube UI clicks (Security Feature 2) */}
-                  <div 
-                    className="absolute inset-0 z-20" 
-                    onContextMenu={(e) => e.preventDefault()}
-                  ></div>
-
-                  <style dangerouslySetInnerHTML={{__html: `
-                    @keyframes float-watermark {
-                      0% { transform: translate(-30%, -30%) rotate(-12deg); }
-                      25% { transform: translate(30%, -15%) rotate(12deg); }
-                      50% { transform: translate(15%, 30%) rotate(-8deg); }
-                      75% { transform: translate(-25%, 20%) rotate(8deg); }
-                      100% { transform: translate(-30%, -30%) rotate(-12deg); }
-                    }
-                    .animate-float-watermark {
-                      animation: float-watermark 25s infinite linear;
-                    }
-                  `}} />
-
-                  {activeVideo.videoId ? (
-                    <>
-                      <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-none" />
-                      
-                      {/* Floating Watermark for Screen Recording Protection */}
-                      <div className="absolute inset-0 z-30 pointer-events-none select-none flex items-center justify-center opacity-30">
-                        <div className="text-white text-xs md:text-sm font-semibold tracking-wider bg-black/45 px-3 py-1.5 rounded-full border border-white/10 whitespace-nowrap animate-float-watermark">
-                          {user?.email || "student@skillyug.com"}
-                        </div>
-                      </div>
-
-                      {/* Diagnostic Overlay for Admins */}
-                      {isAdmin && (
-                        <div className="absolute top-4 left-4 z-40 bg-black/90 text-[10px] text-green-400 p-2.5 rounded-xl font-mono border border-green-500/20 max-w-[280px] pointer-events-auto select-text max-h-[140px] overflow-y-auto custom-scrollbar">
-                          <div className="font-bold border-b border-green-500/20 pb-1 mb-1 flex justify-between items-center">
-                            <span>DIAGNOSTICS PANEL</span>
-                            <button onClick={() => setDebugLogs([])} className="text-red-400 hover:underline">Clear</button>
-                          </div>
-                          {debugLogs.length === 0 ? (
-                            <div className="text-gray-500">No logs captured...</div>
-                          ) : (
-                            debugLogs.map((log, idx) => (
-                              <div key={idx} className="leading-tight mb-0.5 break-all">{log}</div>
-                            ))
-                          )}
-                        </div>
-                      )}
-
-                      {/* Video Load/Error States */}
-                      {playerError && (
-                        <div className="absolute inset-0 bg-black/95 z-35 flex flex-col items-center justify-center text-center p-4">
-                          <HelpCircle className="w-10 h-10 text-red-500 mb-2" />
-                          <p className="text-white text-sm font-bold">{playerError}</p>
-                          <p className="text-slate-500 text-xs mt-1">Please verify YouTube channel embedding permissions.</p>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="text-center z-40 relative">
-                      <Lock className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-                      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Recording Unavailable</p>
-                      <p className="text-xs text-slate-500 mt-2">Session recording will appear here once ready.</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Custom Controls */}
-                <div className="bg-[#060a1f] p-4 flex flex-col justify-center z-40 border-t border-white/10 h-[25%] lg:h-[20%]">
-                  {activeVideo.videoId ? (
-                    <div className="w-full flex flex-col gap-3">
-                      {/* Timeline Slider with custom tracks */}
-                      <div className="relative w-full group flex items-center h-4">
-                        {/* Background Track */}
-                        <div className="absolute left-0 right-0 h-1 rounded-full bg-white/10 pointer-events-none" />
-                        
-                        {/* Buffer Bar */}
-                        <div 
-                          className="absolute left-0 h-1 rounded-full bg-white/20 pointer-events-none transition-all duration-300"
-                          style={{ width: `${bufferedFraction * 100}%` }}
-                        />
-                        
-                        {/* Progress Bar */}
-                        <div 
-                          className="absolute left-0 h-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 pointer-events-none"
-                          style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                        />
-
-                        {/* Slider Thumb */}
-                        <div 
-                          className="absolute w-3 h-3 rounded-full bg-blue-400 border border-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none transform -translate-x-1/2"
-                          style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                        />
-
-                        {/* Input Range for Seeking */}
-                        <input 
-                          type="range"
-                          min={0}
-                          max={duration || 100}
-                          value={currentTime}
-                          onChange={handleSeekChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        />
-                      </div>
-
-                      {/* Controls Toolbar Row */}
-                      <div className="flex items-center justify-between w-full">
-                        {/* Left side: Play/Pause/Skip controls, Mute, Volume, Time */}
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-3.5">
-                            {/* Skip Backward 10s */}
-                            <button
-                              onClick={skipBackward}
-                              className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
-                              title="Skip Backward 10s"
-                            >
-                              <RotateCcw className="w-5 h-5" />
-                            </button>
-
-                            {/* Play/Pause Button */}
-                            <button 
-                              onClick={handlePlayPause}
-                              className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
-                              title={isPlaying ? "Pause" : "Play / Continue"}
-                            >
-                              {isPlaying ? (
-                                <Pause className="w-5 h-5" />
-                              ) : (
-                                <Play className="w-5 h-5" fill="currentColor" />
-                              )}
-                            </button>
-
-                            {/* Skip Forward 10s */}
-                            <button
-                              onClick={skipForward}
-                              className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
-                              title="Skip Forward 10s"
-                            >
-                              <RotateCw className="w-5 h-5" />
-                            </button>
-                          </div>
-
-                          {/* Mute/Volume controls */}
-                          <div className="flex items-center gap-2 group/volume relative">
-                            <button 
-                              onClick={handleToggleMute}
-                              className="text-slate-400 hover:text-white transition-colors cursor-pointer"
-                              title={isMuted ? "Unmute" : "Mute"}
-                            >
-                              {isMuted || volume === 0 ? (
-                                <VolumeX className="w-5 h-5" />
-                              ) : (
-                                <Volume2 className="w-5 h-5" />
-                              )}
-                            </button>
-                            
-                            {/* Sleek volume slider that expands on hover/focus */}
-                            <input 
-                              type="range"
-                              min={0}
-                              max={100}
-                              value={isMuted ? 0 : volume}
-                              onChange={handleVolumeChange}
-                              className="w-0 group-hover/volume:w-20 transition-all duration-300 h-1 bg-white/20 accent-blue-500 rounded-full cursor-pointer"
-                            />
-                          </div>
-
-                          {/* Time Display */}
-                          <div className="text-xs font-medium text-slate-400 tracking-wider">
-                            {formatTime(currentTime)} <span className="text-slate-600">/</span> {formatTime(duration)}
-                          </div>
-                        </div>
-
-                        {/* Right side: playback speed, branding & fullscreen */}
-                        <div className="flex items-center gap-3">
-                          <select
-                            value={playbackSpeed}
-                            onChange={(e) => handleSpeedChange(Number(e.target.value))}
-                            className="bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-300 outline-none cursor-pointer transition-colors"
-                            title="Playback Speed"
-                          >
-                            <option value={0.25} className="bg-[#060a1f] text-slate-300">0.25x</option>
-                            <option value={0.5} className="bg-[#060a1f] text-slate-300">0.5x</option>
-                            <option value={0.75} className="bg-[#060a1f] text-slate-300">0.75x</option>
-                            <option value={1} className="bg-[#060a1f] text-slate-300">1.0x (Normal)</option>
-                            <option value={1.25} className="bg-[#060a1f] text-slate-300">1.25x</option>
-                            <option value={1.5} className="bg-[#060a1f] text-slate-300">1.5x</option>
-                            <option value={1.75} className="bg-[#060a1f] text-slate-300">1.75x</option>
-                            <option value={2} className="bg-[#060a1f] text-slate-300">2.0x</option>
-                          </select>
-
-                          <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 select-none">
-                            Skillyug Player
-                          </span>
-                          <button 
-                            onClick={handleFullscreen}
-                            className="text-slate-400 hover:text-white transition-colors cursor-pointer"
-                            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-                          >
-                            {isFullscreen ? (
-                              <Minimize2 className="w-5 h-5" />
-                            ) : (
-                              <Maximize2 className="w-5 h-5" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center w-full">
-                      <span className="text-xs text-slate-500 font-bold uppercase tracking-widest select-none">
-                        No active recording
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          <SecureVideoPlayer
+            videos={videos}
+            activeVideo={activeVideo}
+            setActiveVideo={setActiveVideo}
+            isAdmin={isAdmin}
+            isSyncing={isSyncing}
+            syncStatus={syncStatus}
+            handleSyncVideos={handleSyncVideos}
+            userEmail={user?.email || "student@skillyug.com"}
+          />
 
           {/* Bottom Section: Bootcamp Calendar */}
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-8">

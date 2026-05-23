@@ -64,34 +64,32 @@ function LoginForm() {
       }
       setLoading(false);
     } else if (authData.user) {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          // Check role to route correctly
-          const res = await fetch("/api/onboarding/role", {
-            headers: {
-              "Authorization": `Bearer ${session.access_token}`
-            }
-          });
-          if (res.ok) {
-            const roleData = await res.json();
-            if (roleData.user?.role === "parent") {
-              setSuccessMsg("Success! Routing to Parent Portal...");
-              setTimeout(() => router.push("/parent-portal"), 800);
-              return;
-            } else if (roleData.user?.role === "student") {
-              setSuccessMsg("Success! Routing to Student Batch...");
-              setTimeout(() => router.push("/my-batch"), 800);
-              return;
-            }
+      let role = authData.user.user_metadata?.role;
+      if (!role) {
+        try {
+          const { data: profile } = await supabase
+            .from("users")
+            .select("role")
+            .eq("id", authData.user.id)
+            .maybeSingle();
+          if (profile?.role) {
+            role = profile.role;
           }
+        } catch (roleErr) {
+          console.error("Error fetching user role on login:", roleErr);
         }
-      } catch (roleErr) {
-        console.error("Error fetching user role on login:", roleErr);
       }
-      
-      setSuccessMsg("Success! Loading dashboard...");
-      setTimeout(() => router.push(redirectTo), 800);
+
+      if (role === "parent") {
+        setSuccessMsg("Success! Routing to Parent Portal...");
+        setTimeout(() => router.push("/parent-portal"), 50);
+      } else if (role === "student") {
+        setSuccessMsg("Success! Routing to Student Batch...");
+        setTimeout(() => router.push("/my-batch"), 50);
+      } else {
+        setSuccessMsg("Success! Loading dashboard...");
+        setTimeout(() => router.push(redirectTo), 50);
+      }
     }
   };
 
