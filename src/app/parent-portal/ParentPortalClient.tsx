@@ -471,7 +471,7 @@ function ParentPortalContent() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-in fade-in duration-300"
         >
-          <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[2.5rem] border border-slate-100 bg-white p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-slate-900">
+          <div className="relative w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[2.5rem] border border-slate-100 bg-white p-5 sm:p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-slate-900">
             <div className="absolute -right-16 -top-16 w-36 h-36 bg-purple-500/5 blur-[50px] rounded-full pointer-events-none" />
 
             <button
@@ -481,7 +481,7 @@ function ParentPortalContent() {
                 setEnrollError("");
                 setPaymentStep("checkout");
               }}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-full font-bold transition-all text-base"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold transition-all text-lg z-30"
             >
               ×
             </button>
@@ -631,7 +631,7 @@ function ParentPortalContent() {
       {/* ── Generated Credentials Card (Glassmorphism Overlay) ──────────────── */}
       {showCredentialsCard && generatedCredentials && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[2.5rem] border border-slate-100 bg-white p-6 md:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200 text-slate-900">
+          <div className="w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[2.5rem] border border-slate-100 bg-white p-5 sm:p-6 md:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200 text-slate-900">
             
             <div className="flex items-center gap-3">
               <div className="rounded-xl border border-purple-100 bg-purple-50 p-3">
