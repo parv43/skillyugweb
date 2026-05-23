@@ -739,9 +739,7 @@ export default function MyBatchPage() {
 
       <section className="relative z-10 px-6 pt-24 md:pt-32 pb-12 md:pb-16 lg:px-12">
         <div className="max-w-7xl mx-auto space-y-10">
-          <div className="hidden md:block">
-            <FirstClassCountdown />
-          </div>
+          <FirstClassCountdown />
           {isPaidUser ? (
             <>
 
