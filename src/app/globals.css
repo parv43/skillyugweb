@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-background: #020617; /* Slate 950 deep navy */
   --color-foreground: #f8fafc; /* Slate 50 */

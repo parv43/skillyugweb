@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { getRequiredEnv } from "@/lib/razorpayServer";
+import { getRequiredEnv, getRazorpayAuthHeader } from "@/lib/razorpayServer";
 
 export const runtime = "nodejs";
+
+const PARENT_ORDER_COOKIE = "parent_payment_order_id";
 
 function createSupabaseAdmin() {
   return createClient(
@@ -54,16 +56,6 @@ async function getAuthenticatedUser(request: NextRequest) {
   return data.user;
 }
 
-// Generate random secure password for direct kid enrollment
-function generateRandomPassword(length = 12) {
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}
-
 export async function POST(request: NextRequest) {
   try {
     const parentUser = await getAuthenticatedUser(request);
@@ -76,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     const admin = createSupabaseAdmin();
 
-    // Verify parent is registered with the role 'parent'
+    // Verify or auto-set parent is registered with the role 'parent'
     const { data: parentProfile } = await admin
       .from("users")
       .select("role")
@@ -84,7 +76,6 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (!parentProfile || parentProfile.role !== "parent") {
-      // Auto-set parent role if not set yet, for convenience
       await admin.from("users").upsert({
         id: parentUser.id,
         email: parentUser.email!,
@@ -93,9 +84,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // ── CASE A: RESOLVE SPONSORSHIP TOKEN ───────────────────
+    const notes: Record<string, string> = {
+      parent_id: parentUser.id,
+      parent_email: parentUser.email ?? "",
+    };
+
+    // ── CASE A: VALIDATE SPONSORSHIP TOKEN ───────────────────
     if (sponsorshipToken) {
-      // Find the pending enrollment
       const { data: pending, error: pendingError } = await admin
         .from("pending_enrollments")
         .select("student_id, status")
@@ -110,178 +105,71 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Sponsorship token has already been resolved or expired" }, { status: 400 });
       }
 
-      const studentId = pending.student_id;
-
-      // Fetch student email
-      const { data: studentUser, error: studentError } = await admin.auth.admin.getUserById(studentId);
-      if (studentError || !studentUser || !studentUser.user) {
-        return NextResponse.json({ error: "Linked student user not found" }, { status: 404 });
+      notes.booking_type = "parent_sponsorship";
+      notes.sponsorship_token = sponsorshipToken;
+    } 
+    // ── CASE B: VALIDATE DIRECT ENROLLMENT ───────────────────
+    else {
+      if (!kidEmail || !kidEmail.includes("@")) {
+        return NextResponse.json({ error: "Valid child email is required for enrollment" }, { status: 400 });
       }
-      const studentEmail = studentUser.user.email;
-
-      // Mark sponsorship token as resolved
-      await admin
-        .from("pending_enrollments")
-        .update({ status: "resolved" })
-        .eq("token", sponsorshipToken);
-
-      // Create student-parent relation
-      await admin
-        .from("student_parent_relations")
-        .upsert({ parent_id: parentUser.id, student_id: studentId });
-
-      // Fetch student details from public.users to get their full_name
-      const { data: studentProfile } = await admin
-        .from("users")
-        .select("full_name")
-        .eq("id", studentId)
-        .maybeSingle();
-
-      const studentName = studentProfile?.full_name || studentUser.user.user_metadata?.full_name || "Skillyug Student";
-      const parentPhone = parentUser.phone || studentUser.user.phone || "+910000000000";
-
-      // Create slot booking for access (amount = 399 INR, payment_status = paid)
-      const mockPaymentId = `pay_mock_${crypto.randomUUID().slice(0, 12)}`;
-      const mockOrderId = `order_mock_${crypto.randomUUID().slice(0, 12)}`;
-
-      const { error: bookingError } = await admin
-        .from("slot_bookings")
-        .insert({
-          user_id: studentId,
-          email: studentEmail,
-          name: studentName,
-          phone: parentPhone,
-          amount_paid: 399,
-          currency: "INR",
-          razorpay_order_id: mockOrderId,
-          razorpay_payment_id: mockPaymentId,
-          payment_status: "captured",
-          grade_class: "6-12",
-        });
-
-      if (bookingError) {
-        console.error("[Parent Payment] Failed to insert slot booking:", bookingError);
-        return NextResponse.json({ error: bookingError.message }, { status: 500 });
-      }
-
-      return NextResponse.json({
-        success: true,
-        message: "Sponsorship enrollment successful",
-        studentId: studentId,
-        enrolledEmail: studentEmail
-      });
+      notes.booking_type = "parent_direct";
+      notes.kid_email = kidEmail.trim().toLowerCase();
     }
 
-    // ── CASE B: DIRECT ENROLLMENT & ACCOUNT CREATION ────────
-    if (!kidEmail || !kidEmail.includes("@")) {
-      return NextResponse.json({ error: "Valid child email is required for enrollment" }, { status: 400 });
-    }
+    // Create Razorpay order (₹399.00 = 39900 paise)
+    const amount = 39900; 
+    const currency = "INR";
+    const receipt = `parent_${Date.now()}`.slice(0, 40);
 
-    const targetEmail = kidEmail.trim().toLowerCase();
-
-    // Check if user exists in auth.users
-    let studentId: string;
-    let generatedPassword = "";
-    let isNewUser = false;
-
-    // Search auth users using listUsers or by filtering (admin getUserById is single only, so we list users or check database)
-    const { data: existingProfiles, error: selectError } = await admin
-      .from("users")
-      .select("id")
-      .eq("email", targetEmail)
-      .maybeSingle();
-
-    if (existingProfiles) {
-      studentId = existingProfiles.id;
-    } else {
-      // Need to create auth account
-      generatedPassword = generateRandomPassword();
-      isNewUser = true;
-
-      const { data: newUser, error: createError } = await admin.auth.admin.createUser({
-        email: targetEmail,
-        password: generatedPassword,
-        email_confirm: true,
-        user_metadata: { full_name: "Skillyug Student" }
-      });
-
-      if (createError || !newUser.user) {
-        console.error("[Parent Payment] Auth creation error:", createError);
-        return NextResponse.json({ error: createError?.message || "Failed to create student account" }, { status: 500 });
-      }
-
-      studentId = newUser.user.id;
-
-      // Insert role into public.users
-      const { error: profileError } = await admin
-        .from("users")
-        .insert({
-          id: studentId,
-          email: targetEmail,
-          full_name: "Skillyug Student",
-          role: "student"
-        });
-
-      if (profileError) {
-        console.error("[Parent Payment] Profile insertion error:", profileError);
-      }
-    }
-
-    // Link parent and child
-    const { error: relationError } = await admin
-      .from("student_parent_relations")
-      .upsert({ parent_id: parentUser.id, student_id: studentId });
-
-    if (relationError) {
-      console.error("[Parent Payment] Relation mapping error:", relationError);
-      return NextResponse.json({ error: relationError.message }, { status: 500 });
-    }
-
-    // Fetch student details from public.users to get their full_name
-    const { data: studentProfile } = await admin
-      .from("users")
-      .select("full_name")
-      .eq("id", studentId)
-      .maybeSingle();
-
-    const studentName = studentProfile?.full_name || "Skillyug Student";
-    const parentPhone = parentUser.phone || "+910000000000";
-
-    // Create slot booking for access
-    const mockPaymentId = `pay_mock_${crypto.randomUUID().slice(0, 12)}`;
-    const mockOrderId = `order_mock_${crypto.randomUUID().slice(0, 12)}`;
-
-    const { error: bookingError } = await admin
-      .from("slot_bookings")
-      .insert({
-        user_id: studentId,
-        email: targetEmail,
-        name: studentName,
-        phone: parentPhone,
-        amount_paid: 399,
-        currency: "INR",
-        razorpay_order_id: mockOrderId,
-        razorpay_payment_id: mockPaymentId,
-        payment_status: "captured",
-        grade_class: "6-12",
-      });
-
-    if (bookingError) {
-      console.error("[Parent Payment] Failed to insert slot booking:", bookingError);
-      return NextResponse.json({ error: bookingError.message }, { status: 500 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Kid enrolled successfully",
-      studentId: studentId,
-      enrolledEmail: targetEmail,
-      isNewUser,
-      credentials: isNewUser ? { email: targetEmail, password: generatedPassword } : null
+    const razorpayResponse = await fetch("https://api.razorpay.com/v1/orders", {
+      method: "POST",
+      headers: {
+        Authorization: getRazorpayAuthHeader(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount,
+        currency,
+        receipt,
+        notes,
+      }),
+      cache: "no-store",
     });
 
+    const razorpayOrder = await razorpayResponse.json();
+    if (!razorpayResponse.ok) {
+      console.error("[Parent Payment Order Creation] Razorpay error:", razorpayOrder);
+      return NextResponse.json(
+        {
+          error:
+            razorpayOrder?.error?.description || "Unable to create Razorpay order. Please try again.",
+        },
+        { status: 502 }
+      );
+    }
+
+    const response = NextResponse.json({
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
+      customerEmail: parentUser.email ?? "",
+      keyId: getRequiredEnv("RAZORPAY_KEY_ID"),
+      orderId: razorpayOrder.id,
+    });
+
+    // Set secure cookie to prevent session/order hijacking
+    response.cookies.set(PARENT_ORDER_COOKIE, razorpayOrder.id, {
+      httpOnly: true,
+      maxAge: 60 * 15,
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    return response;
+
   } catch (error) {
-    console.error("[Parent Payment API] Failed:", error);
+    console.error("[Parent Payment API] Failed to create Razorpay order:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

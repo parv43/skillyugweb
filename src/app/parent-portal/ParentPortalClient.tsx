@@ -6,6 +6,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Users, Plus, CreditCard, Mail, Key, Share2, CheckCircle, ArrowRight, Loader2, LogOut, Copy, ShieldAlert } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
+import Script from "next/script";
+
+interface RazorpaySuccessPayload {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayFailurePayload {
+  error?: {
+    description?: string;
+    reason?: string;
+  };
+}
 
 type ChildUser = {
   id: string;
@@ -103,98 +117,135 @@ function ParentPortalContent() {
     router.replace("/onboarding");
   };
 
-  // Trigger Mock Payment
-  const triggerPayment = () => {
-    setPaymentStep("processing");
-    setTimeout(async () => {
-      if (isSponsorship && token) {
-        // Automatically resolve sponsorship token since we have it
-        try {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (!session) return;
-
-          const res = await fetch("/api/enroll/parent-payment", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${session.access_token}`
-            },
-            body: JSON.stringify({ sponsorshipToken: token })
-          });
-
-          if (!res.ok) {
-            const errData = await res.json();
-            throw new Error(errData.error || "Failed to resolve sponsorship");
-          }
-
-          const result = await res.json();
-          setPaymentStep("success");
-          await fetchChildren();
-          
-          // Clear query params
-          const url = new URL(window.location.href);
-          url.searchParams.delete("token");
-          window.history.replaceState({}, "", url.pathname);
-          setIsSponsorship(false);
-        } catch (err: any) {
-          setEnrollError(err.message || "Failed to resolve sponsorship payment.");
-          setPaymentStep("checkout");
-        }
-      } else {
-        // Direct flow: move to kid onboarding step after successful mock payment
-        setPaymentStep("success");
-      }
-    }, 1500);
-  };
-
-  // Enroll Kid (Direct flow)
-  const handleDirectEnroll = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Trigger Real Razorpay Payment
+  const triggerPayment = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setEnrollError("");
 
-    if (!kidEmailInput || !kidEmailInput.includes("@")) {
-      setEnrollError("Please enter a valid email address.");
-      return;
+    if (!isSponsorship) {
+      if (!kidEmailInput || !kidEmailInput.includes("@")) {
+        setEnrollError("Please enter a valid email address.");
+        return;
+      }
     }
 
     setEnrollingKid(true);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) {
+        setEnrollError("You must be logged in to make a payment.");
+        setEnrollingKid(false);
+        return;
+      }
 
+      // 1. Create order
       const res = await fetch("/api/enroll/parent-payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${session.access_token}`
         },
-        body: JSON.stringify({ kidEmail: kidEmailInput.trim().toLowerCase() })
+        body: JSON.stringify(
+          isSponsorship && token
+            ? { sponsorshipToken: token }
+            : { kidEmail: kidEmailInput.trim().toLowerCase() }
+        )
       });
 
-      const data = await res.json();
+      const orderData = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Enrollment failed.");
+        throw new Error(orderData.error || "Failed to initiate payment.");
       }
 
-      await fetchChildren();
-
-      if (data.credentials) {
-        // Show credentials copy modal
-        setGeneratedCredentials(data.credentials);
-        setShowCredentialsCard(true);
-      } else {
-        // Student already existed in public.users, enrolled directly
-        alert("Enrolled student successfully!");
+      if (!(window as any).Razorpay) {
+        throw new Error("Payment gateway is currently loading. Please try again in a few seconds.");
       }
 
-      // Reset Form and Modal
-      setKidEmailInput("");
-      setShowPaymentModal(false);
-      setPaymentStep("checkout");
+      setPaymentStep("processing");
+      let paymentFinalized = false;
+
+      // 2. Open Razorpay Modal
+      const razorpay = new (window as any).Razorpay({
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Skillyug",
+        description: isSponsorship ? "Sponsorship Activation Co-pay" : "Direct Student Enrollment",
+        order_id: orderData.orderId,
+        prefill: {
+          name: session.user.user_metadata?.full_name || "",
+          email: session.user.email || "",
+        },
+        notes: {
+          booking_type: isSponsorship ? "parent_sponsorship" : "parent_direct",
+        },
+        theme: {
+          color: "#4f46e5",
+        },
+        handler: async (paymentPayload: RazorpaySuccessPayload) => {
+          paymentFinalized = true;
+          setPaymentStep("processing");
+
+          try {
+            // 3. Verify Payment on Backend
+            const verifyRes = await fetch("/api/enroll/parent-payment/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${session.access_token}`
+              },
+              body: JSON.stringify(paymentPayload)
+            });
+
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok) {
+              throw new Error(verifyData.error || "Payment was captured but enrollment failed.");
+            }
+
+            // Success!
+            await fetchChildren();
+
+            // Reset query param if sponsorship
+            if (isSponsorship) {
+              const url = new URL(window.location.href);
+              url.searchParams.delete("token");
+              window.history.replaceState({}, "", url.pathname);
+              setIsSponsorship(false);
+            }
+
+            if (verifyData.credentials) {
+              setGeneratedCredentials(verifyData.credentials);
+              setShowCredentialsCard(true);
+              setShowPaymentModal(false);
+              setPaymentStep("checkout");
+              setKidEmailInput("");
+            } else {
+              setPaymentStep("success");
+            }
+          } catch (err: any) {
+            console.error("Verification error:", err);
+            setEnrollError(err.message || "Payment verification failed. Please contact support.");
+            setPaymentStep("checkout");
+          } finally {
+            setEnrollingKid(false);
+          }
+        }
+      });
+
+      razorpay.on("payment.failed", (payload: any) => {
+        paymentFinalized = true;
+        setEnrollError(payload.error?.description || "Payment failed. Please try again.");
+        setPaymentStep("checkout");
+        setEnrollingKid(false);
+      });
+
+      razorpay.open();
+
     } catch (err: any) {
-      setEnrollError(err.message || "Failed to onboard child.");
-    } finally {
+      console.error("Order creation error:", err);
+      setEnrollError(err.message || "Failed to initialize payment process.");
+      setPaymentStep("checkout");
       setEnrollingKid(false);
     }
   };
@@ -314,7 +365,7 @@ function ParentPortalContent() {
         </div>
       </section>
 
-      {/* ── Mock Payment Modal ─────────────────────────────────────── */}
+      {/* ── Real Razorpay Payment Modal ─────────────────────────────────────── */}
       {showPaymentModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-in fade-in duration-300"
@@ -326,6 +377,8 @@ function ParentPortalContent() {
               onClick={() => {
                 setShowPaymentModal(false);
                 setIsSponsorship(false);
+                setEnrollError("");
+                setPaymentStep("checkout");
               }}
               className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-full font-bold transition-all text-base"
             >
@@ -355,49 +408,13 @@ function ParentPortalContent() {
                   </div>
                 </div>
 
-                {isSponsorship && (
+                {isSponsorship ? (
                   <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl text-xs text-purple-700 font-semibold flex gap-2 items-center animate-pulse">
                     <Users className="w-4 h-4 flex-shrink-0" />
                     Resolving Student Sponsorship Ticket.
                   </div>
-                )}
-
-                {enrollError && (
-                  <p className="text-xs text-red-500 font-semibold text-center">{enrollError}</p>
-                )}
-
-                <button
-                  onClick={triggerPayment}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:scale-[1.02] shadow-md"
-                >
-                  Pay ₹399.00
-                </button>
-              </div>
-            )}
-
-            {paymentStep === "processing" && (
-              <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
-                <p className="text-sm font-bold text-slate-800 uppercase tracking-wider">Processing payment...</p>
-                <p className="text-xs text-slate-400 font-mono">Contacting banking backend (simulation)</p>
-              </div>
-            )}
-
-            {paymentStep === "success" && (
-              <div className="space-y-6">
-                <div className="flex flex-col items-center justify-center text-center py-4 space-y-4">
-                  <div className="w-16 h-16 bg-green-50 border border-green-200 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-black text-slate-900">Payment Successful</h3>
-                    <p className="text-xs text-slate-500 mt-1">Order capture simulated. Slot generated.</p>
-                  </div>
-                </div>
-
-                {!isSponsorship ? (
-                  // Direct flow: Parent inputs kid's email to onboard
-                  <form onSubmit={handleDirectEnroll} className="space-y-4 pt-4 border-t border-slate-100">
+                ) : (
+                  <div className="space-y-4 pt-2">
                     <div className="space-y-2">
                       <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                         Enter Kid&apos;s Email Address <span className="text-blue-500">*</span>
@@ -414,48 +431,77 @@ function ParentPortalContent() {
                         />
                       </div>
                     </div>
-
-                    {enrollError && (
-                      <p className="text-xs text-red-500 font-semibold">{enrollError}</p>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={enrollingKid}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white hover:bg-blue-500 active:scale-[0.98] transition-all disabled:opacity-50 shadow-md"
-                    >
-                      {enrollingKid ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Onboarding Child...
-                        </>
-                      ) : (
-                        "Onboard Child"
-                      )}
-                    </button>
-                  </form>
-                ) : (
-                  // Sponsorship resolved: Close
-                  <div className="space-y-4 pt-4 border-t border-slate-100">
-                    <p className="text-sm text-center text-slate-500 leading-relaxed">
-                      Sponsorship has been resolved. The student dashboard is now fully unlocked and active!
-                    </p>
-                    <button
-                      onClick={() => {
-                        setShowPaymentModal(false);
-                        setIsSponsorship(false);
-                      }}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-slate-700 transition-all font-bold"
-                    >
-                      Close Portal
-                    </button>
                   </div>
                 )}
+
+                {enrollError && (
+                  <p className="text-xs text-red-500 font-semibold text-center">{enrollError}</p>
+                )}
+
+                <button
+                  onClick={(e) => triggerPayment(e)}
+                  disabled={enrollingKid}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:scale-[1.02] shadow-md disabled:opacity-50"
+                >
+                  {enrollingKid ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Opening Payment...
+                    </>
+                  ) : (
+                    "Pay ₹399.00"
+                  )}
+                </button>
+              </div>
+            )}
+
+            {paymentStep === "processing" && (
+              <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+                <p className="text-sm font-bold text-slate-800 uppercase tracking-wider">Processing payment...</p>
+                <p className="text-xs text-slate-400 font-mono">Verifying with Razorpay secure networks</p>
+              </div>
+            )}
+
+            {paymentStep === "success" && (
+              <div className="space-y-6">
+                <div className="flex flex-col items-center justify-center text-center py-4 space-y-4">
+                  <div className="w-16 h-16 bg-green-50 border border-green-200 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900">Payment Successful</h3>
+                    <p className="text-xs text-slate-500 mt-1">Order captured. Enrollment active.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <p className="text-sm text-center text-slate-500 leading-relaxed">
+                    {isSponsorship
+                      ? "Sponsorship has been resolved. The student dashboard is now fully unlocked and active!"
+                      : "The child has been enrolled successfully! They can log in using their existing email and credentials."}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      setIsSponsorship(false);
+                      setPaymentStep("checkout");
+                    }}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-slate-700 transition-all font-bold"
+                  >
+                    Close Portal
+                  </button>
+                </div>
               </div>
             )}
           </div>
         </div>
       )}
+
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="afterInteractive"
+      />
 
       {/* ── Generated Credentials Card (Glassmorphism Overlay) ──────────────── */}
       {showCredentialsCard && generatedCredentials && (
