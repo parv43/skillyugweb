@@ -51,6 +51,33 @@ function ParentPortalContent() {
   const [showCredentialsCard, setShowCredentialsCard] = useState(false);
   const [generatedCredentials, setGeneratedCredentials] = useState<{ email: string; password: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedChildId, setCopiedChildId] = useState<string | null>(null);
+
+  const handleShareChildDetails = async (child: ChildUser) => {
+    const credText = `Skillyug AI Bootcamp Enrollment:\nStudent: ${child.full_name || "Student"}\nEmail: ${child.email}\nLogin at: ${window.location.origin}/login`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Skillyug AI Bootcamp Access",
+          text: credText,
+          url: `${window.location.origin}/login`
+        });
+        return;
+      } catch (err) {
+        console.log("Error sharing:", err);
+      }
+    }
+    
+    // Clipboard fallback
+    try {
+      await navigator.clipboard.writeText(credText);
+      setCopiedChildId(child.id);
+      setTimeout(() => setCopiedChildId(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   // Fetch children list
   const fetchChildren = async () => {
@@ -277,12 +304,30 @@ function ParentPortalContent() {
   };
 
   // Copy Credentials
-  const handleCopyCredentials = () => {
+  const handleCopyCredentials = async () => {
     if (!generatedCredentials) return;
     const credText = `Skillyug AI Bootcamp Credentials:\nEmail: ${generatedCredentials.email}\nPassword: ${generatedCredentials.password}\nLogin at: ${window.location.origin}/login`;
-    navigator.clipboard.writeText(credText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Skillyug AI Bootcamp Credentials",
+          text: credText,
+          url: `${window.location.origin}/login`
+        });
+        return;
+      } catch (err) {
+        console.log("Error sharing:", err);
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(credText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
   };
 
   if (loading) {
@@ -314,14 +359,14 @@ function ParentPortalContent() {
               <p className="text-sm text-slate-500 font-medium">Welcome, {parentName}. Oversee your child&apos;s learning path.</p>
             </div>
             
-            <div className="flex gap-4">
+            <div className="flex flex-row items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => {
                   setIsSponsorship(false);
                   setPaymentStep("checkout");
                   setShowPaymentModal(true);
                 }}
-                className="flex items-center gap-2 px-5 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all shadow-[0_4px_14px_rgba(59,130,246,0.15)] hover:scale-[1.03] active:scale-[0.97]"
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all shadow-[0_4px_14px_rgba(59,130,246,0.15)] hover:scale-[1.03] active:scale-[0.97]"
               >
                 <Plus className="w-4 h-4" />
                 Enroll Kids in Bootcamp
@@ -329,7 +374,7 @@ function ParentPortalContent() {
               
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center p-3 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 hover:text-slate-800 transition-colors"
+                className="flex items-center justify-center p-3 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 hover:text-slate-800 transition-colors flex-shrink-0"
                 title="Log Out"
               >
                 <LogOut className="w-4 h-4" />
@@ -363,14 +408,35 @@ function ParentPortalContent() {
                     className="group relative cursor-pointer rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:border-slate-300 transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between overflow-hidden hover:shadow-md"
                   >
                     <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center font-black text-purple-600 text-sm">
-                          {child.full_name?.charAt(0).toUpperCase() || "S"}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex-shrink-0 flex items-center justify-center font-black text-purple-600 text-sm">
+                            {child.full_name?.charAt(0).toUpperCase() || "S"}
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="text-base font-black text-slate-800 truncate">{child.full_name || "Skillyug Student"}</h3>
+                            <p className="text-xs text-slate-500 break-all">{child.email}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-base font-black text-slate-800">{child.full_name || "Skillyug Student"}</h3>
-                          <p className="text-xs text-slate-500 break-all">{child.email}</p>
-                        </div>
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleShareChildDetails(child);
+                          }}
+                          className={`p-2.5 rounded-xl border transition-all flex-shrink-0 flex items-center justify-center ${
+                            copiedChildId === child.id
+                              ? "bg-green-50 border-green-200 text-green-600 animate-in zoom-in"
+                              : "bg-slate-50 hover:bg-purple-50 border-slate-200 hover:border-purple-200 text-slate-400 hover:text-purple-600"
+                          }`}
+                          title={copiedChildId === child.id ? "Copied details!" : "Share child details"}
+                        >
+                          {copiedChildId === child.id ? (
+                            <CheckCircle className="w-4 h-4" />
+                          ) : (
+                            <Share2 className="w-4 h-4" />
+                          )}
+                        </button>
                       </div>
                       
                       <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-mono">
@@ -396,7 +462,7 @@ function ParentPortalContent() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-in fade-in duration-300"
         >
-          <div className="relative w-full max-w-md rounded-[2.5rem] border border-slate-100 bg-white p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden text-slate-900">
+          <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[2.5rem] border border-slate-100 bg-white p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-slate-900">
             <div className="absolute -right-16 -top-16 w-36 h-36 bg-purple-500/5 blur-[50px] rounded-full pointer-events-none" />
 
             <button
@@ -556,7 +622,7 @@ function ParentPortalContent() {
       {/* ── Generated Credentials Card (Glassmorphism Overlay) ──────────────── */}
       {showCredentialsCard && generatedCredentials && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="w-full max-w-md rounded-[2.5rem] border border-slate-100 bg-white p-6 md:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200 text-slate-900">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[2.5rem] border border-slate-100 bg-white p-6 md:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200 text-slate-900">
             
             <div className="flex items-center gap-3">
               <div className="rounded-xl border border-purple-100 bg-purple-50 p-3">
