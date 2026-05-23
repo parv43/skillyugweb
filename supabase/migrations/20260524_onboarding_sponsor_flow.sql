@@ -135,3 +135,19 @@ CREATE POLICY "sponsorship_update_all"
 GRANT SELECT, INSERT, UPDATE ON public.users TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.student_parent_relations TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.pending_enrollments TO anon, authenticated;
+
+-- ============================================================
+-- Backfill existing auth.users into public.users
+-- ============================================================
+INSERT INTO public.users (id, email, full_name, role)
+SELECT 
+  id, 
+  email, 
+  COALESCE(raw_user_meta_data->>'full_name', 'Skillyug Student'),
+  CASE 
+    WHEN raw_user_meta_data->>'role' IN ('student', 'parent', 'admin') THEN raw_user_meta_data->>'role'
+    ELSE 'student'
+  END
+FROM auth.users
+ON CONFLICT (id) DO NOTHING;
+
