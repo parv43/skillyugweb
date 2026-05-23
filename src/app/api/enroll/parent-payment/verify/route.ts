@@ -220,13 +220,25 @@ export async function POST(request: NextRequest) {
         .eq("email", targetEmail)
         .maybeSingle();
 
+      generatedPassword = generateRandomPassword();
+      isNewUser = true;
+
       if (existingProfiles) {
         studentId = existingProfiles.id;
+
+        // Reset and update auth password and metadata for existing student accounts
+        const { error: updateError } = await admin.auth.admin.updateUserById(studentId, {
+          password: generatedPassword,
+          user_metadata: {
+            temp_password: generatedPassword
+          }
+        });
+
+        if (updateError) {
+          console.error("[Parent Payment Verify] Auth update error:", updateError);
+        }
       } else {
         // Create new auth account
-        generatedPassword = generateRandomPassword();
-        isNewUser = true;
-
         const { data: newUser, error: createError } = await admin.auth.admin.createUser({
           email: targetEmail,
           password: generatedPassword,
