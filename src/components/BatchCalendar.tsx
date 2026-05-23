@@ -168,7 +168,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
 
       {/* Expanded Events Panel */}
       {selectedDate && (
-        <div className="rounded-[1.75rem] border border-blue-400/15 bg-gradient-to-br from-[#020617] to-slate-900/60 p-6 md:p-8 shadow-[0_4px_40px_rgba(59,130,246,0.06)] overflow-hidden relative">
+        <div className="rounded-[1.75rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-6 md:p-8 shadow-sm overflow-hidden relative">
           {/* Decorative glow */}
           <div
             aria-hidden="true"

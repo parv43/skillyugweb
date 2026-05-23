@@ -87,7 +87,7 @@ function MobileHero() {
         >
           {!loading && !hasSlot && (
             <Link
-              href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
+              href="/onboarding?from=bootcamp"
               className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
               style={{ 
                 background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
@@ -201,7 +201,7 @@ export default function HeroSection() {
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
               {!loading && !hasSlot && (
                 <Link 
-                  href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
+                  href="/onboarding?from=bootcamp"
                   className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
                 >
                   Join the Bootcamp
@@ -223,9 +223,9 @@ export default function HeroSection() {
             </div>
 
             {/* Central Pill Badge */}
-            <div className="relative z-30 px-8 py-4 rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.4)] flex items-center justify-center">
-              <span className="text-xl md:text-2xl font-black text-black tracking-[0.2em] relative z-10">SKILLYUG</span>
-              <div className="absolute inset-0 rounded-full border border-white/40 animate-pulse opacity-50" />
+            <div className="relative z-30 px-8 py-4 rounded-full bg-white border border-purple-100 shadow-[0_10px_25px_rgba(139,92,246,0.12)] flex items-center justify-center">
+              <span className="text-xl md:text-2xl font-black text-purple-600 tracking-[0.2em] relative z-10">SKILLYUG</span>
+              <div className="absolute inset-0 rounded-full border border-purple-200/40 animate-pulse opacity-50" />
             </div>
 
             {/* Orbiting Tool Cards */}

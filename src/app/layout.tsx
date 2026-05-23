@@ -37,8 +37,26 @@ export default async function RootLayout({
   const supabaseHost = supabaseUrl ? new URL(supabaseUrl).host : null
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          id="theme-initializer"
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('theme');
+                  if (saved === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `
+          }}
+        />
         {/* Link to llms.txt so AI crawlers and Semrush can discover it without following internal links */}
         <link rel="llms" href="/llms.txt" />
         {supabaseHost && (

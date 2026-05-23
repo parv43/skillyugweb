@@ -17,16 +17,16 @@ import {
 
 type ToolColor = "blue" | "purple" | "pink" | "indigo" | "cyan" | "violet" | "sky" | "fuchsia" | "teal"
 
-const TOOL_COLORS: Record<ToolColor, { border: string; text: string }> = {
-  blue: { border: "border-blue-500/30", text: "text-blue-400" },
-  purple: { border: "border-purple-500/30", text: "text-purple-400" },
-  pink: { border: "border-pink-500/30", text: "text-pink-400" },
-  indigo: { border: "border-indigo-500/30", text: "text-indigo-400" },
-  cyan: { border: "border-cyan-500/30", text: "text-cyan-400" },
-  violet: { border: "border-violet-500/30", text: "text-violet-400" },
-  sky: { border: "border-sky-500/30", text: "text-sky-400" },
-  fuchsia: { border: "border-fuchsia-500/30", text: "text-fuchsia-400" },
-  teal: { border: "border-teal-500/30", text: "text-teal-400" },
+const TOOL_COLORS: Record<ToolColor, { bg: string; text: string }> = {
+  blue: { bg: "bg-blue-50/80 dark:bg-blue-950/40", text: "text-blue-600 dark:text-blue-400" },
+  purple: { bg: "bg-purple-50/80 dark:bg-purple-950/40", text: "text-purple-600 dark:text-purple-400" },
+  pink: { bg: "bg-pink-50/80 dark:bg-pink-950/40", text: "text-pink-600 dark:text-pink-400" },
+  indigo: { bg: "bg-indigo-50/80 dark:bg-indigo-950/40", text: "text-indigo-600 dark:text-indigo-400" },
+  cyan: { bg: "bg-cyan-50/80 dark:bg-cyan-950/40", text: "text-cyan-600 dark:text-cyan-400" },
+  violet: { bg: "bg-violet-50/80 dark:bg-violet-950/40", text: "text-violet-600 dark:text-violet-400" },
+  sky: { bg: "bg-sky-50/80 dark:bg-sky-950/40", text: "text-sky-600 dark:text-sky-400" },
+  fuchsia: { bg: "bg-fuchsia-50/80 dark:bg-fuchsia-950/40", text: "text-fuchsia-600 dark:text-fuchsia-400" },
+  teal: { bg: "bg-teal-50/80 dark:bg-teal-950/40", text: "text-teal-600 dark:text-teal-400" },
 }
 
 interface ToolCardProps {
@@ -41,14 +41,14 @@ const ToolCard = ({ icon: Icon, title, desc, color = "blue", idx = 0 }: ToolCard
   const styles = TOOL_COLORS[color]
   return (
     <div
-      className="skill-card flex flex-col items-center text-center p-2 group opacity-0"
+      className="skill-card flex flex-col items-start text-left p-6 hover:-translate-y-1 transition-all duration-300 opacity-0 relative group"
       style={{ transitionDelay: `${idx * 80}ms` }}
     >
-      <div className={`w-14 h-14 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-5 border ${styles.border} shadow-[0_4px_12px_rgba(0,0,0,0.1)] group-hover:-translate-y-1 transition-transform duration-300 relative`}>
-        <Icon className={`w-6 h-6 ${styles.text}`} />
+      <div className={`w-12 h-12 rounded-full ${styles.bg} flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-105 shadow-sm`}>
+        <Icon className={`w-5.5 h-5.5 ${styles.text}`} />
       </div>
-      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-      <p className="text-sm text-slate-400 leading-relaxed max-w-[280px]">
+      <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-purple-650 dark:group-hover:text-purple-400 transition-colors">{title}</h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
         {desc}
       </p>
     </div>
@@ -97,30 +97,24 @@ export default function SkillsSection() {
     <section
       ref={sectionRef}
       id="what-they-learn"
-      className="relative w-full py-16 md:py-32 bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 border-b"
+      className="relative w-full py-16 md:py-32 bg-slate-50 dark:bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-200 dark:border-white/5 border-b border-slate-200 dark:border-white/5"
     >
-      {/* Background Layer with subtle Classroom Image */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <img src="/classroom.webp" alt="Classroom Environment" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#020617]/70" />
-      </div>
-
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-purple-900/5 to-transparent pointer-events-none rounded-full z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-150/10 via-purple-150/5 to-transparent pointer-events-none rounded-full z-10" />
 
       {/* Header */}
       <div className="w-full flex justify-center mb-10 md:mb-20 z-20 px-6">
         <div className="text-center max-w-[800px] w-full mx-auto">
-          <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-4 md:mb-6 tracking-tight leading-tight">
+          <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 md:mb-6 tracking-tight leading-tight">
             What Students Will Actually Learn
           </h2>
-          <p className="text-slate-400 text-base md:text-xl font-light">
+          <p className="text-slate-600 dark:text-slate-300 text-base md:text-xl font-light">
             No complex developer tools. At the Skillyug Summer AI Bootcamp, we focus solely on practical AI study tools and homework apps that help Class 6–12 students learn better and finish assignments faster.
           </p>
         </div>
       </div>
 
       {/* Mobile Layout */}
-      <div className="flex flex-col gap-3 px-4 max-w-lg mx-auto w-full z-10 relative md:hidden">
+      <div className="flex flex-col gap-4 px-4 max-w-lg mx-auto w-full z-10 relative md:hidden">
         {tools.filter(t => t.title !== "AI Study Assistant" && t.title !== "AI Research Tools").map((tool, idx) => {
           const Icon = tool.icon
           const colors = ["blue", "purple", "pink", "indigo", "cyan", "violet", "sky", "fuchsia", "teal"]
@@ -129,15 +123,15 @@ export default function SkillsSection() {
           return (
             <div
               key={idx}
-              className="skill-card flex items-start gap-4 bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 backdrop-blur-sm opacity-0"
+              className="skill-card flex items-start gap-4 p-3 opacity-0"
               style={{ transitionDelay: `${idx * 80}ms` }}
             >
-              <div className={`w-11 h-11 rounded-xl bg-[#020617] border ${styles.border} flex items-center justify-center flex-shrink-0`}>
+              <div className={`w-10 h-10 rounded-full ${styles.bg} flex items-center justify-center flex-shrink-0 shadow-sm`}>
                 <Icon className={`w-5 h-5 ${styles.text}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-white font-bold text-sm leading-tight mb-1">{tool.title}</h3>
-                <p className="text-slate-400 text-xs leading-relaxed">{tool.desc}</p>
+                <h3 className="text-slate-900 dark:text-slate-100 font-bold text-sm leading-tight mb-1">{tool.title}</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">{tool.desc}</p>
               </div>
             </div>
           )

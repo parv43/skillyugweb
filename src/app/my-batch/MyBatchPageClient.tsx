@@ -28,7 +28,8 @@ import {
   Play,
   Pause,
   RotateCcw,
-  RotateCw
+  RotateCw,
+  Copy
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
@@ -84,10 +85,17 @@ export default function MyBatchPage() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
+  // Custom states for onboarding & sponsorship flow
+  const [isParentViewOnly, setIsParentViewOnly] = useState(false);
+  const [viewOnlyStudentName, setViewOnlyStudentName] = useState("");
+  const [sponsorLoading, setSponsorLoading] = useState(false);
+  const [sponsorToken, setSponsorToken] = useState("");
+  const [showSponsorModal, setShowSponsorModal] = useState(false);
+
   useEffect(() => {
     if (!user) return;
 
-    const isPaid = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin;
+    const isPaid = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin || isParentViewOnly;
     if (!isPaid) return;
 
     const fetchVideos = async () => {
@@ -612,7 +620,55 @@ export default function MyBatchPage() {
       } = await supabase.auth.getSession();
 
       if (!session) {
-        router.replace("/login?redirect=/my-batch");
+        router.replace("/onboarding");
+        return;
+      }
+
+      // Check if viewing in Parent View-Only Mode
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewOnly = urlParams.get("viewOnly") === "true";
+      const studentId = urlParams.get("studentId");
+
+      if (viewOnly && studentId) {
+        // Authenticated user must be parent, and must be linked to studentId
+        const { data: relation, error: relationError } = await supabase
+          .from("student_parent_relations")
+          .select("parent_id")
+          .eq("student_id", studentId)
+          .eq("parent_id", session.user.id)
+          .maybeSingle();
+
+        if (relationError || !relation) {
+          console.error("Parent-student relation not verified or error occurred:", relationError);
+          router.replace("/onboarding");
+          return;
+        }
+
+        // Fetch student's profile information to display
+        const { data: studentProfile, error: profileError } = await supabase
+          .from("users")
+          .select("id, email, full_name")
+          .eq("id", studentId)
+          .maybeSingle();
+
+        if (profileError || !studentProfile) {
+          console.error("Student profile fetch failed:", profileError);
+          router.replace("/onboarding");
+          return;
+        }
+
+        // Set state for view-only student
+        setIsParentViewOnly(true);
+        setViewOnlyStudentName(studentProfile.full_name || "Skillyug Student");
+        setUserId(studentId);
+        setHasSlotAccess(true); // Parent view-only unlocks all modules
+        setUser({
+          avatarUrl: null,
+          batchLabel: "Summer AI Creator Cohort (Parent View Only)",
+          email: studentProfile.email,
+          fullName: studentProfile.full_name || "Student Profile",
+        });
+        setLoading(false);
         return;
       }
 
@@ -630,31 +686,10 @@ export default function MyBatchPage() {
         console.error("Error checking admin status:", err);
       }
 
-      // ── Fast path: serve from sessionStorage cache (5-min TTL) ──
-      try {
-        const cached = sessionStorage.getItem("mybatch_access");
-        if (cached) {
-          const { value, expiry } = JSON.parse(cached);
-          if ((expiry > Date.now() && value.hasAccess) || isAdminUser) {
-            const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
-            const avatarUrl = session.user.user_metadata?.avatar_url || null;
-            setHasSlotAccess(Boolean(value.hasSlot));
-            setUserId(session.user.id);
-            setUser({
-              avatarUrl,
-              batchLabel: "Summer AI Creator Cohort",
-              email: session.user.email ?? "",
-              fullName,
-            });
-            setLoading(false);
-            return; // skip the API call entirely
-          }
-        }
-      } catch { /* ignore */ }
-
-      // ── Slow path: call API (first visit or cache expired) ──
+      // Fetch from API
       let hasAccess = false;
       let slotAccess = false;
+      let role = "student";
       try {
         const res = await fetch("/api/my-batch/access", {
           method: "GET",
@@ -665,13 +700,14 @@ export default function MyBatchPage() {
           },
         });
         if (res.ok) {
-          const data = (await res.json()) as { hasAccess?: boolean; hasSlot?: boolean };
+          const data = await res.json();
           hasAccess = Boolean(data.hasAccess);
           slotAccess = Boolean(data.hasSlot);
+          role = data.role || "student";
           try {
             sessionStorage.setItem(
               "mybatch_access",
-              JSON.stringify({ value: { hasAccess, hasSlot: slotAccess }, expiry: Date.now() + 5 * 60 * 1000 })
+              JSON.stringify({ value: { hasAccess, hasSlot: slotAccess, role }, expiry: Date.now() + 5 * 60 * 1000 })
             );
           } catch { /* ignore */ }
         } else {
@@ -681,8 +717,13 @@ export default function MyBatchPage() {
         console.error("[MyBatch] Access fetch error:", e);
       }
 
+      if (role === "parent") {
+        router.replace("/parent-portal");
+        return;
+      }
+
       if (!hasAccess && !isAdminUser) {
-        router.replace("/");
+        router.replace("/onboarding");
         return;
       }
 
@@ -711,7 +752,39 @@ export default function MyBatchPage() {
     );
   }
 
-  const isPaidUser = hasSlotAccess || user.email === "eternallytanuj@gmail.com";
+  const handleAskParentToPay = async () => {
+    setSponsorLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const res = await fetch("/api/enroll/sponsor", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSponsorToken(data.token);
+        setShowSponsorModal(true);
+      } else {
+        alert("Failed to generate sponsorship token. Please try again.");
+      }
+    } catch (err) {
+      console.error("Sponsor generation failed:", err);
+    } finally {
+      setSponsorLoading(false);
+    }
+  };
+
+  const sponsorUrl = typeof window !== "undefined" ? `${window.location.origin}/sponsor/${sponsorToken}` : "";
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
+    `Hey! I want to join the Skillyug AI Bootcamp to learn future tech. Click here to sponsor my enrollment: ${sponsorUrl}`
+  )}`;
+
+  const isPaidUser = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin || isParentViewOnly;
   // Only allowlisted users can download the certificate
   const CERT_ALLOWED_UIDS = ["9627ec86-c86d-4fce-8e13-6e8f3f157a83"];
   const canDownloadCert =
@@ -719,7 +792,13 @@ export default function MyBatchPage() {
     (userId !== null && CERT_ALLOWED_UIDS.includes(userId));
 
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-50 relative overflow-x-hidden select-none">
+    <main className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 relative overflow-x-hidden select-none">
+      {isParentViewOnly && (
+        <div className="bg-blue-600/25 border-b border-blue-500/20 px-6 py-3 text-center text-xs font-black uppercase tracking-[0.24em] text-blue-300 flex items-center justify-center gap-2 relative z-50">
+          <BadgeCheck className="w-4 h-4 flex-shrink-0" />
+          Parent View-Only Oversight Mode: Viewing {viewOnlyStudentName}&apos;s Batch Workspace
+        </div>
+      )}
       {/* Screen recording deterrence overlay */}
       {isBlurred && (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#020617]/95 backdrop-blur-3xl px-4 text-center">
@@ -730,9 +809,9 @@ export default function MyBatchPage() {
           </p>
         </div>
       )}
-      <div className="fixed inset-0 pointer-events-none opacity-80">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(168,85,247,0.16),_transparent_28%),linear-gradient(to_bottom,_rgba(15,23,42,0.3),_rgba(2,6,23,0.95))]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.05)_1px,transparent_1px)] bg-[size:72px_72px]" />
+      <div className="fixed inset-0 pointer-events-none opacity-50 z-0 bg-slate-50 dark:bg-[#020617]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.04),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(168,85,247,0.04),_transparent_28%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.03)_1px,transparent_1px)] bg-[size:72px_72px]" />
       </div>
 
       <Navbar />
@@ -776,7 +855,7 @@ export default function MyBatchPage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] flex flex-col items-center justify-center relative">
+            <div className="rounded-[2rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-6 md:p-8 shadow-sm flex flex-col items-center justify-center relative">
               <p className="absolute top-6 left-6 md:top-8 md:left-8 text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
                 Bootcamp Progress
               </p>
@@ -784,12 +863,12 @@ export default function MyBatchPage() {
                 {/* SVG Circle for Pie Graph (0% completion) */}
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   {/* Background Circle */}
-                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="rgba(255,255,255,0.1)" strokeWidth="12" />
+                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="currentColor" strokeWidth="12" className="text-slate-200 dark:text-slate-800" />
                   {/* Progress Circle (0% of 251.2 circumference = 0) */}
                   <circle 
                     cx="50" cy="50" r="40" fill="transparent" stroke="#3b82f6" strokeWidth="12"
                     strokeDasharray="251.2" strokeDashoffset="251.2"
-                    className="drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                    className="drop-shadow-[0_2px_8px_rgba(59,130,246,0.15)]"
                     strokeLinecap="round"
                   />
                 </svg>
@@ -854,14 +933,14 @@ export default function MyBatchPage() {
               </div>
             ) : (
               /* Locked Certificate — shown to everyone else */
-              <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] relative overflow-hidden flex flex-col justify-center">
+              <div className="rounded-[2rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-center">
                 {/* Blurred background content */}
-                <div className="absolute inset-0 p-6 md:p-8 blur-[10px] opacity-40 pointer-events-none select-none flex flex-col justify-center transition-all duration-500 hover:blur-[6px] hover:opacity-60">
+                <div className="absolute inset-0 p-6 md:p-8 blur-[10px] opacity-25 pointer-events-none select-none flex flex-col justify-center transition-all duration-500 hover:blur-[6px] hover:opacity-40">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="rounded-2xl border border-white/10 bg-blue-500/20 p-4">
-                      <BadgeCheck className="h-6 w-6 text-blue-300" />
+                    <div className="rounded-2xl border border-slate-200 dark:border-white/5 bg-blue-50 dark:bg-blue-950/30 p-4">
+                      <BadgeCheck className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-blue-300">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-blue-600">
                       OFFICIAL
                     </span>
                   </div>
@@ -869,17 +948,17 @@ export default function MyBatchPage() {
                     Certificate of Attendance
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                    Claim your official Skillyug AI Education Bootcamp certificate.
+                    Claim your official Skillyug AI Education Bootcamp certificate. Includes a unique verification ID and scannable QR.
                   </p>
-                  <div className="mt-8 w-full rounded-xl bg-blue-600/50 py-5" />
+                  <div className="mt-8 w-full rounded-xl bg-blue-600/30 py-5" />
                 </div>
 
                 {/* Lock overlay */}
                 <div className="relative z-10 flex flex-col items-center justify-center text-center">
-                  <div className="rounded-full bg-slate-950/90 p-5 border border-white/10 mb-6 shadow-2xl relative drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]">
-                    <Lock className="w-8 h-8 text-slate-300" />
+                  <div className="rounded-full bg-slate-100 dark:bg-[#020617] p-5 border border-slate-200 dark:border-white/5 mb-6 shadow-md relative">
+                    <Lock className="w-8 h-8 text-slate-600 dark:text-slate-400" />
                     {/* Chain element */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-1.5 bg-slate-600/80 rotate-45 pointer-events-none rounded-full blur-[0.5px]" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-1.5 bg-slate-300/80 dark:bg-slate-700 rotate-45 pointer-events-none rounded-full blur-[0.5px]" />
                   </div>
                   <h3 className="text-xl font-black text-white tracking-tight">Certificate Locked</h3>
                   <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-300 max-w-[200px] mx-auto leading-relaxed">
@@ -901,31 +980,31 @@ export default function MyBatchPage() {
               </div>
             </div>
 
-            <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div className="mt-8 grid gap-6 md:grid-cols-1 max-w-xl">
               {resourceCards.map((card) => {
                 const Icon = card.icon;
                 return (
                   <article
                     key={card.title}
-                    className={`rounded-[1.75rem] border border-white/8 bg-gradient-to-br ${card.accent} p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}
+                    className={`rounded-[1.75rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-6 shadow-sm`}
                   >
                     <div className="flex items-start justify-between gap-4">
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-                        <Icon className="h-6 w-6 text-blue-200" />
+                      <div className="rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-100 dark:bg-[#020617] p-4">
+                        <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-300">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500">
                         {card.meta}
                       </span>
                     </div>
-                    <h3 className="mt-8 text-2xl font-black tracking-tight text-white">
+                    <h3 className="mt-8 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                       {card.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                    <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                       {card.description}
                     </p>
                     <button
                       type="button"
-                      className="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-blue-200 transition-colors hover:text-white"
+                      className="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-blue-600 transition-colors hover:text-blue-700"
                     >
                       Download
                       <Download className="h-4 w-4" />
@@ -933,10 +1012,6 @@ export default function MyBatchPage() {
                   </article>
                 );
               })}
-              
-              <div className="flex flex-col items-center justify-center w-full">
-                <VoucherCard />
-              </div>
             </div>
           </div>
 
@@ -1223,195 +1298,127 @@ export default function MyBatchPage() {
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-8">
             <BatchCalendar hasSlot={hasSlotAccess} />
           </div>
+
+          {/* Discount Voucher Section */}
+          <div className="max-w-md mx-auto pt-6">
+            <VoucherCard />
+          </div>
         
             </>
           ) : (
             <>
-          <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-6 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
-              <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
-                <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2">
-                  My Batch Workspace
-                </span>
-                <span className="text-slate-500">Live cohort dashboard</span>
-              </div>
-              <div className="mt-8 pt-8 border-t border-white/5">
-                <div className="flex items-center gap-4">
-                  {user?.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt={`${user.fullName} profile`}
-                      className="h-14 w-14 rounded-full border border-white/10 object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-blue-500/10 text-lg font-black text-blue-200">
-                      {user?.fullName.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-lg font-black text-white">{user?.fullName}</p>
-                    <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-400">
-                      {user?.batchLabel}
-                    </p>
+              {/* Syllabus & Instructor Bios */}
+              <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
+                <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
+                    <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2">
+                      Syllabus
+                    </span>
+                    <span className="text-slate-500 font-medium">Bootcamp Course Outline</span>
                   </div>
-                </div>
-                <p className="mt-5 text-sm text-slate-300 break-all">{user?.email}</p>
-              </div>
-
-              <div className="mt-8 pt-8 border-t border-white/5">
-                <div className="flex items-center gap-3">
-                  <Users className="h-5 w-5 text-blue-300" />
-                  <h2 className="text-xl font-black tracking-tight">Batch pulse</h2>
-                </div>
-                <div className="mt-6 rounded-[1.35rem] border border-white/8 bg-slate-950/30 p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">
-                    Next live session
-                  </p>
-                  <p className="mt-3 text-lg font-bold text-white">28th May, 1:00 PM IST</p>
-                  <p className="mt-2 text-sm text-slate-300">
-                    First Class
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)]">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                    Cohort Identity
-                  </p>
-                  <p className="mt-3 text-xl font-bold text-white">{user?.batchLabel}</p>
-                </div>
-                <div className="rounded-full border border-white/10 bg-white/[0.04] p-3">
-                  <Sparkles className="w-5 h-5 text-violet-300" />
-                </div>
-              </div>
-
-              <div className="mt-10 rounded-[1.75rem] border border-white/8 bg-white/[0.03] px-6 py-8 text-center">
-                <Image
-                  src="/skillyug-optimized.svg"
-                  alt="Skillyug logo"
-                  width={260}
-                  height={120}
-                  className="mx-auto h-20 w-auto object-contain"
-                />
-                <p className="mt-6 text-sm leading-relaxed text-slate-300">
-                  Built for focused execution across every session, milestone, and creator sprint.
-                </p>
-              </div>
-
-              <div className="mt-8 rounded-[1.5rem] border border-blue-400/15 bg-blue-500/10 px-5 py-5">
-                <div className="flex items-start gap-3">
-                  <BadgeCheck className="mt-0.5 h-5 w-5 text-blue-300" />
-                  <div>
-                    <p className="text-sm font-bold text-white">Batch status</p>
-                    <p className="mt-1 text-sm text-slate-300">
-                      You are synced with the latest cohort resources and task timeline.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:gap-8">
-            <section className="space-y-8">
-              <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-6 md:p-8">
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                      Curriculum Resources
-                    </p>
-                    <h2 className="mt-3 text-2xl md:text-3xl font-black tracking-tight">Your resource library</h2>
-                  </div>
-                  <Link
-                    href="/#projects"
-                    className="inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-blue-300 transition-colors hover:bg-blue-500/20"
-                  >
-                    Explore projects
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </div>
-
-                <div className="mt-8 grid gap-6 md:grid-cols-2">
-                  {resourceCards.map((card) => {
-                    const Icon = card.icon;
-                    return (
-                      <article
-                        key={card.title}
-                        className={`rounded-[1.75rem] border border-white/8 bg-gradient-to-br ${card.accent} p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-                            <Icon className="h-6 w-6 text-blue-200" />
-                          </div>
-                          <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-300">
-                            {card.meta}
-                          </span>
+                  
+                  <div className="mt-8 space-y-5">
+                    {[
+                      { topic: "Session 1: Generative AI Foundations", desc: "Learn Prompt Engineering, ChatGPT frameworks, and how LLMs work." },
+                      { topic: "Session 2: Visual Creation with Canva AI", desc: "Generate professional social media assets and graphics using AI design tools." },
+                      { topic: "Session 3: Dynamic Presentations with Gamma", desc: "Build gorgeous landing pages and presentation decks in under 5 minutes using Gamma." },
+                      { topic: "Session 4: Advanced Prompting & LLMs", desc: "Deep dive into context windows, system prompts, and multi-turn AI reasoning." },
+                      { topic: "Session 5: Capstone Project Showcase", desc: "Build and deploy your first end-to-end AI agent product and earn certification." }
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex gap-4 p-5 rounded-2xl bg-white/[0.02] border border-white/5">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center font-bold text-xs text-blue-300">
+                          {idx + 1}
                         </div>
-                        <h3 className="mt-8 text-2xl font-black tracking-tight text-white">
-                          {card.title}
-                        </h3>
-                        <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                          {card.description}
-                        </p>
-                        <button
-                          type="button"
-                          className="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-blue-200 transition-colors hover:text-white"
-                        >
-                          Download
-                          <Download className="h-4 w-4" />
-                        </button>
-                      </article>
-                    );
-                  })}
-
-                  {/* Certificate Card */}
-                  <article className="rounded-[1.75rem] border border-blue-500/20 bg-gradient-to-br from-blue-600/20 to-purple-500/10 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] relative overflow-hidden group">
-                    <div className="absolute -right-12 -top-12 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full transition-opacity group-hover:opacity-100 opacity-50"></div>
-                    
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="rounded-2xl border border-white/10 bg-blue-500/20 p-4 shadow-inner">
-                        <BadgeCheck className="h-6 w-6 text-blue-300" />
+                        <div>
+                          <h4 className="text-sm font-black text-white">{item.topic}</h4>
+                          <p className="text-xs text-slate-400 mt-1 leading-relaxed">{item.desc}</p>
+                        </div>
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-blue-300">
-                        OFFICIAL
-                      </span>
-                    </div>
-                    <h3 className="mt-8 text-2xl font-black tracking-tight text-white">
-                      Certificate of Attendance
-                    </h3>
-                    <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                      Claim your official Skillyug AI Education Bootcamp certificate. Includes a unique verification ID and scannable QR.
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] flex flex-col justify-between min-h-[420px]">
+                  <div className="space-y-6">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
+                      Instructors
                     </p>
-                    <button
-                      type="button"
-                      onClick={openCertModal}
-                      disabled={isGenerating}
-                      className="mt-8 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:bg-blue-500 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          Download Certificate
-                          <Download className="h-4 w-4" />
-                        </>
-                      )}
-                    </button>
-                  </article>
+                    
+                    <div className="flex items-center gap-4 pt-4 border-t border-white/5">
+                      <img
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKcLNe4nCx6jDQ4EVV_02UM6m6QJi_0LiI7l7BOYGCvUfePGpBf-4iq0oD97lRJqplgkKfvQWD0GBG99GEyd5o7D02N-7QpzqTdXC4UupM-OfyKFoKrQi8DHlPUrvTCvJQQ4DSYmJHKMrwmmGcspe4XyEhsPcvtyRW5UHFUk1gh7Oq1ax02nkjQ7vXBzrilSRlKcbMzcGwTuJpnS6BO9md1N6C7rmanrP1-JFEYbcgO-oyUxhepXupvaNomp79iKCHAibUpyvnVGU"
+                        alt="Tanuj Pathak"
+                        className="h-14 w-14 rounded-full border border-white/10 object-cover"
+                      />
+                      <div>
+                        <p className="text-base font-black text-white">Tanuj Pathak</p>
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-blue-300 mt-0.5">Lead Mentor</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                      Ex-software architect specializing in generative AI applications and systems. Tanuj mentors students in classes 6-12 on building functional projects using advanced AI tools.
+                    </p>
+                  </div>
+
+                  <div className="mt-8 rounded-[1.5rem] border border-blue-400/15 bg-blue-500/10 px-5 py-4 flex gap-3 items-center">
+                    <Sparkles className="h-5 w-5 text-blue-300 flex-shrink-0 animate-pulse" />
+                    <div>
+                      <p className="text-xs font-bold text-white uppercase tracking-wider">Cohort Identity</p>
+                      <p className="text-[11px] text-slate-300 mt-0.5">Summer AI Creator Cohort</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <BatchCalendar hasSlot={hasSlotAccess} />
-            </section>
 
-          </div>
-        
+              {/* Locked Modules Preview with Ask Parent CTA */}
+              <div className="relative rounded-[2rem] border border-white/10 bg-slate-950/40 p-1 overflow-hidden min-h-[450px] flex items-center justify-center">
+                {/* Blurred content representations */}
+                <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 blur-md opacity-25 select-none pointer-events-none">
+                  <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 space-y-4">
+                    <div className="h-10 w-24 bg-white/10 rounded-xl" />
+                    <div className="h-6 w-48 bg-white/10 rounded-lg" />
+                    <div className="h-16 w-full bg-white/10 rounded-xl" />
+                  </div>
+                  
+                  <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 space-y-4">
+                    <div className="h-10 w-24 bg-white/10 rounded-xl" />
+                    <div className="h-6 w-48 bg-white/10 rounded-lg" />
+                    <div className="h-16 w-full bg-white/10 rounded-xl" />
+                  </div>
+                </div>
+
+                {/* Glassmorphic overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-black/40 backdrop-blur-[5px] z-30">
+                  <div className="w-20 h-20 rounded-full bg-slate-950/95 border border-white/15 shadow-2xl flex items-center justify-center relative mb-6">
+                    <Lock className="w-8 h-8 text-blue-300 animate-pulse" />
+                    <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full" />
+                  </div>
+                  
+                  <h3 className="text-2xl font-black text-white tracking-tight">AI Learning Modules Locked</h3>
+                  <p className="mt-3 text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+                    Access to 5+ hours of recorded classes, project resources, calendars, and certificates is locked. Ask a parent to sponsor your slot enrollment.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={handleAskParentToPay}
+                    disabled={sponsorLoading}
+                    className="mt-8 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white hover:scale-[1.03] transition-all duration-200 active:scale-[0.98] disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.3)] border border-white/10"
+                  >
+                    {sponsorLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Generating Link...
+                      </>
+                    ) : (
+                      <>
+                        Ask a Parent to Pay
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </>
           )}
         </div>
@@ -1638,6 +1645,67 @@ export default function MyBatchPage() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+      {/* ── WhatsApp Sponsor Share Modal ────────────────────────────── */}
+      {showSponsorModal && (
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/85 backdrop-blur-lg"
+        >
+          <div className="relative w-full max-w-md rounded-[2.5rem] border border-white/10 bg-[#060a1f] p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200" style={{ pointerEvents: 'auto' }}>
+            <button
+              onClick={() => setShowSponsorModal(false)}
+              className="absolute top-5 right-6 text-slate-400 hover:text-white transition-colors text-2xl leading-none"
+            >
+              ×
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="rounded-xl border border-purple-400/20 bg-purple-500/15 p-3">
+                <Sparkles className="h-5 w-5 text-purple-300 animate-pulse" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">Sponsorship Ticket</p>
+                <h3 className="text-lg font-black text-white">Ask Parent to Sponsor</h3>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-400 leading-relaxed mb-6">
+              Send this sponsorship link to your parent. Once they complete the payment of ₹3,800, your batch dashboard will immediately unlock!
+            </p>
+
+            <div className="space-y-4">
+              {/* Pre-filled Message Display */}
+              <div className="rounded-xl border border-white/5 bg-slate-950/60 p-4 font-mono text-[10px] text-slate-400 leading-relaxed select-text">
+                <span className="text-[9px] text-slate-500 block uppercase font-bold tracking-wider mb-1.5">Prefilled Message</span>
+                &quot;Hey! I want to join the Skillyug AI Bootcamp to learn future tech. Click here to sponsor my enrollment: {sponsorUrl}&quot;
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20ba59] py-3 text-xs font-bold uppercase tracking-[0.15em] text-white transition-all active:scale-[0.98] text-center"
+                >
+                  <Users className="w-4 h-4 flex-shrink-0" />
+                  Share on WhatsApp
+                </a>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(sponsorUrl);
+                    alert("Sponsorship link copied to clipboard!");
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] py-3 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-all active:scale-[0.97]"
+                >
+                  <Copy className="w-4 h-4" />
+                  Copy Link
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

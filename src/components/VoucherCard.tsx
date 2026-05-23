@@ -49,10 +49,10 @@ export default function VoucherCard() {
             transition: isHovered ? "none" : "transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)",
             transformStyle: "preserve-3d"
           }}
-          className="relative w-full aspect-[1.6/1] bg-[#020617] rounded-[1.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(99,102,241,0.2)] transform-gpu group cursor-crosshair"
+          className="relative w-full aspect-[1.38/1] bg-[#020617] rounded-[1.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(99,102,241,0.2)] transform-gpu group cursor-crosshair"
         >
           <div 
-            className="absolute inset-0 z-10 flex flex-col justify-between text-white p-5 md:p-8 rounded-[1.5rem] border border-white/10"
+            className="voucher-card absolute inset-0 z-10 flex flex-col justify-between text-white p-5 md:p-6 rounded-[1.5rem] border border-white/10"
             style={{
               background: "linear-gradient(135deg, rgba(99, 102, 241, 0.8) 0%, rgba(124, 58, 237, 0.8) 100%)",
               backdropFilter: "blur(10px)",
@@ -73,14 +73,14 @@ export default function VoucherCard() {
             <div className="relative z-20 flex items-center gap-3 transform-gpu" style={{ transform: "translateZ(30px)" }}>
               <img 
                 alt="Skillyug Logo" 
-                className="w-auto h-20 md:h-28 object-contain drop-shadow-xl" 
+                className="w-auto h-12 md:h-16 object-contain drop-shadow-xl" 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaLDtPLJdtYtLv7h3BpCI-2V0TEyavDu-CIZlHmTw9NZCET4Hrl6Gwuat-8zMLTXdmmu1RbxmFKw8cg8jLDhGCxNJqUaAS6SC5bYSrx_S65Ie7dBr0RQJEbECi1jLaI6A8zej8M2j_tHZ-fFDiHFgKKrJyBUd25poMnXG5OGtfSt7GH55mted7jFGDQl21ReJ2Tj17RCSDQ5uAzhGIC4HR6PkGy0xjPX7L-dyuMJa8olbTjYXZSmERXVrkAN0GdvkShTSX9PiCIPkH"
               />
             </div>
             
             {/* Middle Section: Value Proposition */}
-            <div className="relative z-20 mt-auto mb-2 md:mb-4 transform-gpu" style={{ transform: "translateZ(40px)" }}>
-              <h2 className="font-black tracking-tight mb-1 drop-shadow-lg text-3xl md:text-4xl lg:text-5xl leading-none">
+            <div className="relative z-20 mt-auto mb-2 md:mb-3 transform-gpu" style={{ transform: "translateZ(40px)" }}>
+              <h2 className="font-black tracking-tight mb-1 drop-shadow-lg text-2xl md:text-3xl lg:text-4xl leading-none">
                 ₹500 DISCOUNT
               </h2>
               <p className="text-white/80 font-semibold tracking-widest uppercase text-[10px] md:text-xs">
@@ -89,14 +89,14 @@ export default function VoucherCard() {
             </div>
             
             {/* Bottom Section: Terms/Code */}
-            <div className="relative z-20 flex flex-col md:flex-row justify-between items-start md:items-end border-t border-white/20 pt-3 gap-3 transform-gpu" style={{ transform: "translateZ(20px)" }}>
+            <div className="relative z-20 flex flex-col md:flex-row justify-between items-start md:items-end border-t border-white/20 pt-2 gap-2 transform-gpu" style={{ transform: "translateZ(20px)" }}>
               <p className="text-white/80 text-[10px] md:text-xs font-medium max-w-[120px] md:max-w-[150px]">
                 Valid on Upcoming Premium Courses.
               </p>
-              <div className="bg-white/10 rounded-lg backdrop-blur-md border border-white/20 px-3 py-2 md:px-4 md:py-3 flex items-center shadow-lg">
+              <div className="bg-white/10 rounded-lg backdrop-blur-md border border-white/20 px-2 py-1.5 md:px-3 md:py-2 flex items-center shadow-lg">
                 <span className="font-mono tracking-widest font-bold text-[10px] md:text-xs flex items-center text-white/90">
-                  <Lock className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 opacity-80" />
-                  CODE: <span className="text-white/40 ml-1 md:ml-2">XXXXX</span>
+                  <Lock className="w-3.5 h-3.5 mr-1.5 opacity-80" />
+                  CODE: <span className="text-white/40 ml-1.5">XXXXX</span>
                 </span>
               </div>
             </div>

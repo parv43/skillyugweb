@@ -11,10 +11,11 @@ export type AccessState = {
   loading: boolean;
   userId?: string;
   userEmail?: string;
+  role?: string;
 };
 
 // Module-level promise cache to deduplicate simultaneous calls
-let fetchPromise: Promise<{ hasAccess: boolean; hasSlot: boolean }> | null = null;
+let fetchPromise: Promise<{ hasAccess: boolean; hasSlot: boolean; role?: string | null }> | null = null;
 
 export function useAccessControl(): AccessState {
   const [state, setState] = useState<AccessState>({
@@ -56,6 +57,7 @@ export function useAccessControl(): AccessState {
                 loading: false,
                 userId: session.user.id,
                 userEmail: session.user.email,
+                role: value.role || undefined,
               });
             }
             return;
@@ -92,10 +94,11 @@ export function useAccessControl(): AccessState {
             loading: false,
             userId: session.user.id,
             userEmail: session.user.email,
+            role: data.role || undefined,
           });
           try {
             sessionStorage.setItem("mybatch_access", JSON.stringify({
-              value: { hasAccess: Boolean(data.hasAccess), hasSlot: Boolean(data.hasSlot) },
+              value: { hasAccess: Boolean(data.hasAccess), hasSlot: Boolean(data.hasSlot), role: data.role },
               expiry: Date.now() + 5 * 60 * 1000
             }));
           } catch {}
