@@ -3,6 +3,51 @@
 import React, { useState, useEffect } from "react"
 import { Calendar, Clock, Sparkles } from "lucide-react"
 
+// FlipUnit represents a single flipping digit card
+const FlipUnit = ({ digit }: { digit: string }) => {
+  const [currentDigit, setCurrentDigit] = useState(digit)
+  const [previousDigit, setPreviousDigit] = useState(digit)
+  const [isFlipping, setIsFlipping] = useState(false)
+
+  useEffect(() => {
+    if (digit !== currentDigit) {
+      setPreviousDigit(currentDigit)
+      setCurrentDigit(digit)
+      setIsFlipping(true)
+    }
+  }, [digit, currentDigit])
+
+  const handleAnimationEnd = () => {
+    setIsFlipping(false)
+    setPreviousDigit(digit)
+  }
+
+  return (
+    <div className="flip-unit">
+      {/* Background bottom half (shows current/new digit) */}
+      <div className="flip-card flip-card__bottom">
+        <div className="flip-card-inner-text">{currentDigit}</div>
+      </div>
+      {/* Background top half (shows previous/old digit) */}
+      <div className="flip-card flip-card__top">
+        <div className="flip-card-inner-text">{previousDigit}</div>
+      </div>
+      {/* Flipper card that rotates */}
+      <div
+        className={`flipper ${isFlipping ? "is-flipping" : ""}`}
+        onAnimationEnd={handleAnimationEnd}
+      >
+        <div className="flip-card flipper__top">
+          <div className="flip-card-inner-text">{previousDigit}</div>
+        </div>
+        <div className="flip-card flipper__bottom">
+          <div className="flip-card-inner-text">{currentDigit}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function FirstClassCountdown() {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -76,31 +121,34 @@ export default function FirstClassCountdown() {
         {/* Right Side: Interactive Countdown & Calendar Link */}
         <div className="flex flex-wrap items-center justify-center gap-6">
           {!timeLeft.isExpired && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               {[
                 { label: "days", value: timeLeft.days },
                 { label: "hours", value: timeLeft.hours },
                 { label: "mins", value: timeLeft.minutes },
                 { label: "secs", value: timeLeft.seconds },
-              ].map((unit, index, arr) => (
-                <React.Fragment key={unit.label}>
-                  <div className="flex flex-col items-center">
-                    <div className="bg-slate-950/60 border border-white/8 hover:border-blue-500/30 transition-colors rounded-xl px-3 py-2 min-w-[3.5rem] flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.3)]">
-                      <span className="text-xl md:text-2xl font-mono font-bold text-white tracking-tight">
-                        {String(unit.value).padStart(2, "0")}
+              ].map((unit, index, arr) => {
+                const paddedValue = String(unit.value).padStart(2, "0")
+                return (
+                  <React.Fragment key={unit.label}>
+                    <div className="flex flex-col items-center">
+                      <div className="flex gap-0.5 sm:gap-1">
+                        {paddedValue.split("").map((digit, dIdx) => (
+                          <FlipUnit key={dIdx} digit={digit} />
+                        ))}
+                      </div>
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1.5 select-none">
+                        {unit.label}
                       </span>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">
-                      {unit.label}
-                    </span>
-                  </div>
-                  {index < arr.length - 1 && (
-                    <span className="text-lg font-bold text-slate-500/60 self-start mt-2 select-none animate-[pulse_1s_infinite]">
-                      :
-                    </span>
-                  )}
-                </React.Fragment>
-              ))}
+                    {index < arr.length - 1 && (
+                      <span className="text-lg font-bold text-slate-500/60 self-start mt-2 select-none animate-[pulse_1s_infinite]">
+                        :
+                      </span>
+                    )}
+                  </React.Fragment>
+                )
+              })}
             </div>
           )}
 
