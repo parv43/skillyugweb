@@ -15,6 +15,7 @@ function ResolveContent() {
       try {
         const role = searchParams.get("role");
         const token = searchParams.get("token") || "";
+        const kidEmail = searchParams.get("kidEmail") || "";
 
         if (!role || !["student", "parent"].includes(role)) {
           setErrorMsg("Invalid onboarding parameters.");
@@ -29,6 +30,7 @@ function ResolveContent() {
           const params = new URLSearchParams();
           if (role) params.set("role", role);
           if (token) params.set("token", token);
+          if (kidEmail) params.set("studentEmail", kidEmail);
           const qs = params.toString();
           if (qs) redirectUrl += `?${qs}`;
           
@@ -69,9 +71,11 @@ function ResolveContent() {
           }
         } else if (role === "parent") {
           let parentPath = "/parent-portal";
-          if (token) {
-            parentPath += `?token=${encodeURIComponent(token)}`;
-          }
+          const params = new URLSearchParams();
+          if (token) params.set("token", token);
+          if (kidEmail) params.set("kidEmail", kidEmail);
+          const queryString = params.toString();
+          if (queryString) parentPath += `?${queryString}`;
           router.replace(parentPath);
         }
       } catch (err: any) {

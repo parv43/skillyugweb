@@ -99,15 +99,31 @@ function ParentPortalContent() {
       await fetchChildren();
       setLoading(false);
 
+      const kidEmailParam = searchParams.get("kidEmail") || "";
+
       // If token is in query parameters, automatically open payment modal to resolve sponsorship
       if (token) {
         setIsSponsorship(true);
         setShowPaymentModal(true);
+      } else if (kidEmailParam) {
+        setKidEmailInput(kidEmailParam);
+        setIsSponsorship(false);
+        setPaymentStep("checkout");
+        setShowPaymentModal(true);
+
+        // Remove kidEmail from the URL search parameters cleanly
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("kidEmail");
+          window.history.replaceState({}, "", url.pathname + url.search);
+        } catch (e) {
+          console.error(e);
+        }
       }
     };
 
     initPortal();
-  }, [router, token]);
+  }, [router, token, searchParams]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
