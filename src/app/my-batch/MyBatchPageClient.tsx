@@ -507,7 +507,7 @@ function SecureVideoPlayer({
           </div>
 
           {/* Custom Controls */}
-          <div className="bg-[#060a1f] p-4 flex flex-col justify-center z-40 border-t border-white/10 h-[25%] lg:h-[20%]">
+          <div className="bg-[#060a1f] p-4 flex flex-col justify-center z-40 border-t border-white/10 h-auto min-h-[90px] lg:h-[20%]">
             {activeVideo.videoId ? (
               <div className="w-full flex flex-col gap-3">
                 {/* Timeline Slider with custom tracks */}
@@ -545,14 +545,14 @@ function SecureVideoPlayer({
                 </div>
 
                 {/* Controls Toolbar Row */}
-                <div className="flex items-center justify-between w-full">
-                  {/* Left side: Play/Pause/Skip controls, Mute, Volume, Time */}
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between w-full gap-3.5 sm:gap-0">
+                  {/* Left side / Top Row on Mobile: Play/Pause/Skip & Time */}
+                  <div className="flex items-center justify-between sm:justify-start gap-4">
                     <div className="flex items-center gap-3.5">
                       {/* Skip Backward 10s */}
                       <button
                         onClick={skipBackward}
-                        className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center p-1"
                         title="Skip Backward 10s"
                       >
                         <RotateCcw className="w-5 h-5" />
@@ -561,7 +561,7 @@ function SecureVideoPlayer({
                       {/* Play/Pause Button */}
                       <button 
                         onClick={handlePlayPause}
-                        className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center p-1"
                         title={isPlaying ? "Pause" : "Play / Continue"}
                       >
                         {isPlaying ? (
@@ -574,18 +574,26 @@ function SecureVideoPlayer({
                       {/* Skip Forward 10s */}
                       <button
                         onClick={skipForward}
-                        className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center p-1"
                         title="Skip Forward 10s"
                       >
                         <RotateCw className="w-5 h-5" />
                       </button>
                     </div>
 
+                    {/* Time Display */}
+                    <div className="text-xs font-semibold text-slate-400 tracking-wider font-mono">
+                      {formatTime(currentTime)} <span className="text-slate-600">/</span> {formatTime(duration)}
+                    </div>
+                  </div>
+
+                  {/* Right side / Bottom Row on Mobile: Volume, speed, fullscreen */}
+                  <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-3">
                     {/* Mute/Volume controls */}
                     <div className="flex items-center gap-2 group/volume relative">
                       <button 
                         onClick={handleToggleMute}
-                        className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
                         title={isMuted ? "Unmute" : "Mute"}
                       >
                         {isMuted || volume === 0 ? (
@@ -595,55 +603,50 @@ function SecureVideoPlayer({
                         )}
                       </button>
                       
-                      {/* Sleek volume slider that expands on hover/focus */}
+                      {/* Sleek volume slider that is slightly visible on mobile, expands on desktop hover */}
                       <input 
                         type="range"
                         min={0}
                         max={100}
                         value={isMuted ? 0 : volume}
                         onChange={handleVolumeChange}
-                        className="w-0 group-hover/volume:w-20 transition-all duration-300 h-1 bg-white/20 accent-blue-500 rounded-full cursor-pointer"
+                        className="w-16 sm:w-0 sm:group-hover/volume:w-20 transition-all duration-300 h-1 bg-white/20 accent-blue-500 rounded-full cursor-pointer"
                       />
                     </div>
 
-                    {/* Time Display */}
-                    <div className="text-xs font-medium text-slate-400 tracking-wider">
-                      {formatTime(currentTime)} <span className="text-slate-600">/</span> {formatTime(duration)}
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={playbackSpeed}
+                        onChange={(e) => handleSpeedChange(Number(e.target.value))}
+                        className="bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-300 outline-none cursor-pointer transition-colors"
+                        title="Playback Speed"
+                      >
+                        <option value={0.25} className="bg-[#060a1f] text-slate-300">0.25x</option>
+                        <option value={0.5} className="bg-[#060a1f] text-slate-300">0.5x</option>
+                        <option value={0.75} className="bg-[#060a1f] text-slate-300">0.75x</option>
+                        <option value={1} className="bg-[#060a1f] text-slate-300">1.0x (Normal)</option>
+                        <option value={1.25} className="bg-[#060a1f] text-slate-300">1.25x</option>
+                        <option value={1.5} className="bg-[#060a1f] text-slate-300">1.5x</option>
+                        <option value={1.75} className="bg-[#060a1f] text-slate-300">1.75x</option>
+                        <option value={2} className="bg-[#060a1f] text-slate-300">2.0x</option>
+                      </select>
+
+                      <span className="hidden md:inline text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 select-none">
+                        Skillyug Player
+                      </span>
+
+                      <button 
+                        onClick={handleFullscreen}
+                        className="text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                        title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                      >
+                        {isFullscreen ? (
+                          <Minimize2 className="w-5 h-5" />
+                        ) : (
+                          <Maximize2 className="w-5 h-5" />
+                        )}
+                      </button>
                     </div>
-                  </div>
-
-                  {/* Right side: playback speed, branding & fullscreen */}
-                  <div className="flex items-center gap-3">
-                    <select
-                      value={playbackSpeed}
-                      onChange={(e) => handleSpeedChange(Number(e.target.value))}
-                      className="bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-300 outline-none cursor-pointer transition-colors"
-                      title="Playback Speed"
-                    >
-                      <option value={0.25} className="bg-[#060a1f] text-slate-300">0.25x</option>
-                      <option value={0.5} className="bg-[#060a1f] text-slate-300">0.5x</option>
-                      <option value={0.75} className="bg-[#060a1f] text-slate-300">0.75x</option>
-                      <option value={1} className="bg-[#060a1f] text-slate-300">1.0x (Normal)</option>
-                      <option value={1.25} className="bg-[#060a1f] text-slate-300">1.25x</option>
-                      <option value={1.5} className="bg-[#060a1f] text-slate-300">1.5x</option>
-                      <option value={1.75} className="bg-[#060a1f] text-slate-300">1.75x</option>
-                      <option value={2} className="bg-[#060a1f] text-slate-300">2.0x</option>
-                    </select>
-
-                    <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 select-none">
-                      Skillyug Player
-                    </span>
-                    <button 
-                      onClick={handleFullscreen}
-                      className="text-slate-400 hover:text-white transition-colors cursor-pointer"
-                      title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-                    >
-                      {isFullscreen ? (
-                        <Minimize2 className="w-5 h-5" />
-                      ) : (
-                        <Maximize2 className="w-5 h-5" />
-                      )}
-                    </button>
                   </div>
                 </div>
               </div>
@@ -697,6 +700,34 @@ export default function MyBatchPage() {
     scheduled_at: string;
     join_url: string;
   } | null>(null);
+
+  const [copiedSponsor, setCopiedSponsor] = useState(false);
+
+  const handleShareSponsor = async () => {
+    const credText = `Hey! I want to join the Skillyug AI Bootcamp to learn future tech. Click here to sponsor my enrollment: ${sponsorUrl}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Sponsor Skillyug AI Bootcamp",
+          text: credText,
+          url: sponsorUrl
+        });
+        return;
+      } catch (err) {
+        console.log("Error sharing:", err);
+      }
+    }
+    
+    // Clipboard fallback
+    try {
+      await navigator.clipboard.writeText(sponsorUrl);
+      setCopiedSponsor(true);
+      setTimeout(() => setCopiedSponsor(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -1789,7 +1820,7 @@ export default function MyBatchPage() {
         <div
           className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/85 backdrop-blur-lg"
         >
-          <div className="relative w-full max-w-md rounded-[2.5rem] border border-white/10 bg-[#060a1f] p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200" style={{ pointerEvents: 'auto' }}>
+          <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[2.5rem] border border-white/10 bg-[#060a1f] p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200" style={{ pointerEvents: 'auto' }}>
             <button
               onClick={() => setShowSponsorModal(false)}
               className="absolute top-5 right-6 text-slate-400 hover:text-white transition-colors text-2xl leading-none"
@@ -1831,14 +1862,11 @@ export default function MyBatchPage() {
                 
                 <button
                   type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(sponsorUrl);
-                    alert("Sponsorship link copied to clipboard!");
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] py-3 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-all active:scale-[0.97]"
+                  onClick={handleShareSponsor}
+                  className="flex-grow flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] py-3 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-all active:scale-[0.97]"
                 >
                   <Copy className="w-4 h-4" />
-                  Copy Link
+                  {copiedSponsor ? "Copied!" : "Share / Copy Link"}
                 </button>
               </div>
             </div>
