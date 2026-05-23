@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useAccessControl } from "@/hooks/useAccessControl"
+import FirstClassCountdown from "@/components/FirstClassCountdown"
 
 // The tool cards orbiting the central badge
 interface OrbitingToolProps {
@@ -72,6 +73,11 @@ function MobileHero() {
         >
           In a highly competitive world, standard school education isn&apos;t enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
         </p>
+
+        {/* Countdown CTA */}
+        <div className="w-full mb-6 max-w-sm">
+          <FirstClassCountdown />
+        </div>
 
         {/* CTAs */}
         <div
@@ -163,7 +169,7 @@ export default function HeroSection() {
           
           {/* Left Column: Copy & CTAs */}
           <div
-            className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left"
+            className="w-full lg:w-[58%] flex flex-col items-center lg:items-start text-center lg:text-left"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-blue-500/30 mb-6 bg-blue-500/5">
               <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
@@ -183,6 +189,11 @@ export default function HeroSection() {
               massive edge in academics and their future career.
             </p>
 
+            {/* Countdown CTA */}
+            <div className="w-full mb-8 max-w-2xl">
+              <FirstClassCountdown />
+            </div>
+
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
               {!loading && !hasSlot && (
                 <Link 
@@ -197,7 +208,7 @@ export default function HeroSection() {
 
           {/* Right Column: Orbit Animation */}
           <div
-            className="w-full lg:w-1/2 h-[300px] sm:h-[600px] flex items-center justify-center relative"
+            className="w-full lg:w-[42%] h-[300px] sm:h-[600px] flex items-center justify-center relative"
           >
             {/* Faint Orbit Ring */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

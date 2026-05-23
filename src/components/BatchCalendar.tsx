@@ -18,9 +18,9 @@ const formatDate = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
-// Define the bootcamp active period (May 20, 2026 - June 20, 2026)
-const BOOTCAMP_START = new Date(2026, 4, 20); // Month is 0-indexed (4 = May)
-const BOOTCAMP_END = new Date(2026, 5, 20); // 5 = June
+// Define the bootcamp active period (May 28, 2026 - June 27, 2026)
+const BOOTCAMP_START = new Date(2026, 4, 28); // Month is 0-indexed (4 = May)
+const BOOTCAMP_END = new Date(2026, 5, 27); // 5 = June
 
 // Removed global isBootcampDay to use prop-based logic inside component
 
@@ -30,7 +30,7 @@ const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean }) {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 4, 1));
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(2026, 4, 20));
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(2026, 4, 28));
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -61,9 +61,8 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
       );
     } else {
       const dateObj = new Date(year, month, day);
-      const isBootcamp = hasSlot
-        ? (dateObj >= BOOTCAMP_START && dateObj <= BOOTCAMP_END)
-        : false;
+      const dayOfWeek = dateObj.getDay();
+      const isBootcamp = dateObj >= BOOTCAMP_START && dateObj <= BOOTCAMP_END && dayOfWeek !== 0 && dayOfWeek !== 6;
       const dateStr = formatDate(dateObj);
       const hasEvents = false;
       const isSelected = selectedDate != null && formatDate(selectedDate) === dateStr;
@@ -232,7 +231,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
               </div>
               <p className="text-slate-300 font-medium">No sessions scheduled for this day.</p>
               <p className="text-sm text-slate-500 mt-1">
-                Bootcamp runs May 20 – June 20. Highlighted days have sessions.
+                Bootcamp runs May 28 – June 27. Highlighted days indicate active days.
               </p>
             </div>
           )}

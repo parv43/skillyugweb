@@ -34,6 +34,7 @@ import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import BatchCalendar from "@/components/BatchCalendar";
 import VoucherCard from "@/components/VoucherCard";
+import FirstClassCountdown from "@/components/FirstClassCountdown";
 
 const MOCK_VIDEOS = [
   { id: 1, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
@@ -738,6 +739,7 @@ export default function MyBatchPage() {
 
       <section className="relative z-10 px-6 pt-24 md:pt-32 pb-12 md:pb-16 lg:px-12">
         <div className="max-w-7xl mx-auto space-y-10">
+          <FirstClassCountdown />
           {isPaidUser ? (
             <>
 
@@ -1265,9 +1267,9 @@ export default function MyBatchPage() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-400">
                     Next live session
                   </p>
-                  <p className="mt-3 text-lg font-bold text-white">10th May, 8:00 PM IST</p>
+                  <p className="mt-3 text-lg font-bold text-white">28th May, 1:00 PM IST</p>
                   <p className="mt-2 text-sm text-slate-300">
-                    Intro Session
+                    First Class
                   </p>
                 </div>
               </div>
