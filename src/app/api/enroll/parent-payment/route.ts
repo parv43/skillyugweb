@@ -130,7 +130,17 @@ export async function POST(request: NextRequest) {
         .from("student_parent_relations")
         .upsert({ parent_id: parentUser.id, student_id: studentId });
 
-      // Create slot booking for access (amount = 3800 INR, payment_status = paid)
+      // Fetch student details from public.users to get their full_name
+      const { data: studentProfile } = await admin
+        .from("users")
+        .select("full_name")
+        .eq("id", studentId)
+        .maybeSingle();
+
+      const studentName = studentProfile?.full_name || studentUser.user.user_metadata?.full_name || "Skillyug Student";
+      const parentPhone = parentUser.phone || studentUser.user.phone || "+910000000000";
+
+      // Create slot booking for access (amount = 399 INR, payment_status = paid)
       const mockPaymentId = `pay_mock_${crypto.randomUUID().slice(0, 12)}`;
       const mockOrderId = `order_mock_${crypto.randomUUID().slice(0, 12)}`;
 
@@ -139,7 +149,9 @@ export async function POST(request: NextRequest) {
         .insert({
           user_id: studentId,
           email: studentEmail,
-          amount_paid: 3800,
+          name: studentName,
+          phone: parentPhone,
+          amount_paid: 399,
           currency: "INR",
           razorpay_order_id: mockOrderId,
           razorpay_payment_id: mockPaymentId,
@@ -225,6 +237,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: relationError.message }, { status: 500 });
     }
 
+    // Fetch student details from public.users to get their full_name
+    const { data: studentProfile } = await admin
+      .from("users")
+      .select("full_name")
+      .eq("id", studentId)
+      .maybeSingle();
+
+    const studentName = studentProfile?.full_name || "Skillyug Student";
+    const parentPhone = parentUser.phone || "+910000000000";
+
     // Create slot booking for access
     const mockPaymentId = `pay_mock_${crypto.randomUUID().slice(0, 12)}`;
     const mockOrderId = `order_mock_${crypto.randomUUID().slice(0, 12)}`;
@@ -234,7 +256,9 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: studentId,
         email: targetEmail,
-        amount_paid: 3800,
+        name: studentName,
+        phone: parentPhone,
+        amount_paid: 399,
         currency: "INR",
         razorpay_order_id: mockOrderId,
         razorpay_payment_id: mockPaymentId,
