@@ -339,19 +339,19 @@ function ParentPortalContent() {
                     <CreditCard className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900">Mock Checkout</h3>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-mono">Gateway Simulator</p>
+                    <h3 className="text-lg font-black text-slate-900">Checkout</h3>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-mono">Secure Payment</p>
                   </div>
                 </div>
 
                 <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-500">AI Creator Bootcamp Slot</span>
-                    <span className="text-slate-800 font-bold">₹3,800.00</span>
+                    <span className="text-slate-800 font-bold">₹399.00</span>
                   </div>
                   <div className="flex justify-between text-sm pt-2.5 border-t border-slate-100 font-black text-lg">
                     <span className="text-slate-900">Total Amount</span>
-                    <span className="text-purple-600">₹3,800.00</span>
+                    <span className="text-purple-600">₹399.00</span>
                   </div>
                 </div>
 
@@ -370,7 +370,7 @@ function ParentPortalContent() {
                   onClick={triggerPayment}
                   className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:scale-[1.02] shadow-md"
                 >
-                  Pay ₹3,800.00 (Mock)
+                  Pay ₹399.00
                 </button>
               </div>
             )}
