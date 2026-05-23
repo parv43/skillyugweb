@@ -17,9 +17,7 @@ const FlipUnit = ({ digit }: { digit: string }) => {
     }
   }, [digit, currentDigit])
 
-  const handleAnimationEnd = (e: React.AnimationEvent) => {
-    // Prevent dual trigger caused by child transitions bubbling to .flipper
-    if (e.target !== e.currentTarget) return
+  const handleAnimationEnd = () => {
     setIsFlipping(false)
     setPreviousDigit(digit)
   }
@@ -35,11 +33,11 @@ const FlipUnit = ({ digit }: { digit: string }) => {
         <div className="flip-card-inner-text">{previousDigit}</div>
       </div>
       {/* Flipper card that rotates */}
-      <div
-        className={`flipper ${isFlipping ? "is-flipping" : ""}`}
-        onAnimationEnd={handleAnimationEnd}
-      >
-        <div className="flip-card flipper__top">
+      <div className={`flipper ${isFlipping ? "is-flipping" : ""}`}>
+        <div
+          className="flip-card flipper__top"
+          onAnimationEnd={handleAnimationEnd}
+        >
           <div className="flip-card-inner-text">{previousDigit}</div>
         </div>
         <div className="flip-card flipper__bottom">
