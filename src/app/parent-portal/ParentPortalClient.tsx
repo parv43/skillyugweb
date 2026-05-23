@@ -26,6 +26,7 @@ type ChildUser = {
   email: string;
   full_name: string | null;
   enrolledAt: string;
+  temp_password?: string | null;
 };
 
 function ParentPortalContent() {
@@ -54,7 +55,9 @@ function ParentPortalContent() {
   const [copiedChildId, setCopiedChildId] = useState<string | null>(null);
 
   const handleShareChildDetails = async (child: ChildUser) => {
-    const credText = `Skillyug AI Bootcamp Enrollment:\nStudent: ${child.full_name || "Student"}\nEmail: ${child.email}\nLogin at: ${window.location.origin}/login`;
+    const credText = child.temp_password
+      ? `Skillyug AI Bootcamp Credentials:\nStudent: ${child.full_name || "Student"}\nEmail: ${child.email}\nPassword: ${child.temp_password}\nLogin at: ${window.location.origin}/login`
+      : `Skillyug AI Bootcamp Enrollment:\nStudent: ${child.full_name || "Student"}\nEmail: ${child.email}\nLogin at: ${window.location.origin}/login`;
     
     if (navigator.share) {
       try {
@@ -416,6 +419,12 @@ function ParentPortalContent() {
                           <div className="min-w-0">
                             <h3 className="text-base font-black text-slate-800 truncate">{child.full_name || "Skillyug Student"}</h3>
                             <p className="text-xs text-slate-500 break-all">{child.email}</p>
+                            {child.temp_password && (
+                              <div className="mt-1.5 flex items-center gap-1.5 text-xs text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded-md w-fit border border-purple-100 font-mono">
+                                <Key className="w-3 h-3 text-purple-400" />
+                                <span>Pass: {child.temp_password}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                         

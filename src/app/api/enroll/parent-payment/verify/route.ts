@@ -231,7 +231,10 @@ export async function POST(request: NextRequest) {
           email: targetEmail,
           password: generatedPassword,
           email_confirm: true,
-          user_metadata: { full_name: "Skillyug Student" }
+          user_metadata: { 
+            full_name: "Skillyug Student",
+            temp_password: generatedPassword
+          }
         });
 
         if (createError || !newUser.user) {
