@@ -96,32 +96,55 @@ export default function FirstClassCountdown() {
 
   return (
     <div className="w-full rounded-2xl border border-white/10 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 bg-white/[0.02] backdrop-blur-xl p-5 md:p-6 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:border-white/20 transition-all duration-300">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-        {/* Left Side: Title and Date info */}
-        <div className="flex items-center gap-4 text-center md:text-left">
-          <div className="hidden sm:flex p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+        
+        {/* Left Block: Info & Button */}
+        <div className="flex items-center gap-4 text-center sm:text-left">
+          <div className="hidden lg:flex p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)] flex-shrink-0">
             <Calendar className="w-6 h-6 text-blue-300" />
           </div>
-          <div>
-            <div className="flex items-center justify-center md:justify-start gap-2">
-              <Sparkles className="w-4 h-4 text-purple-300 animate-pulse" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-300">
-                Live Cohort Starts Soon
-              </span>
+          <div className="flex flex-col items-center sm:items-start gap-3">
+            <div>
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <Sparkles className="w-4 h-4 text-purple-300 animate-pulse" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-300">
+                  Live Cohort Starts Soon
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-white mt-1">
+                {timeLeft.isExpired ? "First Class has started!" : "First Class starts in"}
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5 font-medium">
+                Thursday, 28th May at 1:00 PM IST
+              </p>
             </div>
-            <h3 className="text-lg md:text-xl font-black text-white mt-1">
-              {timeLeft.isExpired ? "First Class has started!" : "First Class starts in"}
-            </h3>
-            <p className="text-xs text-slate-400 mt-0.5 font-medium">
-              Thursday, 28th May at 1:00 PM IST
-            </p>
+            
+            {/* Calendar Button (Desktop: aligned left; Mobile: hidden here, shown at bottom) */}
+            <div className="hidden sm:block">
+              {timeLeft.isExpired ? (
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-500/30 bg-green-500/10 text-green-300 text-[10px] font-bold uppercase tracking-wider animate-pulse">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping" />
+                  Live Now
+                </div>
+              ) : (
+                <a
+                  href={calendarUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-[10px] font-bold uppercase tracking-[0.15em] text-slate-200 transition-all hover:bg-white/[0.08] hover:text-white hover:scale-[1.03] active:scale-[0.97]"
+                >
+                  <Clock className="w-3.5 h-3.5 text-blue-300" />
+                  Add to Calendar
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Right Side: Interactive Countdown & Calendar Link */}
-        <div className="flex flex-wrap items-center justify-center gap-6">
+        {/* Right Block: Countdown Cards */}
+        <div className="flex flex-col items-center gap-4 w-full sm:w-auto">
           {!timeLeft.isExpired && (
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 justify-center">
               {[
                 { label: "days", value: timeLeft.days },
                 { label: "hours", value: timeLeft.hours },
@@ -152,23 +175,27 @@ export default function FirstClassCountdown() {
             </div>
           )}
 
-          {timeLeft.isExpired ? (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-green-500/30 bg-green-500/10 text-green-300 text-xs font-bold uppercase tracking-wider animate-pulse">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
-              Live Now
-            </div>
-          ) : (
-            <a
-              href={calendarUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-xs font-bold uppercase tracking-[0.15em] text-slate-200 transition-all hover:bg-white/[0.08] hover:text-white hover:scale-[1.03] active:scale-[0.97]"
-            >
-              <Clock className="w-4 h-4 text-blue-300" />
-              Add to Calendar
-            </a>
-          )}
+          {/* Calendar Button (Mobile-only: shown at the bottom) */}
+          <div className="sm:hidden w-full flex justify-center">
+            {timeLeft.isExpired ? (
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-green-500/30 bg-green-500/10 text-green-300 text-xs font-bold uppercase tracking-wider animate-pulse">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
+                Live Now
+              </div>
+            ) : (
+              <a
+                href={calendarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-center inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-xs font-bold uppercase tracking-[0.15em] text-slate-200 transition-all hover:bg-white/[0.08] hover:text-white"
+              >
+                <Clock className="w-4 h-4 text-blue-300" />
+                Add to Calendar
+              </a>
+            )}
+          </div>
         </div>
+
       </div>
     </div>
   )

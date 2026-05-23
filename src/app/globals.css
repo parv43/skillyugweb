@@ -201,15 +201,22 @@ body {
 /* ── Flip Countdown Card Styles ─────────────────────────────────────────── */
 .flip-unit {
   position: relative;
-  width: 2.75rem;
-  height: 3.75rem;
+  width: 1.85rem;
+  height: 2.6rem;
   perspective: 300px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .flip-unit {
-    width: 3.25rem;
-    height: 4.5rem;
+    width: 2.25rem;
+    height: 3.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .flip-unit {
+    width: 3rem;
+    height: 4.25rem;
   }
 }
 
@@ -236,12 +243,18 @@ body {
   justify-content: center;
   font-family: monospace;
   font-weight: 700;
-  font-size: 2.25rem;
+  font-size: 1.35rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .flip-card-inner-text {
-    font-size: 2.75rem;
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .flip-card-inner-text {
+    font-size: 2.5rem;
   }
 }
 
