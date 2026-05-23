@@ -9,6 +9,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { markPaymentSupportNoticePending } from "@/lib/paymentSupportNotice";
 import { PARTIAL_BOOK_SLOT_AMOUNT_RUPEES, FULL_BOOK_SLOT_AMOUNT_RUPEES } from "@/lib/pricing";
 import { supabase } from "@/lib/supabaseClient";
+import { useAccessControl } from "@/hooks/useAccessControl";
+import { MessageCircle, Mail as MailIcon, ShieldAlert, Copy as CopyIcon, ShieldCheck } from "lucide-react";
 
 interface RazorpayOrderResponse {
   amount: number;
@@ -93,28 +95,40 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const [userEmail, setUserEmail] = useState("");
   const showPaymentHelpCta = Boolean(successMsg || errorMsg);
 
+  const { isLoggedIn, hasAccess, role, loading: accessLoading, userEmail: authEmail } = useAccessControl();
+  const [copiedLink, setCopiedLink] = useState(false);
+
   useEffect(() => {
-    const checkAuth = async () => {
+    if (accessLoading) return;
+
+    if (!isLoggedIn) {
+      const currentPath = fromParam ? `/book-slot?from=${fromParam}` : "/book-slot";
+      router.replace(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    if (role === "student" && hasAccess) {
+      router.replace("/my-batch");
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    const checkAuthDetails = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        const currentPath = fromParam ? `/book-slot?from=${fromParam}` : "/book-slot";
-        router.replace(`/login?redirect=${encodeURIComponent(currentPath)}`);
-        setIsCheckingAuth(false);
-        return;
+      if (session) {
+        const fullName = session.user?.user_metadata?.full_name || "";
+        if (fullName) {
+          setPrefilledName(fullName);
+          setStudentName(fullName);
+        }
       }
-
-      const fullName = session.user?.user_metadata?.full_name || "";
-      if (fullName) {
-        setPrefilledName(fullName);
-        setStudentName(fullName);
-      }
-
-      setUserEmail(session.user?.email ?? "");
+      setUserEmail(authEmail || session?.user?.email || "");
       setIsCheckingAuth(false);
     };
 
-    checkAuth();
-  }, [router]);
+    checkAuthDetails();
+  }, [accessLoading, isLoggedIn, role, hasAccess, router, fromParam, authEmail]);
 
   useEffect(() => {
     if (razorpayScriptStatus !== "loading") {
@@ -513,117 +527,182 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
               </div>
             )}
 
-            <form className="space-y-8" onSubmit={handlePayment}>
-              <div className="space-y-6">
-                <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
-                    Student Name
+            {isLoggedIn && role === "student" && !hasAccess ? (
+              <div className="space-y-6 pt-4 border-t border-white/5 animate-in fade-in duration-300">
+                <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/10 text-amber-200 text-xs font-semibold flex items-start gap-3.5 leading-relaxed">
+                  <ShieldAlert className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-sm text-white mb-1">Awaiting Parent Activation</p>
+                    To join the AI Creator Bootcamp, your parent must activate your student slot. Direct payments by students are not allowed.
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-1">
+                    Your Secure Onboarding Link
                   </label>
-                  <div className="relative">
+                  <div className="flex gap-2">
                     <input
-                      name="studentName"
-                      required
-                      value={studentName}
-                      onChange={(e) => setStudentName(e.currentTarget.value)}
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
-                      placeholder="Enter full name"
                       type="text"
+                      readOnly
+                      value={`${typeof window !== "undefined" ? window.location.origin : ""}/onboarding?studentEmail=${encodeURIComponent(userEmail || "")}`}
+                      className="flex-1 bg-[#2d2a37] border-none outline-none rounded-xl py-3.5 px-4 text-xs text-[#cac4cf] overflow-hidden text-ellipsis whitespace-nowrap"
                     />
-                  </div>
-                </div>
-
-                <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
-                    Phone Number
-                  </label>
-                  <div className="relative">
-                    <input
-                      name="phoneNumber"
-                      required
-                      value={phoneNumber}
-                      pattern="\d{10}"
-                      maxLength={10}
-                      title="Please enter exactly 10 digits"
-                      onInput={(e) => {
-                        e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, "");
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const shareLink = `${window.location.origin}/onboarding?studentEmail=${encodeURIComponent(userEmail || "")}`;
+                        navigator.clipboard.writeText(shareLink);
+                        setCopiedLink(true);
+                        setTimeout(() => setCopiedLink(false), 2000);
                       }}
-                      onChange={(e) =>
-                        setPhoneNumber(e.currentTarget.value.replace(/[^0-9]/g, "").slice(0, 10))
-                      }
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
-                      placeholder="9876543210"
-                      type="tel"
-                    />
+                      className="px-4 rounded-xl bg-[#2d2a37] hover:bg-[#343040] border border-white/5 text-[#e6e0e9] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <CopyIcon className="w-3.5 h-3.5" />
+                      {copiedLink ? "Copied" : "Copy"}
+                    </button>
                   </div>
                 </div>
 
-                <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
-                    Class/Grade
-                  </label>
-                  <div className="relative">
-                    <select
-                      name="grade"
-                      required
-                      value={grade}
-                      onChange={(e) => setGrade(e.currentTarget.value)}
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium appearance-none"
-                    >
-                      <option disabled value="">
-                        Select class or grade
-                      </option>
-                      <option value="6th">6th</option>
-                      <option value="7th">7th</option>
-                      <option value="8th">8th</option>
-                      <option value="9th">9th</option>
-                      <option value="10th">10th</option>
-                      <option value="11th">11th</option>
-                      <option value="12th">12th</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-[#938f99]">
-                      <span className="material-symbols-outlined">expand_more</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <a
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Hi! I'm ready to join the Skillyug Summer AI Bootcamp, but I need you to activate my slot. Please click here to enroll me: ${typeof window !== "undefined" ? window.location.origin : ""}/onboarding?studentEmail=${encodeURIComponent(userEmail || "")}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 py-4 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-[0_4px_14px_rgba(16,185,129,0.2)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Share on WhatsApp
+                  </a>
+
+                  <a
+                    href={`mailto:?subject=${encodeURIComponent("Skillyug Bootcamp Enrollment Activation")}&body=${encodeURIComponent(`Hi! I'm ready to join the Skillyug Summer AI Bootcamp, but I need you to activate my slot. Please click here to enroll me:\n\n${typeof window !== "undefined" ? window.location.origin : ""}/onboarding?studentEmail=${encodeURIComponent(userEmail || "")}`)}`}
+                    className="flex items-center justify-center gap-2 py-4 rounded-full bg-slate-800 hover:bg-slate-700 text-[#e6e0e9] font-bold text-xs uppercase tracking-wider transition-all border border-white/5 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  >
+                    <MailIcon className="w-4 h-4" />
+                    Share via Email
+                  </a>
+                </div>
+
+                <div className="pt-4 border-t border-white/5 flex flex-col items-center justify-center">
+                  <p className="text-[10px] font-label text-[#938f99]/65 uppercase tracking-widest text-center leading-relaxed">
+                    Send this link to your parent so they can safely complete your registration.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <form className="space-y-8" onSubmit={handlePayment}>
+                <div className="space-y-6">
+                  <div className="group">
+                    <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
+                      Student Name
+                    </label>
+                    <div className="relative">
+                      <input
+                        name="studentName"
+                        required
+                        value={studentName}
+                        onChange={(e) => setStudentName(e.currentTarget.value)}
+                        className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
+                        placeholder="Enter full name"
+                        type="text"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="group">
+                    <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
+                      Phone Number
+                    </label>
+                    <div className="relative">
+                      <input
+                        name="phoneNumber"
+                        required
+                        value={phoneNumber}
+                        pattern="\d{10}"
+                        maxLength={10}
+                        title="Please enter exactly 10 digits"
+                        onInput={(e) => {
+                          e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, "");
+                        }}
+                        onChange={(e) =>
+                          setPhoneNumber(e.currentTarget.value.replace(/[^0-9]/g, "").slice(0, 10))
+                        }
+                        className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
+                        placeholder="9876543210"
+                        type="tel"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="group">
+                    <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
+                      Class/Grade
+                    </label>
+                    <div className="relative">
+                      <select
+                        name="grade"
+                        required
+                        value={grade}
+                        onChange={(e) => setGrade(e.currentTarget.value)}
+                        className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium appearance-none"
+                      >
+                        <option disabled value="">
+                          Select class or grade
+                        </option>
+                        <option value="6th">6th</option>
+                        <option value="7th">7th</option>
+                        <option value="8th">8th</option>
+                        <option value="9th">9th</option>
+                        <option value="10th">10th</option>
+                        <option value="11th">11th</option>
+                        <option value="12th">12th</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-[#938f99]">
+                        <span className="material-symbols-outlined">expand_more</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="group">
+                    <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
+                      Promo Code (Optional)
+                    </label>
+                    <div className="relative">
+                      <input
+                        name="promoCode"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.currentTarget.value.toUpperCase())}
+                        className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium uppercase"
+                        placeholder="Enter promo code"
+                        type="text"
+                      />
                     </div>
                   </div>
                 </div>
 
-                <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
-                    Promo Code (Optional)
-                  </label>
-                  <div className="relative">
-                    <input
-                      name="promoCode"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.currentTarget.value.toUpperCase())}
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium uppercase"
-                      placeholder="Enter promo code"
-                      type="text"
-                    />
-                  </div>
+                <div className="pt-4">
+                  <button
+                    disabled={
+                      isProcessingPayment ||
+                      isCheckingAuth ||
+                      razorpayScriptStatus !== "ready"
+                    }
+                    className="w-full bg-gradient-to-r from-[#7c4dff] to-[#448aff] text-white font-bold py-5 rounded-full hover:shadow-[0_0_30px_-5px_rgba(124,77,255,0.6)] disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
+                    type="submit"
+                  >
+                    <span className="material-symbols-outlined">payments</span>
+                    {isProcessingPayment
+                      ? "Opening Payment..."
+                      : razorpayScriptStatus === "loading"
+                        ? "Loading Payment Gateway..."
+                        : razorpayScriptStatus === "failed"
+                          ? "Payment Gateway Unavailable"
+                          : `Pay Now - ₹${displayAmount}`}
+                  </button>
                 </div>
-              </div>
-
-              <div className="pt-4">
-                <button
-                  disabled={
-                    isProcessingPayment ||
-                    isCheckingAuth ||
-                    razorpayScriptStatus !== "ready"
-                  }
-                  className="w-full bg-gradient-to-r from-[#7c4dff] to-[#448aff] text-white font-bold py-5 rounded-full hover:shadow-[0_0_30px_-5px_rgba(124,77,255,0.6)] disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
-                  type="submit"
-                >
-                  <span className="material-symbols-outlined">payments</span>
-                  {isProcessingPayment
-                    ? "Opening Payment..."
-                    : razorpayScriptStatus === "loading"
-                      ? "Loading Payment Gateway..."
-                      : razorpayScriptStatus === "failed"
-                        ? "Payment Gateway Unavailable"
-                        : `Pay Now - ₹${displayAmount}`}
-                </button>
-              </div>
-            </form>
+              </form>
+            )}
 
             <div className="mt-8 text-center">
               <p className="text-[11px] font-label text-[#938f99]/60 uppercase tracking-widest">

@@ -12,6 +12,7 @@ function OnboardingContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
   const from = searchParams.get("from") || "";
+  const studentEmail = searchParams.get("studentEmail") || "";
 
   const [loading, setLoading] = useState(false);
   const [showParentModal, setShowParentModal] = useState(false);
@@ -62,6 +63,9 @@ function OnboardingContent() {
       }
       if (from) {
         nextPath += `&from=${encodeURIComponent(from)}`;
+      }
+      if (studentEmail) {
+        nextPath += `&kidEmail=${encodeURIComponent(studentEmail)}`;
       }
 
       const { error } = await supabase.auth.signInWithOAuth({
@@ -123,7 +127,11 @@ function OnboardingContent() {
           // Auto-logged in
           setSuccessMsg("Account created! Redirecting...");
           let nextUrl = "/parent-portal";
-          if (token) nextUrl += `?token=${encodeURIComponent(token)}`;
+          const params = new URLSearchParams();
+          if (token) params.set("token", token);
+          if (studentEmail) params.set("kidEmail", studentEmail);
+          const queryString = params.toString();
+          if (queryString) nextUrl += `?${queryString}`;
           setTimeout(() => router.push(nextUrl), 1500);
         } else {
           setSuccessMsg("Check your inbox/spam for a verification link to activate your parent account.");
@@ -148,7 +156,11 @@ function OnboardingContent() {
 
           setSuccessMsg("Login successful! Redirecting...");
           let nextUrl = "/parent-portal";
-          if (token) nextUrl += `?token=${encodeURIComponent(token)}`;
+          const params = new URLSearchParams();
+          if (token) params.set("token", token);
+          if (studentEmail) params.set("kidEmail", studentEmail);
+          const queryString = params.toString();
+          if (queryString) nextUrl += `?${queryString}`;
           setTimeout(() => router.push(nextUrl), 1500);
         }
       }
