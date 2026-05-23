@@ -204,6 +204,7 @@ body {
   width: 1.85rem;
   height: 2.6rem;
   perspective: 300px;
+  flex-shrink: 0;
 }
 
 @media (min-width: 640px) {
@@ -215,8 +216,8 @@ body {
 
 @media (min-width: 1024px) {
   .flip-unit {
-    width: 3rem;
-    height: 4.25rem;
+    width: 3.25rem;
+    height: 4.5rem;
   }
 }
 
@@ -254,7 +255,7 @@ body {
 
 @media (min-width: 1024px) {
   .flip-card-inner-text {
-    font-size: 2.5rem;
+    font-size: 2.75rem;
   }
 }
 

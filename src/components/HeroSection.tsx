@@ -74,11 +74,6 @@ function MobileHero() {
           In a highly competitive world, standard school education isn&apos;t enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
         </p>
 
-        {/* Countdown CTA */}
-        <div className="w-full mb-6 max-w-sm">
-          <FirstClassCountdown />
-        </div>
-
         {/* CTAs */}
         <div
           className="w-full flex flex-col gap-4 mb-6"
