@@ -75,9 +75,11 @@ function MobileHero() {
         </p>
 
         {/* Countdown CTA */}
-        <div className="w-full mb-6 max-w-sm">
-          <FirstClassCountdown />
-        </div>
+        {!loading && hasSlot && (
+          <div className="w-full mb-6 max-w-sm">
+            <FirstClassCountdown />
+          </div>
+        )}
 
         {/* CTAs */}
         <div
@@ -190,9 +192,11 @@ export default function HeroSection() {
             </p>
 
             {/* Countdown CTA */}
-            <div className="w-full mb-8 max-w-2xl">
-              <FirstClassCountdown />
-            </div>
+            {!loading && hasSlot && (
+              <div className="w-full mb-8 max-w-2xl">
+                <FirstClassCountdown />
+              </div>
+            )}
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
               {!loading && !hasSlot && (
