@@ -216,8 +216,8 @@ body {
 
 @media (min-width: 1024px) {
   .flip-unit {
-    width: 3.25rem;
-    height: 4.5rem;
+    width: 2.85rem;
+    height: 3.9rem;
   }
 }
 
@@ -255,7 +255,7 @@ body {
 
 @media (min-width: 1024px) {
   .flip-card-inner-text {
-    font-size: 2.75rem;
+    font-size: 2.35rem;
   }
 }
 

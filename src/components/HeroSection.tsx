@@ -185,7 +185,7 @@ export default function HeroSection() {
             </p>
 
             {/* Countdown CTA */}
-            <div className="w-full mb-8 max-w-xl">
+            <div className="w-full mb-8 max-w-2xl">
               <FirstClassCountdown />
             </div>
 
