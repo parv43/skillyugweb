@@ -183,6 +183,16 @@ function ParentPortalContent() {
         theme: {
           color: "#4f46e5",
         },
+        modal: {
+          confirm_close: true,
+          ondismiss: () => {
+            if (!paymentFinalized) {
+              setEnrollError("Payment was cancelled before completion.");
+              setPaymentStep("checkout");
+              setEnrollingKid(false);
+            }
+          },
+        },
         handler: async (paymentPayload: RazorpaySuccessPayload) => {
           paymentFinalized = true;
           setPaymentStep("processing");
