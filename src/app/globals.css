@@ -726,6 +726,13 @@ div[class*="w-16"].bg-\[\#0f172a\]\/80 {
 .fixed[class*="blur-["]:not([class*="backdrop-blur"]) {
   opacity: 0.12 !important;
 }
+
+/* Custom background override for countdown card in light theme to preserve gradient aesthetic */
+.countdown-card-dynamic {
+  background-image: linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(168, 85, 247, 0.05), rgba(236, 72, 153, 0.05)) !important;
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
 }
 
 

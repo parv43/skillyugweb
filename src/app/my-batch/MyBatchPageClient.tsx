@@ -29,7 +29,9 @@ import {
   Pause,
   RotateCcw,
   RotateCw,
-  Copy
+  Copy,
+  Clock,
+  Video
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
@@ -91,6 +93,11 @@ export default function MyBatchPage() {
   const [sponsorLoading, setSponsorLoading] = useState(false);
   const [sponsorToken, setSponsorToken] = useState("");
   const [showSponsorModal, setShowSponsorModal] = useState(false);
+  const [liveSession, setLiveSession] = useState<{
+    title: string;
+    scheduled_at: string;
+    join_url: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -142,6 +149,29 @@ export default function MyBatchPage() {
 
     fetchVideos();
   }, [user, hasSlotAccess, isAdmin]);
+
+  useEffect(() => {
+    if (!user) return;
+    const isPaid = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin || isParentViewOnly;
+    if (!isPaid) return;
+
+    const fetchLiveSession = async () => {
+      try {
+        const res = await fetch("/api/my-batch/live-session");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.session) {
+            setLiveSession(data.session);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load live session details:", err);
+      }
+    };
+
+    fetchLiveSession();
+  }, [user, hasSlotAccess, isAdmin, isParentViewOnly]);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -886,11 +916,62 @@ export default function MyBatchPage() {
                 <Calendar className="h-6 w-6 text-blue-300" />
                 <h2 className="text-2xl font-black tracking-tight">Next Live Session</h2>
               </div>
-              <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-slate-950/40 p-6 md:p-8 flex flex-col items-center justify-center min-h-[200px]">
-                <p className="text-xl font-black text-slate-500 uppercase tracking-widest">
-                  None
-                </p>
-              </div>
+              {liveSession ? (
+                <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-slate-950/40 p-5 md:p-6 flex flex-col justify-between min-h-[200px] hover:border-white/15 transition-all duration-300 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 blur-[40px] rounded-full group-hover:bg-blue-500/10 transition-colors pointer-events-none"></div>
+                  <div>
+                    <h3 className="text-lg font-black text-white group-hover:text-blue-300 transition-colors">
+                      {liveSession.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-2 font-medium">
+                      {new Date(liveSession.scheduled_at).toLocaleString('en-IN', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                        timeZone: 'Asia/Kolkata'
+                      }) + " IST"}
+                    </p>
+                  </div>
+                  
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <a
+                      href={liveSession.join_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white uppercase tracking-wider transition-all hover:scale-[1.03] active:scale-[0.97]"
+                    >
+                      <Video className="w-4 h-4" />
+                      Join Live Meeting
+                    </a>
+                    
+                    <a
+                      href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(liveSession.title)}&dates=${
+                        (() => {
+                          const start = new Date(liveSession.scheduled_at);
+                          const end = new Date(start.getTime() + 90 * 60 * 1000);
+                          const toGCalISO = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+                          return `${toGCalISO(start)}/${toGCalISO(end)}`;
+                        })()
+                      }&details=Join+live+session+at:+${encodeURIComponent(liveSession.join_url)}&sf=true`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-xs font-bold text-slate-200 uppercase tracking-wider transition-all hover:bg-white/[0.08] hover:text-white hover:scale-[1.03] active:scale-[0.97]"
+                    >
+                      <Clock className="w-4 h-4 text-blue-300" />
+                      Add to Calendar
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-8 rounded-[1.5rem] border border-white/8 bg-slate-950/40 p-6 md:p-8 flex flex-col items-center justify-center min-h-[200px]">
+                  <p className="text-xl font-black text-slate-500 uppercase tracking-widest">
+                    None
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Certificate Card — unlocked only for allowlisted users */}
