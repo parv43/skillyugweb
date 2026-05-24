@@ -50,7 +50,7 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: OrbitingTo
 
 // ─── Mobile-Only Hero ───────────────────────────────────────────────────────
 function MobileHero() {
-  const { isLoggedIn, hasSlot, loading } = useAccessControl();
+  const { isLoggedIn, hasSlot, loading, role } = useAccessControl();
 
   return (
     <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-[#020617] overflow-hidden">
@@ -75,7 +75,20 @@ function MobileHero() {
         </p>
 
         {/* Countdown CTA / CTA Button */}
-        {!loading && hasSlot ? (
+        {!loading && role === "parent" ? (
+          <div className="w-full flex flex-col gap-4 mb-6">
+            <Link
+              href="/parent-portal"
+              className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
+              style={{ 
+                background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
+                boxShadow: "0 4px 20px rgba(139,92,246,0.3)" 
+              }}
+            >
+              Go to Parent Portal
+            </Link>
+          </div>
+        ) : !loading && hasSlot ? (
           <div className="w-full mb-6 max-w-sm">
             <FirstClassCountdown />
           </div>
@@ -120,7 +133,7 @@ function MobileHero() {
 // ─── Main Export ─────────────────────────────────────────────────────────────
 export default function HeroSection() {
   const [orbitRadius, setOrbitRadius] = useState(230)
-  const { isLoggedIn, hasSlot, loading } = useAccessControl();
+  const { isLoggedIn, hasSlot, loading, role } = useAccessControl();
 
   useEffect(() => {
     const updateRadius = () => {
@@ -187,7 +200,16 @@ export default function HeroSection() {
             </p>
 
             {/* Countdown CTA / CTA Button */}
-            {!loading && hasSlot ? (
+            {!loading && role === "parent" ? (
+              <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
+                <Link 
+                  href="/parent-portal"
+                  className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
+                >
+                  Go to Parent Portal
+                </Link>
+              </div>
+            ) : !loading && hasSlot ? (
               <div className="w-full mb-8 max-w-2xl">
                 <FirstClassCountdown />
               </div>

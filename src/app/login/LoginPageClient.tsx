@@ -121,6 +121,11 @@ function LoginForm() {
       let role = authData.user.user_metadata?.role;
       if (!role) {
         try {
+          role = localStorage.getItem("user_role") || undefined;
+        } catch {}
+      }
+      if (!role) {
+        try {
           const { data: profile } = await supabase
             .from("users")
             .select("role")
@@ -296,7 +301,7 @@ function LoginForm() {
               const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                  redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/onboarding/resolve?role=student`)}`,
+                  redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/onboarding/resolve`)}`,
                 },
               });
               if (error) setErrorMsg(error.message);

@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useAccessControl } from "@/hooks/useAccessControl"
 
 export default function CTASection() {
-  const { isLoggedIn, hasSlot, loading } = useAccessControl()
+  const { isLoggedIn, hasSlot, loading, role } = useAccessControl()
 
   return (
     <section className="relative w-full py-40 bg-[#020617] flex items-center justify-center overflow-hidden border-t-2 border-slate-800">
@@ -33,7 +33,14 @@ export default function CTASection() {
 
           {/* Dual Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10 w-full">
-            {!loading && hasSlot ? (
+            {!loading && role === "parent" ? (
+              <Link
+                href="/parent-portal"
+                className="glow-button px-10 py-5 rounded-full text-white font-bold text-xl tracking-wide shadow-2xl hover:scale-[1.03] transition-transform w-full sm:w-auto text-center border border-blue-400/50 inline-block"
+              >
+                Go to Parent Portal
+              </Link>
+            ) : !loading && hasSlot ? (
               <div className="text-slate-300 font-semibold py-5">
                 You have reserved a slot in the bootcamp.
               </div>

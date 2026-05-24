@@ -17,11 +17,6 @@ function ResolveContent() {
         const token = searchParams.get("token") || "";
         const kidEmail = searchParams.get("kidEmail") || "";
 
-        if (!role || !["student", "parent"].includes(role)) {
-          setErrorMsg("Invalid onboarding parameters.");
-          return;
-        }
-
         // Get current authenticated user
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -38,22 +33,59 @@ function ResolveContent() {
           return;
         }
 
-        // Save role in public.users database
-        const res = await fetch("/api/onboarding/role", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session.access_token}`
-          },
-          body: JSON.stringify({
-            role,
-            fullName: session.user.user_metadata?.full_name
-          })
-        });
+        // 1. Check if user already has a role in the database
+        let resolvedRole: string | null = null;
+        try {
+          const getRes = await fetch("/api/onboarding/role", {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${session.access_token}`
+            }
+          });
+          if (getRes.ok) {
+            const getData = await getRes.json();
+            if (getData.user?.role) {
+              resolvedRole = getData.user.role;
+            }
+          }
+        } catch (getErr) {
+          console.error("[Onboarding Resolve] GET role failed:", getErr);
+        }
 
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || "Failed to save onboarding role");
+        // 2. If no role exists in the database, we must save the role if provided
+        if (!resolvedRole) {
+          if (!role || !["student", "parent"].includes(role)) {
+            // No role parameter and no database role -> redirect to role selection
+            router.replace("/onboarding");
+            return;
+          }
+
+          // Save role in public.users database
+          const res = await fetch("/api/onboarding/role", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
+              role,
+              fullName: session.user.user_metadata?.full_name
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.error || "Failed to save onboarding role");
+          }
+
+          const resData = await res.json();
+          resolvedRole = resData.user?.role || role;
+        }
+
+        if (resolvedRole) {
+          try {
+            localStorage.setItem("user_role", resolvedRole);
+          } catch {}
         }
 
         // Clear local storage and session cache for my-batch access to force refresh
@@ -62,14 +94,14 @@ function ResolveContent() {
         } catch {}
 
         // Redirect based on role
-        if (role === "student") {
+        if (resolvedRole === "student") {
           const fromParam = searchParams.get("from");
           if (fromParam === "bootcamp") {
             router.replace("/book-slot?from=bootcamp");
           } else {
             router.replace("/my-batch");
           }
-        } else if (role === "parent") {
+        } else if (resolvedRole === "parent") {
           let parentPath = "/parent-portal";
           const params = new URLSearchParams();
           if (token) params.set("token", token);

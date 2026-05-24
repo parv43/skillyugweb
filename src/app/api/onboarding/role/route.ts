@@ -97,6 +97,22 @@ export async function POST(request: NextRequest) {
     const admin = createSupabaseAdmin();
     const nameToSet = fullName || user.user_metadata?.full_name || "Skillyug User";
 
+    // Check if user already exists and has a role set to prevent overwriting
+    const { data: existingUser, error: checkError } = await admin
+      .from("users")
+      .select("id, email, full_name, role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("[Role API POST] Check query error:", checkError);
+    }
+
+    if (existingUser?.role) {
+      console.log("[Role API POST] User already has role:", existingUser.role, "skipping upsert");
+      return NextResponse.json({ user: existingUser });
+    }
+
     const { data, error } = await admin
       .from("users")
       .upsert({
