@@ -33,7 +33,11 @@ export default function CTASection() {
 
           {/* Dual Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10 w-full">
-            {!loading && !hasSlot && (
+            {!loading && hasSlot ? (
+              <div className="text-slate-300 font-semibold py-5">
+                You have reserved a slot in the bootcamp.
+              </div>
+            ) : (
               <Link
                 href="/onboarding?from=bootcamp"
                 className="glow-button px-10 py-5 rounded-full text-white font-bold text-xl tracking-wide shadow-2xl hover:scale-[1.03] transition-transform w-full sm:w-auto text-center border border-blue-400/50 inline-block"

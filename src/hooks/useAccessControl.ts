@@ -32,44 +32,42 @@ export function useAccessControl(): AccessState {
     let cancelled = false;
 
     const checkAccess = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        if (!cancelled) {
-          setState({ isLoggedIn: false, hasAccess: false, hasSlot: false, loading: false, userId: undefined, userEmail: undefined });
-          try { sessionStorage.removeItem("mybatch_access") } catch {}
-        }
-        return;
-      }
-
-      // Check cache first
       try {
-        const cached = sessionStorage.getItem("mybatch_access");
-        if (cached) {
-          const { value, expiry } = JSON.parse(cached);
-          if (Date.now() < expiry) {
-            if (!cancelled) {
-              setState({
-                isLoggedIn: true,
-                hasAccess: Boolean(value.hasAccess),
-
-                hasSlot: Boolean(value.hasSlot),
-                loading: false,
-                userId: session.user.id,
-                userEmail: session.user.email,
-                role: value.role || undefined,
-              });
-            }
-            return;
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          if (!cancelled) {
+            setState({ isLoggedIn: false, hasAccess: false, hasSlot: false, loading: false, userId: undefined, userEmail: undefined });
+            try { sessionStorage.removeItem("mybatch_access") } catch {}
           }
+          return;
         }
-      } catch {}
 
-      // Fetch from API with explicit Bearer token — avoids all cookie-forwarding issues
-      try {
+        // Check cache first
+        try {
+          const cached = sessionStorage.getItem("mybatch_access");
+          if (cached) {
+            const { value, expiry } = JSON.parse(cached);
+            if (Date.now() < expiry) {
+              if (!cancelled) {
+                setState({
+                  isLoggedIn: true,
+                  hasAccess: Boolean(value.hasAccess),
+                  hasSlot: Boolean(value.hasSlot),
+                  loading: false,
+                  userId: session.user.id,
+                  userEmail: session.user.email,
+                  role: value.role || undefined,
+                });
+              }
+              return;
+            }
+          }
+        } catch {}
+
+        // Fetch from API with explicit Bearer token — avoids all cookie-forwarding issues
         if (!fetchPromise) {
-          const session = await supabase.auth.getSession();
-          const token = session.data.session?.access_token;
+          const token = session?.access_token;
           fetchPromise = fetch("/api/my-batch/access", {
             credentials: "same-origin",
             headers: {
@@ -89,7 +87,6 @@ export function useAccessControl(): AccessState {
           setState({
             isLoggedIn: true,
             hasAccess: Boolean(data.hasAccess),
-
             hasSlot: Boolean(data.hasSlot),
             loading: false,
             userId: session.user.id,
@@ -103,9 +100,9 @@ export function useAccessControl(): AccessState {
             }));
           } catch {}
         }
-      } catch {
+      } catch (err) {
         if (!cancelled) {
-          setState(s => ({ ...s, isLoggedIn: true, loading: false, userId: session.user.id, userEmail: session.user.email }));
+          setState({ isLoggedIn: false, hasAccess: false, hasSlot: false, loading: false, userId: undefined, userEmail: undefined });
         }
       }
     };

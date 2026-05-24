@@ -74,18 +74,13 @@ function MobileHero() {
           In a highly competitive world, standard school education isn&apos;t enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
         </p>
 
-        {/* Countdown CTA */}
-        {!loading && hasSlot && (
+        {/* Countdown CTA / CTA Button */}
+        {!loading && hasSlot ? (
           <div className="w-full mb-6 max-w-sm">
             <FirstClassCountdown />
           </div>
-        )}
-
-        {/* CTAs */}
-        <div
-          className="w-full flex flex-col gap-4 mb-6"
-        >
-          {!loading && !hasSlot && (
+        ) : (
+          <div className="w-full flex flex-col gap-4 mb-6">
             <Link
               href="/onboarding?from=bootcamp"
               className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
@@ -96,8 +91,8 @@ function MobileHero() {
             >
               Join the Bootcamp
             </Link>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Full-width Hero Image bleeding to edges */}
@@ -191,23 +186,21 @@ export default function HeroSection() {
               massive edge in academics and their future career.
             </p>
 
-            {/* Countdown CTA */}
-            {!loading && hasSlot && (
+            {/* Countdown CTA / CTA Button */}
+            {!loading && hasSlot ? (
               <div className="w-full mb-8 max-w-2xl">
                 <FirstClassCountdown />
               </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
-              {!loading && !hasSlot && (
+            ) : (
+              <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
                 <Link 
                   href="/onboarding?from=bootcamp"
                   className="glow-button px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
                 >
                   Join the Bootcamp
                 </Link>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Orbit Animation */}
