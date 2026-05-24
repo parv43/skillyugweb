@@ -25,32 +25,24 @@ function OnboardingContent() {
         if (session?.user) {
           let role = session.user.user_metadata?.role;
           
-          // Try local storage cache next
-          if (!role) {
-            try {
-              role = localStorage.getItem("user_role") || undefined;
-            } catch {}
+          // Fetch resolved/healed role from onboarding API
+          try {
+            const roleRes = await fetch("/api/onboarding/role", {
+              headers: {
+                "Authorization": `Bearer ${session.access_token}`
+              }
+            });
+            if (roleRes.ok) {
+              const roleData = await roleRes.json();
+              if (roleData.user?.role) {
+                role = roleData.user.role;
+              }
+            }
+          } catch (err) {
+            console.error("Error fetching resolved role on onboarding session check:", err);
           }
           
-          // Fallback to database query if not found anywhere
-          if (!role) {
-            try {
-              const { data: profile } = await supabase
-                .from("users")
-                .select("role")
-                .eq("id", session.user.id)
-                .maybeSingle();
-              if (profile?.role) {
-                role = profile.role;
-                try {
-                  localStorage.setItem("user_role", role);
-                } catch {}
-              }
-            } catch (err) {
-              console.error("Error checking session role:", err);
-            }
-          } else {
-            // Sync role cache to local storage
+          if (role) {
             try {
               localStorage.setItem("user_role", role);
             } catch {}

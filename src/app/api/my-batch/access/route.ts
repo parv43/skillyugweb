@@ -65,18 +65,48 @@ async function getAuthenticatedUser(request: NextRequest) {
 async function getAccessDetails(userId: string, email: string | null): Promise<{ hasSlot: boolean }> {
   const admin = createSupabaseAdmin();
 
-  // Single query using OR — avoids a second round trip
-  const query = admin
+  // 1. Try matching by user_id first (fastest, indexed)
+  const { data: userIdMatch, error: userIdError } = await admin
     .from("slot_bookings")
-    .select("razorpay_payment_id", { count: "exact", head: true })
-    .or(`user_id.eq.${userId}${email ? `,email.eq.${email}` : ""}`)
-    .limit(1);
+    .select("razorpay_payment_id")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
 
-  const { count, error } = await query;
+  if (userIdError) {
+    console.error("[Access] slot_bookings user_id query error:", userIdError);
+  }
 
-  if (error) console.error("[Access] slot_bookings query error:", error);
+  if (userIdMatch) {
+    return { hasSlot: true };
+  }
 
-  return { hasSlot: (count ?? 0) > 0 };
+  // 2. Fallback to case-insensitive email check
+  if (email) {
+    const { data: emailMatch, error: emailError } = await admin
+      .from("slot_bookings")
+      .select("razorpay_payment_id")
+      .ilike("email", email.trim())
+      .limit(1)
+      .maybeSingle();
+
+    if (emailError) {
+      console.error("[Access] slot_bookings email query error:", emailError);
+    }
+
+    if (emailMatch) {
+      // Self-healing: associate the user_id with this slot booking for future fast checks
+      console.log("[Access] Healing slot_bookings: linking user_id to email", email);
+      await admin
+        .from("slot_bookings")
+        .update({ user_id: userId })
+        .ilike("email", email.trim());
+
+      return { hasSlot: true };
+    }
+  }
+
+  return { hasSlot: false };
 }
 
 export async function GET(request: NextRequest) {
@@ -93,18 +123,29 @@ export async function GET(request: NextRequest) {
 
     const admin = createSupabaseAdmin();
     
-    // Fetch user profile and access details in parallel to reduce API response latency
-    const [profileRes, accessRes] = await Promise.all([
+    // Fetch user profile, parent relations, and access details in parallel to reduce API response latency
+    const [profileRes, relationRes, accessRes] = await Promise.all([
       admin
         .from("users")
         .select("role")
         .eq("id", user.id)
         .maybeSingle(),
+      admin
+        .from("student_parent_relations")
+        .select("id")
+        .eq("parent_id", user.id)
+        .limit(1)
+        .maybeSingle(),
       getAccessDetails(user.id, user.email ?? null)
     ]);
 
-    const role = profileRes.data?.role || user.user_metadata?.role || "student"; // Default to student
+    let role = profileRes.data?.role || user.user_metadata?.role || "student"; // Default to student
     const hasSlot = accessRes.hasSlot;
+
+    // Self-healing: if the user exists as a parent in student_parent_relations, their role is "parent"
+    if (relationRes.data) {
+      role = "parent";
+    }
     
     // Students can access dashboard even if not paid (in locked mode)
     // Admins have full access. Parents can access their child's batch via query params.
