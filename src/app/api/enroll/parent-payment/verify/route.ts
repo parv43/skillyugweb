@@ -212,6 +212,9 @@ export async function POST(request: NextRequest) {
       }
 
       targetEmail = kidEmail.trim().toLowerCase();
+      const kidName = notes.kid_name ? notes.kid_name.trim() : "Skillyug Student";
+      const kidGrade = notes.kid_grade ? notes.kid_grade.trim() : "6";
+      const kidPassword = notes.kid_password ? notes.kid_password.trim() : "";
 
       // Check if user exists in public.users
       const { data: existingProfiles } = await admin
@@ -220,7 +223,7 @@ export async function POST(request: NextRequest) {
         .eq("email", targetEmail)
         .maybeSingle();
 
-      generatedPassword = generateRandomPassword();
+      generatedPassword = kidPassword || generateRandomPassword();
       isNewUser = true;
 
       if (existingProfiles) {
@@ -230,13 +233,18 @@ export async function POST(request: NextRequest) {
         const { error: updateError } = await admin.auth.admin.updateUserById(studentId, {
           password: generatedPassword,
           user_metadata: {
-            temp_password: generatedPassword
+            full_name: kidName,
+            temp_password: generatedPassword,
+            grade: kidGrade
           }
         });
 
         if (updateError) {
           console.error("[Parent Payment Verify] Auth update error:", updateError);
         }
+
+        // Also update full_name in public.users if it's existing user
+        await admin.from("users").update({ full_name: kidName }).eq("id", studentId);
       } else {
         // Create new auth account
         const { data: newUser, error: createError } = await admin.auth.admin.createUser({
@@ -244,8 +252,9 @@ export async function POST(request: NextRequest) {
           password: generatedPassword,
           email_confirm: true,
           user_metadata: { 
-            full_name: "Skillyug Student",
-            temp_password: generatedPassword
+            full_name: kidName,
+            temp_password: generatedPassword,
+            grade: kidGrade
           }
         });
 
@@ -262,7 +271,7 @@ export async function POST(request: NextRequest) {
           .insert({
             id: studentId,
             email: targetEmail,
-            full_name: "Skillyug Student",
+            full_name: kidName,
             role: "student"
           });
 
@@ -305,7 +314,7 @@ export async function POST(request: NextRequest) {
         razorpay_order_id: expectedOrderId,
         razorpay_payment_id: razorpayPaymentId,
         payment_status: capturedPayment.status,
-        grade_class: "6-12",
+        grade_class: bookingType === "parent_direct" ? (notes.kid_grade || "6-12") : "6-12",
       });
 
     if (bookingError) {

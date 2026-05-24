@@ -1205,50 +1205,50 @@ export default function MyBatchPage() {
 
       <Navbar />
 
-      <section className="relative z-10 px-6 pt-24 md:pt-32 pb-12 md:pb-16 lg:px-12">
+      <section className="relative z-10 px-4 sm:px-6 pt-24 md:pt-32 pb-12 md:pb-16 lg:px-12">
         <div className="max-w-7xl mx-auto space-y-10">
           {isPaidUser && <FirstClassCountdown />}
           {isPaidUser ? (
             <>
 
           {/* Top Section: Profile & Circular Progress */}
-          <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-6 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
-              <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
-                <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
+            <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-5 sm:p-6 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
+              <div className="flex flex-wrap items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.28em] text-blue-300">
+                <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1.5 sm:px-4 sm:py-2">
                   My Batch Workspace
                 </span>
                 <span className="text-slate-500">Live cohort dashboard</span>
               </div>
-              <div className="mt-8 pt-8 border-t border-white/5">
-                <div className="flex items-center gap-4">
+              <div className="mt-6 pt-6 border-t border-white/5">
+                <div className="flex items-center gap-3 sm:gap-4">
                   {user?.avatarUrl ? (
                     <img
                       src={user.avatarUrl}
                       alt={`${user.fullName} profile`}
-                      className="h-16 w-16 rounded-full border border-white/10 object-cover"
+                      className="h-12 w-12 sm:h-16 sm:w-16 rounded-full border border-white/10 object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-blue-500/10 text-xl font-black text-blue-200">
+                    <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full border border-white/10 bg-blue-500/10 text-lg sm:text-xl font-black text-blue-200 flex-shrink-0">
                       {user?.fullName.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <div>
-                    <p className="text-2xl font-black text-white">{user?.fullName}</p>
-                    <p className="mt-1 text-sm uppercase tracking-[0.24em] text-slate-400">
+                  <div className="min-w-0">
+                    <p className="text-xl sm:text-2xl font-black text-white truncate">{user?.fullName}</p>
+                    <p className="mt-1 text-[10px] sm:text-sm uppercase tracking-[0.2em] sm:tracking-[0.24em] text-slate-400">
                       {user?.batchLabel}
                     </p>
                   </div>
                 </div>
-                <p className="mt-6 text-sm text-slate-300 break-all">{user?.email}</p>
+                <p className="mt-4 sm:mt-6 text-xs sm:text-sm text-slate-300 break-all">{user?.email}</p>
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-6 md:p-8 shadow-sm flex flex-col items-center justify-center relative">
-              <p className="absolute top-6 left-6 md:top-8 md:left-8 text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
+            <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-5 sm:p-6 md:p-8 shadow-sm flex flex-row sm:flex-col items-center justify-between sm:justify-center gap-4 relative">
+              <p className="sm:absolute sm:top-6 sm:left-6 md:top-8 md:left-8 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] sm:tracking-[0.28em] text-slate-400 self-start sm:self-auto">
                 Bootcamp Progress
               </p>
-              <div className="relative mt-8 w-40 h-40 flex items-center justify-center">
+              <div className="relative w-28 h-28 sm:mt-8 sm:w-40 sm:h-40 flex items-center justify-center flex-shrink-0">
                 {/* SVG Circle for Pie Graph (0% completion) */}
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   {/* Background Circle */}
@@ -1262,14 +1262,14 @@ export default function MyBatchPage() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl md:text-3xl font-black text-white">0%</span>
+                  <span className="text-2xl sm:text-3xl font-black text-white">0%</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Middle Section 1: Next Live Session & Locked Certificate */}
-          <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 xl:grid-cols-2">
             <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-8 shadow-[0_0_60px_rgba(59,130,246,0.08)]">
               <div className="flex items-center gap-3">
                 <Calendar className="h-6 w-6 text-blue-300" />
@@ -1410,13 +1410,13 @@ export default function MyBatchPage() {
           </div>
 
           {/* Middle Section 2: Resource Library */}
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-6 md:p-8">
+          <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-5 sm:p-6 md:p-8">
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
                   Curriculum Resources
                 </p>
-                <h2 className="mt-3 text-2xl md:text-3xl font-black tracking-tight">Your resource library</h2>
+                <h2 className="mt-2 text-xl sm:text-2xl md:text-3xl font-black tracking-tight">Your resource library</h2>
               </div>
             </div>
 
@@ -1468,7 +1468,7 @@ export default function MyBatchPage() {
           />
 
           {/* Bottom Section: Bootcamp Calendar */}
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-8">
+          <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-4 sm:p-6 md:p-8">
             <BatchCalendar hasSlot={hasSlotAccess} />
           </div>
 
@@ -1481,8 +1481,8 @@ export default function MyBatchPage() {
           ) : (
             <>
               {/* Syllabus & Instructor Bios */}
-              <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-                <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
+                <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-5 sm:p-6 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
                   <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
                     <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2">
                       Syllabus
@@ -1511,7 +1511,7 @@ export default function MyBatchPage() {
                   </div>
                 </div>
 
-                <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] flex flex-col justify-between min-h-[420px]">
+                <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-5 sm:p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] flex flex-col justify-between min-h-[360px] sm:min-h-[420px]">
                   <div className="space-y-6">
                     <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
                       Instructors
@@ -1544,7 +1544,7 @@ export default function MyBatchPage() {
               </div>
 
               {/* Locked Modules Preview with Ask Parent CTA */}
-              <div className="relative rounded-[2rem] border border-white/10 bg-slate-950/40 p-1 overflow-hidden min-h-[450px] flex items-center justify-center">
+              <div className="relative rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-slate-950/40 p-1 overflow-hidden min-h-[380px] sm:min-h-[450px] flex items-center justify-center">
                 {/* Blurred content representations */}
                 <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 blur-md opacity-25 select-none pointer-events-none">
                   <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 space-y-4">
@@ -1567,8 +1567,8 @@ export default function MyBatchPage() {
                     <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full" />
                   </div>
                   
-                  <h3 className="text-2xl font-black text-white tracking-tight">AI Learning Modules Locked</h3>
-                  <p className="mt-3 text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">AI Learning Modules Locked</h3>
+                  <p className="mt-3 text-xs sm:text-sm text-slate-400 max-w-sm sm:max-w-md mx-auto leading-relaxed">
                     Access to 5+ hours of recorded classes, project resources, calendars, and certificates is locked. Ask a parent to sponsor your slot enrollment.
                   </p>
 
@@ -1576,7 +1576,7 @@ export default function MyBatchPage() {
                     type="button"
                     onClick={handleAskParentToPay}
                     disabled={sponsorLoading}
-                    className="mt-8 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white hover:scale-[1.03] transition-all duration-200 active:scale-[0.98] disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.3)] border border-white/10"
+                    className="mt-6 sm:mt-8 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-6 sm:px-8 py-3 sm:py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white hover:scale-[1.03] transition-all duration-200 active:scale-[0.98] disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.3)] border border-white/10"
                   >
                     {sponsorLoading ? (
                       <>

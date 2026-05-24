@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { kidEmail, sponsorshipToken } = body;
+    const { kidEmail, kidName, kidGrade, kidPassword, sponsorshipToken } = body;
 
     const admin = createSupabaseAdmin();
 
@@ -115,6 +115,9 @@ export async function POST(request: NextRequest) {
       }
       notes.booking_type = "parent_direct";
       notes.kid_email = kidEmail.trim().toLowerCase();
+      notes.kid_name = kidName ? kidName.trim() : "Skillyug Student";
+      notes.kid_grade = kidGrade ? kidGrade.trim() : "6";
+      notes.kid_password = kidPassword ? kidPassword.trim() : "";
     }
 
     // Create Razorpay order (₹399.00 = 39900 paise)

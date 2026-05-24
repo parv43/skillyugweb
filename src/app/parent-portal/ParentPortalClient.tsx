@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Users, Plus, CreditCard, Mail, Key, Share2, CheckCircle, ArrowRight, Loader2, LogOut, Copy, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Users, Plus, CreditCard, Mail, Key, Share2, CheckCircle, ArrowRight, Loader2, LogOut, Copy, ShieldAlert, ShieldCheck, Eye, EyeOff, Sparkles, GraduationCap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import Script from "next/script";
@@ -45,6 +45,10 @@ function ParentPortalContent() {
 
   // Direct Enrollment Kid Input
   const [kidEmailInput, setKidEmailInput] = useState("");
+  const [kidNameInput, setKidNameInput] = useState("");
+  const [kidGradeInput, setKidGradeInput] = useState("6");
+  const [kidPasswordInput, setKidPasswordInput] = useState("");
+  const [showKidPassword, setShowKidPassword] = useState(false);
   const [enrollError, setEnrollError] = useState("");
   const [enrollingKid, setEnrollingKid] = useState(false);
   
@@ -173,6 +177,22 @@ function ParentPortalContent() {
         setEnrollError("Please enter a valid email address.");
         return;
       }
+      if (!kidNameInput.trim()) {
+        setEnrollError("Please enter the student's full name.");
+        return;
+      }
+      if (!kidGradeInput) {
+        setEnrollError("Please select the student's grade.");
+        return;
+      }
+      if (!kidPasswordInput) {
+        setEnrollError("Please set a password for the student.");
+        return;
+      }
+      if (kidPasswordInput.length < 6) {
+        setEnrollError("Student password must be at least 6 characters long.");
+        return;
+      }
     }
 
     setEnrollingKid(true);
@@ -195,7 +215,12 @@ function ParentPortalContent() {
         body: JSON.stringify(
           isSponsorship && token
             ? { sponsorshipToken: token }
-            : { kidEmail: kidEmailInput.trim().toLowerCase() }
+            : { 
+                kidEmail: kidEmailInput.trim().toLowerCase(),
+                kidName: kidNameInput.trim(),
+                kidGrade: kidGradeInput,
+                kidPassword: kidPasswordInput.trim()
+              }
         )
       });
 
@@ -276,6 +301,9 @@ function ParentPortalContent() {
               setShowPaymentModal(false);
               setPaymentStep("checkout");
               setKidEmailInput("");
+              setKidNameInput("");
+              setKidGradeInput("6");
+              setKidPasswordInput("");
             } else {
               setPaymentStep("success");
             }
@@ -351,14 +379,14 @@ function ParentPortalContent() {
 
       <Navbar />
 
-      <section className="relative z-10 px-6 pt-28 md:pt-36 pb-16 lg:px-12">
-        <div className="max-w-6xl mx-auto space-y-10">
+      <section className="relative z-10 px-4 sm:px-6 pt-28 md:pt-36 pb-16 lg:px-12">
+        <div className="max-w-6xl mx-auto space-y-8 sm:space-y-10">
           
           {/* Header Portal Row */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-8">
             <div className="space-y-1">
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-purple-600">Security Center</span>
-              <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Parent Portal</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Parent Portal</h1>
               <p className="text-sm text-slate-500 font-medium">Welcome, {parentName}. Oversee your child&apos;s learning path.</p>
             </div>
             
@@ -393,7 +421,7 @@ function ParentPortalContent() {
             </h2>
 
             {children.length === 0 ? (
-              <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center space-y-4 shadow-sm">
+              <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-8 sm:p-10 text-center space-y-4 shadow-sm">
                 <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto border border-slate-100">
                   <Users className="w-6 h-6 text-slate-400" />
                 </div>
@@ -480,6 +508,10 @@ function ParentPortalContent() {
                 setIsSponsorship(false);
                 setEnrollError("");
                 setPaymentStep("checkout");
+                setKidEmailInput("");
+                setKidNameInput("");
+                setKidGradeInput("6");
+                setKidPasswordInput("");
               }}
               className="absolute top-4 right-4 sm:top-6 sm:right-6 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold transition-all text-lg z-30"
             >
@@ -524,9 +556,28 @@ function ParentPortalContent() {
                   </div>
                 ) : (
                   <div className="space-y-4 pt-2">
-                    <div className="space-y-2">
+                    {/* Kid's Name */}
+                    <div className="space-y-1.5">
                       <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-                        Enter Kid&apos;s Email Address <span className="text-blue-500">*</span>
+                        Student&apos;s Full Name <span className="text-blue-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input
+                          type="text"
+                          required
+                          value={kidNameInput}
+                          onChange={(e) => setKidNameInput(e.target.value)}
+                          placeholder="e.g. Tanuj Pathak"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Kid's Email */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                        Student&apos;s Email Address <span className="text-blue-500">*</span>
                       </label>
                       <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -535,12 +586,85 @@ function ParentPortalContent() {
                           required
                           value={kidEmailInput}
                           onChange={(e) => setKidEmailInput(e.target.value.trim().toLowerCase())}
-                          placeholder="kid@gmail.com"
+                          placeholder="student@gmail.com"
                           autoComplete="email"
                           spellCheck="false"
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                         />
                       </div>
+                    </div>
+
+                    {/* Kid's Grade Selector */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                        Student&apos;s Grade / Class <span className="text-blue-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <select
+                          value={kidGradeInput}
+                          onChange={(e) => setKidGradeInput(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-10 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none cursor-pointer"
+                        >
+                          {[6, 7, 8, 9, 10, 11, 12].map((grade) => (
+                            <option key={grade} value={grade}>
+                              Grade {grade}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-450 text-xs">▼</div>
+                      </div>
+                    </div>
+
+                    {/* Password Section */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                      <div className="flex justify-between items-center">
+                        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                          Password for student <span className="text-blue-500">*</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            // Generate strong 8 character password following best practices
+                            const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$";
+                            let pwd = "";
+                            for (let i = 0; i < 8; i++) {
+                              pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+                            }
+                            setKidPasswordInput(pwd);
+                          }}
+                          className="text-[10px] font-bold text-purple-655 hover:text-purple-500 flex items-center gap-1 uppercase tracking-wider transition-colors active:scale-95"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-purple-500 animate-pulse" />
+                          Auto-Generate
+                        </button>
+                      </div>
+                      
+                      <div className="relative">
+                        <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input
+                          type={showKidPassword ? "text" : "password"}
+                          required
+                          value={kidPasswordInput}
+                          onChange={(e) => setKidPasswordInput(e.target.value)}
+                          placeholder="Min 6 characters"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-11 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowKidPassword(!showKidPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-450 hover:text-slate-650"
+                        >
+                          {showKidPassword ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-[9px] text-slate-400 leading-normal">
+                        Create a secure password for your child to log in. Minimum length is 6 characters.
+                      </p>
                     </div>
                   </div>
                 )}
