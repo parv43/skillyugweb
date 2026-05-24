@@ -147,9 +147,8 @@ export async function GET(request: NextRequest) {
       role = "parent";
     }
     
-    // Students can access dashboard even if not paid (in locked mode)
-    // Admins have full access. Parents can access their child's batch via query params.
-    const hasAccess = hasSlot || role === "student" || role === "admin";
+    // Allow access ONLY if the user has slot (payment verified) OR is admin OR the tester email.
+    const hasAccess = hasSlot || role === "admin" || user.email === "eternallytanuj@gmail.com";
 
     console.log("[Access] Result — role:", role, "hasSlot:", hasSlot, "hasAccess:", hasAccess);
 
