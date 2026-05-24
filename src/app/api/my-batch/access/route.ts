@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
       getAccessDetails(user.id, user.email ?? null)
     ]);
 
-    const role = profileRes.data?.role || "student"; // Default to student
+    const role = profileRes.data?.role || user.user_metadata?.role || "student"; // Default to student
     const hasSlot = accessRes.hasSlot;
     
     // Students can access dashboard even if not paid (in locked mode)

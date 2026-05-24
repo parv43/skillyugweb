@@ -36,10 +36,33 @@ export async function GET(request: Request) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data: authData, error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+    if (!error && authData?.user) {
+      let role = authData.user.user_metadata?.role;
+      if (!role) {
+        try {
+          const { data: profile } = await supabase
+            .from("users")
+            .select("role")
+            .eq("id", authData.user.id)
+            .maybeSingle();
+          if (profile?.role) {
+            role = profile.role;
+          }
+        } catch (dbErr) {
+          console.error("DB check failed in callback:", dbErr);
+        }
+      }
+
+      let targetNext = next;
+      if (role === "parent") {
+        targetNext = "/parent-portal";
+      } else if (role === "student") {
+        targetNext = "/my-batch";
+      }
+
+      return NextResponse.redirect(`${origin}${targetNext}`);
     }
   }
 

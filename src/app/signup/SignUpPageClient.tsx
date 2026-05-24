@@ -11,7 +11,7 @@ import { validateEmail } from "@/lib/emailValidation";
 function SignUpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/my-batch";
+  const redirectTo = searchParams.get("redirect") || "/parent-portal";
   const role = "parent"; // Forced to parent as students are registered via Parent Portal checkout
 
   const [fullName, setFullName] = useState("");
