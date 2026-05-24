@@ -15,7 +15,7 @@ export function middleware(request: NextRequest) {
     "object-src 'none'",
     "frame-ancestors 'self'",
     "form-action 'self'",
-    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""} https://checkout.razorpay.com https://*.razorpay.com https://unpkg.com https://www.youtube.com https://s.ytimg.com https://us-assets.i.posthog.com https://*.posthog.com`,
+    `script-src 'self' 'nonce-${nonce}' 'sha256-3uKCkN1r/54AjtxWMcMhIy4Dwn4oTQ/oWb6HnQ6fszo='${isDev ? " 'unsafe-eval'" : ""} https://checkout.razorpay.com https://*.razorpay.com https://unpkg.com https://www.youtube.com https://s.ytimg.com https://us-assets.i.posthog.com https://*.posthog.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' data: https://fonts.gstatic.com",
     [

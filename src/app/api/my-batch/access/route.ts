@@ -93,17 +93,18 @@ export async function GET(request: NextRequest) {
 
     const admin = createSupabaseAdmin();
     
-    // Fetch user profile and role
-    const { data: userProfile } = await admin
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
+    // Fetch user profile and access details in parallel to reduce API response latency
+    const [profileRes, accessRes] = await Promise.all([
+      admin
+        .from("users")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle(),
+      getAccessDetails(user.id, user.email ?? null)
+    ]);
 
-    const role = userProfile?.role || "student"; // Default to student
-
-    // Check slot bookings
-    const { hasSlot } = await getAccessDetails(user.id, user.email ?? null);
+    const role = profileRes.data?.role || "student"; // Default to student
+    const hasSlot = accessRes.hasSlot;
     
     // Students can access dashboard even if not paid (in locked mode)
     // Admins have full access. Parents can access their child's batch via query params.

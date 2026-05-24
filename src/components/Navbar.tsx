@@ -17,7 +17,7 @@ export default function Navbar() {
   const rafRef = React.useRef<number | null>(null)
   
   // Use the shared access control hook
-  const { isLoggedIn, hasAccess: hasMyBatchAccess, userId, userEmail } = useAccessControl()
+  const { isLoggedIn, hasAccess: hasMyBatchAccess, userId, userEmail, role } = useAccessControl()
 
   const [theme, setTheme] = useState<"light" | "dark">("light")
   const [mounted, setMounted] = useState(false)
@@ -153,16 +153,22 @@ export default function Navbar() {
     }
   }
 
-  const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Bootcamp", href: "/bootcamp" },
-    { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
-    { name: "Testimonials", href: "/#testimonials" },
-    { name: "Blog", href: "/blog" },
-  ]
-  const visibleNavLinks = hasMyBatchAccess
-    ? [...navLinks.slice(0, 1), { name: "My Batch", href: "/my-batch" }, ...navLinks.slice(1)]
-    : navLinks
+  const visibleNavLinks = React.useMemo(() => {
+    const links = [
+      { name: "Home", href: "/" },
+      { name: "Bootcamp", href: "/bootcamp" },
+      { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
+      { name: "Testimonials", href: "/#testimonials" },
+      { name: "Blog", href: "/blog" },
+    ]
+    if (isLoggedIn && role === "parent") {
+      return [...links.slice(0, 1), { name: "Parent Portal", href: "/parent-portal" }, ...links.slice(1)]
+    }
+    if (hasMyBatchAccess) {
+      return [...links.slice(0, 1), { name: "My Batch", href: "/my-batch" }, ...links.slice(1)]
+    }
+    return links;
+  }, [isLoggedIn, role, hasMyBatchAccess]);
 
   return (
     <header 
@@ -187,6 +193,8 @@ export default function Navbar() {
                 ? pathname.startsWith("/blog") 
                 : link.name === "My Batch"
                   ? pathname === "/my-batch"
+                : link.name === "Parent Portal"
+                  ? pathname === "/parent-portal"
                 : link.name === "Home"
                   ? pathname === "/"
                   : link.href === pathname;
@@ -245,7 +253,7 @@ export default function Navbar() {
 
         {/* Mobile Menu Toggle */}
         <button 
-          className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="md:hidden text-slate-900 dark:text-white p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-expanded={mobileMenuOpen}
           aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
@@ -269,6 +277,8 @@ export default function Navbar() {
                 ? pathname.startsWith("/blog") 
                 : link.name === "My Batch"
                   ? pathname === "/my-batch"
+                : link.name === "Parent Portal"
+                  ? pathname === "/parent-portal"
                 : link.name === "Home"
                   ? pathname === "/"
                   : link.href === pathname;
@@ -297,7 +307,7 @@ export default function Navbar() {
                 <Link 
                   href="/profile" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-3 py-3 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-white/10 transition-colors"
+                  className="w-full flex items-center justify-center gap-3 py-3 rounded-lg bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 shadow-[0_0_15px_rgba(0,0,0,0.02)] dark:shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-slate-200 dark:border-white/10 transition-colors"
                   aria-label="View Profile"
                 >
                   <Avatar
@@ -306,7 +316,7 @@ export default function Navbar() {
                     variant="beam"
                     colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
                   />
-                  <span className="text-white font-bold text-base">My Profile</span>
+                  <span className="text-slate-900 dark:text-white font-bold text-base">My Profile</span>
                 </Link>
               ) : (
                 <div className="flex flex-col gap-3">

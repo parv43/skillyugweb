@@ -363,16 +363,16 @@ function ParentPortalContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center text-slate-500 font-sans">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center text-slate-500 dark:text-slate-400 font-sans">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 relative overflow-x-hidden select-none font-sans">
+    <main className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 relative overflow-x-hidden select-none font-sans">
       {/* Background layer */}
-      <div className="fixed inset-0 pointer-events-none opacity-50 z-0 bg-slate-50">
+      <div className="fixed inset-0 pointer-events-none opacity-50 z-0 bg-slate-50 dark:bg-[#020617]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.04),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(168,85,247,0.04),_transparent_28%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.03)_1px,transparent_1px)] bg-[size:72px_72px]" />
       </div>
@@ -383,11 +383,11 @@ function ParentPortalContent() {
         <div className="max-w-6xl mx-auto space-y-8 sm:space-y-10">
           
           {/* Header Portal Row */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-white/5 pb-8">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-purple-600">Security Center</span>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Parent Portal</h1>
-              <p className="text-sm text-slate-500 font-medium">Welcome, {parentName}. Oversee your child&apos;s learning path.</p>
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-purple-600 dark:text-purple-400">Security Center</span>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Parent Portal</h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Welcome, {parentName}. Oversee your child&apos;s learning path.</p>
             </div>
             
             <div className="flex flex-row items-center gap-3 w-full sm:w-auto">
@@ -405,7 +405,7 @@ function ParentPortalContent() {
               
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center p-3 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 hover:text-slate-800 transition-colors flex-shrink-0"
+                className="flex items-center justify-center p-3 rounded-full bg-slate-100 dark:bg-[#090d1f] hover:bg-slate-200 dark:hover:bg-slate-800/50 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors flex-shrink-0"
                 title="Log Out"
               >
                 <LogOut className="w-4 h-4" />
@@ -415,18 +415,18 @@ function ParentPortalContent() {
 
           {/* Children List Dashboard */}
           <div className="space-y-6">
-            <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-              <Users className="w-5 h-5 text-purple-600" />
+            <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+              <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               Enrolled Children ({children.length})
             </h2>
 
             {children.length === 0 ? (
-              <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-8 sm:p-10 text-center space-y-4 shadow-sm">
-                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto border border-slate-100">
-                  <Users className="w-6 h-6 text-slate-400" />
+              <div className="rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-8 sm:p-10 text-center space-y-4 shadow-sm">
+                <div className="w-12 h-12 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center mx-auto border border-slate-100 dark:border-white/5">
+                  <Users className="w-6 h-6 text-slate-400 dark:text-slate-500" />
                 </div>
-                <p className="text-sm font-semibold text-slate-700">No children enrolled yet.</p>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-350">No children enrolled yet.</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm mx-auto">
                   Click the &quot;Enroll Kids in Bootcamp&quot; button above to onboard children or resolve pending sponsorship tokens.
                 </p>
               </div>
@@ -436,20 +436,20 @@ function ParentPortalContent() {
                   <div
                     key={child.id}
                     onClick={() => router.push(`/my-batch?viewOnly=true&studentId=${child.id}`)}
-                    className="group relative cursor-pointer rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:border-slate-300 transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between overflow-hidden hover:shadow-md"
+                    className="group relative cursor-pointer rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-6 shadow-sm hover:border-slate-300 dark:hover:border-white/10 transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between overflow-hidden hover:shadow-md dark:shadow-none"
                   >
                     <div className="space-y-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex-shrink-0 flex items-center justify-center font-black text-purple-600 text-sm">
+                          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/30 flex-shrink-0 flex items-center justify-center font-black text-purple-600 dark:text-purple-400 text-sm">
                             {child.full_name?.charAt(0).toUpperCase() || "S"}
                           </div>
                           <div className="min-w-0">
-                            <h3 className="text-base font-black text-slate-800 truncate">{child.full_name || "Skillyug Student"}</h3>
-                            <p className="text-xs text-slate-500 break-all">{child.email}</p>
+                            <h3 className="text-base font-black text-slate-800 dark:text-white truncate">{child.full_name || "Skillyug Student"}</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 break-all">{child.email}</p>
                             {child.temp_password && (
-                              <div className="mt-1.5 flex items-center gap-1.5 text-xs text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded-md w-fit border border-purple-100 font-mono">
-                                <Key className="w-3 h-3 text-purple-400" />
+                              <div className="mt-1.5 flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400 font-bold bg-purple-50 dark:bg-purple-950/30 px-2 py-0.5 rounded-md w-fit border border-purple-100 dark:border-purple-900/30 font-mono">
+                                <Key className="w-3 h-3 text-purple-400 dark:text-purple-500" />
                                 <span>Pass: {child.temp_password}</span>
                               </div>
                             )}
@@ -463,8 +463,8 @@ function ParentPortalContent() {
                           }}
                           className={`p-2.5 rounded-xl border transition-all flex-shrink-0 flex items-center justify-center ${
                             copiedChildId === child.id
-                              ? "bg-green-50 border-green-200 text-green-600 animate-in zoom-in"
-                              : "bg-slate-50 hover:bg-purple-50 border-slate-200 hover:border-purple-200 text-slate-400 hover:text-purple-600"
+                              ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-900/30 text-green-600 dark:text-green-400 animate-in zoom-in"
+                              : "bg-slate-50 dark:bg-slate-900 hover:bg-purple-50 dark:hover:bg-purple-950/30 border-slate-200 dark:border-white/5 hover:border-purple-200 dark:hover:border-purple-900/30 text-slate-400 dark:text-slate-500 hover:text-purple-600 dark:hover:text-purple-400"
                           }`}
                           title={copiedChildId === child.id ? "Copied details!" : "Share child details"}
                         >
@@ -476,15 +476,15 @@ function ParentPortalContent() {
                         </button>
                       </div>
                       
-                      <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-mono">
+                      <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex justify-between items-center text-[10px] text-slate-400 dark:text-slate-500 font-mono">
                         <span>Enrolled On</span>
-                        <span className="text-slate-600">{new Date(child.enrolledAt).toLocaleDateString()}</span>
+                        <span className="text-slate-600 dark:text-slate-400">{new Date(child.enrolledAt).toLocaleDateString()}</span>
                       </div>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-between text-xs font-bold uppercase tracking-[0.2em] text-purple-600 group-hover:text-purple-700 transition-colors pt-2">
+                    <div className="mt-6 flex items-center justify-between text-xs font-bold uppercase tracking-[0.2em] text-purple-600 dark:text-purple-400 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors pt-2">
                       <span>View Batch Dashboard</span>
-                      <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-purple-600 transform group-hover:translate-x-1.5 transition-all" />
+                      <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-700 group-hover:text-purple-600 dark:group-hover:text-purple-400 transform group-hover:translate-x-1.5 transition-all" />
                     </div>
                   </div>
                 ))}
@@ -499,7 +499,7 @@ function ParentPortalContent() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-in fade-in duration-300"
         >
-          <div className="relative w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[2.5rem] border border-slate-100 bg-white p-5 sm:p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-slate-900">
+          <div className="relative w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[2.5rem] border border-slate-100 dark:border-white/5 bg-white dark:bg-[#090d1f] p-5 sm:p-6 md:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-slate-900 dark:text-slate-100">
             <div className="absolute -right-16 -top-16 w-36 h-36 bg-purple-500/5 blur-[50px] rounded-full pointer-events-none" />
 
             <button
@@ -513,7 +513,7 @@ function ParentPortalContent() {
                 setKidGradeInput("6");
                 setKidPasswordInput("");
               }}
-              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold transition-all text-lg z-30"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white bg-slate-100 dark:bg-slate-850 hover:bg-slate-200 dark:hover:bg-slate-750 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold transition-all text-lg z-30"
             >
               ×
             </button>
@@ -525,27 +525,27 @@ function ParentPortalContent() {
                     <ShieldCheck className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900">Secure Checkout</h3>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-mono">100% Encrypted Payment</p>
+                    <h3 className="text-lg font-black text-slate-900 dark:text-white">Secure Checkout</h3>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 font-mono">100% Encrypted Payment</p>
                   </div>
                 </div>
 
-                <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 space-y-2.5">
-                  <div className="flex justify-between text-xs text-slate-500 font-medium">
+                <div className="rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-white/5 p-4 space-y-2.5">
+                  <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
                     <span>Bootcamp Co-pay Amount</span>
-                    <span className="font-semibold text-slate-700">₹399.00</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">₹399.00</span>
                   </div>
-                  <div className="flex justify-between text-xs text-slate-500 font-medium">
+                  <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
                     <span>Platform Convenience Fee</span>
-                    <span className="font-semibold text-green-600 font-mono tracking-wider text-[10px] uppercase">FREE</span>
+                    <span className="font-semibold text-green-600 dark:text-green-400 font-mono tracking-wider text-[10px] uppercase">FREE</span>
                   </div>
-                  <div className="flex justify-between text-xs text-slate-500 font-medium">
+                  <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
                     <span>Taxes (GST Included)</span>
-                    <span className="font-semibold text-slate-700">₹0.00</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">₹0.00</span>
                   </div>
-                  <div className="flex justify-between text-sm pt-3 border-t border-slate-200 font-black text-base">
-                    <span className="text-slate-900">Total Payable</span>
-                    <span className="text-purple-650">₹399.00</span>
+                  <div className="flex justify-between text-sm pt-3 border-t border-slate-200 dark:border-white/5 font-black text-base">
+                    <span className="text-slate-900 dark:text-white">Total Payable</span>
+                    <span className="text-purple-650 dark:text-purple-400">₹399.00</span>
                   </div>
                 </div>
 
@@ -558,7 +558,7 @@ function ParentPortalContent() {
                   <div className="space-y-4 pt-2">
                     {/* Kid's Name */}
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                         Student&apos;s Full Name <span className="text-blue-500">*</span>
                       </label>
                       <div className="relative">
@@ -569,14 +569,14 @@ function ParentPortalContent() {
                           value={kidNameInput}
                           onChange={(e) => setKidNameInput(e.target.value)}
                           placeholder="e.g. Tanuj Pathak"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                         />
                       </div>
                     </div>
 
                     {/* Kid's Email */}
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                         Student&apos;s Email Address <span className="text-blue-500">*</span>
                       </label>
                       <div className="relative">
@@ -589,14 +589,14 @@ function ParentPortalContent() {
                           placeholder="student@gmail.com"
                           autoComplete="email"
                           spellCheck="false"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                         />
                       </div>
                     </div>
 
                     {/* Kid's Grade Selector */}
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                         Student&apos;s Grade / Class <span className="text-blue-500">*</span>
                       </label>
                       <div className="relative">
@@ -604,10 +604,10 @@ function ParentPortalContent() {
                         <select
                           value={kidGradeInput}
                           onChange={(e) => setKidGradeInput(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-10 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none cursor-pointer"
+                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl py-3.5 pl-11 pr-10 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none cursor-pointer"
                         >
                           {[6, 7, 8, 9, 10, 11, 12].map((grade) => (
-                            <option key={grade} value={grade}>
+                            <option key={grade} value={grade} className="dark:bg-slate-950">
                               Grade {grade}
                             </option>
                           ))}
@@ -617,9 +617,9 @@ function ParentPortalContent() {
                     </div>
 
                     {/* Password Section */}
-                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-white/5">
                       <div className="flex justify-between items-center">
-                        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                           Password for student <span className="text-blue-500">*</span>
                         </label>
                         <button
@@ -633,9 +633,9 @@ function ParentPortalContent() {
                             }
                             setKidPasswordInput(pwd);
                           }}
-                          className="text-[10px] font-bold text-purple-655 hover:text-purple-500 flex items-center gap-1 uppercase tracking-wider transition-colors active:scale-95"
+                          className="text-[10px] font-bold text-purple-655 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 flex items-center gap-1 uppercase tracking-wider transition-colors active:scale-95"
                         >
-                          <Sparkles className="w-3.5 h-3.5 text-purple-500 animate-pulse" />
+                          <Sparkles className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400 animate-pulse" />
                           Auto-Generate
                         </button>
                       </div>
@@ -648,7 +648,7 @@ function ParentPortalContent() {
                           value={kidPasswordInput}
                           onChange={(e) => setKidPasswordInput(e.target.value)}
                           placeholder="Min 6 characters"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-11 pr-11 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors font-mono"
+                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl py-3.5 pl-11 pr-11 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors font-mono"
                         />
                         <button
                           type="button"
@@ -707,25 +707,25 @@ function ParentPortalContent() {
             {paymentStep === "processing" && (
               <div className="flex flex-col items-center justify-center py-12 space-y-4">
                 <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
-                <p className="text-sm font-bold text-slate-800 uppercase tracking-wider">Processing payment...</p>
-                <p className="text-xs text-slate-400 font-mono">Verifying with Razorpay secure networks</p>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Processing payment...</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-mono">Verifying with Razorpay secure networks</p>
               </div>
             )}
 
             {paymentStep === "success" && (
               <div className="space-y-6">
                 <div className="flex flex-col items-center justify-center text-center py-4 space-y-4">
-                  <div className="w-16 h-16 bg-green-50 border border-green-200 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  <div className="w-16 h-16 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/30 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-slate-900">Payment Successful</h3>
-                    <p className="text-xs text-slate-500 mt-1">Order captured. Enrollment active.</p>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">Payment Successful</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Order captured. Enrollment active.</p>
                   </div>
                 </div>
 
-                <div className="space-y-4 pt-4 border-t border-slate-100">
-                  <p className="text-sm text-center text-slate-500 leading-relaxed">
+                <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-white/5">
+                  <p className="text-sm text-center text-slate-500 dark:text-slate-400 leading-relaxed">
                     {isSponsorship
                       ? "Sponsorship has been resolved. The student dashboard is now fully unlocked and active!"
                       : "The child has been enrolled successfully! They can log in using their existing email and credentials."}
@@ -736,7 +736,7 @@ function ParentPortalContent() {
                       setIsSponsorship(false);
                       setPaymentStep("checkout");
                     }}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-slate-700 transition-all font-bold"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-slate-700 dark:text-slate-300 transition-all font-bold"
                   >
                     Close Portal
                   </button>
@@ -755,31 +755,31 @@ function ParentPortalContent() {
       {/* ── Generated Credentials Card (Glassmorphism Overlay) ──────────────── */}
       {showCredentialsCard && generatedCredentials && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[2.5rem] border border-slate-100 bg-white p-5 sm:p-6 md:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200 text-slate-900">
+          <div className="w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-3xl sm:rounded-[2.5rem] border border-slate-100 dark:border-white/5 bg-white dark:bg-[#090d1f] p-5 sm:p-6 md:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200 text-slate-900 dark:text-slate-100">
             
             <div className="flex items-center gap-3">
-              <div className="rounded-xl border border-purple-100 bg-purple-50 p-3">
-                <Key className="h-5 w-5 text-purple-600" />
+              <div className="rounded-xl border border-purple-100 dark:border-purple-900/30 bg-purple-50 dark:bg-purple-950/30 p-3">
+                <Key className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-slate-900">Student Account Created</h3>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-mono">Secure credentials</p>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">Student Account Created</h3>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 font-mono">Secure credentials</p>
               </div>
             </div>
 
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               We generated a secure account for your child. Share these credentials with them so they can access their dashboard:
             </p>
 
             {/* Credentials Info Display Box */}
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5 space-y-4 font-mono text-xs select-text relative">
+            <div className="rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-slate-900 p-5 space-y-4 font-mono text-xs select-text relative">
               <div className="space-y-1">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Student Email</span>
-                <span className="text-slate-800 text-sm break-all font-semibold block">{generatedCredentials.email}</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider block">Student Email</span>
+                <span className="text-slate-800 dark:text-white text-sm break-all font-semibold block">{generatedCredentials.email}</span>
               </div>
               <div className="space-y-1">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Generated Password</span>
-                <span className="text-purple-600 text-sm font-semibold block">{generatedCredentials.password}</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider block">Generated Password</span>
+                <span className="text-purple-600 dark:text-purple-400 text-sm font-semibold block">{generatedCredentials.password}</span>
               </div>
               
               <div className="absolute top-4 right-4">
@@ -803,7 +803,7 @@ function ParentPortalContent() {
                   setShowCredentialsCard(false);
                   setGeneratedCredentials(null);
                 }}
-                className="flex-grow rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold py-3.5 text-xs uppercase tracking-[0.2em] transition-all"
+                className="flex-grow rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 font-bold py-3.5 text-xs uppercase tracking-[0.2em] transition-all"
               >
                 Done
               </button>
@@ -818,7 +818,7 @@ function ParentPortalContent() {
 export default function ParentPortalClient() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center text-slate-500 font-sans">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center text-slate-500 dark:text-slate-400 font-sans">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
       </div>
     }>
