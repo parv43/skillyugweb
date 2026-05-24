@@ -65,11 +65,11 @@ async function getAuthenticatedUser(request: NextRequest) {
 async function getAccessDetails(userId: string, email: string | null): Promise<{ hasSlot: boolean }> {
   const admin = createSupabaseAdmin();
 
-  // Single query using OR — avoids a second round trip
+  // Single query using OR — avoids a second round trip, matching email case-insensitively using ilike
   const query = admin
     .from("slot_bookings")
     .select("razorpay_payment_id", { count: "exact", head: true })
-    .or(`user_id.eq.${userId}${email ? `,email.eq.${email}` : ""}`)
+    .or(`user_id.eq.${userId}${email ? `,email.ilike.${email.trim()}` : ""}`)
     .limit(1);
 
   const { count, error } = await query;
@@ -93,18 +93,29 @@ export async function GET(request: NextRequest) {
 
     const admin = createSupabaseAdmin();
     
-    // Fetch user profile and access details in parallel to reduce API response latency
-    const [profileRes, accessRes] = await Promise.all([
+    // Fetch user profile, parent relations, and access details in parallel to reduce API response latency
+    const [profileRes, relationRes, accessRes] = await Promise.all([
       admin
         .from("users")
         .select("role")
         .eq("id", user.id)
         .maybeSingle(),
+      admin
+        .from("student_parent_relations")
+        .select("id")
+        .eq("parent_id", user.id)
+        .limit(1)
+        .maybeSingle(),
       getAccessDetails(user.id, user.email ?? null)
     ]);
 
-    const role = profileRes.data?.role || user.user_metadata?.role || "student"; // Default to student
+    let role = profileRes.data?.role || user.user_metadata?.role || "student"; // Default to student
     const hasSlot = accessRes.hasSlot;
+
+    // Self-healing: if the user exists as a parent in student_parent_relations, their role is "parent"
+    if (relationRes.data) {
+      role = "parent";
+    }
     
     // Students can access dashboard even if not paid (in locked mode)
     // Admins have full access. Parents can access their child's batch via query params.
