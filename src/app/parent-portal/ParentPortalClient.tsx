@@ -108,37 +108,9 @@ function ParentPortalContent() {
 
   useEffect(() => {
     let active = true;
+    let authSubscription: { unsubscribe: () => void } | null = null;
 
-    const initPortal = async () => {
-      // 1. Get initial session
-      let session = null;
-      try {
-        const check = await supabase.auth.getSession();
-        session = check.data.session;
-      } catch (err) {
-        console.error("Supabase getSession failed:", err);
-      }
-
-      // 2. If no session, check cache or wait up to 1.5s for async session restoration (to prevent redirect race condition on refresh)
-      if (!session) {
-        const hasCachedSession = typeof window !== "undefined" && localStorage.getItem("user_role") === "parent";
-        if (hasCachedSession) {
-          for (let i = 0; i < 15; i++) {
-            await new Promise((resolve) => setTimeout(resolve, 100));
-            if (!active) return;
-            try {
-              const check = await supabase.auth.getSession();
-              if (check.data.session) {
-                session = check.data.session;
-                break;
-              }
-            } catch (err) {
-              console.error("Retrying getSession failed:", err);
-            }
-          }
-        }
-      }
-
+    const initPortalWithSession = async (session: any) => {
       if (!session) {
         if (active) router.replace("/onboarding");
         return;
@@ -195,10 +167,36 @@ function ParentPortalContent() {
       }
     };
 
-    initPortal();
+    // First check session immediately
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!active) return;
+      if (session) {
+        initPortalWithSession(session);
+      } else {
+        // If not immediately available, subscribe to auth state changes to catch INITIAL_SESSION or SIGNED_IN
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+          if (!active) return;
+          // When INITIAL_SESSION or SIGNED_IN fires with a session
+          if (currentSession) {
+            initPortalWithSession(currentSession);
+            subscription.unsubscribe();
+          } else {
+            // If INITIAL_SESSION fires and session is still null, then user is definitely logged out
+            if (event === "INITIAL_SESSION") {
+              router.replace("/onboarding");
+              subscription.unsubscribe();
+            }
+          }
+        });
+        authSubscription = subscription;
+      }
+    });
 
     return () => {
       active = false;
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
     };
   }, [router, token, searchParams]);
 

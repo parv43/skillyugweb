@@ -7,6 +7,7 @@ import Image from "next/image"
 import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react"
 import Navbar from "@/components/Navbar"
 import { BOOK_SLOT_AMOUNT_LABEL } from "@/lib/pricing"
+import { useAccessControl } from "@/hooks/useAccessControl"
 
 const instructors = [
   {
@@ -115,6 +116,7 @@ function BootcampSpline() {
   )
 }
 function EnrollmentCard() {
+  const { role, loading } = useAccessControl()
   const cardRef = useRef<HTMLDivElement>(null)
   const cardStyle = {
     "--rx": "0deg",
@@ -220,10 +222,10 @@ function EnrollmentCard() {
             </div>
 
             <Link
-              href="/onboarding?from=bootcamp"
+              href={!loading && role === "parent" ? "/parent-portal" : "/onboarding?from=bootcamp"}
               className="mt-9 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-5 text-lg font-bold text-white shadow-[0_0_34px_rgba(124,58,237,0.34)] transition hover:-translate-y-0.5 hover:shadow-[0_0_52px_rgba(124,58,237,0.52)]"
             >
-              Enroll in Bootcamp
+              {!loading && role === "parent" ? "Go to Parent Portal" : "Enroll in Bootcamp"}
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
           </div>
@@ -234,6 +236,7 @@ function EnrollmentCard() {
 }
 
 function DesktopBootcampHero() {
+  const { role, loading } = useAccessControl()
   return (
     <section className="relative hidden min-h-screen items-center overflow-hidden px-6 pb-16 pt-28 md:flex md:px-10 md:py-28 lg:px-16">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_20%_26%,rgba(168,85,247,0.12),transparent_34%),radial-gradient(circle_at_78%_30%,rgba(37,99,235,0.12),transparent_34%),radial-gradient(circle_at_78%_70%,rgba(139,92,246,0.1),transparent_38%),linear-gradient(135deg,#f8fafc_0%,#f8fafc_42%,#f5f3ff_72%,#e0e7ff_100%)] dark:bg-[radial-gradient(circle_at_20%_26%,rgba(168,85,247,0.15),transparent_34%),radial-gradient(circle_at_78%_30%,rgba(37,99,235,0.15),transparent_34%),radial-gradient(circle_at_78%_70%,rgba(139,92,246,0.1),transparent_38%),linear-gradient(135deg,#020617_0%,#020617_42%,#0b0a0f_72%,#050a1e_100%)]" />
@@ -267,10 +270,10 @@ function DesktopBootcampHero() {
           </p>
           <div>
             <Link
-              href="/onboarding?from=bootcamp"
+              href={!loading && role === "parent" ? "/parent-portal" : "/onboarding?from=bootcamp"}
               className="mt-9 inline-flex rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(168,85,247,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgba(168,85,247,0.45)]"
             >
-              Enroll Now
+              {!loading && role === "parent" ? "Go to Parent Portal" : "Enroll Now"}
             </Link>
           </div>
         </div>
@@ -280,6 +283,7 @@ function DesktopBootcampHero() {
 }
 
 function MobileBootcampHero() {
+  const { role, loading } = useAccessControl()
   return (
     <section className="relative flex min-h-screen flex-col justify-center overflow-hidden px-6 pb-16 pt-32 md:hidden">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(37,99,235,0.15),transparent_40%),linear-gradient(135deg,#f8fafc_0%,#f5f3ff_50%,#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(37,99,235,0.15),transparent_40%),linear-gradient(135deg,#020617_0%,#0b0a0f_50%,#020617_100%)]" />
@@ -308,10 +312,10 @@ function MobileBootcampHero() {
           className="mt-10 w-full"
         >
           <Link
-            href="/onboarding?from=bootcamp"
+            href={!loading && role === "parent" ? "/parent-portal" : "/onboarding?from=bootcamp"}
             className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_24px_rgba(168,85,247,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgba(168,85,247,0.45)]"
           >
-            Enroll Now
+            {!loading && role === "parent" ? "Go to Parent Portal" : "Enroll Now"}
           </Link>
         </div>
       </div>
