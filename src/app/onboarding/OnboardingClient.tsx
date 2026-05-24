@@ -266,10 +266,9 @@ function OnboardingContent() {
 
           {/* Selection Cards List */}
           <div className="space-y-5">
-            {/* Student Account Card */}
+            {/* Teacher Account Card */}
             <button
-              onClick={handleStudentAuth}
-              disabled={loading}
+              onClick={() => alert("Work under progress")}
               className="w-full text-left flex items-center justify-between p-5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-white shadow-sm hover:shadow-md transition-all duration-300 group hover:scale-[1.01] cursor-pointer"
             >
               <div className="flex items-center gap-4">
@@ -278,8 +277,8 @@ function OnboardingContent() {
                   <GraduationCap className="w-6 h-6 text-cyan-500" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-800">Student account</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">I&apos;m a student</p>
+                  <h3 className="text-base font-bold text-slate-800">Teacher account</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">I&apos;m a teacher</p>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-1.5 transition-all" />

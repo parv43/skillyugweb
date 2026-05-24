@@ -230,18 +230,26 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-4">
           {renderThemeToggle()}
           {isLoggedIn ? (
-            <Link 
-              href="/profile" 
-              className="flex items-center justify-center rounded-full border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-105 transition-all duration-300"
-              aria-label="View Profile"
-            >
-              <Avatar
-                size={40}
-                name={userEmail || userId || "User"}
-                variant="beam"
-                colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
-              />
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link 
+                href={role === "parent" ? "/parent-portal" : "/my-batch"} 
+                className="text-sm font-semibold text-slate-300 hover:text-white transition-colors"
+              >
+                Log in
+              </Link>
+              <Link 
+                href="/profile" 
+                className="flex items-center justify-center rounded-full border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-105 transition-all duration-300"
+                aria-label="View Profile"
+              >
+                <Avatar
+                  size={40}
+                  name={userEmail || userId || "User"}
+                  variant="beam"
+                  colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
+                />
+              </Link>
+            </div>
           ) : (
             <div className="flex items-center gap-3">
               <Link 
@@ -313,20 +321,29 @@ export default function Navbar() {
             </li>
             <li className="mt-4 pt-4 border-t border-white/10">
               {isLoggedIn ? (
-                <Link 
-                  href="/profile" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-3 py-3 rounded-lg bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 shadow-[0_0_15px_rgba(0,0,0,0.02)] dark:shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-slate-200 dark:border-white/10 transition-colors"
-                  aria-label="View Profile"
-                >
-                  <Avatar
-                    size={32}
-                    name={userEmail || userId || "User"}
-                    variant="beam"
-                    colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
-                  />
-                  <span className="text-slate-900 dark:text-white font-bold text-base">My Profile</span>
-                </Link>
+                <div className="flex flex-col gap-3">
+                  <Link 
+                    href={role === "parent" ? "/parent-portal" : "/my-batch"}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-3 rounded-lg text-base font-bold text-slate-300 bg-slate-800/50 hover:text-white hover:bg-slate-700/50 transition-colors border border-white/5"
+                  >
+                    Log in
+                  </Link>
+                  <Link 
+                    href="/profile" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-3 py-3 rounded-lg bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 shadow-[0_0_15px_rgba(0,0,0,0.02)] dark:shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-slate-200 dark:border-white/10 transition-colors"
+                    aria-label="View Profile"
+                  >
+                    <Avatar
+                      size={32}
+                      name={userEmail || userId || "User"}
+                      variant="beam"
+                      colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
+                    />
+                    <span className="text-slate-900 dark:text-white font-bold text-base">My Profile</span>
+                  </Link>
+                </div>
               ) : (
                 <div className="flex flex-col gap-3">
                   <Link 
