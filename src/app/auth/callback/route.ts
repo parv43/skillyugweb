@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { checkUserPayment } from "@/lib/paymentCheck";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -40,53 +41,31 @@ export async function GET(request: Request) {
     const { data: authData, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && authData?.user) {
-      let role = authData.user.user_metadata?.role;
+      const { hasPaid, resolvedRole } = await checkUserPayment(
+        authData.user.id,
+        authData.user.email ?? null,
+        authData.user.user_metadata?.full_name || authData.user.user_metadata?.name
+      );
+
+      let targetNext = "/parent-portal";
       
-      try {
-        const admin = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
-
-        // Fetch user profile and check for parent relations in parallel using service role
-        const [profileRes, relationRes] = await Promise.all([
-          admin
-            .from("users")
-            .select("role")
-            .eq("id", authData.user.id)
-            .maybeSingle(),
-          admin
-            .from("student_parent_relations")
-            .select("id")
-            .eq("parent_id", authData.user.id)
-            .limit(1)
-            .maybeSingle()
-        ]);
-
-        if (profileRes.data?.role) {
-          role = profileRes.data.role;
-        }
-
-        // Self-healing: if they have parent-child relations, they are a parent
-        if (relationRes.data) {
-          role = "parent";
-          if (profileRes.data && profileRes.data.role !== "parent") {
-            console.log("[Auth Callback] Self-healing parent role in database for user:", authData.user.id);
-            await admin
-              .from("users")
-              .update({ role: "parent" })
-              .eq("id", authData.user.id);
-          }
-        }
-      } catch (err) {
-        console.error("DB check failed in callback:", err);
+      // If user has paid and is student/admin, direct them to my-batch
+      if (hasPaid && (resolvedRole === "student" || resolvedRole === "admin")) {
+        targetNext = "/my-batch";
       }
 
-      let targetNext = next;
-      if (role === "parent") {
-        targetNext = "/parent-portal";
-      } else if (role === "student") {
-        targetNext = "/my-batch";
+      // Preserve query params for parent redirection if present in the next URL (like kidEmail or token)
+      if (resolvedRole === "parent") {
+        try {
+          const nextUrl = new URL(next, origin);
+          const parentUrl = new URL("/parent-portal", origin);
+          nextUrl.searchParams.forEach((val, key) => {
+            parentUrl.searchParams.set(key, val);
+          });
+          targetNext = parentUrl.pathname + parentUrl.search;
+        } catch {
+          // Fallback to default /parent-portal
+        }
       }
 
       return NextResponse.redirect(`${origin}${targetNext}`);

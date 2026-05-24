@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { getRequiredEnv } from "@/lib/razorpayServer";
+import { checkUserPayment } from "@/lib/paymentCheck";
 
 export const runtime = "nodejs";
 
@@ -121,38 +122,18 @@ export async function GET(request: NextRequest) {
 
     console.log("[Access] Checking access for user:", user.id, user.email);
 
-    const admin = createSupabaseAdmin();
-    
-    // Fetch user profile, parent relations, and access details in parallel to reduce API response latency
-    const [profileRes, relationRes, accessRes] = await Promise.all([
-      admin
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle(),
-      admin
-        .from("student_parent_relations")
-        .select("id")
-        .eq("parent_id", user.id)
-        .limit(1)
-        .maybeSingle(),
-      getAccessDetails(user.id, user.email ?? null)
-    ]);
+    const { hasPaid, resolvedRole } = await checkUserPayment(
+      user.id,
+      user.email ?? null,
+      user.user_metadata?.full_name || user.user_metadata?.name
+    );
 
-    let role = profileRes.data?.role || user.user_metadata?.role || "student"; // Default to student
-    const hasSlot = accessRes.hasSlot;
+    const hasAccess = hasPaid;
+    const hasSlot = hasPaid && resolvedRole === "student";
 
-    // Self-healing: if the user exists as a parent in student_parent_relations, their role is "parent"
-    if (relationRes.data) {
-      role = "parent";
-    }
-    
-    // Allow access ONLY if the user has slot (payment verified) OR is admin OR the tester email.
-    const hasAccess = hasSlot || role === "admin" || user.email === "eternallytanuj@gmail.com";
+    console.log("[Access] Result — role:", resolvedRole, "hasSlot:", hasSlot, "hasAccess:", hasAccess);
 
-    console.log("[Access] Result — role:", role, "hasSlot:", hasSlot, "hasAccess:", hasAccess);
-
-    const response = NextResponse.json({ hasAccess, hasSlot, role });
+    const response = NextResponse.json({ hasAccess, hasSlot, role: resolvedRole });
     response.headers.set("Cache-Control", "no-store, max-age=0");
     return response;
   } catch (error) {
