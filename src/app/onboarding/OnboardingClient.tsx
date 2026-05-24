@@ -23,23 +23,23 @@ function OnboardingContent() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
-          let role = session.user.user_metadata?.role;
+          let role = undefined;
+          let hasAccess = false;
           
-          // Fetch resolved/healed role from onboarding API
+          // Fetch access status and role from my-batch access API
           try {
-            const roleRes = await fetch("/api/onboarding/role", {
+            const accessRes = await fetch("/api/my-batch/access", {
               headers: {
                 "Authorization": `Bearer ${session.access_token}`
               }
             });
-            if (roleRes.ok) {
-              const roleData = await roleRes.json();
-              if (roleData.user?.role) {
-                role = roleData.user.role;
-              }
+            if (accessRes.ok) {
+              const accessData = await accessRes.json();
+              role = accessData.role;
+              hasAccess = accessData.hasAccess;
             }
           } catch (err) {
-            console.error("Error fetching resolved role on onboarding session check:", err);
+            console.error("Error checking access on onboarding session check:", err);
           }
           
           if (role) {
@@ -52,6 +52,11 @@ function OnboardingContent() {
           if (role === "parent") {
             router.replace(`/parent-portal${searchStr}`);
           } else if (role === "student") {
+            if (hasAccess) {
+              router.replace(`/my-batch${searchStr}`);
+            }
+            // If student has no paid access, they remain on onboarding without looping
+          } else if (role === "admin") {
             router.replace(`/my-batch${searchStr}`);
           }
         }

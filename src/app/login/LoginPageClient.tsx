@@ -26,23 +26,23 @@ function LoginForm() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
-          let role = session.user.user_metadata?.role;
+          let role = undefined;
+          let hasAccess = false;
           
-          // Fetch resolved/healed role from onboarding API
+          // Fetch access status and role from my-batch access API
           try {
-            const roleRes = await fetch("/api/onboarding/role", {
+            const accessRes = await fetch("/api/my-batch/access", {
               headers: {
                 "Authorization": `Bearer ${session.access_token}`
               }
             });
-            if (roleRes.ok) {
-              const roleData = await roleRes.json();
-              if (roleData.user?.role) {
-                role = roleData.user.role;
-              }
+            if (accessRes.ok) {
+              const accessData = await accessRes.json();
+              role = accessData.role;
+              hasAccess = accessData.hasAccess;
             }
           } catch (err) {
-            console.error("Error fetching resolved role on session check:", err);
+            console.error("Error checking access on session check:", err);
           }
           
           if (role) {
@@ -55,6 +55,12 @@ function LoginForm() {
           if (role === "parent") {
             router.replace(`/parent-portal${searchStr}`);
           } else if (role === "student") {
+            if (hasAccess) {
+              router.replace(`/my-batch${searchStr}`);
+            } else {
+              router.replace(`/onboarding${searchStr}`);
+            }
+          } else if (role === "admin") {
             router.replace(`/my-batch${searchStr}`);
           } else {
             router.replace(`${redirectTo}${searchStr}`);
@@ -112,21 +118,21 @@ function LoginForm() {
     } else if (authData.user) {
       let role = authData.user.user_metadata?.role;
       
-      // Fetch resolved/healed role from onboarding API
+      // Fetch access status and role from my-batch access API
+      let hasAccess = false;
       try {
-        const roleRes = await fetch("/api/onboarding/role", {
+        const accessRes = await fetch("/api/my-batch/access", {
           headers: {
             "Authorization": `Bearer ${authData.session?.access_token}`
           }
         });
-        if (roleRes.ok) {
-          const roleData = await roleRes.json();
-          if (roleData.user?.role) {
-            role = roleData.user.role;
-          }
+        if (accessRes.ok) {
+          const accessData = await accessRes.json();
+          role = accessData.role;
+          hasAccess = accessData.hasAccess;
         }
       } catch (roleErr) {
-        console.error("Error fetching resolved role on login:", roleErr);
+        console.error("Error checking access on login:", roleErr);
       }
 
       if (role) {
@@ -139,8 +145,13 @@ function LoginForm() {
         setSuccessMsg("Success! Routing to Parent Portal...");
         setTimeout(() => router.push("/parent-portal"), 50);
       } else if (role === "student") {
-        setSuccessMsg("Success! Routing to Student Batch...");
-        setTimeout(() => router.push("/my-batch"), 50);
+        if (hasAccess) {
+          setSuccessMsg("Success! Routing to Student Batch...");
+          setTimeout(() => router.push("/my-batch"), 50);
+        } else {
+          setSuccessMsg("Success! Routing to Onboarding...");
+          setTimeout(() => router.push("/onboarding"), 50);
+        }
       } else {
         setSuccessMsg("Success! Loading dashboard...");
         setTimeout(() => router.push(redirectTo), 50);

@@ -99,7 +99,27 @@ function ResolveContent() {
           if (fromParam === "bootcamp") {
             router.replace("/book-slot?from=bootcamp");
           } else {
-            router.replace("/my-batch");
+            // Check paid access
+            let hasAccess = false;
+            try {
+              const accessRes = await fetch("/api/my-batch/access", {
+                headers: {
+                  "Authorization": `Bearer ${session.access_token}`
+                }
+              });
+              if (accessRes.ok) {
+                const data = await accessRes.json();
+                hasAccess = data.hasAccess;
+              }
+            } catch (err) {
+              console.error("[Onboarding Resolve] Fetch access failed:", err);
+            }
+
+            if (hasAccess) {
+              router.replace("/my-batch");
+            } else {
+              router.replace("/onboarding");
+            }
           }
         } else if (resolvedRole === "parent") {
           let parentPath = "/parent-portal";

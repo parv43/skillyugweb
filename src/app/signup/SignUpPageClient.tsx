@@ -32,34 +32,26 @@ function SignUpForm() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
-          let role = session.user.user_metadata?.role;
+          let role = undefined;
+          let hasAccess = false;
           
-          // Try local storage cache next
-          if (!role) {
-            try {
-              role = localStorage.getItem("user_role") || undefined;
-            } catch {}
+          // Fetch access status and role from my-batch access API
+          try {
+            const accessRes = await fetch("/api/my-batch/access", {
+              headers: {
+                "Authorization": `Bearer ${session.access_token}`
+              }
+            });
+            if (accessRes.ok) {
+              const accessData = await accessRes.json();
+              role = accessData.role;
+              hasAccess = accessData.hasAccess;
+            }
+          } catch (err) {
+            console.error("Error checking access on signup redirect:", err);
           }
           
-          // Fallback to database query if not found anywhere
-          if (!role) {
-            try {
-              const { data: profile } = await supabase
-                .from("users")
-                .select("role")
-                .eq("id", session.user.id)
-                .maybeSingle();
-              if (profile?.role) {
-                role = profile.role;
-                try {
-                  localStorage.setItem("user_role", role);
-                } catch {}
-              }
-            } catch (err) {
-              console.error("Error checking session role on signup redirect:", err);
-            }
-          } else {
-            // Sync role cache to local storage
+          if (role) {
             try {
               localStorage.setItem("user_role", role);
             } catch {}
@@ -69,7 +61,11 @@ function SignUpForm() {
           if (role === "parent") {
             router.replace(`/parent-portal${searchStr}`);
           } else if (role === "student") {
-            router.replace(`/my-batch${searchStr}`);
+            if (hasAccess) {
+              router.replace(`/my-batch${searchStr}`);
+            } else {
+              router.replace(`/onboarding${searchStr}`);
+            }
           }
         }
       } catch (err) {
