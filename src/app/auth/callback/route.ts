@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 export async function GET(request: Request) {
@@ -40,19 +41,45 @@ export async function GET(request: Request) {
 
     if (!error && authData?.user) {
       let role = authData.user.user_metadata?.role;
-      if (!role) {
-        try {
-          const { data: profile } = await supabase
+      
+      try {
+        const admin = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        // Fetch user profile and check for parent relations in parallel using service role
+        const [profileRes, relationRes] = await Promise.all([
+          admin
             .from("users")
             .select("role")
             .eq("id", authData.user.id)
-            .maybeSingle();
-          if (profile?.role) {
-            role = profile.role;
-          }
-        } catch (dbErr) {
-          console.error("DB check failed in callback:", dbErr);
+            .maybeSingle(),
+          admin
+            .from("student_parent_relations")
+            .select("id")
+            .eq("parent_id", authData.user.id)
+            .limit(1)
+            .maybeSingle()
+        ]);
+
+        if (profileRes.data?.role) {
+          role = profileRes.data.role;
         }
+
+        // Self-healing: if they have parent-child relations, they are a parent
+        if (relationRes.data) {
+          role = "parent";
+          if (profileRes.data && profileRes.data.role !== "parent") {
+            console.log("[Auth Callback] Self-healing parent role in database for user:", authData.user.id);
+            await admin
+              .from("users")
+              .update({ role: "parent" })
+              .eq("id", authData.user.id);
+          }
+        }
+      } catch (err) {
+        console.error("DB check failed in callback:", err);
       }
 
       let targetNext = next;

@@ -28,32 +28,24 @@ function LoginForm() {
         if (session?.user) {
           let role = session.user.user_metadata?.role;
           
-          // Try local storage cache next
-          if (!role) {
-            try {
-              role = localStorage.getItem("user_role") || undefined;
-            } catch {}
+          // Fetch resolved/healed role from onboarding API
+          try {
+            const roleRes = await fetch("/api/onboarding/role", {
+              headers: {
+                "Authorization": `Bearer ${session.access_token}`
+              }
+            });
+            if (roleRes.ok) {
+              const roleData = await roleRes.json();
+              if (roleData.user?.role) {
+                role = roleData.user.role;
+              }
+            }
+          } catch (err) {
+            console.error("Error fetching resolved role on session check:", err);
           }
           
-          // Fallback to database query if not found anywhere
-          if (!role) {
-            try {
-              const { data: profile } = await supabase
-                .from("users")
-                .select("role")
-                .eq("id", session.user.id)
-                .maybeSingle();
-              if (profile?.role) {
-                role = profile.role;
-                try {
-                  localStorage.setItem("user_role", role);
-                } catch {}
-              }
-            } catch (err) {
-              console.error("Error fetching user role on automatic redirect check:", err);
-            }
-          } else {
-            // Sync role cache to local storage
+          if (role) {
             try {
               localStorage.setItem("user_role", role);
             } catch {}
@@ -119,24 +111,22 @@ function LoginForm() {
       setLoading(false);
     } else if (authData.user) {
       let role = authData.user.user_metadata?.role;
-      if (!role) {
-        try {
-          role = localStorage.getItem("user_role") || undefined;
-        } catch {}
-      }
-      if (!role) {
-        try {
-          const { data: profile } = await supabase
-            .from("users")
-            .select("role")
-            .eq("id", authData.user.id)
-            .maybeSingle();
-          if (profile?.role) {
-            role = profile.role;
+      
+      // Fetch resolved/healed role from onboarding API
+      try {
+        const roleRes = await fetch("/api/onboarding/role", {
+          headers: {
+            "Authorization": `Bearer ${authData.session?.access_token}`
           }
-        } catch (roleErr) {
-          console.error("Error fetching user role on login:", roleErr);
+        });
+        if (roleRes.ok) {
+          const roleData = await roleRes.json();
+          if (roleData.user?.role) {
+            role = roleData.user.role;
+          }
         }
+      } catch (roleErr) {
+        console.error("Error fetching resolved role on login:", roleErr);
       }
 
       if (role) {
