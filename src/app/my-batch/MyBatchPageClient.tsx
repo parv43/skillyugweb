@@ -1207,9 +1207,7 @@ export default function MyBatchPage() {
 
       <section className="relative z-10 px-4 sm:px-6 pt-24 md:pt-32 pb-12 md:pb-16 lg:px-12">
         <div className="max-w-7xl mx-auto space-y-10">
-          {isPaidUser && <FirstClassCountdown />}
-          {isPaidUser ? (
-            <>
+          <FirstClassCountdown />
 
           {/* Top Section: Profile & Circular Progress */}
           <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
@@ -1476,124 +1474,6 @@ export default function MyBatchPage() {
           <div className="max-w-md mx-auto pt-6">
             <VoucherCard />
           </div>
-        
-            </>
-          ) : (
-            <>
-              {/* Syllabus & Instructor Bios */}
-            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-                <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-5 sm:p-6 md:p-10 shadow-[0_0_60px_rgba(59,130,246,0.08)] self-start">
-                  <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
-                    <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2">
-                      Syllabus
-                    </span>
-                    <span className="text-slate-500 font-medium">Bootcamp Course Outline</span>
-                  </div>
-                  
-                  <div className="mt-8 space-y-5">
-                    {[
-                      { topic: "Session 1: Generative AI Foundations", desc: "Learn Prompt Engineering, ChatGPT frameworks, and how LLMs work." },
-                      { topic: "Session 2: Visual Creation with Canva AI", desc: "Generate professional social media assets and graphics using AI design tools." },
-                      { topic: "Session 3: Dynamic Presentations with Gamma", desc: "Build gorgeous landing pages and presentation decks in under 5 minutes using Gamma." },
-                      { topic: "Session 4: Advanced Prompting & LLMs", desc: "Deep dive into context windows, system prompts, and multi-turn AI reasoning." },
-                      { topic: "Session 5: Capstone Project Showcase", desc: "Build and deploy your first end-to-end AI agent product and earn certification." }
-                    ].map((item, idx) => (
-                      <div key={idx} className="flex gap-4 p-5 rounded-2xl bg-white/[0.02] border border-white/5">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center font-bold text-xs text-blue-300">
-                          {idx + 1}
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-black text-white">{item.topic}</h4>
-                          <p className="text-xs text-slate-400 mt-1 leading-relaxed">{item.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-[#090d1f] p-5 sm:p-6 md:p-8 shadow-[0_0_80px_rgba(124,77,255,0.12)] flex flex-col justify-between min-h-[360px] sm:min-h-[420px]">
-                  <div className="space-y-6">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                      Instructors
-                    </p>
-                    
-                    <div className="flex items-center gap-4 pt-4 border-t border-white/5">
-                      <img
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKcLNe4nCx6jDQ4EVV_02UM6m6QJi_0LiI7l7BOYGCvUfePGpBf-4iq0oD97lRJqplgkKfvQWD0GBG99GEyd5o7D02N-7QpzqTdXC4UupM-OfyKFoKrQi8DHlPUrvTCvJQQ4DSYmJHKMrwmmGcspe4XyEhsPcvtyRW5UHFUk1gh7Oq1ax02nkjQ7vXBzrilSRlKcbMzcGwTuJpnS6BO9md1N6C7rmanrP1-JFEYbcgO-oyUxhepXupvaNomp79iKCHAibUpyvnVGU"
-                        alt="Tanuj Pathak"
-                        className="h-14 w-14 rounded-full border border-white/10 object-cover"
-                      />
-                      <div>
-                        <p className="text-base font-black text-white">Tanuj Pathak</p>
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-blue-300 mt-0.5">Lead Mentor</p>
-                      </div>
-                    </div>
-                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
-                      Ex-software architect specializing in generative AI applications and systems. Tanuj mentors students in classes 6-12 on building functional projects using advanced AI tools.
-                    </p>
-                  </div>
-
-                  <div className="mt-8 rounded-[1.5rem] border border-blue-400/15 bg-blue-500/10 px-5 py-4 flex gap-3 items-center">
-                    <Sparkles className="h-5 w-5 text-blue-300 flex-shrink-0 animate-pulse" />
-                    <div>
-                      <p className="text-xs font-bold text-white uppercase tracking-wider">Cohort Identity</p>
-                      <p className="text-[11px] text-slate-300 mt-0.5">Summer AI Creator Cohort</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Locked Modules Preview with Ask Parent CTA */}
-              <div className="relative rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-slate-950/40 p-1 overflow-hidden min-h-[380px] sm:min-h-[450px] flex items-center justify-center">
-                {/* Blurred content representations */}
-                <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 blur-md opacity-25 select-none pointer-events-none">
-                  <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 space-y-4">
-                    <div className="h-10 w-24 bg-white/10 rounded-xl" />
-                    <div className="h-6 w-48 bg-white/10 rounded-lg" />
-                    <div className="h-16 w-full bg-white/10 rounded-xl" />
-                  </div>
-                  
-                  <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 space-y-4">
-                    <div className="h-10 w-24 bg-white/10 rounded-xl" />
-                    <div className="h-6 w-48 bg-white/10 rounded-lg" />
-                    <div className="h-16 w-full bg-white/10 rounded-xl" />
-                  </div>
-                </div>
-
-                {/* Glassmorphic overlay */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-black/40 backdrop-blur-[5px] z-30">
-                  <div className="w-20 h-20 rounded-full bg-slate-950/95 border border-white/15 shadow-2xl flex items-center justify-center relative mb-6">
-                    <Lock className="w-8 h-8 text-blue-300 animate-pulse" />
-                    <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full" />
-                  </div>
-                  
-                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">AI Learning Modules Locked</h3>
-                  <p className="mt-3 text-xs sm:text-sm text-slate-400 max-w-sm sm:max-w-md mx-auto leading-relaxed">
-                    Access to 5+ hours of recorded classes, project resources, calendars, and certificates is locked. Ask a parent to sponsor your slot enrollment.
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={handleAskParentToPay}
-                    disabled={sponsorLoading}
-                    className="mt-6 sm:mt-8 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-6 sm:px-8 py-3 sm:py-3.5 text-xs font-bold uppercase tracking-[0.24em] text-white hover:scale-[1.03] transition-all duration-200 active:scale-[0.98] disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.3)] border border-white/10"
-                  >
-                    {sponsorLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Generating Link...
-                      </>
-                    ) : (
-                      <>
-                        Ask a Parent to Pay
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
         </div>
       </section>
 
