@@ -463,14 +463,40 @@ function ParentPortalContent() {
             </h2>
 
             {children.length === 0 ? (
-              <div className="rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-8 sm:p-10 text-center space-y-4 shadow-sm">
-                <div className="w-12 h-12 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center mx-auto border border-slate-100 dark:border-white/5">
-                  <Users className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+              <div className="space-y-6">
+                <div className="flex flex-col md:flex-row items-center justify-between p-6 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:text-amber-200 gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-amber-500/20 rounded-xl flex-shrink-0">
+                      <CreditCard className="w-5 h-5 text-amber-650 dark:text-amber-450 animate-pulse" />
+                    </div>
+                    <div className="space-y-1 text-left">
+                      <h4 className="text-sm font-black tracking-wide uppercase">Payment Required</h4>
+                      <p className="text-xs text-slate-650 dark:text-slate-400 font-medium">
+                        You must complete the payment process first before you can add kids to the system.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsSponsorship(false);
+                      setPaymentStep("checkout");
+                      setShowPaymentModal(true);
+                    }}
+                    className="w-full md:w-auto px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    Pay ₹399.00 & Register Kid
+                  </button>
                 </div>
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-350">No children enrolled yet.</p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm mx-auto">
-                  Click the &quot;Enroll Kids in Bootcamp&quot; button above to onboard children or resolve pending sponsorship tokens.
-                </p>
+
+                <div className="rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-[#090d1f] p-8 sm:p-10 text-center space-y-4 shadow-sm">
+                  <div className="w-12 h-12 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center mx-auto border border-slate-100 dark:border-white/5">
+                    <Users className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+                  </div>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-350">No children enrolled yet.</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm mx-auto">
+                    Click the &quot;Enroll Kids in Bootcamp&quot; button above to onboard children or resolve pending sponsorship tokens.
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getRequiredEnv } from "@/lib/razorpayServer";
+import { checkUserPayment } from "@/lib/paymentCheck";
 
 export const runtime = "nodejs";
 
@@ -61,43 +62,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Determine role and sync to DB
+    const { resolvedRole } = await checkUserPayment(
+      user.id,
+      user.email ?? null,
+      user.user_metadata?.full_name || user.user_metadata?.name
+    );
+
     const admin = createSupabaseAdmin();
-    
-    // Fetch profile and check if they exist as parent in parallel
-    const [profileRes, relationRes] = await Promise.all([
-      admin
-        .from("users")
-        .select("id, email, full_name, role")
-        .eq("id", user.id)
-        .maybeSingle(),
-      admin
-        .from("student_parent_relations")
-        .select("id")
-        .eq("parent_id", user.id)
-        .limit(1)
-        .maybeSingle()
-    ]);
+    const { data, error } = await admin
+      .from("users")
+      .select("id, email, full_name, role")
+      .eq("id", user.id)
+      .maybeSingle();
 
-    if (profileRes.error) {
-      console.error("[Role API GET] Query error:", profileRes.error);
-      return NextResponse.json({ error: profileRes.error.message }, { status: 500 });
-    }
-
-    let data = profileRes.data;
-    
-    // Self-healing: if they have relations, they are a parent. Sync to database.
-    if (data && relationRes.data && data.role !== "parent") {
-      console.log("[Role API GET] Healing parent role in database for user:", user.id);
-      const { data: updatedUser, error: updateError } = await admin
-        .from("users")
-        .update({ role: "parent" })
-        .eq("id", user.id)
-        .select("id, email, full_name, role")
-        .single();
-      
-      if (!updateError && updatedUser) {
-        data = updatedUser;
-      }
+    if (error) {
+      console.error("[Role API GET] Query error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ user: data || null });
@@ -121,38 +102,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid role specified" }, { status: 400 });
     }
 
-    const admin = createSupabaseAdmin();
     const nameToSet = fullName || user.user_metadata?.full_name || "Skillyug User";
 
-    // Check if user already exists and has a role set to prevent overwriting
-    const { data: existingUser, error: checkError } = await admin
+    // Resolve and sync role to DB based on payment
+    const { resolvedRole } = await checkUserPayment(user.id, user.email ?? null, nameToSet);
+
+    const admin = createSupabaseAdmin();
+    const { data, error } = await admin
       .from("users")
       .select("id, email, full_name, role")
       .eq("id", user.id)
       .maybeSingle();
 
-    if (checkError) {
-      console.error("[Role API POST] Check query error:", checkError);
-    }
-
-    if (existingUser?.role) {
-      console.log("[Role API POST] User already has role:", existingUser.role, "skipping upsert");
-      return NextResponse.json({ user: existingUser });
-    }
-
-    const { data, error } = await admin
-      .from("users")
-      .upsert({
-        id: user.id,
-        email: user.email!,
-        full_name: nameToSet,
-        role: role,
-      })
-      .select("id, email, full_name, role")
-      .single();
-
     if (error) {
-      console.error("[Role API POST] Upsert error:", error);
+      console.error("[Role API POST] Query error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
