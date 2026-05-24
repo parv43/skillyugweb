@@ -107,43 +107,82 @@ function ParentPortalContent() {
   };
 
   useEffect(() => {
+    let active = true;
+
     const initPortal = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      // 1. Get initial session
+      let session = null;
+      try {
+        const check = await supabase.auth.getSession();
+        session = check.data.session;
+      } catch (err) {
+        console.error("Supabase getSession failed:", err);
+      }
+
+      // 2. If no session, check cache or wait up to 1.5s for async session restoration (to prevent redirect race condition on refresh)
       if (!session) {
-        router.replace("/onboarding");
+        const hasCachedSession = typeof window !== "undefined" && localStorage.getItem("user_role") === "parent";
+        if (hasCachedSession) {
+          for (let i = 0; i < 15; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            if (!active) return;
+            try {
+              const check = await supabase.auth.getSession();
+              if (check.data.session) {
+                session = check.data.session;
+                break;
+              }
+            } catch (err) {
+              console.error("Retrying getSession failed:", err);
+            }
+          }
+        }
+      }
+
+      if (!session) {
+        if (active) router.replace("/onboarding");
         return;
       }
 
+      if (!active) return;
       setParentName(session.user.user_metadata?.full_name || "Parent");
 
       // Verify user is parent
-      const res = await fetch("/api/onboarding/role", {
-        headers: {
-          "Authorization": `Bearer ${session.access_token}`
+      try {
+        const res = await fetch("/api/onboarding/role", {
+          headers: {
+            "Authorization": `Bearer ${session.access_token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user && data.user.role !== "parent") {
+            if (active) router.replace("/my-batch");
+            return;
+          }
         }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.user && data.user.role !== "parent") {
-          router.replace("/my-batch");
-          return;
-        }
+      } catch (err) {
+        console.error("Failed to verify user role:", err);
       }
 
       await fetchChildren();
-      setLoading(false);
+      if (active) setLoading(false);
 
       const kidEmailParam = searchParams.get("kidEmail") || "";
 
       // If token is in query parameters, automatically open payment modal to resolve sponsorship
       if (token) {
-        setIsSponsorship(true);
-        setShowPaymentModal(true);
+        if (active) {
+          setIsSponsorship(true);
+          setShowPaymentModal(true);
+        }
       } else if (kidEmailParam) {
-        setKidEmailInput(kidEmailParam);
-        setIsSponsorship(false);
-        setPaymentStep("checkout");
-        setShowPaymentModal(true);
+        if (active) {
+          setKidEmailInput(kidEmailParam);
+          setIsSponsorship(false);
+          setPaymentStep("checkout");
+          setShowPaymentModal(true);
+        }
 
         // Remove kidEmail from the URL search parameters cleanly
         try {
@@ -157,12 +196,17 @@ function ParentPortalContent() {
     };
 
     initPortal();
+
+    return () => {
+      active = false;
+    };
   }, [router, token, searchParams]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     try {
       sessionStorage.clear();
+      localStorage.removeItem("user_role");
     } catch {}
     router.replace("/onboarding");
   };
@@ -625,12 +669,27 @@ function ParentPortalContent() {
                         <button
                           type="button"
                           onClick={() => {
-                            // Generate strong 8 character password following best practices
-                            const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$";
+                            // Generate strong 12 character password following best practices
+                            const lowercase = "abcdefghijkmnopqrstuvwxyz";
+                            const uppercase = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+                            const numbers = "23456789";
+                            const symbols = "!@#$%&*?";
+                            const allChars = lowercase + uppercase + numbers + symbols;
+                            
+                            // Guarantee at least one of each class
                             let pwd = "";
-                            for (let i = 0; i < 8; i++) {
-                              pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+                            pwd += lowercase.charAt(Math.floor(Math.random() * lowercase.length));
+                            pwd += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
+                            pwd += numbers.charAt(Math.floor(Math.random() * numbers.length));
+                            pwd += symbols.charAt(Math.floor(Math.random() * symbols.length));
+                            
+                            // Fill the rest up to 12 characters
+                            for (let i = 4; i < 12; i++) {
+                              pwd += allChars.charAt(Math.floor(Math.random() * allChars.length));
                             }
+                            
+                            // Shuffle the password characters to avoid predictable patterns
+                            pwd = pwd.split('').sort(() => 0.5 - Math.random()).join('');
                             setKidPasswordInput(pwd);
                           }}
                           className="text-[10px] font-bold text-purple-655 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 flex items-center gap-1 uppercase tracking-wider transition-colors active:scale-95"
