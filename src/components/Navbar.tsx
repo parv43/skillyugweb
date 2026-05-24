@@ -41,25 +41,34 @@ export default function Navbar() {
   }
 
   const renderThemeToggle = () => {
-    if (!mounted) return <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10" />
+    if (!mounted) {
+      return (
+        <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center">
+          <div className="w-5 h-5 relative flex items-center justify-center opacity-40">
+            <Sun className="w-5 h-5 text-amber-600 dark:text-yellow-400 absolute dark:hidden" />
+            <Moon className="w-5 h-5 text-indigo-600 dark:text-indigo-400 absolute hidden dark:block" />
+          </div>
+        </div>
+      )
+    }
 
     return (
       <button
         onClick={toggleTheme}
-        className="relative w-10 h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 group overflow-hidden cursor-pointer shadow-[0_0_15px_rgba(255,255,255,0.02)]"
+        className="relative w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 transition-all duration-300 group overflow-hidden cursor-pointer shadow-sm dark:shadow-[0_0_15px_rgba(255,255,255,0.02)]"
         aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
       >
         <span className="sr-only">Toggle dark mode</span>
         <div className="relative w-5 h-5 flex items-center justify-center">
           <Sun 
-            className={`w-5 h-5 text-yellow-400 absolute transition-all duration-500 transform-gpu ${
+            className={`w-5 h-5 text-amber-600 dark:text-yellow-400 absolute transition-all duration-500 transform-gpu ${
               theme === "dark" 
                 ? "rotate-90 scale-0 opacity-0" 
                 : "rotate-0 scale-100 opacity-100"
             }`}
           />
           <Moon 
-            className={`w-5 h-5 text-indigo-400 absolute transition-all duration-500 transform-gpu ${
+            className={`w-5 h-5 text-indigo-600 dark:text-indigo-400 absolute transition-all duration-500 transform-gpu ${
               theme === "dark" 
                 ? "rotate-0 scale-100 opacity-100" 
                 : "-rotate-90 scale-0 opacity-0"
