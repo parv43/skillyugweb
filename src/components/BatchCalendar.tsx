@@ -57,7 +57,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
 
     if (!isValidDay) {
       calendarCells.push(
-        <div key={`empty-${i}`} aria-hidden="true" className="h-10" />
+        <div key={`empty-${i}`} aria-hidden="true" className="aspect-square w-full" />
       );
     } else {
       const dateObj = new Date(year, month, day);
@@ -75,12 +75,12 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
           aria-label={`Select ${dateStr}`}
           aria-pressed={isSelected}
           className={[
-            "relative h-10 w-full rounded-xl flex items-center justify-center text-sm font-semibold",
+            "relative aspect-square w-full rounded-full sm:rounded-xl flex items-center justify-center text-xs sm:text-sm font-bold sm:font-semibold",
             "transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
             isSelected
               ? "bg-gradient-to-br from-blue-500 to-violet-500 text-white shadow-[0_0_14px_rgba(139,92,246,0.45)] border border-white/20"
               : isBootcamp
-              ? "bg-blue-500/10 border border-blue-400/20 text-blue-200 hover:bg-blue-500/25 hover:border-blue-400/40"
+              ? "bg-blue-500/10 border border-blue-400/20 text-blue-250 hover:bg-blue-500/25 hover:border-blue-400/40"
               : "text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200",
           ].join(" ")}
         >
@@ -102,30 +102,30 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
   return (
     <div className="space-y-5">
       {/* Calendar Card */}
-      <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-6 md:p-8">
+      <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-white/10 bg-white/[0.035] backdrop-blur-xl p-4 sm:p-6 md:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-7">
-          <div className="flex items-center gap-3">
-            <CalendarDays className="h-5 w-5 text-blue-300" />
-            <h2 className="text-2xl font-black tracking-tight">Bootcamp Schedule</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-7">
+          <div className="flex items-center gap-2.5">
+            <CalendarDays className="h-5 w-5 text-blue-300 flex-shrink-0" />
+            <h2 className="text-lg sm:text-2xl font-black tracking-tight text-white">Bootcamp Schedule</h2>
           </div>
-          <div className="flex items-center gap-1 border border-white/10 rounded-full p-1 bg-slate-950/50">
+          <div className="flex items-center justify-between sm:justify-end gap-1 border border-white/10 rounded-full p-1 bg-slate-950/50 w-full sm:w-auto">
             <button
               type="button"
               onClick={handlePrevMonth}
               aria-label="Previous month"
-              className="p-2 rounded-full hover:bg-white/10 text-slate-300 transition-colors"
+              className="p-1.5 sm:p-2 rounded-full hover:bg-white/10 text-slate-300 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-sm font-bold w-32 text-center text-white select-none">
+            <span className="text-xs sm:text-sm font-bold w-full sm:w-28 text-center text-white select-none">
               {currentDate.toLocaleString("default", { month: "long" })} {year}
             </span>
             <button
               type="button"
               onClick={handleNextMonth}
               aria-label="Next month"
-              className="p-2 rounded-full hover:bg-white/10 text-slate-300 transition-colors"
+              className="p-1.5 sm:p-2 rounded-full hover:bg-white/10 text-slate-300 transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -137,7 +137,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
           {daysOfWeek.map((d) => (
             <div
               key={d}
-              className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 text-center pb-3"
+              className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-slate-500 text-center pb-2"
             >
               {d}
             </div>
@@ -145,22 +145,22 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-y-1.5 gap-x-1">
+        <div className="grid grid-cols-7 gap-y-1.5 gap-x-1.5">
           {calendarCells}
         </div>
 
         {/* Legend */}
-        <div className="mt-7 pt-5 border-t border-white/5 flex flex-wrap items-center gap-5 text-xs font-semibold text-slate-400">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-blue-500/20 border border-blue-400/30" />
-            <span>Active Bootcamp Day</span>
+        <div className="mt-6 pt-5 border-t border-white/5 flex flex-wrap items-center gap-3 sm:gap-5 text-[10px] sm:text-xs font-semibold text-slate-400">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-sm bg-blue-500/20 border border-blue-400/30" />
+            <span>Bootcamp Day</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-pink-400" />
-            <span>Session Scheduled</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+            <span>Session</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-blue-500 to-violet-500" />
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-sm bg-gradient-to-br from-blue-500 to-violet-500" />
             <span>Selected</span>
           </div>
         </div>
