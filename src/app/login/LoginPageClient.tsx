@@ -20,6 +20,56 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [emailSuggestion, setEmailSuggestion] = useState("");
+
+  React.useEffect(() => {
+    const checkLoggedIn = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        let role = session.user.user_metadata?.role;
+        
+        // Try local storage cache next
+        if (!role) {
+          try {
+            role = localStorage.getItem("user_role") || undefined;
+          } catch {}
+        }
+        
+        // Fallback to database query if not found anywhere
+        if (!role) {
+          try {
+            const { data: profile } = await supabase
+              .from("users")
+              .select("role")
+              .eq("id", session.user.id)
+              .maybeSingle();
+            if (profile?.role) {
+              role = profile.role;
+              try {
+                localStorage.setItem("user_role", role);
+              } catch {}
+            }
+          } catch (err) {
+            console.error("Error fetching user role on automatic redirect check:", err);
+          }
+        } else {
+          // Sync role cache to local storage
+          try {
+            localStorage.setItem("user_role", role);
+          } catch {}
+        }
+        
+        const searchStr = window.location.search;
+        if (role === "parent") {
+          router.replace(`/parent-portal${searchStr}`);
+        } else if (role === "student") {
+          router.replace(`/my-batch${searchStr}`);
+        } else {
+          router.replace(`${redirectTo}${searchStr}`);
+        }
+      }
+    };
+    checkLoggedIn();
+  }, [router, redirectTo]);
   
   const authInfoMsg =
     searchParams.get("reset") === "success"
@@ -78,6 +128,12 @@ function LoginForm() {
         } catch (roleErr) {
           console.error("Error fetching user role on login:", roleErr);
         }
+      }
+
+      if (role) {
+        try {
+          localStorage.setItem("user_role", role);
+        } catch {}
       }
 
       if (role === "parent") {

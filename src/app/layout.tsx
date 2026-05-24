@@ -24,15 +24,11 @@ export const metadata: Metadata = {
 
 const organizationSchema = getOrganizationSchema()
 
-import { headers } from "next/headers"
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const nonce = (await headers()).get("x-nonce") ?? ""
-
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseHost = supabaseUrl ? new URL(supabaseUrl).host : null
 
@@ -41,20 +37,8 @@ export default async function RootLayout({
       <head>
         <script
           id="theme-initializer"
-          nonce={nonce}
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var saved = localStorage.getItem('theme');
-                  if (saved === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                } catch (e) {}
-              })();
-            `
+            __html: `(function(){try{var saved=localStorage.getItem('theme');if(saved==='dark'){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}catch(e){}})();`
           }}
         />
         {/* Link to llms.txt so AI crawlers and Semrush can discover it without following internal links */}
@@ -67,7 +51,6 @@ export default async function RootLayout({
         )}
         <script
           type="application/ld+json"
-          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>

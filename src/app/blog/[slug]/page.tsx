@@ -10,7 +10,6 @@ import ShareButton from "@/components/ShareButton";
 import CommentSection from "@/components/comments/CommentSection";
 
 import { createMetadata, getBlogPostingSchema } from "@/lib/seo";
-import { headers } from "next/headers";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -64,11 +63,9 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
 
   const blogPostingSchema = getBlogPostingSchema(blog);
 
-  const nonce = (await headers()).get("x-nonce") ?? "";
-
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative pb-0">
-      <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }} />
 
       {/* Background Gradients */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">

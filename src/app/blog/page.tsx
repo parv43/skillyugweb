@@ -7,7 +7,6 @@ import BlogListing from "@/components/BlogListing";
 import { Metadata } from "next";
 
 import { createMetadata, getBlogCollectionSchema } from "@/lib/seo";
-import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   ...createMetadata({
@@ -18,7 +17,7 @@ export const metadata: Metadata = {
   }),
 };
 
-export default async function BlogListingPage() {
+export default function BlogListingPage() {
   const featuredBlog = blogs.find(blog => blog.featured) || blogs[0];
   const regularBlogs = blogs.filter(blog => blog.slug !== featuredBlog.slug);
 
@@ -32,13 +31,11 @@ export default async function BlogListingPage() {
   ];
 
   const blogListSchema = getBlogCollectionSchema(blogs);
-  const nonce = (await headers()).get("x-nonce") ?? "";
 
   return (
     <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative pb-20">
       <script
         type="application/ld+json"
-        nonce={nonce}
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListSchema) }}
       />
 

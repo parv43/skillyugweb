@@ -33,6 +33,10 @@ export default function ProfilePage() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
+    try {
+      sessionStorage.clear()
+      localStorage.removeItem("user_role")
+    } catch {}
     router.push("/")
   }
 
