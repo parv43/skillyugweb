@@ -28,6 +28,67 @@ const BOOTCAMP_END = new Date(2026, 5, 27); // 5 = June
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+const CLASS_NAMES: Record<number, string> = {
+  1: "Introduction to AI & ChatGPT Basics",
+  2: "Prompt Engineering & Advanced Chat Techniques",
+  3: "AI for Writing, Summarizing & Creative Essays",
+  4: "Visual Design & Image Generation with Midjourney",
+  5: "Canva AI & Creating Stunning Presentations",
+  6: "Presentation Design with Gamma AI",
+  7: "Perplexity AI for Smarter Homework & Fact-checking",
+  8: "NotebookLM & Organizing Study Materials",
+  9: "Building Custom AI Assistants & Study Chatbots",
+  10: "Workflow Automation & Future AI Skills",
+  11: "AI-Powered Coding and App Building Introduction",
+  12: "Creating Custom AI Chatbots with Custom Knowledge",
+  13: "Video Generation and Editing with Runway AI",
+  14: "Voice & Audio Generation with ElevenLabs",
+  15: "AI agents, Automation Pipelines and Make.com",
+  16: "Student Portfolio Building with AI Tools",
+  17: "AI Ethics, Safe Usage & Combating Bias",
+  18: "Collaborative Team Projects Using AI",
+  19: "AI for Personal Branding & Student Resumes",
+  20: "Graduation Project Pitch Prep with AI Guidance",
+  21: "Graduation Project Review & Iterative Improvements",
+  22: "Final Showcase & Bootcamp Graduation Ceremony"
+};
+
+const getClassNumber = (date: Date) => {
+  let count = 0;
+  let current = new Date(BOOTCAMP_START.getTime());
+  
+  while (current <= date) {
+    const dayOfWeek = current.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      count++;
+    }
+    current.setDate(current.getDate() + 1);
+  }
+  return count;
+};
+
+const getClassStatus = (date: Date) => {
+  const now = new Date();
+  
+  const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  
+  if (compareDate < currentDate) {
+    return { label: "Class is Over", type: "past", color: "border-red-500/20 bg-red-500/10 text-red-400" };
+  } else if (compareDate.getTime() === currentDate.getTime()) {
+    // Today! Class is over after 3 PM (15:00)
+    if (now.getHours() >= 15) {
+      return { label: "Class is Over", type: "past", color: "border-red-500/20 bg-red-500/10 text-red-400 font-bold" };
+    } else if (now.getHours() >= 13) {
+      return { label: "Live Now", type: "live", color: "border-green-500/30 bg-green-500/10 text-green-300 animate-pulse font-bold" };
+    } else {
+      return { label: "Upcoming", type: "upcoming", color: "border-blue-500/20 bg-blue-500/10 text-blue-300 font-bold" };
+    }
+  } else {
+    return { label: "Scheduled", type: "future", color: "border-slate-500/20 bg-slate-500/10 text-slate-400" };
+  }
+};
+
 export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean }) {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 4, 1));
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(2026, 4, 28));
@@ -97,7 +158,33 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
   }
 
   const selectedDateStr = selectedDate ? formatDate(selectedDate) : null;
-  const dayEvents: { title: string; time: string; type: "live" | "task"; urgency?: string }[] = [];
+  const dayEvents: { title: string; time: string; type: "live" | "task"; urgency?: string; urgencyColor?: string }[] = [];
+
+  if (selectedDate) {
+    const isSelectedBootcamp = selectedDate >= BOOTCAMP_START && selectedDate <= BOOTCAMP_END && selectedDate.getDay() !== 0 && selectedDate.getDay() !== 6;
+    if (isSelectedBootcamp) {
+      const classNum = getClassNumber(selectedDate);
+      const romanNumerals: Record<number, string> = {
+        1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 
+        6: "VI", 7: "VII", 8: "VIII", 9: "IX", 10: "X",
+        11: "XI", 12: "XII", 13: "XIII", 14: "XIV", 15: "XV",
+        16: "XVI", 17: "XVII", 18: "XVIII", 19: "XIX", 20: "XX",
+        21: "XXI", 22: "XXII"
+      };
+      
+      const romanStr = romanNumerals[classNum] || String(classNum);
+      const className = CLASS_NAMES[classNum] || "Summer AI Bootcamp Live Session";
+      const status = getClassStatus(selectedDate);
+      
+      dayEvents.push({
+        title: `Class ${romanStr}: ${className}`,
+        time: "1:00 PM - 2:00 PM IST",
+        type: "live",
+        urgency: status.label,
+        urgencyColor: status.color
+      });
+    }
+  }
 
   return (
     <div className="space-y-5">
@@ -217,7 +304,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
                     </div>
                   </div>
                   {event.urgency && (
-                    <span className="rounded-full border border-pink-500/20 bg-pink-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-pink-300 self-start sm:self-auto flex-shrink-0">
+                    <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] self-start sm:self-auto flex-shrink-0 ${event.urgencyColor || 'border-pink-500/20 bg-pink-500/10 text-pink-300'}`}>
                       {event.urgency}
                     </span>
                   )}
