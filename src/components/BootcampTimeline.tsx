@@ -100,7 +100,7 @@ export default function BootcampTimeline() {
     <section
       ref={sectionRef}
       id="curriculum"
-      className="relative w-full py-24 bg-[#020617] overflow-hidden border-t border-slate-800/50 flex flex-col items-center select-none"
+      className="relative w-full py-24 bg-white overflow-hidden border-t border-slate-100 flex flex-col items-center select-none"
     >
       {/* Custom Animations for Glowing Nodes */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -123,10 +123,10 @@ export default function BootcampTimeline() {
 
       {/* Header Section */}
       <div className="text-center mb-16 px-6 max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-4 tracking-tight">
+        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
           Learning Progression
         </h2>
-        <p className="text-slate-400 text-base md:text-lg font-light">
+        <p className="text-slate-600 text-base md:text-lg font-light">
           A focused 5-week journey from explorer to active creator.
         </p>
       </div>
@@ -163,7 +163,7 @@ export default function BootcampTimeline() {
                   <path
                     d={pathData}
                     fill="none"
-                    stroke="#1e293b"
+                    stroke="#e2e8f0"
                     strokeWidth="3"
                     strokeDasharray="8 8"
                   />
@@ -192,7 +192,7 @@ export default function BootcampTimeline() {
                     strokeWidth="3"
                     strokeDasharray="8 8"
                     mask={`url(#glow-mask-${i})`}
-                    style={{ filter: "drop-shadow(0 0 8px rgba(59,130,246,0.6))" }}
+                    style={{ filter: "drop-shadow(0 0 8px rgba(59,130,246,0.3))" }}
                   />
                 </g>
               )
@@ -212,13 +212,13 @@ export default function BootcampTimeline() {
             const Icon = step.icon
 
             // Dynamic Styling based on state
-            const ringColor = isCompleted || isCurrent ? "border-[#3b82f6]" : "border-slate-800"
-            const bgColor = isCurrent ? "bg-[#0f172a]" : "bg-[#020617]"
+            const ringColor = isCompleted || isCurrent ? "border-[#3b82f6]" : "border-slate-200"
+            const bgColor = isCurrent ? "bg-blue-50" : "bg-white"
             const iconColor = isCompleted || isCurrent 
-                                ? (i === 4 ? "text-yellow-400" : "text-[#3b82f6]") 
-                                : "text-slate-600"
+                                ? (i === 4 ? "text-yellow-500" : "text-[#3b82f6]") 
+                                : "text-slate-400"
             
-            const textOpacity = isLocked ? "opacity-40" : "opacity-100"
+            const textOpacity = isLocked ? "opacity-45" : "opacity-100"
 
             return (
               <React.Fragment key={`node-${i}`}>
@@ -236,17 +236,17 @@ export default function BootcampTimeline() {
                   <span className="text-[10px] font-bold tracking-[0.15em] text-[#3b82f6] uppercase mb-1 drop-shadow-sm">
                     {step.week}
                   </span>
-                  <h3 className={`text-base font-bold leading-tight mb-1 ${isLocked ? "text-slate-300" : "text-white"}`}>
+                  <h3 className={`text-base font-bold leading-tight mb-1 ${isLocked ? "text-slate-400" : "text-slate-900"}`}>
                     {step.title}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-snug">
+                  <p className="text-xs text-slate-600 leading-snug">
                     {step.desc}
                   </p>
                 </div>
 
                 {/* Circular Icon Node */}
                 <div
-                  className={`absolute w-16 h-16 rounded-full border-2 ${ringColor} ${bgColor} flex items-center justify-center cursor-pointer transition-colors duration-500 z-10 hover:bg-blue-950/40 ${isCurrent ? "node-current" : ""} ${isCompleted ? "node-completed" : ""}`}
+                  className={`absolute w-16 h-16 rounded-full border-2 ${ringColor} ${bgColor} flex items-center justify-center cursor-pointer transition-colors duration-500 z-10 hover:bg-blue-50/50 ${isCurrent ? "node-current" : ""} ${isCompleted ? "node-completed" : ""}`}
                   style={{ 
                     top: cy - 32, 
                     left: cx - 32
@@ -258,16 +258,16 @@ export default function BootcampTimeline() {
                   
                   {/* Current Step Indicator Badge (like the yellow star in screenshot 2) */}
                   {isCurrent && (
-                    <div className="absolute -right-2 -top-1 w-6 h-6 bg-red-500 rounded-full border-[3px] border-[#020617] flex items-center justify-center animate-bounce">
+                    <div className="absolute -right-2 -top-1 w-6 h-6 bg-red-500 rounded-full border-[3px] border-white flex items-center justify-center animate-bounce">
                       <Star className="w-3 h-3 text-white fill-current" />
                     </div>
                   )}
                   
                   {/* Completion checkmark badge */}
                   {isCompleted && (
-                     <div className="absolute -right-1 -top-1 w-5 h-5 bg-[#3b82f6] rounded-full border-[2px] border-[#020617] flex items-center justify-center">
+                     <div className="absolute -right-1 -top-1 w-5 h-5 bg-[#3b82f6] rounded-full border-[2px] border-white flex items-center justify-center">
                         <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                      </div>
                   )}

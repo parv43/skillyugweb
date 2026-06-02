@@ -109,21 +109,21 @@ export default function ContactUs() {
   };
 
   return (
-    <section className="relative w-full pt-24 pb-8 bg-[#020617] overflow-hidden flex justify-center border-t border-slate-900 z-10" id="contact">
+    <section className="relative w-full pt-24 pb-8 bg-white overflow-hidden flex justify-center border-t border-slate-100 z-10" id="contact">
       {/* Background Glows */}
-      <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-blue-900/20 blur-[120px] rounded-full pointer-events-none"></div>
-      <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-purple-900/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none"></div>
       
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6">
         {/* Header Section */}
         <div className="text-center mb-16 relative">
-          <span className="inline-block px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-sm font-bold tracking-widest mb-6 uppercase shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+          <span className="inline-block px-4 py-1.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 text-sm font-bold tracking-widest mb-6 uppercase shadow-sm">
             Reach Out
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
             Contact Skillyug
           </h2>
-          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
+          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-light leading-relaxed">
             Have questions about the bootcamp? Drop us a message and our team will get right back to you.
           </p>
         </div>
@@ -132,8 +132,8 @@ export default function ContactUs() {
           
           {/* Contact Form Section */}
           <div className="lg:col-span-7">
-            <div className="glass-panel bg-[#0f172a]/60 backdrop-blur-md rounded-[2rem] p-8 pb-10 md:p-10 border border-white/5 relative overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.1)] group">
-              <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
+            <div className="bg-slate-50 border border-slate-200/80 rounded-[2rem] p-8 pb-10 md:p-10 relative overflow-hidden shadow-sm group">
+              <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
 
               <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                 <label htmlFor="contact-bot-check" className="sr-only">
@@ -163,27 +163,27 @@ export default function ContactUs() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label htmlFor="contact-name" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Full Name</label>
+                    <label htmlFor="contact-name" className="text-xs uppercase tracking-widest text-slate-600 font-bold ml-1">Full Name</label>
                     <input 
                       id="contact-name"
                       type="text" 
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 placeholder:text-slate-600" 
+                      className="w-full bg-white border border-slate-300 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-slate-800 placeholder:text-slate-400" 
                       placeholder="Full name" 
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="contact-phone" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Phone Number</label>
+                    <label htmlFor="contact-phone" className="text-xs uppercase tracking-widest text-slate-600 font-bold ml-1">Phone Number</label>
                     <input 
                       id="contact-phone"
                       type="tel" 
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 placeholder:text-slate-600" 
+                      className="w-full bg-white border border-slate-300 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-slate-800 placeholder:text-slate-400" 
                       placeholder="+91 0000-0000" 
                       required
                     />
@@ -191,33 +191,33 @@ export default function ContactUs() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="contact-role" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Role / Grade</label>
+                  <label htmlFor="contact-role" className="text-xs uppercase tracking-widest text-slate-600 font-bold ml-1">Role / Grade</label>
                   <select 
                     id="contact-role"
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
-                    className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 appearance-none"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-slate-800 appearance-none"
                   >
-                    <option value="Select Option" className="bg-[#0f172a]">Select Option</option>
-                    <option value="Grade 6-8" className="bg-[#0f172a]">Grade 6-8</option>
-                    <option value="Grade 9-10" className="bg-[#0f172a]">Grade 9-10</option>
-                    <option value="Grade 11-12" className="bg-[#0f172a]">Grade 11-12</option>
-                    <option value="Undergraduate" className="bg-[#0f172a]">Undergraduate</option>
-                    <option value="Parent" className="bg-[#0f172a]">Parent</option>
-                    <option value="School Administrator" className="bg-[#0f172a]">School Administrator</option>
-                    <option value="others" className="bg-[#0f172a]">others</option>
+                    <option value="Select Option">Select Option</option>
+                    <option value="Grade 6-8">Grade 6-8</option>
+                    <option value="Grade 9-10">Grade 9-10</option>
+                    <option value="Grade 11-12">Grade 11-12</option>
+                    <option value="Undergraduate">Undergraduate</option>
+                    <option value="Parent">Parent</option>
+                    <option value="School Administrator">School Administrator</option>
+                    <option value="others">others</option>
                   </select>
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="contact-message" className="text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Message</label>
+                  <label htmlFor="contact-message" className="text-xs uppercase tracking-widest text-slate-600 font-bold ml-1">Message</label>
                   <textarea 
                     id="contact-message"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full bg-[#020617]/50 border border-slate-800 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all text-slate-200 placeholder:text-slate-600 resize-none" 
+                    className="w-full bg-white border border-slate-300 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-slate-800 placeholder:text-slate-400 resize-none" 
                     placeholder="How can we help you?" 
                     rows={4}
                     required
@@ -238,31 +238,31 @@ export default function ContactUs() {
           {/* Contact Info Section */}
           <div className="lg:col-span-5 space-y-6 pt-4 lg:pt-0">
             {/* Email Card */}
-            <div className="glass-panel group p-8 rounded-[1.5rem] bg-[#0f172a]/40 border border-white/5 border-l-4 border-l-blue-500 hover:bg-[#0f172a]/70 hover:-translate-y-1 transition-all overflow-hidden relative">
+            <div className="group p-8 rounded-[1.5rem] bg-slate-50 border border-slate-200 border-l-4 border-l-blue-500 hover:bg-slate-100/50 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative">
               <div className="absolute right-0 top-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
               <div className="flex items-start gap-5 relative z-10">
-                <div className="bg-[#020617]/80 p-4 rounded-2xl text-blue-400 shadow-inner shadow-white/5 border border-white/5">
+                <div className="bg-white p-4 rounded-2xl text-blue-600 shadow-sm border border-slate-205">
                   <Mail className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1.5">Email Us</h3>
-                  <p className="text-base md:text-xl font-bold text-white tracking-wide break-all">contact@skillyugedu.com</p>
-                  <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">Send us a direct email. Our support team typically responds within 24 hours.</p>
+                  <h3 className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-1.5">Email Us</h3>
+                  <p className="text-base md:text-xl font-bold text-slate-900 tracking-wide break-all">contact@skillyugedu.com</p>
+                  <p className="text-sm text-slate-600 mt-2 font-medium leading-relaxed">Send us a direct email. Our support team typically responds within 24 hours.</p>
                 </div>
               </div>
             </div>
 
             {/* Phone Card */}
-            <div className="glass-panel group p-8 rounded-[1.5rem] bg-[#0f172a]/40 border border-white/5 border-l-4 border-l-purple-500 hover:bg-[#0f172a]/70 hover:-translate-y-1 transition-all overflow-hidden relative">
+            <div className="group p-8 rounded-[1.5rem] bg-slate-50 border border-slate-200 border-l-4 border-l-purple-500 hover:bg-slate-100/50 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative">
               <div className="absolute right-0 top-0 w-32 h-32 bg-purple-500/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
               <div className="flex items-start gap-5 relative z-10">
-                <div className="bg-[#020617]/80 p-4 rounded-2xl text-purple-400 shadow-inner shadow-white/5 border border-white/5">
+                <div className="bg-white p-4 rounded-2xl text-purple-600 shadow-sm border border-slate-205">
                   <Phone className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1.5">Call Us</h3>
-                  <p className="text-base md:text-xl font-bold text-white tracking-wide break-all">07941057514</p>
-                  <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">Available Monday to Friday, from 9:00 AM to 6:00 PM IST.</p>
+                  <h3 className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-1.5">Call Us</h3>
+                  <p className="text-base md:text-xl font-bold text-slate-900 tracking-wide break-all">07941057514</p>
+                  <p className="text-sm text-slate-600 mt-2 font-medium leading-relaxed">Available Monday to Friday, from 9:00 AM to 6:00 PM IST.</p>
                 </div>
               </div>
             </div>
@@ -272,21 +272,21 @@ export default function ContactUs() {
               href="https://www.linkedin.com/company/skillyug-official/"
               target="_blank"
               rel="noopener noreferrer"
-              className="glass-panel group block p-8 rounded-[1.5rem] bg-[#0f172a]/40 border border-white/5 border-l-4 border-l-sky-500 hover:bg-[#0f172a]/70 hover:-translate-y-1 transition-all overflow-hidden relative"
+              className="group block p-8 rounded-[1.5rem] bg-slate-50 border border-slate-200 border-l-4 border-l-sky-500 hover:bg-slate-100/50 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative"
             >
               <div className="absolute right-0 top-0 w-32 h-32 bg-sky-500/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
               <div className="flex items-start gap-5 relative z-10">
-                <div className="bg-[#020617]/80 p-4 rounded-2xl text-sky-400 shadow-inner shadow-white/5 border border-white/5">
+                <div className="bg-white p-4 rounded-2xl text-sky-600 shadow-sm border border-slate-205">
                   <Linkedin className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1.5">
+                  <h3 className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-1.5">
                     LinkedIn
                   </h3>
-                  <p className="text-base md:text-xl font-bold text-white tracking-wide">
+                  <p className="text-base md:text-xl font-bold text-slate-900 tracking-wide">
                     Follow Skillyug
                   </p>
-                  <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">
+                  <p className="text-sm text-slate-600 mt-2 font-medium leading-relaxed">
                     Get company updates, announcements, and student highlights
                     on our official LinkedIn page.
                   </p>

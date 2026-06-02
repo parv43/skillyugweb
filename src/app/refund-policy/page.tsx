@@ -14,18 +14,18 @@ export const metadata: Metadata = {
 
 export default function RefundPolicy() {
   return (
-    <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white">
+    <main className="bg-slate-50 min-h-screen text-slate-800 font-sans selection:bg-blue-500/10 selection:text-blue-900">
       <Navbar />
 
       <div className="max-w-[800px] mx-auto pt-32 pb-24 px-6 md:px-8">
-        <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 transition-colors mb-8 group text-sm font-semibold">
+        <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors mb-8 group text-sm font-semibold">
           <span className="text-lg leading-none">←</span>
           <span>Back to Home</span>
         </Link>
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">Cancellation & Refund Policy</h1>
-        <p className="text-slate-400 text-sm mb-12">Last updated on 02-04-2026 22:26:13</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Cancellation & Refund Policy</h1>
+        <p className="text-slate-500 text-sm mb-12">Last updated on 02-04-2026 22:26:13</p>
 
-        <div className="text-slate-300 text-base space-y-6 leading-relaxed">
+        <div className="text-slate-600 text-base space-y-6 leading-relaxed">
           <p>
             SKILLYUG LLP believes in helping its customers as far as possible, and has therefore a liberal cancellation policy. Under this policy:
           </p>
@@ -39,25 +39,25 @@ export default function RefundPolicy() {
       </div>
 
       {/* Shared Footer */}
-      <footer className="relative z-10 w-full bg-[#020617] border-t border-slate-900/80 py-12 flex flex-col items-center">
-        <div className="mb-6">
-          <Image src="/skillyug.png" alt="Skillyug Logo" width={300} height={100} className="h-16 md:h-20 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+      <footer className="relative z-10 w-full bg-slate-50 border-t border-slate-200/80 pt-8 pb-20 flex flex-col items-center">
+        <div className="bg-slate-100/50 p-6 md:p-16 px-10 md:px-48 rounded-[2rem] md:rounded-[2.5rem] mb-16 backdrop-blur-sm overflow-hidden group border border-slate-200/50">
+          <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" width={300} height={150} className="h-14 md:h-36 w-auto object-contain scale-[1.8] md:scale-[2.0] transition-transform group-hover:scale-[2.4] duration-500 transform-gpu brightness-0 opacity-85" />
         </div>
 
         <nav className="mb-6">
-          <ul className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400">
-            <li><Link href="/" className="hover:text-blue-400 transition-colors">Home</Link></li>
-            <li><Link href="/blog" className="hover:text-blue-400 transition-colors">Blog</Link></li>
+          <ul className="flex flex-wrap justify-center gap-6 text-sm font-semibold text-slate-500">
+            <li><Link href="/" className="hover:text-blue-600 transition-colors">Home</Link></li>
+            <li><Link href="/blog" className="hover:text-blue-600 transition-colors">Blog</Link></li>
           </ul>
         </nav>
 
-        <div className="mb-8 flex gap-4 text-xs text-slate-500">
-          <Link href="/refund-policy" className="hover:text-slate-300 transition-colors">Refund Policy</Link>
+        <div className="mb-8 flex gap-4 text-xs text-slate-400">
+          <Link href="/refund-policy" className="hover:text-slate-600 transition-colors">Refund Policy</Link>
           <span>|</span>
-          <Link href="/terms-and-conditions" className="hover:text-slate-300 transition-colors">Terms & Conditions</Link>
+          <Link href="/terms-and-conditions" className="hover:text-slate-600 transition-colors">Terms & Conditions</Link>
         </div>
 
-        <p className="text-sm font-mono text-slate-500 tracking-widest text-center">
+        <p className="text-xs font-mono text-slate-400 tracking-widest text-center">
           © 2026 SKILLYUG<br />
           ALL RIGHTS RESERVED.
         </p>
