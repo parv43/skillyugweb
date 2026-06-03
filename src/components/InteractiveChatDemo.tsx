@@ -97,42 +97,42 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
   }
 
   return (
-    <section id={id} className="relative w-full py-32 bg-slate-50 overflow-hidden border-t border-slate-100">
+    <section id={id} className="relative w-full py-32 bg-slate-50 dark:bg-[#020617] overflow-hidden border-t border-slate-100 dark:border-slate-900">
       
       {/* Background Ambience */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/5 blur-[150px] rounded-full pointer-events-none" />
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-900/10 blur-[150px] rounded-full pointer-events-none" />
 
       <div className="text-center mb-10 px-6 max-w-3xl mx-auto relative z-20">
-        <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 mb-6 drop-shadow-sm tracking-tight">
+        <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 mb-6 drop-shadow-sm tracking-tight">
           Master the Art of Prompting
         </h2>
-        <p className="text-slate-600 text-lg md:text-xl font-light mb-4">
+        <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl font-light mb-4">
           We don&apos;t just teach students what AI is. We teach them exactly how to talk to it to get professional results.
         </p>
-        <p className="text-blue-600 text-sm font-semibold tracking-wide">
+        <p className="text-blue-600 dark:text-blue-400/80 text-sm font-semibold dark:font-medium tracking-wide">
           Have questions about the bootcamp? Ask our AI assistant instantly.
         </p>
       </div>
 
       {/* Chat Interface Container */}
       <div className="max-w-4xl mx-auto px-4 relative z-10">
-        <div className="w-full bg-white rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col h-[600px]">
+        <div className="w-full bg-card dark:bg-[#0a0f1c] rounded-3xl border border-slate-200 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_0_50px_rgba(59,130,246,0.05)] overflow-hidden flex flex-col h-[600px] dark:cyber-glow">
           
           {/* Header */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shadow-[0_0_10px_rgba(139,92,246,0.2)]">
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-background/50 dark:bg-white/[0.02]">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shadow-[0_0_10px_rgba(139,92,246,0.2)] dark:shadow-[0_0_10px_rgba(139,92,246,0.3)]">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h3 className="text-slate-800 font-bold text-sm tracking-wide">Interactive AI Assistant</h3>
-              <p className="text-xs text-slate-500">Skillyug Simulator</p>
+              <h3 className="text-slate-800 dark:text-slate-200 font-bold text-sm tracking-wide">Interactive AI Assistant</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Skillyug Simulator</p>
             </div>
           </div>
 
           {/* Chat History Container */}
           <div 
             ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent"
+            className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent"
           >
               {messages.map((msg, i) => (
                 <div 
@@ -141,7 +141,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
                 >
                   {/* AI Avatar */}
                   {msg.role === 'ai' && (
-                    <div className="w-10 h-10 shrink-0 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center mt-1 text-blue-600">
+                    <div className="w-10 h-10 shrink-0 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center mt-1 text-blue-600 dark:text-blue-400">
                       <Bot className="w-5 h-5" />
                     </div>
                   )}
@@ -149,15 +149,15 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
                   {/* Message Bubble */}
                   <div className={`max-w-[80%] rounded-2xl p-5 ${
                     msg.role === 'user' 
-                      ? 'bg-blue-500 text-white rounded-tr-none shadow-sm' 
-                      : 'bg-slate-100 border border-slate-200/60 text-slate-800 rounded-tl-none'
+                      ? 'bg-blue-500 text-white rounded-tr-none shadow-sm dark:bg-blue-600/20 dark:border dark:border-blue-500/30 dark:text-blue-50 dark:shadow-none' 
+                      : 'bg-background border border-slate-200/60 dark:bg-white/5 dark:border-white/10 text-slate-800 dark:text-slate-300 rounded-tl-none'
                   }`}>
                     <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                   </div>
 
                   {/* User Avatar */}
                   {msg.role === 'user' && (
-                    <div className="w-10 h-10 shrink-0 rounded-full bg-purple-50 border border-purple-200 flex items-center justify-center mt-1 text-purple-600">
+                    <div className="w-10 h-10 shrink-0 rounded-full bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30 flex items-center justify-center mt-1 text-purple-600 dark:text-purple-400">
                       <User className="w-5 h-5" />
                     </div>
                   )}
@@ -167,13 +167,13 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
               {/* Typing Indicator — CSS bounce replaces framer-motion */}
               {isTyping && (
                 <div className="flex gap-4">
-                  <div className="w-10 h-10 shrink-0 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center mt-1 text-blue-600">
+                  <div className="w-10 h-10 shrink-0 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center mt-1 text-blue-600 dark:text-blue-400">
                     <Bot className="w-5 h-5" />
                   </div>
-                  <div className="bg-slate-100 border border-slate-200/60 rounded-2xl rounded-tl-none p-5 flex items-center gap-2 pr-6">
-                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce-dot-1" />
-                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce-dot-2" />
-                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce-dot-3" />
+                  <div className="bg-background border border-slate-200/60 dark:bg-white/5 dark:border-white/10 rounded-2xl rounded-tl-none p-5 flex items-center gap-2 pr-6">
+                    <span className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-bounce-dot-1" />
+                    <span className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-bounce-dot-2" />
+                    <span className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-bounce-dot-3" />
                   </div>
                 </div>
               )}
@@ -181,7 +181,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-slate-50/50 border-t border-slate-100">
+          <div className="p-4 bg-background/50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5">
             
             {/* Quick Prompts */}
             <div className="flex flex-wrap gap-2 mb-4">
@@ -190,7 +190,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
                   key={i}
                   onClick={() => handleSend(prompt)}
                   disabled={isTyping}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 hover:border-blue-400/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-slate-700 dark:text-slate-300 bg-card dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-blue-400/50 dark:hover:border-blue-400/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
                   {prompt}
                 </button>
@@ -215,7 +215,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
                 onChange={(e) => setInputVal(e.target.value)}
                 placeholder="Message the AI..."
                 disabled={isTyping}
-                className="w-full bg-white border border-slate-200 rounded-xl py-4 pl-4 pr-14 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/10 shadow-sm transition-all disabled:opacity-50"
+                className="w-full bg-background dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl py-4 pl-4 pr-14 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 dark:focus:ring-blue-500/20 shadow-sm transition-all disabled:opacity-50"
               />
               <button 
                 type="submit"
