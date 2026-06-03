@@ -98,25 +98,25 @@ export default function Home() {
       
       <ContactUs />
       
-      <footer className="relative z-10 w-full bg-slate-50 border-t border-slate-200/80 pt-8 pb-20 flex flex-col items-center">
-        <div className="bg-slate-100/50 p-6 md:p-16 px-10 md:px-48 rounded-[2rem] md:rounded-[2.5rem] mb-16 backdrop-blur-sm overflow-hidden group border border-slate-200/50">
+      <footer className="relative z-10 w-full bg-slate-50 dark:bg-[#020617] border-t border-slate-200/80 dark:border-slate-800/80 pt-8 pb-20 flex flex-col items-center">
+        <div className="bg-slate-100/50 dark:bg-slate-900/50 p-6 md:p-16 px-10 md:px-48 rounded-[2rem] md:rounded-[2.5rem] mb-16 backdrop-blur-sm overflow-hidden group border border-slate-200/50 dark:border-slate-800/50">
           <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" width={300} height={150} className="h-14 md:h-36 w-auto object-contain scale-[1.8] md:scale-[2.0] transition-transform group-hover:scale-[2.4] duration-500 transform-gpu" />
         </div>
         
         <nav className="mb-6">
-          <ul className="flex flex-wrap justify-center gap-6 text-sm font-semibold text-slate-500">
-            <li><Link href="/" className="hover:text-blue-600 transition-colors">Home</Link></li>
-            <li><Link href="/blog" className="hover:text-blue-600 transition-colors">Blog</Link></li>
+          <ul className="flex flex-wrap justify-center gap-6 text-sm font-semibold text-slate-500 dark:text-slate-400">
+            <li><Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</Link></li>
+            <li><Link href="/blog" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Blog</Link></li>
           </ul>
         </nav>
 
-        <div className="mb-8 flex gap-4 text-xs text-slate-400">
-          <Link href="/refund-policy" className="hover:text-slate-600 transition-colors">Refund Policy</Link>
+        <div className="mb-8 flex gap-4 text-xs text-slate-400 dark:text-slate-500">
+          <Link href="/refund-policy" className="hover:text-slate-600 dark:hover:text-slate-350 transition-colors">Refund Policy</Link>
           <span>|</span>
-          <Link href="/terms-and-conditions" className="hover:text-slate-600 transition-colors">Terms & Conditions</Link>
+          <Link href="/terms-and-conditions" className="hover:text-slate-600 dark:hover:text-slate-350 transition-colors">Terms & Conditions</Link>
         </div>
 
-        <p className="text-xs font-mono text-slate-400 tracking-widest text-center">
+        <p className="text-xs font-mono text-slate-400 dark:text-slate-500 tracking-widest text-center">
           © 2026 SKILLYUG<br />
           ALL RIGHTS RESERVED.
         </p>

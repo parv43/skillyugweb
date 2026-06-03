@@ -89,17 +89,17 @@ export default function ResetPasswordPageClient() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     )
   }
 
   return (
-    <div className="bg-slate-50 text-slate-800 min-h-screen selection:bg-blue-500/10 relative overflow-hidden font-sans">
+    <div className="bg-slate-50 text-slate-800 dark:bg-[#020617] dark:text-slate-200 min-h-screen selection:bg-blue-500/10 relative overflow-hidden font-sans">
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-slate-50/80 z-10" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(85,22,190,0.02)_0%,_transparent_55%)] z-20"></div>
+        <div className="absolute inset-0 bg-slate-50/80 dark:bg-[#020617]/90 z-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(85,22,190,0.02)_0%,_transparent_55%)] dark:bg-[radial-gradient(circle_at_50%_0%,_rgba(168,85,247,0.05)_0%,_transparent_55%)] z-20"></div>
       </div>
 
       <main className="relative z-10 flex min-h-screen items-center justify-center px-6 py-12">
@@ -114,22 +114,22 @@ export default function ResetPasswordPageClient() {
             </Link>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-8 md:p-12 shadow-lg relative overflow-hidden">
+          <div className="bg-white border border-slate-200 dark:bg-[#0a0f1c] dark:border-white/10 rounded-xl p-8 md:p-12 shadow-lg relative overflow-hidden">
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none"></div>
 
             <header className="mb-10 relative z-10">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-100">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:ring-blue-900/30">
                   <LockKeyhole className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold tracking-[0.2em] text-blue-600">SECURE RESET</p>
-                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+                  <p className="text-xs font-bold tracking-[0.2em] text-blue-600 dark:text-blue-400">SECURE RESET</p>
+                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                     New Password
                   </h1>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed text-slate-500">
+              <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                 Use a new password you have not used elsewhere, then sign in again with the updated
                 password.
               </p>
@@ -137,7 +137,7 @@ export default function ResetPasswordPageClient() {
 
             {!hasRecoverySession ? (
               <div className="relative z-10 space-y-5">
-                <div className="p-4 bg-blue-50 text-blue-755 rounded-xl text-sm font-semibold border border-blue-250">
+                <div className="p-4 bg-blue-50 text-blue-755 border border-blue-250 rounded-xl text-sm font-semibold dark:bg-blue-950/40 dark:text-blue-450 dark:border-blue-900/30">
                   This reset session is missing or has expired. Request a fresh password reset link to continue.
                 </div>
                 <Link
@@ -150,25 +150,25 @@ export default function ResetPasswordPageClient() {
             ) : (
               <form className="space-y-6 relative z-10" onSubmit={handleSubmit}>
                 {errorMsg && (
-                  <div className="p-4 bg-red-50 text-red-750 rounded-xl text-center text-sm font-semibold border border-red-250">
+                  <div className="p-4 bg-red-50 text-red-750 border border-red-250 rounded-xl text-center text-sm font-semibold dark:bg-red-950/45 dark:text-red-400 dark:border-red-900/30">
                     {errorMsg}
                   </div>
                 )}
 
                 {successMsg && (
-                  <div className="p-4 bg-emerald-50 text-emerald-800 rounded-xl text-sm font-semibold border border-emerald-200">
+                  <div className="p-4 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-sm font-semibold dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">
                     {successMsg}
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <label className="block text-slate-500 tracking-[0.05em] uppercase font-bold text-xs">
+                  <label className="block text-slate-500 dark:text-slate-400 tracking-[0.05em] uppercase font-bold text-xs">
                     New Password
                   </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-lg py-4 px-5 pr-12 text-slate-800 placeholder:text-slate-455 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 outline-none"
+                      className="w-full bg-slate-50 border border-slate-300 text-slate-800 placeholder:text-slate-455 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 outline-none rounded-lg py-4 px-5 pr-12 dark:bg-[#020617] dark:border-white/10 dark:text-white dark:placeholder:text-slate-500"
                       placeholder="Create a new password"
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
@@ -179,7 +179,7 @@ export default function ResetPasswordPageClient() {
                     <button
                       type="button"
                       onClick={() => setShowPassword((value) => !value)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 dark:text-slate-500 dark:hover:text-blue-400 transition-colors"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -188,13 +188,13 @@ export default function ResetPasswordPageClient() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-slate-500 tracking-[0.05em] uppercase font-bold text-xs">
+                  <label className="block text-slate-500 dark:text-slate-400 tracking-[0.05em] uppercase font-bold text-xs">
                     Confirm New Password
                   </label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-lg py-4 px-5 pr-12 text-slate-800 placeholder:text-slate-455 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 outline-none"
+                      className="w-full bg-slate-50 border border-slate-300 text-slate-800 placeholder:text-slate-455 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 outline-none rounded-lg py-4 px-5 pr-12 dark:bg-[#020617] dark:border-white/10 dark:text-white dark:placeholder:text-slate-500"
                       placeholder="Re-enter your new password"
                       value={confirmPassword}
                       onChange={(event) => setConfirmPassword(event.target.value)}
@@ -205,7 +205,7 @@ export default function ResetPasswordPageClient() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword((value) => !value)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 dark:text-slate-500 dark:hover:text-blue-400 transition-colors"
                       aria-label={showConfirmPassword ? "Hide password confirmation" : "Show password confirmation"}
                     >
                       {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}

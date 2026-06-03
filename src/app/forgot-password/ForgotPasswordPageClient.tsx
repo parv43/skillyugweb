@@ -88,9 +88,9 @@ function ForgotPasswordForm() {
   }
 
   return (
-    <div className="bg-slate-50 text-slate-800 min-h-screen selection:bg-blue-500/10 relative overflow-hidden font-sans">
+    <div className="bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-200 min-h-screen selection:bg-blue-500/10 relative overflow-hidden font-sans transition-colors duration-300">
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-slate-50/80 z-10" />
+        <div className="absolute inset-0 bg-slate-50/80 dark:bg-[#020617]/90 z-10" />
         <img
           alt="Abstract flow"
           className="w-full h-full object-cover opacity-5 scale-110 blur-3xl"
@@ -111,59 +111,59 @@ function ForgotPasswordForm() {
             </Link>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-8 md:p-12 shadow-lg relative overflow-hidden">
+          <div className="bg-white dark:bg-[#0a0f1c] border border-slate-200 dark:border-white/10 rounded-xl p-8 md:p-12 shadow-lg relative overflow-hidden">
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none"></div>
 
             <header className="mb-10 relative z-10">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm mb-6 w-fit"
+                className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm mb-6 w-fit dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 dark:text-slate-400 dark:hover:text-white"
               >
                 <span className="font-bold tracking-widest text-xs uppercase pl-2">← BACK TO LOGIN</span>
               </Link>
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-100">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 ring-1 ring-blue-100 dark:ring-blue-900/35">
                   <Mail className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold tracking-[0.2em] text-blue-600">PASSWORD HELP</p>
-                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+                  <p className="text-xs font-bold tracking-[0.2em] text-blue-600 dark:text-blue-400">PASSWORD HELP</p>
+                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                     Reset Password
                   </h1>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed text-slate-500">
+              <p className="text-sm leading-relaxed text-slate-505 dark:text-slate-350">
                 Enter the email you use for Skillyug. If an account exists, we&apos;ll send a secure reset
                 link.
               </p>
             </header>
 
             {infoMsg && (
-              <div className="p-4 mb-6 bg-blue-50 text-blue-750 rounded-xl text-sm font-semibold border border-blue-250 relative z-10">
+              <div className="p-4 mb-6 bg-blue-50 dark:bg-blue-950/20 text-blue-750 dark:text-blue-400 rounded-xl text-sm font-semibold border border-blue-200 dark:border-blue-900/30 relative z-10">
                 {infoMsg}
               </div>
             )}
 
             {errorMsg && (
-              <div className="p-4 mb-6 bg-red-50 text-red-750 rounded-xl text-center text-sm font-semibold border border-red-250 relative z-10">
+              <div className="p-4 mb-6 bg-red-50 dark:bg-red-950/20 text-red-750 dark:text-red-400 rounded-xl text-center text-sm font-semibold border border-red-200 dark:border-red-900/30 relative z-10">
                 {errorMsg}
               </div>
             )}
 
             {successMsg && (
-              <div className="p-4 mb-6 bg-emerald-50 text-emerald-800 rounded-xl text-sm font-semibold border border-emerald-200 relative z-10">
+              <div className="p-4 mb-6 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-400 rounded-xl text-sm font-semibold border border-emerald-200 dark:border-emerald-900/30 relative z-10">
                 {successMsg}
               </div>
             )}
 
             <form className="space-y-6 relative z-10" onSubmit={handleSubmit}>
               <div className="space-y-2">
-                <label className="block text-slate-500 tracking-[0.05em] uppercase font-bold text-xs">
+                <label className="block text-slate-500 dark:text-slate-455 tracking-[0.05em] uppercase font-bold text-xs">
                   Email Address
                 </label>
                 <input
                   type="email"
-                  className={`w-full bg-slate-50 border border-slate-300 rounded-lg py-4 px-5 text-slate-800 placeholder:text-slate-455 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 outline-none ${
+                  className={`w-full bg-slate-50 border border-slate-300 rounded-lg py-4 px-5 text-slate-800 placeholder:text-slate-455 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 outline-none dark:bg-[#020617] dark:border-white/10 dark:text-white dark:placeholder:text-slate-500 ${
                     emailMismatch ? "focus:ring-red-500 ring-1 ring-red-500/50" : ""
                   }`}
                   placeholder="name@gmail.com"
@@ -179,7 +179,7 @@ function ForgotPasswordForm() {
                   required
                 />
                 {emailSuggestion && (
-                  <div className="mt-2 text-sm text-blue-600 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                  <div className="mt-2 text-sm text-blue-600 dark:text-blue-450 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
                     <span>Did you mean</span>
                     <button
                       type="button"
@@ -188,7 +188,7 @@ function ForgotPasswordForm() {
                         setEmail(`${name}@${emailSuggestion}`)
                         setEmailSuggestion("")
                       }}
-                      className="font-bold underline hover:text-blue-800 transition-colors"
+                      className="font-bold underline hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                     >
                       {emailSuggestion}?
                     </button>
@@ -206,9 +206,9 @@ function ForgotPasswordForm() {
             </form>
 
             <footer className="mt-10 text-center relative z-10 space-y-3">
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-500 dark:text-slate-450 text-sm">
                 Signed up with Google? Use{" "}
-                <Link href="/login" className="text-blue-600 font-bold hover:text-blue-800 transition-colors duration-200">
+                <Link href="/login" className="text-blue-600 dark:text-blue-400 font-bold hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-200">
                   Continue with Google
                 </Link>{" "}
                 on the login page instead of resetting a password.
@@ -225,8 +225,8 @@ export default function ForgotPasswordPageClient() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
         </div>
       }
     >

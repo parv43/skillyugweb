@@ -13,13 +13,13 @@ import {
 
 type AccentColor = "slate" | "blue" | "purple" | "pink" | "emerald" | "yellow"
 
-const ACCENT_STYLES: Record<AccentColor, { border: string; dot: string; text: string }> = {
-  slate: { border: "border-slate-300", dot: "bg-slate-400", text: "text-slate-600" },
-  blue:  { border: "border-blue-300",  dot: "bg-blue-400",  text: "text-blue-600"  },
-  purple:{ border: "border-purple-300",dot: "bg-purple-400",text: "text-purple-600"},
-  pink:  { border: "border-pink-300",  dot: "bg-pink-400",  text: "text-pink-600"  },
-  emerald:{border:"border-emerald-300",dot:"bg-emerald-400",text:"text-emerald-600"},
-  yellow:{ border: "border-yellow-300",dot: "bg-yellow-400",text: "text-yellow-600"},
+const ACCENT_STYLES: Record<AccentColor, { border: string; dot: string; text: string; darkText: string }> = {
+  slate: { border: "border-slate-300", dot: "bg-slate-400", text: "text-slate-600", darkText: "dark:text-slate-400" },
+  blue:  { border: "border-blue-300",  dot: "bg-blue-400",  text: "text-blue-600",  darkText: "dark:text-blue-400"  },
+  purple:{ border: "border-purple-300",dot: "bg-purple-400",text: "text-purple-600",darkText: "dark:text-purple-400"},
+  pink:  { border: "border-pink-300",  dot: "bg-pink-400",  text: "text-pink-600",  darkText: "dark:text-pink-400"  },
+  emerald:{border:"border-emerald-300",dot:"bg-emerald-400",text:"text-emerald-600",darkText: "dark:text-emerald-400"},
+  yellow:{ border: "border-yellow-300",dot: "bg-yellow-400",text: "text-yellow-600",darkText: "dark:text-yellow-400"},
 }
 
 interface EcosystemNodeProps {
@@ -38,13 +38,13 @@ const EcosystemNode = ({ icon: Icon, label, desc, position, color = "blue", dela
       className={`ecosystem-node absolute flex flex-col items-center justify-center z-20 ${position} w-48 text-center opacity-0`}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      <div className={`w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-4 border ${styles.border} shadow-sm group hover:-translate-y-2 hover:shadow-md transition-all duration-300 relative`}>
-        <Icon className={`w-8 h-8 ${styles.text} group-hover:opacity-80 transition-opacity`} />
+      <div className={`w-16 h-16 rounded-2xl bg-white dark:bg-[#0a0f1c] flex items-center justify-center mb-4 border ${styles.border} dark:border-white/10 shadow-sm group hover:-translate-y-2 hover:shadow-md dark:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300 relative`}>
+        <Icon className={`w-8 h-8 ${styles.text} ${styles.darkText} group-hover:opacity-80 transition-opacity`} />
         <div className={`absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${styles.dot}`} />
         <div className={`absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${styles.dot}`} />
       </div>
-      <h4 className="text-slate-900 font-bold text-sm mb-1">{label}</h4>
-      <p className="text-slate-600 text-xs leading-relaxed">{desc}</p>
+      <h4 className="text-slate-900 dark:text-white font-bold text-sm mb-1">{label}</h4>
+      <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">{desc}</p>
     </div>
   )
 }
@@ -87,17 +87,17 @@ export default function AIToolsSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-32 bg-white overflow-hidden flex flex-col items-center border-t border-slate-100"
+      className="relative w-full py-32 bg-white dark:bg-[#020617] overflow-hidden flex flex-col items-center border-t border-slate-100 dark:border-slate-900"
     >
-      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-blue-500/0 to-transparent rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/5 via-purple-500/0 to-transparent rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 dark:from-blue-500/15 via-blue-500/0 to-transparent rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/5 dark:from-purple-500/15 via-purple-500/0 to-transparent rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="text-center mb-24 z-20 px-6 max-w-3xl">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 mb-6 drop-shadow-sm tracking-tight leading-tight">
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-300 dark:to-purple-300 mb-6 drop-shadow-sm tracking-tight leading-tight">
           Tools Students Will Learn
         </h2>
-        <p className="text-slate-600 text-lg md:text-xl font-light">
+        <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl font-light">
           An interconnected ecosystem. We train students to chain powerful AI platforms together to build fully functional systems from scratch.
         </p>
       </div>
@@ -143,14 +143,14 @@ export default function AIToolsSection() {
             return (
               <div
                 key={i}
-                className="mobile-tool-card bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col items-center text-center gap-2 shadow-sm opacity-0"
+                className="mobile-tool-card bg-white dark:bg-[#0a0f1c] border border-slate-200/80 dark:border-white/10 rounded-2xl p-4 flex flex-col items-center text-center gap-2 shadow-sm opacity-0"
                 style={{ transitionDelay: `${i * 80}ms` }}
               >
-                <div className={`w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center border ${styles.border} mb-1`}>
-                  <Icon className={`w-6 h-6 ${styles.text}`} />
+                <div className={`w-12 h-12 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center border ${styles.border} dark:border-white/10 mb-1`}>
+                  <Icon className={`w-6 h-6 ${styles.text} ${styles.darkText}`} />
                 </div>
-                <h4 className="text-slate-900 font-bold text-xs leading-tight">{label}</h4>
-                <p className="text-slate-600 text-[11px] leading-relaxed">{desc}</p>
+                <h4 className="text-slate-900 dark:text-white font-bold text-xs leading-tight">{label}</h4>
+                <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">{desc}</p>
               </div>
             )
           })}
@@ -158,29 +158,29 @@ export default function AIToolsSection() {
 
         <div className="flex items-center gap-2 px-2">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-          <span className="text-slate-400 text-xs font-semibold tracking-widest uppercase">Student Workflow</span>
+          <span className="text-slate-400 dark:text-slate-500 text-xs font-semibold tracking-widest uppercase">Student Workflow</span>
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
         </div>
 
         <div className="flex flex-col gap-3 w-full">
           {[
-            { step: "01", title: "Prompt Design", desc: "Students write a structured prompt explaining their idea to an LLM.", color: "from-blue-50 to-blue-100/30", border: "border-blue-100" },
-            { step: "02", title: "AI Generation", desc: "AI tools output the raw code, text, graphics, and structure required.", color: "from-purple-50 to-purple-100/30", border: "border-purple-100" },
-            { step: "03", title: "Human Polish", desc: "Students use Canva to refine layouts and edit out AI hallucinations.", color: "from-pink-50 to-pink-100/30", border: "border-pink-100" },
-            { step: "04", title: "Final Project", desc: "A complete, functioning website, game, or presentation is created.", color: "from-emerald-50 to-emerald-100/30", border: "border-emerald-100" },
+            { step: "01", title: "Prompt Design", desc: "Students write a structured prompt explaining their idea to an LLM.", color: "from-blue-50 to-blue-100/30 dark:from-blue-500/20 dark:to-blue-500/5", border: "border-blue-100 dark:border-blue-500/20" },
+            { step: "02", title: "AI Generation", desc: "AI tools output the raw code, text, graphics, and structure required.", color: "from-purple-50 to-purple-100/30 dark:from-purple-500/20 dark:to-purple-500/5", border: "border-purple-100 dark:border-purple-500/20" },
+            { step: "03", title: "Human Polish", desc: "Students use Canva to refine layouts and edit out AI hallucinations.", color: "from-pink-50 to-pink-100/30 dark:from-pink-500/20 dark:to-pink-500/5", border: "border-pink-100 dark:border-pink-500/20" },
+            { step: "04", title: "Final Project", desc: "A complete, functioning website, game, or presentation is created.", color: "from-emerald-50 to-emerald-100/30 dark:from-emerald-500/20 dark:to-emerald-500/5", border: "border-emerald-100 dark:border-emerald-500/20" },
           ].map(({ step, title, desc, color, border }, i) => (
             <div
               key={i}
               className={`workflow-step relative bg-gradient-to-br ${color} border ${border} rounded-2xl p-4 flex items-start gap-4 overflow-hidden opacity-0`}
               style={{ transitionDelay: `${i * 100}ms` }}
             >
-              <span className="text-4xl font-black font-mono opacity-10 text-slate-400 absolute right-4 top-3 select-none">{step}</span>
-              <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-slate-800 font-bold text-xs">{step}</span>
+              <span className="text-4xl font-black font-mono opacity-10 text-slate-400 dark:text-slate-500 absolute right-4 top-3 select-none">{step}</span>
+              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-slate-800 dark:text-slate-200 font-bold text-xs">{step}</span>
               </div>
               <div>
-                <h3 className="text-slate-900 font-bold text-sm mb-1">{title}</h3>
-                <p className="text-slate-600 text-xs leading-relaxed">{desc}</p>
+                <h3 className="text-slate-900 dark:text-white font-bold text-sm mb-1">{title}</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">{desc}</p>
               </div>
             </div>
           ))}
