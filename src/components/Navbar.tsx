@@ -117,7 +117,7 @@ export default function Navbar() {
     <header 
       className={`animate-slide-down fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? "bg-black/5 backdrop-blur-md border-b border-white/5 py-4 shadow-lg" 
+          ? "bg-white/80 backdrop-blur-md border-b border-slate-200/80 py-4 shadow-sm" 
           : "bg-transparent py-6"
       }`}
     >
@@ -130,7 +130,7 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav aria-label="Main Navigation" className="hidden md:block">
-          <ul className="flex gap-8 items-center bg-white/5 px-6 py-2.5 rounded-full border border-white/5 backdrop-blur-sm shadow-[inset_0_0_10px_rgba(255,255,255,0.02)]">
+          <ul className="flex gap-8 items-center bg-slate-100/80 px-6 py-2.5 rounded-full border border-slate-200/80 backdrop-blur-sm shadow-sm">
             {visibleNavLinks.map((link) => {
               const active = link.name === "Blog" 
                 ? pathname.startsWith("/blog") 
@@ -145,8 +145,8 @@ export default function Navbar() {
                   <Link 
                     href={link.href} 
                     onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
-                    className={`text-sm font-medium transition-all ${
-                      active ? "text-white text-shadow-[0_0_10px_rgba(255,255,255,0.8)]" : "text-slate-300 hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                    className={`text-sm font-semibold transition-all ${
+                      active ? "text-slate-900" : "text-slate-600 hover:text-slate-900"
                     }`}
                     aria-label={link.ariaLabel || `Go to ${link.name}`}
                   >
@@ -163,7 +163,7 @@ export default function Navbar() {
           {isLoggedIn ? (
             <Link 
               href="/profile" 
-              className="flex items-center justify-center rounded-full border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-105 transition-all duration-300"
+              className="flex items-center justify-center rounded-full border border-slate-200 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300"
               aria-label="View Profile"
             >
               <Avatar
@@ -177,13 +177,13 @@ export default function Navbar() {
             <div className="flex items-center gap-3">
               <Link 
                 href="/login" 
-                className="text-sm font-semibold text-slate-300 hover:text-white transition-colors"
+                className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
               >
                 Log in
               </Link>
               <Link 
                 href="/signup" 
-                className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] hover:scale-105 transition-all duration-300 block border border-white/10"
+                className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_4px_15px_rgba(59,130,246,0.35)] hover:shadow-[0_6px_20px_rgba(139,92,246,0.45)] hover:scale-105 transition-all duration-300 block border border-blue-500/20"
               >
                 Sign up
               </Link>
@@ -193,7 +193,7 @@ export default function Navbar() {
 
         {/* Mobile Menu Toggle */}
         <button 
-          className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="md:hidden text-slate-800 p-2 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-expanded={mobileMenuOpen}
           aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
@@ -206,7 +206,7 @@ export default function Navbar() {
       {/* Mobile Navigation Menu */}
       <div 
         id="mobile-menu"
-        className={`md:hidden absolute top-full left-0 w-full bg-[#050a1e] border-b border-white/10 shadow-2xl transition-all duration-300 overflow-y-auto ${
+        className={`md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-200 shadow-xl transition-all duration-300 overflow-y-auto ${
           mobileMenuOpen ? "max-h-[85vh] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
         }`}
       >
@@ -225,8 +225,8 @@ export default function Navbar() {
                 <li key={link.name}>
                   <Link 
                     href={link.href} 
-                    className={`block text-base font-medium transition-colors py-3 px-4 rounded-lg ${
-                      active ? "text-white bg-white/10" : "text-slate-300 hover:text-white hover:bg-white/5"
+                    className={`block text-base font-semibold transition-colors py-3 px-4 rounded-lg ${
+                      active ? "text-blue-600 bg-blue-50" : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"
                     }`}
                     aria-label={link.ariaLabel || `Go to ${link.name}`}
                     onClick={(e: React.MouseEvent) => handleNavClick(e, link.href)}
@@ -236,12 +236,12 @@ export default function Navbar() {
                 </li>
               );
             })}
-            <li className="mt-4 pt-4 border-t border-white/10">
+            <li className="mt-4 pt-4 border-t border-slate-100">
               {isLoggedIn ? (
                 <Link 
                   href="/profile" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-3 py-3 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-white/10 transition-colors"
+                  className="w-full flex items-center justify-center gap-3 py-3 rounded-lg bg-slate-100 hover:bg-slate-200/80 shadow-sm border border-slate-200 transition-colors"
                   aria-label="View Profile"
                 >
                   <Avatar
@@ -250,21 +250,21 @@ export default function Navbar() {
                     variant="beam"
                     colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
                   />
-                  <span className="text-white font-bold text-base">My Profile</span>
+                  <span className="text-slate-800 font-bold text-base">My Profile</span>
                 </Link>
               ) : (
                 <div className="flex flex-col gap-3">
                   <Link 
                     href="/login" 
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-center py-3 rounded-lg text-base font-bold text-slate-300 bg-slate-800/50 hover:text-white hover:bg-slate-700/50 transition-colors border border-white/5"
+                    className="w-full text-center py-3 rounded-lg text-base font-bold text-slate-700 bg-slate-50 hover:text-slate-950 hover:bg-slate-100 transition-colors border border-slate-200"
                   >
                     Log in
                   </Link>
                   <Link 
                     href="/signup" 
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(59,130,246,0.4)] block border border-white/10"
+                    className="w-full text-center py-3 rounded-lg text-base font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-md block border border-blue-500/20"
                   >
                     Sign up
                   </Link>
@@ -275,7 +275,7 @@ export default function Navbar() {
               <Link 
                 href="/#contact" 
                 onClick={(e: React.MouseEvent) => handleNavClick(e, "/#contact")}
-                className="w-full text-center py-3 rounded-lg text-base font-bold text-blue-300 border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition-colors block"
+                className="w-full text-center py-3 rounded-lg text-base font-bold text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 transition-colors block"
                 aria-label="Contact Us"
               >
                 Contact Us

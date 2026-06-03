@@ -18,15 +18,15 @@ import {
 type ToolColor = "blue" | "purple" | "pink" | "indigo" | "cyan" | "violet" | "sky" | "fuchsia" | "teal"
 
 const TOOL_COLORS: Record<ToolColor, { border: string; text: string }> = {
-  blue: { border: "border-blue-500/30", text: "text-blue-400" },
-  purple: { border: "border-purple-500/30", text: "text-purple-400" },
-  pink: { border: "border-pink-500/30", text: "text-pink-400" },
-  indigo: { border: "border-indigo-500/30", text: "text-indigo-400" },
-  cyan: { border: "border-cyan-500/30", text: "text-cyan-400" },
-  violet: { border: "border-violet-500/30", text: "text-violet-400" },
-  sky: { border: "border-sky-500/30", text: "text-sky-400" },
-  fuchsia: { border: "border-fuchsia-500/30", text: "text-fuchsia-400" },
-  teal: { border: "border-teal-500/30", text: "text-teal-400" },
+  blue: { border: "border-blue-200", text: "text-blue-600" },
+  purple: { border: "border-purple-200", text: "text-purple-600" },
+  pink: { border: "border-pink-200", text: "text-pink-600" },
+  indigo: { border: "border-indigo-200", text: "text-indigo-600" },
+  cyan: { border: "border-cyan-200", text: "text-cyan-600" },
+  violet: { border: "border-violet-200", text: "text-violet-600" },
+  sky: { border: "border-sky-200", text: "text-sky-600" },
+  fuchsia: { border: "border-fuchsia-200", text: "text-fuchsia-600" },
+  teal: { border: "border-teal-200", text: "text-teal-600" },
 }
 
 interface ToolCardProps {
@@ -44,11 +44,11 @@ const ToolCard = ({ icon: Icon, title, desc, color = "blue", idx = 0 }: ToolCard
       className="skill-card flex flex-col items-center text-center p-2 group opacity-0"
       style={{ transitionDelay: `${idx * 80}ms` }}
     >
-      <div className={`w-14 h-14 rounded-2xl bg-[#0f172a]/80 flex items-center justify-center mb-5 border ${styles.border} shadow-[0_4px_12px_rgba(0,0,0,0.1)] group-hover:-translate-y-1 transition-transform duration-300 relative`}>
+      <div className={`w-14 h-14 rounded-2xl bg-white flex items-center justify-center mb-5 border ${styles.border} shadow-sm group-hover:-translate-y-1 transition-transform duration-300 relative`}>
         <Icon className={`w-6 h-6 ${styles.text}`} />
       </div>
-      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-      <p className="text-sm text-slate-400 leading-relaxed max-w-[280px]">
+      <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
+      <p className="text-sm text-slate-600 leading-relaxed max-w-[280px]">
         {desc}
       </p>
     </div>
@@ -97,23 +97,23 @@ export default function SkillsSection() {
     <section
       ref={sectionRef}
       id="what-they-learn"
-      className="relative w-full py-16 md:py-32 bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-900 border-b"
+      className="relative w-full py-16 md:py-32 bg-white overflow-hidden flex flex-col items-center justify-center border-t border-slate-100 border-b"
     >
       {/* Background Layer with subtle Classroom Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img src="/classroom.webp" alt="Classroom Environment" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#020617]/70" />
+        <div className="absolute inset-0 bg-slate-50/60" />
       </div>
 
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-purple-900/5 to-transparent pointer-events-none rounded-full z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-purple-500/0 to-transparent pointer-events-none rounded-full z-10" />
 
       {/* Header */}
       <div className="w-full flex justify-center mb-10 md:mb-20 z-20 px-6">
         <div className="text-center max-w-[800px] w-full mx-auto">
-          <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 mb-4 md:mb-6 tracking-tight leading-tight">
+          <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 mb-4 md:mb-6 tracking-tight leading-tight">
             What Students Will Actually Learn
           </h2>
-          <p className="text-slate-400 text-base md:text-xl font-light">
+          <p className="text-slate-600 text-base md:text-xl font-light">
             No complex developer tools. At the Skillyug Summer AI Bootcamp, we focus solely on practical AI study tools and homework apps that help Class 6–12 students learn better and finish assignments faster.
           </p>
         </div>
@@ -129,15 +129,15 @@ export default function SkillsSection() {
           return (
             <div
               key={idx}
-              className="skill-card flex items-start gap-4 bg-[#0f172a]/80 border border-white/8 rounded-2xl p-4 backdrop-blur-sm opacity-0"
+              className="skill-card flex items-start gap-4 bg-white/90 border border-slate-200 rounded-2xl p-4 backdrop-blur-sm shadow-sm opacity-0"
               style={{ transitionDelay: `${idx * 80}ms` }}
             >
-              <div className={`w-11 h-11 rounded-xl bg-[#020617] border ${styles.border} flex items-center justify-center flex-shrink-0`}>
+              <div className={`w-11 h-11 rounded-xl bg-slate-50 border ${styles.border} flex items-center justify-center flex-shrink-0`}>
                 <Icon className={`w-5 h-5 ${styles.text}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-white font-bold text-sm leading-tight mb-1">{tool.title}</h3>
-                <p className="text-slate-400 text-xs leading-relaxed">{tool.desc}</p>
+                <h3 className="text-slate-900 font-bold text-sm leading-tight mb-1">{tool.title}</h3>
+                <p className="text-slate-600 text-xs leading-relaxed">{tool.desc}</p>
               </div>
             </div>
           )

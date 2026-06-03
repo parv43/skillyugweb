@@ -30,7 +30,7 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: OrbitingTo
         style={{ transform: `translateY(-${radius}px)` }}
       >
         <div
-          className="w-full h-full pointer-events-auto animate-counter-orbit flex flex-col items-center justify-center bg-[rgba(255,255,255,0.05)] backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-[16px] overflow-hidden hover:bg-white/10 hover:border-blue-400/30 transition-colors duration-300"
+          className="w-full h-full pointer-events-auto animate-counter-orbit flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm border border-slate-200/85 rounded-[16px] overflow-hidden shadow-sm hover:bg-white hover:border-blue-300 hover:shadow-md transition-all duration-300"
           style={{
             '--start-angle': `${angle}deg`,
             '--tilt': `${tilt}deg`,
@@ -38,7 +38,7 @@ const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: OrbitingTo
           } as React.CSSProperties}
         >
           <span className="text-3xl mb-1">{icon}</span>
-          <span className="text-[10px] sm:text-[11px] font-semibold text-slate-200 tracking-wide uppercase leading-none text-center px-1">
+          <span className="text-[10px] sm:text-[11px] font-bold text-slate-700 tracking-wide uppercase leading-none text-center px-1">
             {label}
           </span>
         </div>
@@ -52,23 +52,23 @@ function MobileHero() {
   const { isLoggedIn, hasSlot, loading } = useAccessControl();
 
   return (
-    <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-[#020617] overflow-hidden">
+    <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-background overflow-hidden">
       {/* Subtle Background Glows matching the screenshot */}
       <div className="absolute inset-0 pointer-events-none -z-10">
-        <div className="absolute top-[5%] left-[0%] w-[300px] h-[300px] bg-purple-600/10 rounded-full blur-[100px]" />
+        <div className="absolute top-[5%] left-[0%] w-[300px] h-[300px] bg-purple-600/5 rounded-full blur-[100px]" />
       </div>
 
       <div className="px-6 relative z-20 w-full flex flex-col items-start text-left">
         {/* Header Copy */}
         <h2
-          className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-white"
+          className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-slate-900"
         >
-          Help your child build <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-fuchsia-400">
+          Help your child build <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-fuchsia-600">
             AI skills that improve study, projects, and creative confidence.
           </span>
         </h2>
         <p
-          className="text-slate-300 text-[17px] leading-relaxed max-w-sm mb-10 font-normal"
+          className="text-slate-600 text-[17px] leading-relaxed max-w-sm mb-10 font-normal"
         >
           In a highly competitive world, standard school education isn&apos;t enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
         </p>
@@ -109,8 +109,8 @@ function MobileHero() {
           quality={85}
         />
         {/* Connection gradients: Top for text legibility, Bottom for section transition */}
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#020617] via-[#020617]/40 to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#020617] to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background via-background/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </div>
     </section>
   )
@@ -152,13 +152,13 @@ export default function HeroSection() {
       </div>
 
       {/* ── Desktop Hero (≥ md) — completely unchanged ── */}
-      <section className="hidden md:flex relative w-full min-h-[90vh] bg-[#020617] overflow-hidden items-center justify-center pt-24 pb-20">
+      <section className="hidden md:flex relative w-full min-h-[90vh] bg-background overflow-hidden items-center justify-center pt-24 pb-20">
         
         {/* Background Neural Gradients */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[20%] right-[10%] w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/15 via-purple-900/5 to-transparent rounded-full" />
-          <div className="absolute bottom-[20%] left-[10%] w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent rounded-full" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:60px_60px] opacity-40" />
+          <div className="absolute top-[20%] right-[10%] w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/10 via-purple-500/5 to-transparent rounded-full" />
+          <div className="absolute bottom-[20%] left-[10%] w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-blue-500/5 to-transparent rounded-full" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.02)_1px,transparent_1px)] bg-[size:60px_60px] opacity-40" />
         </div>
 
         <div className="container mx-auto px-6 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-16 lg:gap-8">
@@ -167,19 +167,19 @@ export default function HeroSection() {
           <div
             className="w-full lg:w-[58%] flex flex-col items-center lg:items-start text-center lg:text-left"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-blue-500/30 mb-6 bg-blue-500/5">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 bg-blue-50/50 shadow-sm mb-6">
               <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-              <span className="text-[11px] sm:text-xs font-bold text-blue-200 uppercase tracking-widest">Skillyug Summer AI Bootcamp • Classes 6–12</span>
+              <span className="text-[11px] sm:text-xs font-bold text-blue-700 uppercase tracking-widest">Skillyug Summer AI Bootcamp • Classes 6–12</span>
             </div>
 
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
               Give Your Child the AI Tools<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
                 They Need to Build Real World Things
               </span>
             </h2>
 
-            <p className="text-lg md:text-xl text-slate-300 max-w-xl mb-10 font-light leading-relaxed">
+            <p className="text-lg md:text-xl text-slate-600 max-w-xl mb-10 font-light leading-relaxed">
               In a highly competitive world, standard school education isn&apos;t
               enough. We train your child to leverage advanced AI, giving them a
               massive edge in academics and their future career.
@@ -206,15 +206,15 @@ export default function HeroSection() {
             {/* Faint Orbit Ring */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div 
-                className="absolute rounded-full border border-white/5 transition-all duration-500" 
+                className="absolute rounded-full border border-slate-200 transition-all duration-500" 
                 style={{ width: orbitRadius * 2, height: orbitRadius * 2 }}
               />
             </div>
 
             {/* Central Pill Badge */}
-            <div className="relative z-30 px-8 py-4 rounded-full bg-white shadow-[0_0_30px_rgba(255,255,255,0.4)] flex items-center justify-center">
+            <div className="relative z-30 px-8 py-4 rounded-full bg-white shadow-md border border-slate-200/80 flex items-center justify-center">
               <span className="text-xl md:text-2xl font-black text-black tracking-[0.2em] relative z-10">SKILLYUG</span>
-              <div className="absolute inset-0 rounded-full border border-white/40 animate-pulse opacity-50" />
+              <div className="absolute inset-0 rounded-full border border-slate-200 animate-pulse opacity-50" />
             </div>
 
             {/* Orbiting Tool Cards */}
