@@ -102,7 +102,7 @@ export default function SkillsSection() {
       {/* Background Layer with subtle Classroom Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img src="/classroom.webp" alt="Classroom Environment" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-slate-50/85" />
+        <div className="absolute inset-0 bg-slate-50/60" />
       </div>
 
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-purple-500/0 to-transparent pointer-events-none rounded-full z-10" />
