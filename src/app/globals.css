@@ -1,21 +1,15 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-border: var(--card-border);
+  --color-background: #020617; /* Slate 950 deep navy */
+  --color-foreground: #f8fafc; /* Slate 50 */
   --font-sans: var(--font-geist-sans), sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-border: #e2e8f0;
-  --flip-card-bg: #e2e8f0;
-  --flip-card-text: #0f172a;
+  --background: #020617;
+  --foreground: #f8fafc;
 }
 
 body {
@@ -28,12 +22,12 @@ body {
 
 /* Glassmorphism utilities */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(15, 23, 42, 0.35); /* Deeper with more contrast */
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-top: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.15); /* Slight highlight on top */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05); /* Lighter shadow */
 }
 
 /* Soft glow for icons (optimized) */
@@ -237,8 +231,8 @@ body {
   color: var(--flip-card-text, #ffffff);
   display: flex;
   justify-content: center;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .flip-card-inner-text {

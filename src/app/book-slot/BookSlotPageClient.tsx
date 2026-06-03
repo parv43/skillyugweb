@@ -366,11 +366,11 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         .glass-panel {
-          background: rgba(255, 255, 255, 0.8);
+          background: rgba(27, 25, 35, 0.4);
           backdrop-filter: blur(24px);
         }
         .luminous-glow {
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 0 100px -20px rgba(160, 140, 255, 0.12);
         }
         .spotlight-card {
           position: relative;
@@ -383,7 +383,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           right: 0;
           width: 300px;
           height: 300px;
-          background: radial-gradient(circle at center, rgba(59, 130, 246, 0.04) 0%, transparent 70%);
+          background: radial-gradient(circle at center, rgba(160, 140, 255, 0.08) 0%, transparent 70%);
           pointer-events: none;
         }
       `,
@@ -399,12 +399,12 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
         rel="stylesheet"
       />
 
-      <div className="text-slate-800 font-body selection:bg-[#d1c4ff] selection:text-[#2b0064] min-h-screen flex flex-col relative overflow-hidden bg-slate-50">
+      <div className="text-[#e6e0e9] font-body selection:bg-[#d1c4ff] selection:text-[#2b0064] min-h-screen flex flex-col relative overflow-hidden bg-[#0b0a0f]">
         {isCheckingAuth && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-50">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#0b0a0f]">
             <div className="text-center">
-              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
-              <p className="text-sm font-medium text-slate-600">Loading your booking...</p>
+              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[#a4a6ff]/30 border-t-[#a4a6ff]" />
+              <p className="text-sm font-medium text-[#cac4cf]">Loading your booking...</p>
             </div>
           </div>
         )}
@@ -413,15 +413,15 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           <img
             src="/classroom.webp"
             alt="Background Classroom"
-            className="w-full h-full object-cover object-[center_20%] opacity-20"
+            className="w-full h-full object-cover object-[center_20%] opacity-80"
           />
-          <div className="absolute inset-0 bg-slate-50/80" />
+          <div className="absolute inset-0 bg-[#0b0a0f]/60" />
         </div>
 
-        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[140px] pointer-events-none z-0" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none z-0" />
+        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#6750a4]/10 rounded-full blur-[140px] pointer-events-none z-0" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#3f51b5]/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
-        <header className="w-full top-0 sticky z-[100] bg-white/80 border-b border-slate-200/80 backdrop-blur-md flex justify-between items-center px-6 py-4">
+        <header className="w-full top-0 sticky z-[100] bg-[#0b0a0f] flex justify-between items-center px-6 py-4">
           <img
             src="/skillyug-optimized.svg"
             alt="Skillyug Logo"
@@ -431,12 +431,12 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
 
         <main className="flex-grow flex items-center justify-center px-6 py-12 md:py-24 relative z-10">
           <div 
-            className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-slate-200 shadow-lg animate-slide-down"
+            className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-white/5 animate-slide-down"
           >
             <div className="mb-6">
               <Link
                 href={fromParam === "bootcamp" ? "/bootcamp" : "/"}
-                className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors font-headline font-bold text-sm group w-fit"
+                className="flex items-center gap-2 text-[#cac4cf] hover:text-[#d1c4ff] transition-colors font-headline font-bold text-sm group w-fit"
               >
                 <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">
                   arrow_back
@@ -446,10 +446,10 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             </div>
 
             <div className="mb-8">
-              <h1 className="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-slate-900 mb-2">
+              <h1 className="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-[#e6e0e9] mb-2">
                 {paymentTier === "full" ? "Enroll in Bootcamp" : "Book Your Spot"}
               </h1>
-              <p className="text-slate-600 font-medium">
+              <p className="text-[#cac4cf] font-medium">
                 {paymentTier === "full"
                   ? "Complete the full payment to enroll in the upcoming bootcamp."
                   : "Complete this payment to reserve your spot. The total bootcamp price is ₹3800."}
@@ -457,31 +457,31 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             </div>
 
             {userEmail && (
-              <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                Logged in as <span className="font-semibold text-slate-900">{userEmail}</span>
+              <div className="mb-6 rounded-xl border border-[#48474a]/35 bg-[#1b1923]/60 px-4 py-3 text-sm text-[#cac4cf]">
+                Logged in as <span className="font-semibold text-white">{userEmail}</span>
               </div>
             )}
 
             {successMsg && (
-              <div className="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+              <div className="mb-6 rounded-xl border border-green-500/30 bg-green-500/15 px-4 py-3 text-sm font-semibold text-green-300">
                 {successMsg}
               </div>
             )}
 
             {errorMsg && (
-              <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+              <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/15 px-4 py-3 text-sm font-semibold text-red-300">
                 {errorMsg}
               </div>
             )}
 
             {gatewayNotice && (
-              <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+              <div className="mb-6 rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-200">
                 {gatewayNotice}
               </div>
             )}
 
             {razorpayScriptStatus === "loading" && (
-              <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700">
+              <div className="mb-6 rounded-xl border border-blue-500/25 bg-blue-500/10 px-4 py-3 text-sm font-semibold text-blue-200">
                 Loading payment gateway...
               </div>
             )}
@@ -491,7 +491,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 <button
                   type="button"
                   onClick={handleRetryRazorpayScript}
-                  className="flex w-full items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-5 py-4 text-center text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100 hover:text-blue-900"
+                  className="flex w-full items-center justify-center rounded-xl border border-blue-400/25 bg-blue-500/10 px-5 py-4 text-center text-sm font-semibold text-blue-200 transition-colors hover:bg-blue-500/15 hover:text-white"
                 >
                   Retry payment gateway
                 </button>
@@ -502,7 +502,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
               <div className="mb-6">
                 <Link
                   href="/#contact"
-                  className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 text-center text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:from-blue-500 hover:to-indigo-500"
+                  className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-blue-400/30 bg-gradient-to-r from-blue-600/80 to-violet-600/80 px-5 py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(59,130,246,0.7)] transition-all hover:-translate-y-0.5 hover:from-blue-500 hover:to-violet-500 hover:shadow-[0_16px_36px_-12px_rgba(124,77,255,0.8)]"
                 >
                   <span className="material-symbols-outlined text-[20px]">support_agent</span>
                   If you faced any problem during payment, contact us so we can help.
@@ -516,7 +516,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             <form className="space-y-8" onSubmit={handlePayment}>
               <div className="space-y-6">
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 mb-2 group-focus-within:text-blue-600 transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Student Name
                   </label>
                   <div className="relative">
@@ -525,15 +525,15 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       required
                       value={studentName}
                       onChange={(e) => setStudentName(e.currentTarget.value)}
-                      className="w-full bg-slate-50 border border-slate-300 outline-none rounded-xl py-4 px-5 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium"
+                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
                       placeholder="Enter full name"
                       type="text"
-                     />
+                    />
                   </div>
                 </div>
 
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 mb-2 group-focus-within:text-blue-600 transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Phone Number
                   </label>
                   <div className="relative">
@@ -550,7 +550,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       onChange={(e) =>
                         setPhoneNumber(e.currentTarget.value.replace(/[^0-9]/g, "").slice(0, 10))
                       }
-                      className="w-full bg-slate-50 border border-slate-300 outline-none rounded-xl py-4 px-5 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium"
+                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
                       placeholder="9876543210"
                       type="tel"
                     />
@@ -558,7 +558,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 </div>
 
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 mb-2 group-focus-within:text-blue-600 transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Class/Grade
                   </label>
                   <div className="relative">
@@ -567,7 +567,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       required
                       value={grade}
                       onChange={(e) => setGrade(e.currentTarget.value)}
-                      className="w-full bg-slate-50 border border-slate-300 outline-none rounded-xl py-4 px-5 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium appearance-none"
+                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium appearance-none"
                     >
                       <option disabled value="">
                         Select class or grade
@@ -580,14 +580,14 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       <option value="11th">11th</option>
                       <option value="12th">12th</option>
                     </select>
-                    <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-slate-500">
+                    <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-[#938f99]">
                       <span className="material-symbols-outlined">expand_more</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 mb-2 group-focus-within:text-blue-600 transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
                     Promo Code (Optional)
                   </label>
                   <div className="relative">
@@ -595,7 +595,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       name="promoCode"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.currentTarget.value.toUpperCase())}
-                      className="w-full bg-slate-50 border border-slate-300 outline-none rounded-xl py-4 px-5 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium uppercase"
+                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium uppercase"
                       placeholder="Enter promo code"
                       type="text"
                     />
@@ -610,7 +610,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                     isCheckingAuth ||
                     razorpayScriptStatus !== "ready"
                   }
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-5 rounded-full shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
+                  className="w-full bg-gradient-to-r from-[#7c4dff] to-[#448aff] text-white font-bold py-5 rounded-full hover:shadow-[0_0_30px_-5px_rgba(124,77,255,0.6)] disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
                   type="submit"
                 >
                   <span className="material-symbols-outlined">payments</span>
@@ -626,7 +626,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             </form>
 
             <div className="mt-8 text-center">
-              <p className="text-[11px] font-label text-slate-500/80 uppercase tracking-widest">
+              <p className="text-[11px] font-label text-[#938f99]/60 uppercase tracking-widest">
                 Secure payment processed via Razorpay
               </p>
             </div>
