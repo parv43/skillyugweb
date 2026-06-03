@@ -109,7 +109,7 @@ export default function ResetPasswordPageClient() {
               <img
                 src="/skillyug-optimized.svg"
                 alt="Skillyug Logo"
-                className="h-36 md:h-56 w-auto object-contain brightness-0 opacity-85"
+                className="h-36 md:h-56 w-auto object-contain"
               />
             </Link>
           </div>

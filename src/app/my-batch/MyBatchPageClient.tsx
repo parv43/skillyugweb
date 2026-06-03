@@ -1292,7 +1292,7 @@ export default function MyBatchPage() {
                   alt="Skillyug logo"
                   width={260}
                   height={120}
-                  className="mx-auto h-20 w-auto object-contain brightness-0 opacity-85"
+                  className="mx-auto h-20 w-auto object-contain"
                 />
                 <p className="mt-6 text-sm leading-relaxed text-slate-600">
                   Built for focused execution across every session, milestone, and creator sprint.

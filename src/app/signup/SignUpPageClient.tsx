@@ -97,7 +97,7 @@ function SignUpForm() {
       <div className="bg-slate-50 text-slate-800 min-h-screen selection:bg-[#a4a6ff]/30 flex flex-col overflow-x-hidden font-sans">
         <header className="fixed top-0 w-full z-50 bg-white/80 border-b border-slate-200/80 backdrop-blur-3xl flex justify-between items-center px-6 md:px-12 h-24">
           <Link href="/" className="hover:scale-105 transition-transform duration-300">
-            <img src="/skillyug-optimized.svg" alt="Skillyug Logo" className="h-16 md:h-20 w-auto object-contain brightness-0 opacity-85" />
+            <img src="/skillyug-optimized.svg" alt="Skillyug Logo" className="h-16 md:h-20 w-auto object-contain" />
           </Link>
         </header>
 
@@ -178,7 +178,7 @@ function SignUpForm() {
     <div className="bg-slate-50 text-slate-800 min-h-screen selection:bg-[#a4a6ff]/30 flex flex-col overflow-x-hidden font-sans">
       <header className="fixed top-0 w-full z-50 bg-white/80 border-b border-slate-200/80 backdrop-blur-3xl flex justify-between items-center px-6 md:px-12 h-24">
         <Link href="/" className="hover:scale-105 transition-transform duration-300">
-          <img src="/skillyug-optimized.svg" alt="Skillyug Logo" className="h-16 md:h-20 w-auto object-contain brightness-0 opacity-85" />
+          <img src="/skillyug-optimized.svg" alt="Skillyug Logo" className="h-16 md:h-20 w-auto object-contain" />
         </Link>
       </header>
 

@@ -341,7 +341,7 @@ export default function BootcampPage() {
                 className="relative rounded-2xl border border-slate-200 bg-white p-8 backdrop-blur-md shadow-sm transition hover:border-purple-300 hover:bg-white/95"
               >
                 <div className="absolute right-8 top-8 h-20 w-72 opacity-80 transition-opacity hover:opacity-100">
-                  <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" fill className="object-contain object-right brightness-0 opacity-80" />
+                  <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" fill className="object-contain object-right opacity-30" />
                 </div>
                 {instructor.image ? (
                   <div className="mb-7 relative h-24 w-24 overflow-hidden rounded-full border border-slate-200 shadow-sm">
@@ -405,7 +405,7 @@ export default function BootcampPage() {
               alt="Skillyug"
               width={520}
               height={220}
-              className="h-auto w-64 sm:w-80 md:w-[420px] brightness-0 opacity-85"
+              className="h-auto w-64 sm:w-80 md:w-[420px]"
             />
           </div>
           <nav

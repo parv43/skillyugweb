@@ -100,7 +100,7 @@ export default function Home() {
       
       <footer className="relative z-10 w-full bg-slate-50 border-t border-slate-200/80 pt-8 pb-20 flex flex-col items-center">
         <div className="bg-slate-100/50 p-6 md:p-16 px-10 md:px-48 rounded-[2rem] md:rounded-[2.5rem] mb-16 backdrop-blur-sm overflow-hidden group border border-slate-200/50">
-          <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" width={300} height={150} className="h-14 md:h-36 w-auto object-contain scale-[1.8] md:scale-[2.0] transition-transform group-hover:scale-[2.4] duration-500 transform-gpu brightness-0 opacity-85" />
+          <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" width={300} height={150} className="h-14 md:h-36 w-auto object-contain scale-[1.8] md:scale-[2.0] transition-transform group-hover:scale-[2.4] duration-500 transform-gpu" />
         </div>
         
         <nav className="mb-6">

@@ -425,7 +425,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           <img
             src="/skillyug-optimized.svg"
             alt="Skillyug Logo"
-            className="h-20 md:h-24 w-auto object-contain scale-[1.8] md:scale-[2.0] brightness-0 opacity-85"
+            className="h-20 md:h-24 w-auto object-contain scale-[1.8] md:scale-[2.0]"
           />
         </header>
 
