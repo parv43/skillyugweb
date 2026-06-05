@@ -87,7 +87,7 @@ export default function FirstClassCountdown() {
 
   if (!mounted) {
     return (
-      <div className="w-full rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-5 md:p-6 animate-pulse min-h-[90px]"></div>
+      <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 backdrop-blur-xl p-5 md:p-6 animate-pulse min-h-[90px]"></div>
     )
   }
 
@@ -95,26 +95,26 @@ export default function FirstClassCountdown() {
   const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Skillyug+Summer+AI+Bootcamp+-+First+Class&dates=20260528T073000Z/20260528T090000Z&details=Welcome+to+the+first+live+session+of+the+Skillyug+Summer+AI+Bootcamp!+Please+access+the+live+link+from+your+My+Batch+Workspace.&sf=true&output=xml`
 
   return (
-    <div className="w-full rounded-2xl border border-white/10 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 bg-white/[0.02] backdrop-blur-xl p-5 md:p-6 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:border-white/20 transition-all duration-300">
+    <div className="w-full rounded-2xl border border-slate-200 bg-gradient-to-r from-blue-500/[0.02] via-purple-500/[0.02] to-pink-500/[0.02] bg-white backdrop-blur-xl p-5 md:p-6 shadow-sm hover:border-slate-300 transition-all duration-300">
       <div className="flex flex-col gap-6">
         
         {/* Top Row: Info & Button */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/5 pb-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div className="flex items-center gap-3 text-center sm:text-left">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 shadow-[0_0_12px_rgba(59,130,246,0.15)] flex-shrink-0 hidden xs:flex">
-              <Calendar className="w-5 h-5 text-blue-300" />
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 shadow-sm flex-shrink-0 hidden xs:flex">
+              <Calendar className="w-5 h-5 text-blue-600" />
             </div>
             <div>
               <div className="flex items-center justify-center sm:justify-start gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-purple-300 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300">
+                <Sparkles className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">
                   Live Cohort Starts Soon
                 </span>
               </div>
-              <h3 className="text-base font-black text-white mt-0.5">
+              <h3 className="text-base font-black text-slate-900 mt-0.5">
                 {timeLeft.isExpired ? "First Class has started!" : "First Class starts in"}
               </h3>
-              <p className="text-xs text-slate-400 font-medium">
+              <p className="text-xs text-slate-600 font-medium">
                 Thursday, 28th May at 1:00 PM IST
               </p>
             </div>
@@ -123,8 +123,8 @@ export default function FirstClassCountdown() {
           {/* Action Button */}
           <div className="flex-shrink-0">
             {timeLeft.isExpired ? (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-500/30 bg-green-500/10 text-green-300 text-[10px] font-bold uppercase tracking-wider animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping" />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-200 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider animate-pulse">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping" />
                 Live Now
               </div>
             ) : (
@@ -132,9 +132,9 @@ export default function FirstClassCountdown() {
                 href={calendarUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-[10px] font-bold uppercase tracking-[0.15em] text-slate-200 transition-all hover:bg-white/[0.08] hover:text-white hover:scale-[1.03] active:scale-[0.97]"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 hover:scale-[1.03] active:scale-[0.97]"
               >
-                <Clock className="w-3.5 h-3.5 text-blue-300" />
+                <Clock className="w-3.5 h-3.5 text-blue-600" />
                 Add to Calendar
               </a>
             )}
@@ -159,12 +159,12 @@ export default function FirstClassCountdown() {
                         <FlipUnit key={dIdx} digit={digit} />
                       ))}
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1.5 select-none">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 mt-1.5 select-none">
                       {unit.label}
                     </span>
                   </div>
                   {index < arr.length - 1 && (
-                    <span className="text-lg font-bold text-slate-500/60 self-start mt-2 select-none animate-[pulse_1s_infinite]">
+                    <span className="text-lg font-bold text-slate-400 self-start mt-2 select-none animate-[pulse_1s_infinite]">
                       :
                     </span>
                   )}

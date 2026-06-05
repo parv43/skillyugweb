@@ -149,165 +149,154 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
     setErrorMsg("");
     setGatewayNotice("");
     setRazorpayScriptStatus("loading");
-    setRazorpayAutoRetryCount(0);
     setRazorpayScriptKey((current) => current + 1);
   };
 
-  const handlePayment = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
-    setGatewayNotice("");
 
-    if (razorpayScriptStatus === "failed") {
-      setErrorMsg("Razorpay failed to load. Check your network or browser shields and try again.");
+    if (isProcessingPayment) return;
+
+    if (!studentName.trim() || !phoneNumber.trim() || !grade.trim()) {
+      setErrorMsg("Please fill out all required fields.");
       return;
     }
 
-    if (razorpayScriptStatus !== "ready" || !window.Razorpay) {
-      setErrorMsg("Payment gateway is still loading. Please wait until it is ready.");
-      return;
-    }
-
-    const normalizedStudentName = studentName.trim();
-    const normalizedPhoneNumber = phoneNumber.trim();
-    const normalizedGrade = grade.trim();
-    const normalizedPromoCode = promoCode.trim().toUpperCase();
-
-    // Valid promo codes — internal reference only (do NOT display these on the UI):
-    // YUG01 → ANUSHKA
-    // YUG02 → 
-    // YUG03 → 
-    const VALID_PROMO_CODES = ['YUG01', 'YUG02', 'YUG03'];
-
-    if (!normalizedStudentName || !normalizedGrade || !/^\d{10}$/.test(normalizedPhoneNumber)) {
-      setErrorMsg("Enter a valid name, class, and 10-digit phone number before paying.");
-      return;
-    }
-
-    // If a promo code was entered, validate it against allowed codes
-    if (normalizedPromoCode && !VALID_PROMO_CODES.includes(normalizedPromoCode)) {
-      setErrorMsg("Invalid promo code. Please check your code and try again.");
+    if (phoneNumber.length !== 10) {
+      setErrorMsg("Please enter a valid 10-digit phone number.");
       return;
     }
 
     setIsProcessingPayment(true);
 
     try {
-      const orderResponse = await fetch("/api/book-slot/order", {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        setErrorMsg("Your session expired. Please reload and log in again.");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      const orderRequest = await fetch("/api/payment/create-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          grade: normalizedGrade,
-          phoneNumber: normalizedPhoneNumber,
-          promoCode: normalizedPromoCode,
-          studentName: normalizedStudentName,
-          paymentTier: paymentTier,
+          tier: paymentTier,
+          studentName,
+          phoneNumber,
+          grade,
+          promoCode: promoCode.trim() || undefined,
         }),
       });
 
-      const orderData = (await orderResponse.json()) as RazorpayOrderResponse & { error?: string };
-
-      if (!orderResponse.ok) {
-        throw new Error(orderData.error || "Failed to start payment.");
+      const responseBody = await orderRequest.text();
+      let orderResult: RazorpayOrderResponse & { error?: string };
+      try {
+        orderResult = JSON.parse(responseBody);
+      } catch (err) {
+        console.error("Non-JSON API error response:", responseBody);
+        throw new Error("We received a bad response from the payment setup server. Please try again.");
       }
 
-      let paymentFinalized = false;
+      if (!orderRequest.ok) {
+        throw new Error(
+          orderResult.error || "Failed to initialize booking session. Please try again later."
+        );
+      }
 
-      const razorpay = new window.Razorpay({
-        key: orderData.keyId,
-        amount: orderData.amount,
-        currency: orderData.currency,
+      const razorpayOptions: RazorpayOptions = {
+        key: orderResult.keyId,
+        amount: orderResult.amount,
+        currency: orderResult.currency,
         name: "Skillyug",
-        description: "Book Your Spot",
-        order_id: orderData.orderId,
+        description:
+          paymentTier === "full"
+            ? "AI Bootcamp Complete Enrollment Fee"
+            : "AI Bootcamp Partial Spot Reservation Fee",
+        order_id: orderResult.orderId,
         prefill: {
-          name: normalizedStudentName,
-          email: orderData.customerEmail || userEmail,
-          contact: normalizedPhoneNumber,
+          name: prefilledName || studentName,
+          email: orderResult.customerEmail,
+          contact: phoneNumber,
         },
-        notes: {
-          booking_type: "slot_booking",
-          grade: normalizedGrade,
-          promo_code: normalizedPromoCode || "NONE",
-        },
-        retry: {
-          enabled: true,
+        theme: {
+          color: "#3b82f6",
         },
         modal: {
           confirm_close: true,
           ondismiss: () => {
-            if (!paymentFinalized) {
-              setErrorMsg("Payment was cancelled before completion.");
-              setIsProcessingPayment(false);
-            }
+            setIsProcessingPayment(false);
           },
         },
-        theme: {
-          color: "#6750a4",
-        },
-        handler: async (paymentPayload) => {
-          paymentFinalized = true;
-
+        handler: async (paymentPayload: RazorpaySuccessPayload) => {
+          setIsProcessingPayment(true);
           try {
-            const verifyResponse = await fetch("/api/book-slot/verify-payment", {
+            // Keep notice active until verified
+            markPaymentSupportNoticePending();
+
+            const verifyRequest = await fetch("/api/payment/verify-payment", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${session.access_token}`,
               },
               body: JSON.stringify({
-                ...paymentPayload,
-                grade: normalizedGrade,
-                phoneNumber: normalizedPhoneNumber,
-                promoCode: normalizedPromoCode,
-                studentName: normalizedStudentName,
+                razorpayOrderId: paymentPayload.razorpay_order_id,
+                razorpayPaymentId: paymentPayload.razorpay_payment_id,
+                razorpaySignature: paymentPayload.razorpay_signature,
               }),
             });
 
-            const verifyData = await verifyResponse.json();
-            if (!verifyResponse.ok) {
-              throw new Error(
-                verifyData.error || "Payment was captured but booking confirmation failed."
-              );
+            const verifyResult = (await verifyRequest.json()) as { error?: string };
+
+            if (!verifyRequest.ok) {
+              throw new Error(verifyResult.error || "Payment verification failed.");
             }
 
-            setSuccessMsg("Payment successful. Your slot has been booked.");
-            markPaymentSupportNoticePending();
-            setPhoneNumber("");
-            setGrade("");
-            setPromoCode("");
-            setStudentName(prefilledName || "");
-            // Clear cached access state so My Batch re-checks and grants access
-            try { sessionStorage.removeItem("mybatch_access"); } catch { /* ignore */ }
-            router.replace("/my-batch");
-          } catch (error) {
-            console.error("Payment verification error:", error);
+            setSuccessMsg("Payment successful! Redirecting you to your batch dashboard...");
+            setTimeout(() => {
+              router.push("/my-batch");
+            }, 1500);
+          } catch (verifyError) {
+            console.error("Payment verification failure:", verifyError);
             setErrorMsg(
-              error instanceof Error
-                ? error.message
-                : "Payment verification failed. Contact support with your payment details."
+              verifyError instanceof Error
+                ? verifyError.message
+                : "Payment succeeded but verification failed. Reach out to our support team."
             );
-          } finally {
             setIsProcessingPayment(false);
           }
         },
-      });
+      };
 
-      razorpay.on("payment.failed", (payload) => {
-        paymentFinalized = true;
-        const failureReason =
-          payload.error?.description || payload.error?.reason || "Payment failed. Please try again.";
-        setErrorMsg(failureReason);
+      if (!window.Razorpay) {
+        throw new Error("Razorpay SDK is not fully loaded. Check your connection and try again.");
+      }
+
+      const instance = new window.Razorpay(razorpayOptions);
+      instance.on("payment.failed", (failedPayload: RazorpayFailurePayload) => {
+        console.error("Razorpay payment failure event:", failedPayload);
+        setErrorMsg(
+          failedPayload.error?.description || "Payment process cancelled or failed. Please try again."
+        );
         setIsProcessingPayment(false);
       });
 
-      razorpay.open();
-    } catch (error) {
-      console.error("Error creating Razorpay order:", error);
+      instance.open();
+    } catch (orderError) {
+      console.error("Razorpay Setup Failure:", orderError);
       setErrorMsg(
-        error instanceof Error ? error.message : "Unable to start payment. Please try again."
+        orderError instanceof Error
+          ? orderError.message
+          : "Could not start checkout session. Please try again."
       );
       setIsProcessingPayment(false);
     }
@@ -318,35 +307,16 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
       <Script
         key={razorpayScriptKey}
         src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         nonce={nonce}
-        onLoad={() => {
-          setRazorpayScriptStatus("ready");
-          setRazorpayAutoRetryCount(0);
-          setGatewayNotice((current) =>
-            current
-              ? "Payment gateway reloaded. Your details are still filled in. Please review them and tap Pay Now again."
-              : ""
-          );
-          setErrorMsg((current) =>
-            current === "Razorpay failed to load. Check your network or browser shields and try again."
-              || current ===
-                "Razorpay failed to load after retry. Check your network or browser shields, then try again."
-              ? ""
-              : current
-          );
-        }}
-        onError={() => {
-          setRazorpayScriptStatus("failed");
-          setErrorMsg("Razorpay failed to load. Check your network or browser shields and try again.");
-        }}
+        onLoad={() => setRazorpayScriptStatus("ready")}
+        onError={() => setRazorpayScriptStatus("failed")}
       />
 
       <style
         dangerouslySetInnerHTML={{
           __html: `
         .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .font-body { font-family: 'Manrope', sans-serif; }
         .font-label { font-family: 'Manrope', sans-serif; }
 
         .material-symbols-outlined {
@@ -366,11 +336,15 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         .glass-panel {
-          background: rgba(27, 25, 35, 0.4);
+          background: rgba(255, 255, 255, 0.8);
           backdrop-filter: blur(24px);
         }
+        .dark .glass-panel {
+          background: rgba(10, 15, 28, 0.85);
+          border-color: rgba(255, 255, 255, 0.08);
+        }
         .luminous-glow {
-          box-shadow: 0 0 100px -20px rgba(160, 140, 255, 0.12);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
         }
         .spotlight-card {
           position: relative;
@@ -383,7 +357,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           right: 0;
           width: 300px;
           height: 300px;
-          background: radial-gradient(circle at center, rgba(160, 140, 255, 0.08) 0%, transparent 70%);
+          background: radial-gradient(circle at center, rgba(59, 130, 246, 0.04) 0%, transparent 70%);
           pointer-events: none;
         }
       `,
@@ -399,12 +373,12 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
         rel="stylesheet"
       />
 
-      <div className="text-[#e6e0e9] font-body selection:bg-[#d1c4ff] selection:text-[#2b0064] min-h-screen flex flex-col relative overflow-hidden bg-[#0b0a0f]">
+      <div className="text-slate-800 dark:text-slate-200 font-body selection:bg-[#d1c4ff] selection:text-[#2b0064] min-h-screen flex flex-col relative overflow-hidden bg-slate-50 dark:bg-[#020617] transition-colors duration-300">
         {isCheckingAuth && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#0b0a0f]">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-50 dark:bg-[#020617]">
             <div className="text-center">
-              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[#a4a6ff]/30 border-t-[#a4a6ff]" />
-              <p className="text-sm font-medium text-[#cac4cf]">Loading your booking...</p>
+              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
+              <p className="text-sm font-medium text-slate-650 dark:text-slate-400">Loading your booking...</p>
             </div>
           </div>
         )}
@@ -413,15 +387,15 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           <img
             src="/classroom.webp"
             alt="Background Classroom"
-            className="w-full h-full object-cover object-[center_20%] opacity-80"
+            className="w-full h-full object-cover object-[center_20%] opacity-20"
           />
-          <div className="absolute inset-0 bg-[#0b0a0f]/60" />
+          <div className="absolute inset-0 bg-slate-50/80 dark:bg-[#020617]/90" />
         </div>
 
-        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#6750a4]/10 rounded-full blur-[140px] pointer-events-none z-0" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#3f51b5]/10 rounded-full blur-[120px] pointer-events-none z-0" />
+        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[140px] pointer-events-none z-0" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none z-0" />
 
-        <header className="w-full top-0 sticky z-[100] bg-[#0b0a0f] flex justify-between items-center px-6 py-4">
+        <header className="w-full top-0 sticky z-[100] bg-white/80 dark:bg-[#020617]/80 border-b border-slate-200/80 dark:border-slate-800/80 backdrop-blur-md flex justify-between items-center px-6 py-4">
           <img
             src="/skillyug-optimized.svg"
             alt="Skillyug Logo"
@@ -431,12 +405,12 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
 
         <main className="flex-grow flex items-center justify-center px-6 py-12 md:py-24 relative z-10">
           <div 
-            className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-white/5 animate-slide-down"
+            className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-slate-200 dark:border-white/10 shadow-lg animate-slide-down"
           >
             <div className="mb-6">
               <Link
                 href={fromParam === "bootcamp" ? "/bootcamp" : "/"}
-                className="flex items-center gap-2 text-[#cac4cf] hover:text-[#d1c4ff] transition-colors font-headline font-bold text-sm group w-fit"
+                className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-450 dark:hover:text-white transition-colors font-headline font-bold text-sm group w-fit"
               >
                 <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">
                   arrow_back
@@ -446,10 +420,10 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             </div>
 
             <div className="mb-8">
-              <h1 className="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-[#e6e0e9] mb-2">
+              <h1 className="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
                 {paymentTier === "full" ? "Enroll in Bootcamp" : "Book Your Spot"}
               </h1>
-              <p className="text-[#cac4cf] font-medium">
+              <p className="text-slate-600 dark:text-slate-350 font-medium">
                 {paymentTier === "full"
                   ? "Complete the full payment to enroll in the upcoming bootcamp."
                   : "Complete this payment to reserve your spot. The total bootcamp price is ₹3800."}
@@ -457,31 +431,31 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             </div>
 
             {userEmail && (
-              <div className="mb-6 rounded-xl border border-[#48474a]/35 bg-[#1b1923]/60 px-4 py-3 text-sm text-[#cac4cf]">
-                Logged in as <span className="font-semibold text-white">{userEmail}</span>
+              <div className="mb-6 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a] px-4 py-3 text-sm text-slate-655 dark:text-slate-300">
+                Logged in as <span className="font-semibold text-slate-900 dark:text-white">{userEmail}</span>
               </div>
             )}
 
             {successMsg && (
-              <div className="mb-6 rounded-xl border border-green-500/30 bg-green-500/15 px-4 py-3 text-sm font-semibold text-green-300">
+              <div className="mb-6 rounded-xl border border-green-200 dark:border-green-900/30 bg-green-50 dark:bg-green-950/40 px-4 py-3 text-sm font-semibold text-green-700 dark:text-green-400">
                 {successMsg}
               </div>
             )}
 
             {errorMsg && (
-              <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/15 px-4 py-3 text-sm font-semibold text-red-300">
+              <div className="mb-6 rounded-xl border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-950/40 px-4 py-3 text-sm font-semibold text-red-700 dark:text-red-405">
                 {errorMsg}
               </div>
             )}
 
             {gatewayNotice && (
-              <div className="mb-6 rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-200">
+              <div className="mb-6 rounded-xl border border-amber-200 dark:border-amber-900/30 bg-amber-50 dark:bg-amber-950/40 px-4 py-3 text-sm font-semibold text-amber-700 dark:text-amber-400">
                 {gatewayNotice}
               </div>
             )}
 
             {razorpayScriptStatus === "loading" && (
-              <div className="mb-6 rounded-xl border border-blue-500/25 bg-blue-500/10 px-4 py-3 text-sm font-semibold text-blue-200">
+              <div className="mb-6 rounded-xl border border-blue-200 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/40 px-4 py-3 text-sm font-semibold text-blue-700 dark:text-blue-400">
                 Loading payment gateway...
               </div>
             )}
@@ -491,7 +465,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 <button
                   type="button"
                   onClick={handleRetryRazorpayScript}
-                  className="flex w-full items-center justify-center rounded-xl border border-blue-400/25 bg-blue-500/10 px-5 py-4 text-center text-sm font-semibold text-blue-200 transition-colors hover:bg-blue-500/15 hover:text-white"
+                  className="flex w-full items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-5 py-4 text-center text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100 hover:text-blue-900"
                 >
                   Retry payment gateway
                 </button>
@@ -502,7 +476,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
               <div className="mb-6">
                 <Link
                   href="/#contact"
-                  className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-blue-400/30 bg-gradient-to-r from-blue-600/80 to-violet-600/80 px-5 py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(59,130,246,0.7)] transition-all hover:-translate-y-0.5 hover:from-blue-500 hover:to-violet-500 hover:shadow-[0_16px_36px_-12px_rgba(124,77,255,0.8)]"
+                  className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 text-center text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:from-blue-500 hover:to-indigo-500"
                 >
                   <span className="material-symbols-outlined text-[20px]">support_agent</span>
                   If you faced any problem during payment, contact us so we can help.
@@ -516,7 +490,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             <form className="space-y-8" onSubmit={handlePayment}>
               <div className="space-y-6">
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-blue-600 transition-colors">
                     Student Name
                   </label>
                   <div className="relative">
@@ -525,15 +499,15 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       required
                       value={studentName}
                       onChange={(e) => setStudentName(e.currentTarget.value)}
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
+                      className="w-full bg-slate-50 border border-slate-300 dark:bg-slate-900 dark:border-white/10 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium"
                       placeholder="Enter full name"
                       type="text"
-                    />
+                     />
                   </div>
                 </div>
 
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-blue-600 transition-colors">
                     Phone Number
                   </label>
                   <div className="relative">
@@ -550,7 +524,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       onChange={(e) =>
                         setPhoneNumber(e.currentTarget.value.replace(/[^0-9]/g, "").slice(0, 10))
                       }
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium"
+                      className="w-full bg-slate-50 border border-slate-300 dark:bg-slate-900 dark:border-white/10 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium"
                       placeholder="9876543210"
                       type="tel"
                     />
@@ -558,7 +532,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 </div>
 
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-blue-600 transition-colors">
                     Class/Grade
                   </label>
                   <div className="relative">
@@ -567,7 +541,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       required
                       value={grade}
                       onChange={(e) => setGrade(e.currentTarget.value)}
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium appearance-none"
+                      className="w-full bg-slate-50 border border-slate-300 dark:bg-slate-900 dark:border-white/10 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium appearance-none"
                     >
                       <option disabled value="">
                         Select class or grade
@@ -580,14 +554,14 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       <option value="11th">11th</option>
                       <option value="12th">12th</option>
                     </select>
-                    <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-[#938f99]">
+                    <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-slate-500">
                       <span className="material-symbols-outlined">expand_more</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-[#938f99] mb-2 group-focus-within:text-[#d1c4ff] transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-blue-600 transition-colors">
                     Promo Code (Optional)
                   </label>
                   <div className="relative">
@@ -595,7 +569,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       name="promoCode"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.currentTarget.value.toUpperCase())}
-                      className="w-full bg-[#2d2a37] border-none outline-none rounded-xl py-4 px-5 text-[#e6e0e9] placeholder:text-[#938f99]/60 focus:ring-2 focus:ring-[#d1c4ff] transition-all font-medium uppercase"
+                      className="w-full bg-slate-50 border border-slate-300 dark:bg-slate-900 dark:border-white/10 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium uppercase"
                       placeholder="Enter promo code"
                       type="text"
                     />
@@ -607,10 +581,10 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 <button
                   disabled={
                     isProcessingPayment ||
-                    isCheckingAuth ||
-                    razorpayScriptStatus !== "ready"
+                     isCheckingAuth ||
+                     razorpayScriptStatus !== "ready"
                   }
-                  className="w-full bg-gradient-to-r from-[#7c4dff] to-[#448aff] text-white font-bold py-5 rounded-full hover:shadow-[0_0_30px_-5px_rgba(124,77,255,0.6)] disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-5 rounded-full shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
                   type="submit"
                 >
                   <span className="material-symbols-outlined">payments</span>
@@ -626,7 +600,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             </form>
 
             <div className="mt-8 text-center">
-              <p className="text-[11px] font-label text-[#938f99]/60 uppercase tracking-widest">
+              <p className="text-[11px] font-label text-slate-500/80 dark:text-slate-500 uppercase tracking-widest">
                 Secure payment processed via Razorpay
               </p>
             </div>

@@ -73,20 +73,20 @@ export default function PaymentSupportNotice() {
 
   return (
     <section className="relative z-20 px-6 pt-28 md:px-12">
-      <div className="mx-auto max-w-5xl rounded-[1.75rem] border border-amber-400/25 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-blue-500/10 px-6 py-5 shadow-[0_18px_50px_-24px_rgba(251,191,36,0.55)] backdrop-blur-xl">
+      <div className="mx-auto max-w-5xl rounded-[1.75rem] border border-amber-200 bg-amber-50/60 dark:border-amber-900/40 dark:bg-amber-950/20 px-6 py-5 shadow-sm backdrop-blur-xl">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.22em] text-amber-300">
+            <p className="text-sm font-bold uppercase tracking-[0.22em] text-amber-800 dark:text-amber-400">
               Payment Support
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-slate-100 md:text-base">
+            <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-350 md:text-base">
               If My Batch is still not visible after your payment, contact us and we will help you
               resolve access quickly.
             </p>
           </div>
           <Link
             href="/#contact"
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-amber-300/30 bg-amber-400/15 px-5 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-amber-400/25"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-amber-300 bg-amber-100 dark:border-amber-800 dark:bg-amber-900/40 text-amber-900 dark:text-amber-350 transition-all hover:-translate-y-0.5 hover:bg-amber-200/80 dark:hover:bg-amber-900/60"
           >
             <LifeBuoy className="h-4 w-4" />
             Contact Us

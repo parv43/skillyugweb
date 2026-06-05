@@ -35,7 +35,7 @@ export default async function BlogListingPage() {
   const nonce = (await headers()).get("x-nonce") ?? "";
 
   return (
-    <main className="bg-[#020617] min-h-screen text-slate-50 font-sans selection:bg-purple-500/30 selection:text-white relative pb-20">
+    <main className="bg-slate-50 dark:bg-[#020617] min-h-screen text-slate-800 dark:text-slate-200 font-sans selection:bg-blue-500/10 selection:text-blue-900 relative pb-20 transition-colors duration-300">
       <script
         type="application/ld+json"
         nonce={nonce}
@@ -43,9 +43,9 @@ export default async function BlogListingPage() {
       />
 
       {/* Background Gradients */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/15 via-blue-900/5 to-transparent rounded-full" />
-        <div className="absolute top-[40%] right-[10%] w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/15 via-purple-900/5 to-transparent rounded-full" />
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-blue-500/2 to-transparent rounded-full" />
+        <div className="absolute top-[40%] right-[10%] w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/5 via-purple-500/2 to-transparent rounded-full" />
       </div>
 
       <Navbar />
@@ -54,17 +54,17 @@ export default async function BlogListingPage() {
 
         {/* Hero Section */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 neon-text mb-6 tracking-tight leading-[1.1]">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 mb-6 tracking-tight leading-[1.1]">
             AI Learning Blog for Students and Parents
           </h1>
-          <p className="text-lg md:text-xl text-slate-300 font-light leading-relaxed">
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 font-light leading-relaxed">
             Learn AI tools, study smarter, and build future-ready project skills.
           </p>
         </div>
 
         {/* Featured Article */}
         {featuredBlog && (
-          <div className="mb-20 group relative rounded-[24px] overflow-hidden bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] backdrop-blur-sm transition-all duration-300 hover:border-blue-500/30 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
+          <div className="mb-20 group relative rounded-[24px] overflow-hidden bg-white dark:bg-[#0a0f1c] border border-slate-200 dark:border-white/10 shadow-md transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-lg hover:-translate-y-1">
             <div className="flex flex-col lg:flex-row">
               <div className="w-full lg:w-1/2 aspect-video lg:aspect-auto h-64 lg:h-auto overflow-hidden relative">
                 <Image
@@ -81,21 +81,21 @@ export default async function BlogListingPage() {
               </div>
               <div className="w-full lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
                 <div className="flex items-center gap-3 mb-4 flex-wrap">
-                  <span className="text-xs font-semibold text-purple-400 uppercase tracking-widest">{featuredBlog.category}</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
-                  <span className="text-xs text-slate-300 font-medium">By Skillyug</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
-                  <span className="text-xs text-slate-400 font-mono">{featuredBlog.readTime}</span>
+                  <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-widest">{featuredBlog.category}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-350 dark:bg-slate-700"></span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">By Skillyug</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-350 dark:bg-slate-700"></span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">{featuredBlog.readTime}</span>
                 </div>
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight group-hover:text-blue-300 transition-colors">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-4 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {featuredBlog.title}
                 </h2>
-                <p className="text-slate-300 mb-8 leading-relaxed text-base md:text-lg opacity-90">
+                <p className="text-slate-600 dark:text-slate-300 mb-8 leading-relaxed text-base md:text-lg">
                   {featuredBlog.shortDescription}
                 </p>
                 <Link
                   href={`/blog/${featuredBlog.slug}`}
-                  className="inline-flex max-w-max items-center justify-center px-6 py-3 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600/80 to-purple-600/80 hover:from-blue-500 hover:to-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] transition-all duration-300 border border-white/10"
+                  className="inline-flex max-w-max items-center justify-center px-6 py-3 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-md transition-all duration-300"
                 >
                   Read Article
                 </Link>
