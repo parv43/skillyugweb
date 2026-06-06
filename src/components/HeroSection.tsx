@@ -91,7 +91,7 @@ function MobileHero() {
                 Join Bootcamp
               </Link>
               <a
-                href="tel:07941057514"
+                href="tel:7835049710"
                 className="flex-1 py-4 px-4 rounded-full text-[15px] sm:text-[17px] font-bold text-slate-800 dark:text-slate-200 text-center active:scale-95 transition-all border border-slate-350 dark:border-white/20 bg-white/50 dark:bg-white/5 flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <Phone size={16} />
@@ -101,7 +101,7 @@ function MobileHero() {
           ) : (
             !loading && (
               <a
-                href="tel:07941057514"
+                href="tel:7835049710"
                 className="w-full py-4 px-4 rounded-full text-[15px] sm:text-[17px] font-bold text-slate-800 dark:text-slate-200 text-center active:scale-95 transition-all border border-slate-350 dark:border-white/20 bg-white/50 dark:bg-white/5 flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <Phone size={16} />
@@ -228,7 +228,7 @@ export default function HeroSection() {
                 </Link>
               )}
               <a 
-                href="tel:07941057514"
+                href="tel:7835049710"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-slate-350 dark:border-white/20 bg-white/50 dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 hover:border-slate-400 dark:hover:border-white/30 text-slate-800 dark:text-slate-200 font-bold text-lg hover:scale-105 transition-all w-full sm:w-auto text-center cursor-pointer shadow-sm"
               >
                 <Phone size={18} />
@@ -275,7 +275,7 @@ export default function HeroSection() {
 
       {/* Sticky Floating CTA Button */}
       <a
-        href="tel:07941057514"
+        href="tel:7835049710"
         className={`fixed bottom-24 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 border border-blue-400/20 ${
           showSticky ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"
         }`}
