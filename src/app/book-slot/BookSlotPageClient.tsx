@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Phone } from "lucide-react";
 
 import { markPaymentSupportNoticePending } from "@/lib/paymentSupportNotice";
 import { PARTIAL_BOOK_SLOT_AMOUNT_RUPEES, FULL_BOOK_SLOT_AMOUNT_RUPEES } from "@/lib/pricing";
@@ -606,6 +607,16 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             </div>
           </div>
         </main>
+
+        {/* Sticky Floating Call Advisor CTA Button */}
+        <a
+          href="tel:07941057514"
+          className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 border border-blue-400/20"
+          title="Call our advisor"
+        >
+          <Phone size={18} className="animate-pulse" />
+          <span className="text-sm md:text-base font-bold tracking-wide">Call our advisor</span>
+        </a>
       </div>
     </>
   );
