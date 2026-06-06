@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useAccessControl } from "@/hooks/useAccessControl"
+import { Phone } from "lucide-react"
 
 // The tool cards orbiting the central badge
 interface OrbitingToolProps {
@@ -76,20 +77,37 @@ function MobileHero() {
 
 
         {/* CTAs */}
-        <div
-          className="w-full flex flex-col gap-4 mb-6"
-        >
-          {!loading && !hasSlot && (
-            <Link
-              href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
-              className="w-full py-4 px-8 rounded-full text-[17px] font-semibold text-white text-center active:scale-95 transition-transform"
-              style={{ 
-                background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
-                boxShadow: "0 4px 20px rgba(139,92,246,0.3)" 
-              }}
-            >
-              Join the Bootcamp
-            </Link>
+        <div className="w-full mb-6">
+          {!loading && !hasSlot ? (
+            <div className="flex gap-3 w-full">
+              <Link
+                href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
+                className="flex-[1.25] py-4 px-4 rounded-full text-[15px] sm:text-[17px] font-bold text-white text-center active:scale-95 transition-transform flex items-center justify-center"
+                style={{ 
+                  background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
+                  boxShadow: "0 4px 20px rgba(139,92,246,0.3)" 
+                }}
+              >
+                Join Bootcamp
+              </Link>
+              <a
+                href="tel:07941057514"
+                className="flex-1 py-4 px-4 rounded-full text-[15px] sm:text-[17px] font-bold text-slate-800 dark:text-slate-200 text-center active:scale-95 transition-all border border-slate-350 dark:border-white/20 bg-white/50 dark:bg-white/5 flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <Phone size={16} />
+                Call Advisor
+              </a>
+            </div>
+          ) : (
+            !loading && (
+              <a
+                href="tel:07941057514"
+                className="w-full py-4 px-4 rounded-full text-[15px] sm:text-[17px] font-bold text-slate-800 dark:text-slate-200 text-center active:scale-95 transition-all border border-slate-350 dark:border-white/20 bg-white/50 dark:bg-white/5 flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <Phone size={16} />
+                Talk to Advisor
+              </a>
+            )
           )}
         </div>
       </div>
@@ -120,6 +138,7 @@ function MobileHero() {
 export default function HeroSection() {
   const [orbitRadius, setOrbitRadius] = useState(230)
   const { isLoggedIn, hasSlot, loading } = useAccessControl();
+  const [showSticky, setShowSticky] = useState(false)
 
   useEffect(() => {
     const updateRadius = () => {
@@ -133,6 +152,18 @@ export default function HeroSection() {
     updateRadius()
     window.addEventListener('resize', updateRadius)
     return () => window.removeEventListener('resize', updateRadius)
+  }, [])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 500) {
+        setShowSticky(true)
+      } else {
+        setShowSticky(false)
+      }
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const tools = [
@@ -187,7 +218,7 @@ export default function HeroSection() {
 
 
 
-            <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
               {!loading && !hasSlot && (
                 <Link 
                   href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
@@ -196,6 +227,13 @@ export default function HeroSection() {
                   Join the Bootcamp
                 </Link>
               )}
+              <a 
+                href="tel:07941057514"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-slate-350 dark:border-white/20 bg-white/50 dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 hover:border-slate-400 dark:hover:border-white/30 text-slate-800 dark:text-slate-200 font-bold text-lg hover:scale-105 transition-all w-full sm:w-auto text-center cursor-pointer shadow-sm"
+              >
+                <Phone size={18} />
+                Talk to Advisor
+              </a>
             </div>
           </div>
 
@@ -234,6 +272,18 @@ export default function HeroSection() {
 
         </div>
       </section>
+
+      {/* Sticky Floating CTA Button */}
+      <a
+        href="tel:07941057514"
+        className={`fixed bottom-24 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 border border-blue-400/20 ${
+          showSticky ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"
+        }`}
+        title="Talk to Advisor"
+      >
+        <Phone size={18} className="animate-pulse" />
+        <span className="text-sm md:text-base font-bold tracking-wide">Talk to Advisor</span>
+      </a>
     </>
   )
 }
