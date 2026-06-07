@@ -28,12 +28,14 @@ import {
   Play,
   Pause,
   RotateCcw,
-  RotateCw
+  RotateCw,
+  Video
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import BatchCalendar from "@/components/BatchCalendar";
 import VoucherCard from "@/components/VoucherCard";
+import { getNextLiveSession, getCompletedDaysCount } from "@/lib/curriculum";
 
 const MOCK_VIDEOS = [
   { id: 1, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
@@ -72,6 +74,12 @@ export default function MyBatchPage() {
   const [certError, setCertError] = useState("");
   const [generatedCerts, setGeneratedCerts] = useState<{ student: { downloadUrl: string }; parent?: { downloadUrl: string } } | null>(null);
   const [isBlurred, setIsBlurred] = useState(false);
+
+  // Dynamic Curriculum derived states
+  const nextSession = getNextLiveSession();
+  const completedDays = getCompletedDaysCount();
+  const progressPercentage = Math.round((completedDays / 25) * 100);
+  const strokeDashoffset = 251.2 - (251.2 * progressPercentage) / 100;
 
   // Support Ticket State
   const [showTicketModal, setShowTicketModal] = useState(false);
@@ -786,13 +794,13 @@ export default function MyBatchPage() {
                   {/* Progress Circle (0% of 251.2 circumference = 0) */}
                   <circle 
                     cx="50" cy="50" r="40" fill="transparent" strokeWidth="12"
-                    strokeDasharray="251.2" strokeDashoffset="251.2"
+                    strokeDasharray="251.2" strokeDashoffset={strokeDashoffset}
                     className="stroke-blue-500 dark:stroke-blue-400 drop-shadow-[0_2px_4px_rgba(59,130,246,0.1)]"
                     strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">0%</span>
+                  <span className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">{progressPercentage}%</span>
                 </div>
               </div>
             </div>
@@ -805,10 +813,63 @@ export default function MyBatchPage() {
                 <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Next Live Session</h2>
               </div>
-              <div className="mt-8 rounded-[1.5rem] border border-slate-100 bg-slate-50 p-6 md:p-8 flex flex-col items-center justify-center min-h-[200px] dark:border-white/5 dark:bg-[#0f172a]/50">
-                <p className="text-xl font-black text-slate-400 dark:text-slate-550 uppercase tracking-widest">
-                  None
-                </p>
+              <div className="mt-8 rounded-[1.5rem] border border-slate-100 bg-slate-50 p-6 md:p-8 flex flex-col justify-between min-h-[200px] dark:border-white/5 dark:bg-[#0f172a]/50">
+                {nextSession ? (
+                  <>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold uppercase tracking-[0.24em] px-2.5 py-1 rounded-full border ${
+                          nextSession.status === "live" 
+                            ? "bg-red-500/10 border-red-500/25 text-red-655 dark:text-red-400 animate-pulse" 
+                            : "bg-blue-500/10 border-blue-500/25 text-blue-655 dark:text-blue-450"
+                        }`}>
+                          {nextSession.status === "live" ? "Live Now" : "Upcoming Session"}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
+                          Day {nextSession.dayNumber} of 25
+                        </span>
+                      </div>
+                      <h3 className="mt-4 text-xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
+                        {nextSession.topic}
+                      </h3>
+                    </div>
+                    <div className="mt-6 pt-5 border-t border-slate-200/50 dark:border-white/5 flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Date & Time</p>
+                        <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">
+                          {nextSession.date.toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            weekday: "long"
+                          })}, 1:00 PM IST
+                        </p>
+                      </div>
+                      {nextSession.status === "live" ? (
+                        <a 
+                          href="https://meet.google.com/abc-defg-hij"
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-red-500/10"
+                        >
+                          <Video className="w-4 h-4" />
+                          Join Meeting
+                        </a>
+                      ) : (
+                        <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 px-3 py-1.5 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                          1:00 PM IST
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center flex-1 text-center py-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 flex items-center justify-center mb-3 text-emerald-600 dark:text-emerald-400">
+                      <BadgeCheck className="w-6 h-6" />
+                    </div>
+                    <p className="text-base font-bold text-slate-800 dark:text-slate-200">Bootcamp Completed</p>
+                    <p className="text-xs text-slate-505 mt-1">All 25 sessions have been successfully completed.</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1265,10 +1326,26 @@ export default function MyBatchPage() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500 dark:text-slate-455">
                     Next live session
                   </p>
-                  <p className="mt-3 text-lg font-bold text-slate-900 dark:text-white">28th May, 1:00 PM IST</p>
-                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-350">
-                    First Class
-                  </p>
+                  {nextSession ? (
+                    <>
+                      <p className="mt-3 text-lg font-bold text-slate-900 dark:text-white">
+                        {nextSession.date.toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short"
+                        })}, 1:00 PM IST
+                      </p>
+                      <p className="mt-2 text-sm text-slate-600 dark:text-slate-350">
+                        Day {nextSession.dayNumber}: {nextSession.topic}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="mt-3 text-lg font-bold text-slate-900 dark:text-white">Completed</p>
+                      <p className="mt-2 text-sm text-slate-600 dark:text-slate-350">
+                        All 25 sessions have finished!
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

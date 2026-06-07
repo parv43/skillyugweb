@@ -183,7 +183,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
         return;
       }
 
-      const orderRequest = await fetch("/api/payment/create-order", {
+      const orderRequest = await fetch("/api/book-slot/order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -243,16 +243,20 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             // Keep notice active until verified
             markPaymentSupportNoticePending();
 
-            const verifyRequest = await fetch("/api/payment/verify-payment", {
+            const verifyRequest = await fetch("/api/book-slot/verify-payment", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${session.access_token}`,
               },
               body: JSON.stringify({
-                razorpayOrderId: paymentPayload.razorpay_order_id,
-                razorpayPaymentId: paymentPayload.razorpay_payment_id,
-                razorpaySignature: paymentPayload.razorpay_signature,
+                razorpay_order_id: paymentPayload.razorpay_order_id,
+                razorpay_payment_id: paymentPayload.razorpay_payment_id,
+                razorpay_signature: paymentPayload.razorpay_signature,
+                studentName,
+                phoneNumber,
+                grade,
+                promoCode: promoCode.trim() || undefined,
               }),
             });
 
@@ -610,7 +614,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
 
         {/* Sticky Floating Call Advisor CTA Button */}
         <a
-          href="tel:07941057514"
+          href="tel:7835049710"
           className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 border border-blue-400/20"
           title="Call our advisor"
         >

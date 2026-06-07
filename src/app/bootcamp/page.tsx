@@ -321,7 +321,38 @@ function MobileBootcampHero() {
 
 export default function BootcampPage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-200 selection:bg-purple-100 selection:text-purple-900 transition-colors duration-300">
+    <main className="min-h-screen overflow-hidden bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-200 selection:bg-purple-100 selection:text-purple-900 transition-colors duration-300 relative">
+      {/* Full-screen under-work cover overlay */}
+      <div className="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-slate-50/90 dark:bg-[#020617]/95 backdrop-blur-2xl px-6 text-center select-none">
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(139,92,246,0.08),_transparent_45%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        </div>
+
+        <div className="relative z-10 max-w-md w-full border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-[#0a0f1c]/70 rounded-[2.5rem] p-8 md:p-10 shadow-2xl backdrop-blur-xl">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-orange-500/10">
+            <Sparkles className="w-8 h-8 animate-pulse" />
+          </div>
+          
+          <span className="text-[10px] font-bold uppercase tracking-[0.28em] text-orange-600 dark:text-orange-400">
+            Cohort Preparation
+          </span>
+          <h1 className="mt-3 text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            Bootcamp is Under Work
+          </h1>
+          <p className="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400 font-medium">
+            We are currently updating our curriculum and interactive learning environments for the upcoming cohort. We will be live very soon!
+          </p>
+
+          <Link
+            href="/"
+            className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-4 font-bold text-sm shadow-md transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+          >
+            Back to Home
+          </Link>
+        </div>
+      </div>
+
       <Navbar />
 
       <DesktopBootcampHero />

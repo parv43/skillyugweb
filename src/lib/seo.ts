@@ -12,7 +12,7 @@ export const siteConfig = {
     "Skillyug helps Class 6–12 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp in India.",
   ogImagePath: "/opengraph-image",
   email: "contact@skillyugedu.com",
-  phone: "07941057514",
+  phone: "7835049710",
   linkedIn: "https://www.linkedin.com/company/skillyug-official/",
 }
 

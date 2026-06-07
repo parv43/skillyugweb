@@ -261,7 +261,7 @@ export default function ContactUs() {
                 </div>
                 <div>
                   <h3 className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-450 font-bold mb-1.5">Call Us</h3>
-                  <p className="text-base md:text-xl font-bold text-slate-900 dark:text-white tracking-wide break-all">07941057514</p>
+                  <p className="text-base md:text-xl font-bold text-slate-900 dark:text-white tracking-wide break-all">7835049710</p>
                   <p className="text-sm text-slate-600 dark:text-slate-350 mt-2 font-medium leading-relaxed">Available Monday to Friday, from 9:00 AM to 6:00 PM IST.</p>
                 </div>
               </div>
