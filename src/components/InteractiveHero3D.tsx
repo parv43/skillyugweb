@@ -312,7 +312,7 @@ function SceneContent() {
       {/* ── STATIC ORBITAL RINGS (Visually Tilt-Rotated) ── */}
       {/* Ring 1 (Horizontal - Tilted X) - Indigo/Blue Glow */}
       <group rotation={[0, 0, 0]}>
-        <group rotation={[1.15, 0, 0]}>
+        <group rotation={[0.8, 0, 0]}>
           <mesh>
             <torusGeometry args={[radius, 0.012, 16, 120]} />
             <meshPhysicalMaterial
@@ -332,8 +332,8 @@ function SceneContent() {
       </group>
 
       {/* Ring 2 (Diagonal 1 - Tilted Left) - Pink/Fuchsia Glow */}
-      <group rotation={[0, 0, 5 * Math.PI / 12]}>
-        <group rotation={[1.15, 0, 0]}>
+      <group rotation={[0, 0, Math.PI / 4]}>
+        <group rotation={[0.8, 0, 0]}>
           <mesh>
             <torusGeometry args={[radius, 0.012, 16, 120]} />
             <meshPhysicalMaterial
@@ -353,8 +353,8 @@ function SceneContent() {
       </group>
 
       {/* Ring 3 (Diagonal 2 - Tilted Right) - Purple/Violet Glow */}
-      <group rotation={[0, 0, 7 * Math.PI / 12]}>
-        <group rotation={[1.15, 0, 0]}>
+      <group rotation={[0, 0, 3 * Math.PI / 4]}>
+        <group rotation={[0.8, 0, 0]}>
           <mesh>
             <torusGeometry args={[radius, 0.012, 16, 120]} />
             <meshPhysicalMaterial
@@ -379,7 +379,7 @@ function SceneContent() {
         radius={radius} 
         speed={0.55} 
         startOffset={0} 
-        theta={1.15}
+        theta={0.8}
         psi={0}
         texture={textures.claude} 
         label="Claude AI" 
@@ -389,7 +389,7 @@ function SceneContent() {
         radius={radius} 
         speed={0.55} 
         startOffset={Math.PI} 
-        theta={1.15}
+        theta={0.8}
         psi={0}
         texture={textures.perplexity} 
         label="Perplexity" 
@@ -401,8 +401,8 @@ function SceneContent() {
         radius={radius} 
         speed={-0.50} 
         startOffset={0} 
-        theta={1.15}
-        psi={5 * Math.PI / 12}
+        theta={0.8}
+        psi={Math.PI / 4}
         texture={textures.gemini} 
         label="Google Gemini" 
         cardTexture={cardTexture}
@@ -411,8 +411,8 @@ function SceneContent() {
         radius={radius} 
         speed={-0.50} 
         startOffset={Math.PI} 
-        theta={1.15}
-        psi={5 * Math.PI / 12}
+        theta={0.8}
+        psi={Math.PI / 4}
         texture={textures.canva} 
         label="Canva AI" 
         cardTexture={cardTexture}
@@ -423,8 +423,8 @@ function SceneContent() {
         radius={radius} 
         speed={0.48} 
         startOffset={0} 
-        theta={1.15}
-        psi={7 * Math.PI / 12}
+        theta={0.8}
+        psi={3 * Math.PI / 4}
         texture={textures.antigravity} 
         label="Antigravity AI" 
         cardTexture={cardTexture}
@@ -433,8 +433,8 @@ function SceneContent() {
         radius={radius} 
         speed={0.48} 
         startOffset={Math.PI} 
-        theta={1.15}
-        psi={7 * Math.PI / 12}
+        theta={0.8}
+        psi={3 * Math.PI / 4}
         texture={textures.figma} 
         label="Figma" 
         cardTexture={cardTexture}
