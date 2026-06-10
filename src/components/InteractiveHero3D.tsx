@@ -280,8 +280,6 @@ function SceneContent() {
       <OrbitControls 
         enableZoom={false} 
         enablePan={false} 
-        autoRotate 
-        autoRotateSpeed={0.3}
         maxPolarAngle={Math.PI / 1.7}
         minPolarAngle={Math.PI / 3.2}
       />
