@@ -166,6 +166,7 @@ function SceneContent() {
     canva: "/canva.svg",
     antigravity: "/antigravity.svg",
     skillyug: "/skillyug.png",
+    figma: "/figma.svg",
   })
 
   // Set correct colorspace for vivid rendering to prevent dark/washed-out textures
@@ -224,43 +225,7 @@ function SceneContent() {
     return texture
   }, [isDark])
 
-  // 4. Dynamically draw central logo background rounded card (High res 512x256)
-  const coreLogoBgTexture = useMemo(() => {
-    const canvas = document.createElement("canvas")
-    canvas.width = 512
-    canvas.height = 256
-    const ctx = canvas.getContext("2d")
-    if (ctx) {
-      ctx.clearRect(0, 0, 512, 256)
-      
-      // Backdrop fill - High-contrast white fill for both themes to make the logo pop
-      ctx.fillStyle = "rgba(255, 255, 255, 0.95)"
-      const r = 50
-      const w = 472
-      const h = 216
-      const x = 20
-      const y = 20
-      
-      ctx.beginPath()
-      ctx.moveTo(x + r, y)
-      ctx.arcTo(x + w, y, x + w, y + h, r)
-      ctx.arcTo(x + w, y + h, x, y + h, r)
-      ctx.arcTo(x, y + h, x, y, r)
-      ctx.arcTo(x, y, x + w, y, r)
-      ctx.closePath()
-      ctx.fill()
-
-      // Border
-      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.2)" : "rgba(226, 232, 240, 0.85)"
-      ctx.lineWidth = 10
-      ctx.stroke()
-    }
-    
-    const texture = new THREE.CanvasTexture(canvas)
-    texture.minFilter = THREE.LinearMipmapLinearFilter
-    texture.generateMipmaps = true
-    return texture
-  }, [isDark])
+  // (coreLogoBgTexture canvas removed - using direct transparent floating logo)
 
   // Responsive calculations (enlarged radius and scale bounds)
   const radius = useMemo(() => {
@@ -299,8 +264,8 @@ function SceneContent() {
 
       {/* ── CENTRAL REFRACTIVE CORE ── */}
       <group>
-        {/* Physical 3D glass core sphere (transmission increased to 0.95 for maximum clarity) */}
-        <mesh scale={[coreScale, coreScale, coreScale]} renderOrder={3}>
+        {/* Physical 3D glass core sphere (depthWrite={false} to not block the logo) */}
+        <mesh scale={[coreScale, coreScale, coreScale]} renderOrder={1}>
           <sphereGeometry args={[1.35, 64, 64]} />
           <meshPhysicalMaterial
             roughness={0.1}
@@ -309,34 +274,36 @@ function SceneContent() {
             clearcoatRoughness={0.05}
             transparent={true}
             opacity={0.06}
+            depthWrite={false}
             color={isDark ? "#c7d2fe" : "#ffffff"}
             emissive={isDark ? "#4338ca" : "#f1f5f9"}
             emissiveIntensity={isDark ? 0.05 : 0.02}
           />
         </mesh>
         
-        {/* Core Skillyug logo billboard (renderOrder and depthWrite ensure it draws on top of background) */}
+        {/* Core Skillyug logo billboard (floating transparent PNG, rendered on top of the sphere's front face) */}
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
-          {/* Logo Rounded Card Background */}
-          <mesh renderOrder={1}>
-            <planeGeometry args={[1.55, 0.7]} />
-            <meshBasicMaterial 
-              map={coreLogoBgTexture} 
-              transparent 
-              depthWrite={true} 
-            />
-          </mesh>
-          
           {/* Logo Graphic Decal */}
-          <mesh position={[0, 0, 0.035]} renderOrder={2}>
+          <mesh position={[0, 0, 0]} renderOrder={2}>
             <planeGeometry args={[1.7, 1.7]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
               transparent 
               depthWrite={true} 
+              depthTest={true}
             />
           </mesh>
         </group>
+
+        {/* Invisible Depth Mask Sphere (writes to depth buffer for correct node occlusion) */}
+        <mesh scale={[coreScale, coreScale, coreScale]} renderOrder={3}>
+          <sphereGeometry args={[1.35, 64, 64]} />
+          <meshBasicMaterial
+            colorWrite={false}
+            depthWrite={true}
+            transparent={true}
+          />
+        </mesh>
       </group>
 
       {/* ── STATIC ORBITAL RINGS (Visually Tilt-Rotated) ── */}
@@ -397,6 +364,25 @@ function SceneContent() {
         </mesh>
       </group>
 
+      {/* Ring 4 (Tilted 45° Y) - Teal/Cyan Glow */}
+      <group rotation={[0, Math.PI / 4, 0]}>
+        <mesh>
+          <torusGeometry args={[radius, 0.012, 16, 120]} />
+          <meshPhysicalMaterial
+            roughness={0.2}
+            metalness={0.8}
+            clearcoat={1.0}
+            clearcoatRoughness={0.1}
+            transparent={true}
+            opacity={isDark ? 0.35 : 0.45}
+            depthWrite={false}
+            color={isDark ? "#99f6e4" : "#0d9488"}
+            emissive={isDark ? "#0d9488" : "#0f766e"}
+            emissiveIntensity={1.2}
+          />
+        </mesh>
+      </group>
+
       {/* ── ROOT-LEVEL ORBITING NODES (Perfect billboarding, no parent tilt interference) ── */}
       {/* Nodes on Ring 1 */}
       <OrbitingNode 
@@ -446,6 +432,17 @@ function SceneContent() {
         ringRotation={[Math.PI / 2, 0, 0]}
         texture={textures.antigravity} 
         label="Antigravity AI" 
+        cardTexture={cardTexture}
+      />
+
+      {/* Node on Ring 4 */}
+      <OrbitingNode 
+        radius={radius} 
+        speed={-0.5} 
+        startOffset={0} 
+        ringRotation={[0, Math.PI / 4, 0]}
+        texture={textures.figma} 
+        label="Figma" 
         cardTexture={cardTexture}
       />
     </>
