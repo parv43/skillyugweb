@@ -225,33 +225,7 @@ function SceneContent() {
     return texture
   }, [isDark])
 
-  // 4. Dynamically draw central logo background circle (High res 512x512)
-  const coreLogoBgTexture = useMemo(() => {
-    const canvas = document.createElement("canvas")
-    canvas.width = 512
-    canvas.height = 512
-    const ctx = canvas.getContext("2d")
-    if (ctx) {
-      ctx.clearRect(0, 0, 512, 512)
-      
-      // Backdrop fill - High-contrast white fill for both themes to make the logo pop
-      ctx.fillStyle = "rgba(255, 255, 255, 0.95)"
-      ctx.beginPath()
-      ctx.arc(256, 256, 216, 0, Math.PI * 2)
-      ctx.closePath()
-      ctx.fill()
-
-      // Border
-      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.2)" : "rgba(226, 232, 240, 0.85)"
-      ctx.lineWidth = 10
-      ctx.stroke()
-    }
-    
-    const texture = new THREE.CanvasTexture(canvas)
-    texture.minFilter = THREE.LinearMipmapLinearFilter
-    texture.generateMipmaps = true
-    return texture
-  }, [isDark])
+  // (coreLogoBgTexture removed)
 
   // Responsive calculations (enlarged radius and scale bounds)
   const radius = useMemo(() => {
@@ -307,21 +281,10 @@ function SceneContent() {
           />
         </mesh>
         
-        {/* Core Skillyug logo billboard (rendered on top of the sphere's front face) */}
+        {/* Core Skillyug logo billboard (floating transparent PNG, rendered on top of the sphere's front face) */}
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
-          {/* Logo Circular Background */}
-          <mesh renderOrder={2}>
-            <planeGeometry args={[1.1, 1.1]} />
-            <meshBasicMaterial 
-              map={coreLogoBgTexture} 
-              transparent 
-              depthWrite={true} 
-              depthTest={true}
-            />
-          </mesh>
-          
-          {/* Logo Graphic Decal - Larger size overlapping the circular background */}
-          <mesh position={[0, 0, 0.035]} renderOrder={3}>
+          {/* Logo Graphic Decal */}
+          <mesh position={[0, 0, 0]} renderOrder={2}>
             <planeGeometry args={[2.0, 2.0]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
@@ -333,7 +296,7 @@ function SceneContent() {
         </group>
 
         {/* Invisible Depth Mask Sphere (writes to depth buffer for correct node occlusion) */}
-        <mesh scale={[coreScale, coreScale, coreScale]} renderOrder={4}>
+        <mesh scale={[coreScale, coreScale, coreScale]} renderOrder={3}>
           <sphereGeometry args={[1.35, 64, 64]} />
           <meshBasicMaterial
             colorWrite={false}
