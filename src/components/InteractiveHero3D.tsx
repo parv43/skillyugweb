@@ -2,19 +2,19 @@
 
 import React, { useRef, useState, useEffect, useMemo } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { Html, OrbitControls } from "@react-three/drei"
+import { OrbitControls, useTexture } from "@react-three/drei"
 import * as THREE from "three"
 
 // ─── BACKGROUND STARDUST PARTICLES ─────────────────────────────────────────
-function BackgroundParticles({ count = 30 }) {
+function BackgroundParticles({ count = 25 }) {
   const points = useMemo(() => {
     const temp = []
     for (let i = 0; i < count; i++) {
       const x = (Math.random() - 0.5) * 15
       const y = (Math.random() - 0.5) * 15
-      const z = (Math.random() - 0.5) * 10 - 4 // Placed slightly behind the center plane
-      const speed = 0.04 + Math.random() * 0.08
-      const size = 0.015 + Math.random() * 0.035
+      const z = (Math.random() - 0.5) * 8 - 4
+      const speed = 0.03 + Math.random() * 0.07
+      const size = 0.015 + Math.random() * 0.03
       temp.push({ position: new THREE.Vector3(x, y, z), speed, size, initialY: y })
     }
     return temp
@@ -27,9 +27,8 @@ function BackgroundParticles({ count = 30 }) {
     if (ref.current) {
       ref.current.children.forEach((child, i) => {
         const p = points[i]
-        // Gentle drifting motion
-        child.position.y = p.initialY + Math.sin(time * p.speed + i) * 0.25
-        child.position.x = p.position.x + Math.cos(time * p.speed + i) * 0.15
+        child.position.y = p.initialY + Math.sin(time * p.speed + i) * 0.2
+        child.position.x = p.position.x + Math.cos(time * p.speed + i) * 0.1
       })
     }
   })
@@ -51,21 +50,36 @@ function BackgroundParticles({ count = 30 }) {
   )
 }
 
-// ─── DETAILED 3D ORBITING NODE ─────────────────────────────────────────────
+// ─── WEBGL-NATIVE ORBITING NODE CARD ───────────────────────────────────────
 interface OrbitingNodeProps {
   radius: number
   speed: number
   startOffset: number
-  svgSrc: string
+  texture: THREE.Texture
   label: string
+  cardTexture: THREE.Texture
 }
 
-function OrbitingNode({ radius, speed, startOffset, svgSrc, label }: OrbitingNodeProps) {
+function OrbitingNode({ radius, speed, startOffset, texture, label, cardTexture }: OrbitingNodeProps) {
   const groupRef = useRef<THREE.Group>(null)
+  const billboardRef = useRef<THREE.Group>(null)
   const angleRef = useRef(startOffset)
+  const [hovered, setHovered] = useState(false)
+
+  // Manage custom cursor on hover
+  useEffect(() => {
+    if (hovered) {
+      document.body.style.cursor = "pointer"
+    } else {
+      document.body.style.cursor = "auto"
+    }
+    return () => {
+      document.body.style.cursor = "auto"
+    }
+  }, [hovered])
 
   useFrame((state, delta) => {
-    // Continuous travel along local orbit
+    // 1. Orbit calculations
     angleRef.current += speed * delta
     const currentAngle = angleRef.current
 
@@ -74,74 +88,204 @@ function OrbitingNode({ radius, speed, startOffset, svgSrc, label }: OrbitingNod
       groupRef.current.position.y = radius * Math.sin(currentAngle)
       groupRef.current.position.z = 0
     }
+
+    // 2. Billboarding (manually copy camera rotation to face the screen directly)
+    if (billboardRef.current) {
+      billboardRef.current.quaternion.copy(state.camera.quaternion)
+    }
+
+    // 3. Smooth Scale LERP on Hover
+    if (groupRef.current) {
+      const targetScale = hovered ? 1.15 : 1.0
+      groupRef.current.scale.x = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.15)
+      groupRef.current.scale.y = THREE.MathUtils.lerp(groupRef.current.scale.y, targetScale, 0.15)
+      groupRef.current.scale.z = THREE.MathUtils.lerp(groupRef.current.scale.z, targetScale, 0.15)
+    }
   })
 
   return (
     <group ref={groupRef}>
       {/* 
-        By enabling 'transform', the HTML element is converted into a CSS3DObject
-        which integrates directly into the WebGL depth buffer (occluding behind objects).
-        By enabling 'sprite', the HTML container is rotated on every frame to always
-        directly face the camera (billboarding).
-        By using 'distanceFactor={14}', we force 3D scaling perspective (small when far, large when close)
-        while maintaining extremely crisp rendering quality.
+        This group acts as the billboard.
+        By using native WebGL meshes for the cards (instead of HTML DOM overlays),
+        they respect the camera depth buffer and are naturally occluded when they go behind
+        the central glass sphere or central logo plane.
       */}
-      <Html transform sprite distanceFactor={15}>
-        <div 
-          className="group/node w-14 h-14 rounded-2xl flex items-center justify-center bg-white/75 dark:bg-slate-900/75 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 p-2.5 shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 pointer-events-auto cursor-pointer select-none"
-          title={label}
-        >
-          <img 
-            src={svgSrc} 
-            alt={label} 
-            className="w-full h-full object-contain transition-transform group-hover/node:scale-105 duration-300" 
+      <group 
+        ref={billboardRef}
+        onPointerOver={(e) => {
+          e.stopPropagation()
+          setHovered(true)
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation()
+          setHovered(false)
+        }}
+      >
+        {/* Backing glassmorphic card (with borders & shadows rendered dynamically) */}
+        <mesh castShadow receiveShadow>
+          <planeGeometry args={[0.72, 0.72]} />
+          <meshBasicMaterial 
+            map={cardTexture} 
+            transparent 
+            depthWrite={false} 
           />
-        </div>
-      </Html>
+        </mesh>
+
+        {/* Front SVG icon texture (offset slightly forward on Z to prevent z-fighting) */}
+        <mesh position={[0, 0, 0.015]}>
+          <planeGeometry args={[0.42, 0.42]} />
+          <meshBasicMaterial 
+            map={texture} 
+            transparent 
+            depthWrite={false} 
+          />
+        </mesh>
+      </group>
     </group>
   )
 }
 
-// ─── THREE SCENE CONTENT ──────────────────────────────────────────────────
+// ─── SCENE LOADING CONTENT (SUSPENSE SUPPORTED) ──────────────────────────
 function SceneContent() {
   const { width } = useThree((state) => state.viewport)
+  
+  // 1. Listen to the document dark mode class
+  const [isDark, setIsDark] = useState(false)
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"))
+    }
+    checkTheme()
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+    return () => observer.disconnect()
+  }, [])
 
-  // Dynamically calculate responsive orbit radius
+  // 2. Pre-load all SVG textures in WebGL (crisp and cached)
+  const textures = useTexture({
+    claude: "/claude-ai-icon.svg",
+    perplexity: "/perplexity.svg",
+    gemini: "/gemini.svg",
+    canva: "/canva.svg",
+    antigravity: "/antigravity.svg",
+    skillyug: "/skillyug.svg",
+  })
+
+  // 3. Dynamically draw rounded square card backgrounds reacting to light/dark theme changes
+  const cardTexture = useMemo(() => {
+    const canvas = document.createElement("canvas")
+    canvas.width = 256
+    canvas.height = 256
+    const ctx = canvas.getContext("2d")
+    if (ctx) {
+      ctx.clearRect(0, 0, 256, 256)
+      
+      // Card Shadow
+      ctx.shadowColor = isDark ? "rgba(0, 0, 0, 0.45)" : "rgba(0, 0, 0, 0.06)"
+      ctx.shadowBlur = 14
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 4
+
+      // White/slate backdrop fill
+      ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.82)" : "rgba(255, 255, 255, 0.85)"
+      const r = 40
+      const w = 216
+      const h = 216
+      const x = 20
+      const y = 20
+      
+      ctx.beginPath()
+      ctx.moveTo(x + r, y)
+      ctx.arcTo(x + w, y, x + w, y + h, r)
+      ctx.arcTo(x + w, y + h, x, y + h, r)
+      ctx.arcTo(x, y + h, x, y, r)
+      ctx.arcTo(x, y, x + w, y, r)
+      ctx.closePath()
+      ctx.fill()
+
+      // Card Border
+      ctx.shadowBlur = 0
+      ctx.shadowColor = "transparent"
+      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(226, 232, 240, 0.75)"
+      ctx.lineWidth = 5
+      ctx.stroke()
+    }
+    
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.minFilter = THREE.LinearMipmapLinearFilter
+    texture.generateMipmaps = true
+    return texture
+  }, [isDark])
+
+  // 4. Dynamically draw central logo background circle reacting to theme
+  const coreLogoBgTexture = useMemo(() => {
+    const canvas = document.createElement("canvas")
+    canvas.width = 256
+    canvas.height = 256
+    const ctx = canvas.getContext("2d")
+    if (ctx) {
+      ctx.clearRect(0, 0, 256, 256)
+      
+      // Backdrop fill
+      ctx.fillStyle = isDark ? "rgba(10, 15, 28, 0.75)" : "rgba(255, 255, 255, 0.8)"
+      ctx.beginPath()
+      ctx.arc(128, 128, 108, 0, Math.PI * 2)
+      ctx.closePath()
+      ctx.fill()
+
+      // Border
+      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(226, 232, 240, 0.8)"
+      ctx.lineWidth = 5
+      ctx.stroke()
+    }
+    
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.minFilter = THREE.LinearMipmapLinearFilter
+    texture.generateMipmaps = true
+    return texture
+  }, [isDark])
+
+  // Responsive calculations
   const radius = useMemo(() => {
-    return Math.min(3.5, width * 0.35)
+    return Math.min(3.4, width * 0.35)
   }, [width])
 
-  // Center core sphere scale
   const coreScale = useMemo(() => {
     return Math.min(1.2, width * 0.12)
   }, [width])
 
+  const centralLogoRef = useRef<THREE.Group>(null)
+  useFrame((state) => {
+    if (centralLogoRef.current) {
+      centralLogoRef.current.quaternion.copy(state.camera.quaternion)
+    }
+  })
+
   return (
     <>
-      {/* Ambient Fill Light */}
-      <ambientLight intensity={0.4} />
-      
-      {/* High-contrast studio lighting config */}
+      {/* Lights config */}
+      <ambientLight intensity={0.5} />
       <directionalLight position={[5, 10, 5]} intensity={3.5} color="#ffffff" />
       <pointLight position={[-8, -8, -4]} intensity={2.0} color="#f472b6" distance={15} />
-      <pointLight position={[0, 0, 0]} intensity={4.5} color="#818cf8" distance={10} decay={1.5} />
+      <pointLight position={[0, 0, 0]} intensity={5.0} color="#818cf8" distance={10} decay={1.5} />
 
-      {/* Orbit Controls with dynamic bounds */}
+      {/* Interactive OrbitControls */}
       <OrbitControls 
         enableZoom={false} 
         enablePan={false} 
         autoRotate 
-        autoRotateSpeed={0.35}
+        autoRotateSpeed={0.3}
         maxPolarAngle={Math.PI / 1.7}
         minPolarAngle={Math.PI / 3.2}
       />
 
-      {/* Background Floating Particles */}
+      {/* Floating Space Particles */}
       <BackgroundParticles count={25} />
 
       {/* ── CENTRAL REFRACTIVE CORE ── */}
       <group>
-        {/* Glowing glass core sphere */}
+        {/* Physical 3D glass core sphere */}
         <mesh scale={[coreScale, coreScale, coreScale]}>
           <sphereGeometry args={[1.3, 64, 64]} />
           <meshPhysicalMaterial
@@ -157,27 +301,36 @@ function SceneContent() {
           />
         </mesh>
         
-        {/* Core Skillyug logo embedded inside depth queue */}
-        <Html transform sprite distanceFactor={12}>
-          <div className="w-24 h-24 rounded-full flex items-center justify-center bg-white/45 dark:bg-slate-950/45 backdrop-blur-xl border border-slate-200/30 dark:border-white/20 p-4 shadow-2xl select-none pointer-events-none">
-            <img 
-              src="/skillyug.svg" 
-              alt="Skillyug Logo" 
-              className="w-full h-full object-contain" 
+        {/* Core Skillyug logo billboard (rendered inside WebGL to respect depth sorting) */}
+        <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
+          {/* Logo Circular Background */}
+          <mesh>
+            <planeGeometry args={[1.35, 1.35]} />
+            <meshBasicMaterial 
+              map={coreLogoBgTexture} 
+              transparent 
+              depthWrite={false} 
             />
-          </div>
-        </Html>
+          </mesh>
+          
+          {/* Logo Graphic Decal */}
+          <mesh position={[0, 0, 0.015]}>
+            <planeGeometry args={[0.9, 0.9]} />
+            <meshBasicMaterial 
+              map={textures.skillyug} 
+              transparent 
+              depthWrite={false} 
+            />
+          </mesh>
+        </group>
       </group>
 
       {/* ── ORBITAL RING 1 (Tilted 45° X) ── */}
       <group rotation={[Math.PI / 4, 0, 0]}>
-        {/* Inner core wire */}
         <mesh>
           <torusGeometry args={[radius, 0.006, 8, 120]} />
           <meshBasicMaterial color="#a78bfa" transparent opacity={0.35} />
         </mesh>
-        
-        {/* Outer glass-glow tube */}
         <mesh>
           <torusGeometry args={[radius, 0.035, 24, 120]} />
           <meshPhysicalMaterial
@@ -194,32 +347,31 @@ function SceneContent() {
           />
         </mesh>
         
-        {/* Fast Orbiting Nodes: Claude & Perplexity */}
+        {/* Orbiting Nodes: Claude & Perplexity */}
         <OrbitingNode 
           radius={radius} 
           speed={0.65} 
           startOffset={0} 
-          svgSrc="/claude-ai-icon.svg" 
+          texture={textures.claude} 
           label="Claude AI" 
+          cardTexture={cardTexture}
         />
         <OrbitingNode 
           radius={radius} 
           speed={0.65} 
           startOffset={Math.PI} 
-          svgSrc="/perplexity.svg" 
+          texture={textures.perplexity} 
           label="Perplexity" 
+          cardTexture={cardTexture}
         />
       </group>
 
       {/* ── ORBITAL RING 2 (Tilted -45° Y) ── */}
       <group rotation={[0, -Math.PI / 4, 0]}>
-        {/* Inner core wire */}
         <mesh>
           <torusGeometry args={[radius, 0.006, 8, 120]} />
           <meshBasicMaterial color="#a78bfa" transparent opacity={0.35} />
         </mesh>
-        
-        {/* Outer glass-glow tube */}
         <mesh>
           <torusGeometry args={[radius, 0.035, 24, 120]} />
           <meshPhysicalMaterial
@@ -236,32 +388,31 @@ function SceneContent() {
           />
         </mesh>
         
-        {/* Fast Orbiting Nodes: Gemini & Canva */}
+        {/* Orbiting Nodes: Gemini & Canva */}
         <OrbitingNode 
           radius={radius} 
           speed={-0.55} 
           startOffset={Math.PI / 2} 
-          svgSrc="/gemini.svg" 
+          texture={textures.gemini} 
           label="Google Gemini" 
+          cardTexture={cardTexture}
         />
         <OrbitingNode 
           radius={radius} 
           speed={-0.55} 
           startOffset={-Math.PI / 2} 
-          svgSrc="/canva.svg" 
+          texture={textures.canva} 
           label="Canva AI" 
+          cardTexture={cardTexture}
         />
       </group>
 
       {/* ── ORBITAL RING 3 (Horizontal X: 90°) ── */}
       <group rotation={[Math.PI / 2, 0, 0]}>
-        {/* Inner core wire */}
         <mesh>
           <torusGeometry args={[radius, 0.006, 8, 120]} />
           <meshBasicMaterial color="#a78bfa" transparent opacity={0.35} />
         </mesh>
-        
-        {/* Outer glass-glow tube */}
         <mesh>
           <torusGeometry args={[radius, 0.035, 24, 120]} />
           <meshPhysicalMaterial
@@ -278,13 +429,14 @@ function SceneContent() {
           />
         </mesh>
         
-        {/* Fast Orbiting Node: Antigravity */}
+        {/* Orbiting Node: Antigravity */}
         <OrbitingNode 
           radius={radius} 
           speed={0.45} 
           startOffset={0} 
-          svgSrc="/antigravity.svg" 
+          texture={textures.antigravity} 
           label="Antigravity AI" 
+          cardTexture={cardTexture}
         />
       </group>
     </>
@@ -302,7 +454,7 @@ export default function InteractiveHero3D() {
   if (!mounted) {
     return (
       <div className="w-full h-[70vh] min-h-[500px] lg:h-full lg:min-h-[600px] flex items-center justify-center bg-transparent">
-        {/* Premium glowing skeleton state */}
+        {/* Premium skeleton loading spinner */}
         <div className="relative w-32 h-32 flex items-center justify-center">
           <div className="absolute w-20 h-20 rounded-full border-2 border-slate-200 dark:border-white/10 animate-pulse flex items-center justify-center p-2">
             <img 
@@ -323,7 +475,9 @@ export default function InteractiveHero3D() {
         camera={{ position: [3.5, 2.5, 7.5], fov: 55 }} 
         className="w-full h-full"
       >
-        <SceneContent />
+        <React.Suspense fallback={null}>
+          <SceneContent />
+        </React.Suspense>
       </Canvas>
     </div>
   )
