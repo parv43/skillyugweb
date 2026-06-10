@@ -307,7 +307,7 @@ function SceneContent() {
       </group>
 
       {/* ── STATIC ORBITAL RINGS (Visually Tilt-Rotated) ── */}
-      {/* Ring 1 (Tilted Y) - Indigo/Blue Glow */}
+      {/* Ring 1 (Vertical - Tilted Y) - Indigo/Blue Glow */}
       <group rotation={[0, Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
@@ -326,8 +326,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 2 (Tilted -X & Y) - Pink/Fuchsia Glow */}
-      <group rotation={[-0.65906, 0.46365, 0]}>
+      {/* Ring 2 (Horizontal - Tilted X) - Pink/Fuchsia Glow */}
+      <group rotation={[Math.PI / 4, 0, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -345,8 +345,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 3 (Tilted -X & -Y) - Purple/Violet Glow */}
-      <group rotation={[-0.65906, -0.46365, 0]}>
+      {/* Ring 3 (Diagonal I - Quadrant IV) - Purple/Violet Glow */}
+      <group rotation={[0.61548, Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -364,8 +364,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 4 (Tilted -Y) - Teal/Cyan Glow */}
-      <group rotation={[0, -Math.PI / 4, 0]}>
+      {/* Ring 4 (Diagonal II - Quadrant II) - Teal/Cyan Glow */}
+      <group rotation={[-0.61548, -Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -383,8 +383,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 5 (Tilted X & -Y) - Orange/Amber Glow */}
-      <group rotation={[0.65906, -0.46365, 0]}>
+      {/* Ring 5 (Diagonal III - Quadrant III) - Orange/Amber Glow */}
+      <group rotation={[0.61548, -Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -402,8 +402,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 6 (Tilted X & Y) - Green/Emerald Glow */}
-      <group rotation={[0.65906, 0.46365, 0]}>
+      {/* Ring 6 (Diagonal IV - Quadrant I) - Green/Emerald Glow */}
+      <group rotation={[-0.61548, Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -438,7 +438,7 @@ function SceneContent() {
         radius={radius} 
         speed={-0.50} 
         startOffset={Math.PI / 3} 
-        ringRotation={[-0.65906, 0.46365, 0]}
+        ringRotation={[Math.PI / 4, 0, 0]}
         texture={textures.perplexity} 
         label="Perplexity" 
         cardTexture={cardTexture}
@@ -449,7 +449,7 @@ function SceneContent() {
         radius={radius} 
         speed={0.45} 
         startOffset={2 * Math.PI / 3} 
-        ringRotation={[-0.65906, -0.46365, 0]}
+        ringRotation={[0.61548, Math.PI / 4, 0]}
         texture={textures.gemini} 
         label="Google Gemini" 
         cardTexture={cardTexture}
@@ -460,7 +460,7 @@ function SceneContent() {
         radius={radius} 
         speed={-0.60} 
         startOffset={Math.PI} 
-        ringRotation={[0, -Math.PI / 4, 0]}
+        ringRotation={[-0.61548, -Math.PI / 4, 0]}
         texture={textures.canva} 
         label="Canva AI" 
         cardTexture={cardTexture}
@@ -471,7 +471,7 @@ function SceneContent() {
         radius={radius} 
         speed={0.50} 
         startOffset={4 * Math.PI / 3} 
-        ringRotation={[0.65906, -0.46365, 0]}
+        ringRotation={[0.61548, -Math.PI / 4, 0]}
         texture={textures.antigravity} 
         label="Antigravity AI" 
         cardTexture={cardTexture}
@@ -482,7 +482,7 @@ function SceneContent() {
         radius={radius} 
         speed={-0.55} 
         startOffset={5 * Math.PI / 3} 
-        ringRotation={[0.65906, 0.46365, 0]}
+        ringRotation={[-0.61548, Math.PI / 4, 0]}
         texture={textures.figma} 
         label="Figma" 
         cardTexture={cardTexture}
