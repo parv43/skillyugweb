@@ -86,9 +86,9 @@ function OrbitingNode({ radius, speed, startOffset, svgSrc, label }: OrbitingNod
         By using 'distanceFactor={14}', we force 3D scaling perspective (small when far, large when close)
         while maintaining extremely crisp rendering quality.
       */}
-      <Html transform sprite distanceFactor={14}>
+      <Html transform sprite distanceFactor={15}>
         <div 
-          className="group/node w-24 h-24 rounded-[2rem] flex items-center justify-center bg-white/75 dark:bg-slate-900/75 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 p-4 shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 pointer-events-auto cursor-pointer select-none"
+          className="group/node w-14 h-14 rounded-2xl flex items-center justify-center bg-white/75 dark:bg-slate-900/75 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 p-2.5 shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 pointer-events-auto cursor-pointer select-none"
           title={label}
         >
           <img 
