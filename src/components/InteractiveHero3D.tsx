@@ -55,13 +55,14 @@ interface OrbitingNodeProps {
   radius: number
   speed: number
   startOffset: number
-  ringRotation: [number, number, number]
+  theta: number
+  psi: number
   texture: THREE.Texture
   label: string
   cardTexture: THREE.Texture
 }
 
-function OrbitingNode({ radius, speed, startOffset, ringRotation, texture, label, cardTexture }: OrbitingNodeProps) {
+function OrbitingNode({ radius, speed, startOffset, theta, psi, texture, label, cardTexture }: OrbitingNodeProps) {
   const groupRef = useRef<THREE.Group>(null)
   const angleRef = useRef(startOffset)
   const [hovered, setHovered] = useState(false)
@@ -79,7 +80,7 @@ function OrbitingNode({ radius, speed, startOffset, ringRotation, texture, label
   }, [hovered])
 
   useFrame((state, delta) => {
-    // 1. Orbit calculations (apply ring rotation manually to flat coordinates)
+    // 1. Orbit calculations (apply nested rotations manually to flat coordinates)
     angleRef.current += speed * delta
     const currentAngle = angleRef.current
 
@@ -88,10 +89,12 @@ function OrbitingNode({ radius, speed, startOffset, ringRotation, texture, label
       const localY = radius * Math.sin(currentAngle)
       const localZ = 0
 
-      // Rotate local coordinates to match the ring's tilt axis
+      // Rotate local coordinates to match the nested ring rotation
       const pos = new THREE.Vector3(localX, localY, localZ)
-      const euler = new THREE.Euler(ringRotation[0], ringRotation[1], ringRotation[2])
-      pos.applyEuler(euler)
+      // 1. Pitch about X-axis
+      pos.applyAxisAngle(new THREE.Vector3(1, 0, 0), theta)
+      // 2. Roll about Z-axis
+      pos.applyAxisAngle(new THREE.Vector3(0, 0, 1), psi)
 
       groupRef.current.position.copy(pos)
       
@@ -308,60 +311,66 @@ function SceneContent() {
 
       {/* ── STATIC ORBITAL RINGS (Visually Tilt-Rotated) ── */}
       {/* Ring 1 (Horizontal - Tilted X) - Indigo/Blue Glow */}
-      <group rotation={[-1.0472, 0, 0]}>
-        <mesh>
-          <torusGeometry args={[radius, 0.012, 16, 120]} />
-          <meshPhysicalMaterial
-            roughness={0.2}
-            metalness={0.8}
-            clearcoat={1.0}
-            clearcoatRoughness={0.1}
-            transparent={true}
-            opacity={isDark ? 0.35 : 0.45}
-            depthWrite={false}
-            color={isDark ? "#a5b4fc" : "#818cf8"}
-            emissive={isDark ? "#4f46e5" : "#6366f1"}
-            emissiveIntensity={1.2}
-          />
-        </mesh>
+      <group rotation={[0, 0, 0]}>
+        <group rotation={[1.1, 0, 0]}>
+          <mesh>
+            <torusGeometry args={[radius, 0.012, 16, 120]} />
+            <meshPhysicalMaterial
+              roughness={0.2}
+              metalness={0.8}
+              clearcoat={1.0}
+              clearcoatRoughness={0.1}
+              transparent={true}
+              opacity={isDark ? 0.35 : 0.45}
+              depthWrite={false}
+              color={isDark ? "#a5b4fc" : "#818cf8"}
+              emissive={isDark ? "#4f46e5" : "#6366f1"}
+              emissiveIntensity={1.2}
+            />
+          </mesh>
+        </group>
       </group>
 
-      {/* Ring 2 (Diagonal 1 - Tilted -X & -Y) - Pink/Fuchsia Glow */}
-      <group rotation={[0.44783, -0.98279, 0]}>
-        <mesh>
-          <torusGeometry args={[radius, 0.012, 16, 120]} />
-          <meshPhysicalMaterial
-            roughness={0.2}
-            metalness={0.8}
-            clearcoat={1.0}
-            clearcoatRoughness={0.1}
-            transparent={true}
-            opacity={isDark ? 0.35 : 0.45}
-            depthWrite={false}
-            color={isDark ? "#fbcfe8" : "#ec4899"}
-            emissive={isDark ? "#be185d" : "#db2777"}
-            emissiveIntensity={1.2}
-          />
-        </mesh>
+      {/* Ring 2 (Diagonal 1 - Tilted Left) - Pink/Fuchsia Glow */}
+      <group rotation={[0, 0, Math.PI / 3]}>
+        <group rotation={[1.1, 0, 0]}>
+          <mesh>
+            <torusGeometry args={[radius, 0.012, 16, 120]} />
+            <meshPhysicalMaterial
+              roughness={0.2}
+              metalness={0.8}
+              clearcoat={1.0}
+              clearcoatRoughness={0.1}
+              transparent={true}
+              opacity={isDark ? 0.35 : 0.45}
+              depthWrite={false}
+              color={isDark ? "#fbcfe8" : "#ec4899"}
+              emissive={isDark ? "#be185d" : "#db2777"}
+              emissiveIntensity={1.2}
+            />
+          </mesh>
+        </group>
       </group>
 
-      {/* Ring 3 (Diagonal 2 - Tilted X & Y) - Purple/Violet Glow */}
-      <group rotation={[0.44783, 0.98279, 0]}>
-        <mesh>
-          <torusGeometry args={[radius, 0.012, 16, 120]} />
-          <meshPhysicalMaterial
-            roughness={0.2}
-            metalness={0.8}
-            clearcoat={1.0}
-            clearcoatRoughness={0.1}
-            transparent={true}
-            opacity={isDark ? 0.35 : 0.45}
-            depthWrite={false}
-            color={isDark ? "#e9d5ff" : "#a855f7"}
-            emissive={isDark ? "#7e22ce" : "#9333ea"}
-            emissiveIntensity={1.2}
-          />
-        </mesh>
+      {/* Ring 3 (Diagonal 2 - Tilted Right) - Purple/Violet Glow */}
+      <group rotation={[0, 0, 2 * Math.PI / 3]}>
+        <group rotation={[1.1, 0, 0]}>
+          <mesh>
+            <torusGeometry args={[radius, 0.012, 16, 120]} />
+            <meshPhysicalMaterial
+              roughness={0.2}
+              metalness={0.8}
+              clearcoat={1.0}
+              clearcoatRoughness={0.1}
+              transparent={true}
+              opacity={isDark ? 0.35 : 0.45}
+              depthWrite={false}
+              color={isDark ? "#e9d5ff" : "#a855f7"}
+              emissive={isDark ? "#7e22ce" : "#9333ea"}
+              emissiveIntensity={1.2}
+            />
+          </mesh>
+        </group>
       </group>
 
       {/* ── ROOT-LEVEL ORBITING NODES (Perfect billboarding, no parent tilt interference) ── */}
@@ -370,7 +379,8 @@ function SceneContent() {
         radius={radius} 
         speed={0.55} 
         startOffset={0} 
-        ringRotation={[-1.0472, 0, 0]}
+        theta={1.1}
+        psi={0}
         texture={textures.claude} 
         label="Claude AI" 
         cardTexture={cardTexture}
@@ -379,7 +389,8 @@ function SceneContent() {
         radius={radius} 
         speed={0.55} 
         startOffset={Math.PI} 
-        ringRotation={[-1.0472, 0, 0]}
+        theta={1.1}
+        psi={0}
         texture={textures.perplexity} 
         label="Perplexity" 
         cardTexture={cardTexture}
@@ -390,7 +401,8 @@ function SceneContent() {
         radius={radius} 
         speed={-0.50} 
         startOffset={0} 
-        ringRotation={[0.44783, -0.98279, 0]}
+        theta={1.1}
+        psi={Math.PI / 3}
         texture={textures.gemini} 
         label="Google Gemini" 
         cardTexture={cardTexture}
@@ -399,7 +411,8 @@ function SceneContent() {
         radius={radius} 
         speed={-0.50} 
         startOffset={Math.PI} 
-        ringRotation={[0.44783, -0.98279, 0]}
+        theta={1.1}
+        psi={Math.PI / 3}
         texture={textures.canva} 
         label="Canva AI" 
         cardTexture={cardTexture}
@@ -410,7 +423,8 @@ function SceneContent() {
         radius={radius} 
         speed={0.48} 
         startOffset={0} 
-        ringRotation={[0.44783, 0.98279, 0]}
+        theta={1.1}
+        psi={2 * Math.PI / 3}
         texture={textures.antigravity} 
         label="Antigravity AI" 
         cardTexture={cardTexture}
@@ -419,7 +433,8 @@ function SceneContent() {
         radius={radius} 
         speed={0.48} 
         startOffset={Math.PI} 
-        ringRotation={[0.44783, 0.98279, 0]}
+        theta={1.1}
+        psi={2 * Math.PI / 3}
         texture={textures.figma} 
         label="Figma" 
         cardTexture={cardTexture}
