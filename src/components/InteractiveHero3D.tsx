@@ -165,7 +165,7 @@ function SceneContent() {
     gemini: "/gemini.svg",
     canva: "/canva.svg",
     antigravity: "/antigravity.svg",
-    skillyug: "/skillyug.svg",
+    skillyug: "/skillyug.png",
   })
 
   // Set correct colorspace for vivid rendering to prevent dark/washed-out textures
@@ -295,15 +295,15 @@ function SceneContent() {
         <mesh scale={[coreScale, coreScale, coreScale]} renderOrder={3}>
           <sphereGeometry args={[1.35, 64, 64]} />
           <meshPhysicalMaterial
-            roughness={0.05}
-            metalness={0.1}
+            roughness={0.1}
+            metalness={0.15}
             clearcoat={1.0}
-            clearcoatRoughness={0.1}
-            transmission={0.95}
-            thickness={1.5}
-            transparent
-            opacity={0.25}
-            color="#ffffff"
+            clearcoatRoughness={0.05}
+            transparent={true}
+            opacity={0.28}
+            color={isDark ? "#c7d2fe" : "#ffffff"}
+            emissive={isDark ? "#4338ca" : "#f1f5f9"}
+            emissiveIntensity={isDark ? 0.15 : 0.05}
           />
         </mesh>
         
@@ -466,7 +466,7 @@ export default function InteractiveHero3D() {
 
   if (!mounted) {
     return (
-      <div className="w-full h-[80vh] min-h-[550px] lg:h-full lg:min-h-[700px] flex items-center justify-center bg-transparent">
+      <div className="w-full h-[80vh] min-h-[550px] lg:h-full lg:min-h-[800px] flex items-center justify-center bg-transparent">
         {/* Premium skeleton loading spinner */}
         <div className="relative w-32 h-32 flex items-center justify-center">
           <div className="absolute w-20 h-20 rounded-full border-2 border-slate-200 dark:border-white/10 animate-pulse flex items-center justify-center p-2">
@@ -483,7 +483,7 @@ export default function InteractiveHero3D() {
   }
 
   return (
-    <div className="relative w-full h-[80vh] min-h-[550px] lg:h-full lg:min-h-[700px] flex items-center justify-center overflow-hidden">
+    <div className="relative w-full h-[80vh] min-h-[550px] lg:h-full lg:min-h-[800px] flex items-center justify-center overflow-hidden">
       <Canvas 
         camera={{ position: [3.5, 2.5, 7.5], fov: 55 }} 
         className="w-full h-full"

@@ -176,7 +176,7 @@ export default function HeroSection() {
 
           {/* Right Column: Interactive 3D Orbit */}
           <div
-            className="w-full lg:w-[50%] h-[500px] sm:h-[700px] flex items-center justify-center relative"
+            className="w-full lg:w-[50%] h-[500px] sm:h-[800px] flex items-center justify-center relative"
           >
             <InteractiveHero3D />
           </div>
