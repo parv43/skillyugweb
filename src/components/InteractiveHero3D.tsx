@@ -50,19 +50,19 @@ function BackgroundParticles({ count = 25 }) {
   )
 }
 
-// ─── WEBGL-NATIVE ORBITING NODE CARD ───────────────────────────────────────
+// ─── WEBGL-NATIVE BILLBOARDED ORBITING NODE ────────────────────────────────
 interface OrbitingNodeProps {
   radius: number
   speed: number
   startOffset: number
+  ringRotation: [number, number, number]
   texture: THREE.Texture
   label: string
   cardTexture: THREE.Texture
 }
 
-function OrbitingNode({ radius, speed, startOffset, texture, label, cardTexture }: OrbitingNodeProps) {
+function OrbitingNode({ radius, speed, startOffset, ringRotation, texture, label, cardTexture }: OrbitingNodeProps) {
   const groupRef = useRef<THREE.Group>(null)
-  const billboardRef = useRef<THREE.Group>(null)
   const angleRef = useRef(startOffset)
   const [hovered, setHovered] = useState(false)
 
@@ -79,23 +79,27 @@ function OrbitingNode({ radius, speed, startOffset, texture, label, cardTexture 
   }, [hovered])
 
   useFrame((state, delta) => {
-    // 1. Orbit calculations
+    // 1. Orbit calculations (apply ring rotation manually to flat coordinates)
     angleRef.current += speed * delta
     const currentAngle = angleRef.current
 
     if (groupRef.current) {
-      groupRef.current.position.x = radius * Math.cos(currentAngle)
-      groupRef.current.position.y = radius * Math.sin(currentAngle)
-      groupRef.current.position.z = 0
-    }
+      const localX = radius * Math.cos(currentAngle)
+      const localY = radius * Math.sin(currentAngle)
+      const localZ = 0
 
-    // 2. Billboarding (manually copy camera rotation to face the screen directly)
-    if (billboardRef.current) {
-      billboardRef.current.quaternion.copy(state.camera.quaternion)
-    }
+      // Rotate local coordinates to match the ring's tilt axis
+      const pos = new THREE.Vector3(localX, localY, localZ)
+      const euler = new THREE.Euler(ringRotation[0], ringRotation[1], ringRotation[2])
+      pos.applyEuler(euler)
 
-    // 3. Smooth Scale LERP on Hover
-    if (groupRef.current) {
+      groupRef.current.position.copy(pos)
+      
+      // 2. Billboarding: copy camera rotation directly to root-level group
+      // This guarantees they always face front, regardless of where they orbit
+      groupRef.current.quaternion.copy(state.camera.quaternion)
+
+      // 3. Smooth Scale LERP on Hover
       const targetScale = hovered ? 1.15 : 1.0
       groupRef.current.scale.x = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.15)
       groupRef.current.scale.y = THREE.MathUtils.lerp(groupRef.current.scale.y, targetScale, 0.15)
@@ -104,38 +108,36 @@ function OrbitingNode({ radius, speed, startOffset, texture, label, cardTexture 
   })
 
   return (
-    <group ref={groupRef}>
-      <group 
-        ref={billboardRef}
-        onPointerOver={(e) => {
-          e.stopPropagation()
-          setHovered(true)
-        }}
-        onPointerOut={(e) => {
-          e.stopPropagation()
-          setHovered(false)
-        }}
-      >
-        {/* Backing glassmorphic card (enlarged to 0.9 for readability) */}
-        <mesh castShadow receiveShadow>
-          <planeGeometry args={[0.9, 0.9]} />
-          <meshBasicMaterial 
-            map={cardTexture} 
-            transparent 
-            depthWrite={false} 
-          />
-        </mesh>
+    <group 
+      ref={groupRef}
+      onPointerOver={(e) => {
+        e.stopPropagation()
+        setHovered(true)
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation()
+        setHovered(false)
+      }}
+    >
+      {/* Backing glassmorphic card (renderOrder enforced for overlay layering) */}
+      <mesh castShadow receiveShadow renderOrder={4}>
+        <planeGeometry args={[0.9, 0.9]} />
+        <meshBasicMaterial 
+          map={cardTexture} 
+          transparent 
+          depthWrite={true} 
+        />
+      </mesh>
 
-        {/* Front SVG icon texture (enlarged to 0.6 and offset slightly forward) */}
-        <mesh position={[0, 0, 0.02]}>
-          <planeGeometry args={[0.6, 0.6]} />
-          <meshBasicMaterial 
-            map={texture} 
-            transparent 
-            depthWrite={false} 
-          />
-        </mesh>
-      </group>
+      {/* Front SVG icon texture (renderOrder and Z-offset ensure it draws on top) */}
+      <mesh position={[0, 0, 0.025]} renderOrder={5}>
+        <planeGeometry args={[0.6, 0.6]} />
+        <meshBasicMaterial 
+          map={texture} 
+          transparent 
+          depthWrite={true} 
+        />
+      </mesh>
     </group>
   )
 }
@@ -290,7 +292,7 @@ function SceneContent() {
       {/* ── CENTRAL REFRACTIVE CORE ── */}
       <group>
         {/* Physical 3D glass core sphere (transmission increased to 0.95 for maximum clarity) */}
-        <mesh scale={[coreScale, coreScale, coreScale]}>
+        <mesh scale={[coreScale, coreScale, coreScale]} renderOrder={3}>
           <sphereGeometry args={[1.35, 64, 64]} />
           <meshPhysicalMaterial
             roughness={0.05}
@@ -305,31 +307,32 @@ function SceneContent() {
           />
         </mesh>
         
-        {/* Core Skillyug logo billboard (enlarged and positioned slightly forward for clarity) */}
+        {/* Core Skillyug logo billboard (renderOrder and depthWrite ensure it draws on top of background) */}
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
           {/* Logo Circular Background */}
-          <mesh>
+          <mesh renderOrder={1}>
             <planeGeometry args={[1.6, 1.6]} />
             <meshBasicMaterial 
               map={coreLogoBgTexture} 
               transparent 
-              depthWrite={false} 
+              depthWrite={true} 
             />
           </mesh>
           
           {/* Logo Graphic Decal */}
-          <mesh position={[0, 0, 0.035]}>
+          <mesh position={[0, 0, 0.035]} renderOrder={2}>
             <planeGeometry args={[1.15, 1.15]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
               transparent 
-              depthWrite={false} 
+              depthWrite={true} 
             />
           </mesh>
         </group>
       </group>
 
-      {/* ── ORBITAL RING 1 (Tilted 45° X) ── */}
+      {/* ── STATIC ORBITAL RINGS (Visually Tilt-Rotated) ── */}
+      {/* Ring 1 (Tilted 45° X) */}
       <group rotation={[Math.PI / 4, 0, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.006, 8, 120]} />
@@ -350,27 +353,9 @@ function SceneContent() {
             emissiveIntensity={0.2}
           />
         </mesh>
-        
-        {/* Orbiting Nodes: Claude & Perplexity */}
-        <OrbitingNode 
-          radius={radius} 
-          speed={0.65} 
-          startOffset={0} 
-          texture={textures.claude} 
-          label="Claude AI" 
-          cardTexture={cardTexture}
-        />
-        <OrbitingNode 
-          radius={radius} 
-          speed={0.65} 
-          startOffset={Math.PI} 
-          texture={textures.perplexity} 
-          label="Perplexity" 
-          cardTexture={cardTexture}
-        />
       </group>
 
-      {/* ── ORBITAL RING 2 (Tilted -45° Y) ── */}
+      {/* Ring 2 (Tilted -45° Y) */}
       <group rotation={[0, -Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.006, 8, 120]} />
@@ -391,27 +376,9 @@ function SceneContent() {
             emissiveIntensity={0.2}
           />
         </mesh>
-        
-        {/* Orbiting Nodes: Gemini & Canva */}
-        <OrbitingNode 
-          radius={radius} 
-          speed={-0.55} 
-          startOffset={Math.PI / 2} 
-          texture={textures.gemini} 
-          label="Google Gemini" 
-          cardTexture={cardTexture}
-        />
-        <OrbitingNode 
-          radius={radius} 
-          speed={-0.55} 
-          startOffset={-Math.PI / 2} 
-          texture={textures.canva} 
-          label="Canva AI" 
-          cardTexture={cardTexture}
-        />
       </group>
 
-      {/* ── ORBITAL RING 3 (Horizontal X: 90°) ── */}
+      {/* Ring 3 (Horizontal X: 90°) */}
       <group rotation={[Math.PI / 2, 0, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.006, 8, 120]} />
@@ -432,17 +399,59 @@ function SceneContent() {
             emissiveIntensity={0.2}
           />
         </mesh>
-        
-        {/* Orbiting Node: Antigravity */}
-        <OrbitingNode 
-          radius={radius} 
-          speed={0.45} 
-          startOffset={0} 
-          texture={textures.antigravity} 
-          label="Antigravity AI" 
-          cardTexture={cardTexture}
-        />
       </group>
+
+      {/* ── ROOT-LEVEL ORBITING NODES (Perfect billboarding, no parent tilt interference) ── */}
+      {/* Nodes on Ring 1 */}
+      <OrbitingNode 
+        radius={radius} 
+        speed={0.65} 
+        startOffset={0} 
+        ringRotation={[Math.PI / 4, 0, 0]}
+        texture={textures.claude} 
+        label="Claude AI" 
+        cardTexture={cardTexture}
+      />
+      <OrbitingNode 
+        radius={radius} 
+        speed={0.65} 
+        startOffset={Math.PI} 
+        ringRotation={[Math.PI / 4, 0, 0]}
+        texture={textures.perplexity} 
+        label="Perplexity" 
+        cardTexture={cardTexture}
+      />
+
+      {/* Nodes on Ring 2 */}
+      <OrbitingNode 
+        radius={radius} 
+        speed={-0.55} 
+        startOffset={Math.PI / 2} 
+        ringRotation={[0, -Math.PI / 4, 0]}
+        texture={textures.gemini} 
+        label="Google Gemini" 
+        cardTexture={cardTexture}
+      />
+      <OrbitingNode 
+        radius={radius} 
+        speed={-0.55} 
+        startOffset={-Math.PI / 2} 
+        ringRotation={[0, -Math.PI / 4, 0]}
+        texture={textures.canva} 
+        label="Canva AI" 
+        cardTexture={cardTexture}
+      />
+
+      {/* Node on Ring 3 */}
+      <OrbitingNode 
+        radius={radius} 
+        speed={0.45} 
+        startOffset={0} 
+        ringRotation={[Math.PI / 2, 0, 0]}
+        texture={textures.antigravity} 
+        label="Antigravity AI" 
+        cardTexture={cardTexture}
+      />
     </>
   )
 }
