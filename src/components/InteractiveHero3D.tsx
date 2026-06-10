@@ -307,8 +307,8 @@ function SceneContent() {
       </group>
 
       {/* ── STATIC ORBITAL RINGS (Visually Tilt-Rotated) ── */}
-      {/* Ring 1 (Tilted 45° X) - Indigo/Blue Glow */}
-      <group rotation={[Math.PI / 4, 0, 0]}>
+      {/* Ring 1 (Tilted X & Y) - Indigo/Blue Glow */}
+      <group rotation={[Math.PI / 4, Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -326,8 +326,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 2 (Tilted -45° Y) - Pink/Fuchsia Glow */}
-      <group rotation={[0, -Math.PI / 4, 0]}>
+      {/* Ring 2 (Tilted -X & -Y) - Pink/Fuchsia Glow */}
+      <group rotation={[-Math.PI / 4, -Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -345,8 +345,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 3 (Horizontal X: 90°) - Purple/Violet Glow */}
-      <group rotation={[Math.PI / 2, 0, 0]}>
+      {/* Ring 3 (Tilted X & -Y) - Purple/Violet Glow */}
+      <group rotation={[Math.PI / 4, -Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -364,8 +364,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 4 (Tilted 45° Y) - Teal/Cyan Glow */}
-      <group rotation={[0, Math.PI / 4, 0]}>
+      {/* Ring 4 (Tilted -X & Y) - Teal/Cyan Glow */}
+      <group rotation={[-Math.PI / 4, Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -389,7 +389,7 @@ function SceneContent() {
         radius={radius} 
         speed={0.65} 
         startOffset={0} 
-        ringRotation={[Math.PI / 4, 0, 0]}
+        ringRotation={[Math.PI / 4, Math.PI / 4, 0]}
         texture={textures.claude} 
         label="Claude AI" 
         cardTexture={cardTexture}
@@ -398,7 +398,7 @@ function SceneContent() {
         radius={radius} 
         speed={0.65} 
         startOffset={Math.PI} 
-        ringRotation={[Math.PI / 4, 0, 0]}
+        ringRotation={[Math.PI / 4, Math.PI / 4, 0]}
         texture={textures.perplexity} 
         label="Perplexity" 
         cardTexture={cardTexture}
@@ -409,7 +409,7 @@ function SceneContent() {
         radius={radius} 
         speed={-0.55} 
         startOffset={Math.PI / 2} 
-        ringRotation={[0, -Math.PI / 4, 0]}
+        ringRotation={[-Math.PI / 4, -Math.PI / 4, 0]}
         texture={textures.gemini} 
         label="Google Gemini" 
         cardTexture={cardTexture}
@@ -418,7 +418,7 @@ function SceneContent() {
         radius={radius} 
         speed={-0.55} 
         startOffset={-Math.PI / 2} 
-        ringRotation={[0, -Math.PI / 4, 0]}
+        ringRotation={[-Math.PI / 4, -Math.PI / 4, 0]}
         texture={textures.canva} 
         label="Canva AI" 
         cardTexture={cardTexture}
@@ -429,7 +429,7 @@ function SceneContent() {
         radius={radius} 
         speed={0.45} 
         startOffset={0} 
-        ringRotation={[Math.PI / 2, 0, 0]}
+        ringRotation={[Math.PI / 4, -Math.PI / 4, 0]}
         texture={textures.antigravity} 
         label="Antigravity AI" 
         cardTexture={cardTexture}
@@ -440,7 +440,7 @@ function SceneContent() {
         radius={radius} 
         speed={-0.5} 
         startOffset={0} 
-        ringRotation={[0, Math.PI / 4, 0]}
+        ringRotation={[-Math.PI / 4, Math.PI / 4, 0]}
         texture={textures.figma} 
         label="Figma" 
         cardTexture={cardTexture}
