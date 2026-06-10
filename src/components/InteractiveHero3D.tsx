@@ -105,12 +105,6 @@ function OrbitingNode({ radius, speed, startOffset, texture, label, cardTexture 
 
   return (
     <group ref={groupRef}>
-      {/* 
-        This group acts as the billboard.
-        By using native WebGL meshes for the cards (instead of HTML DOM overlays),
-        they respect the camera depth buffer and are naturally occluded when they go behind
-        the central glass sphere or central logo plane.
-      */}
       <group 
         ref={billboardRef}
         onPointerOver={(e) => {
@@ -122,9 +116,9 @@ function OrbitingNode({ radius, speed, startOffset, texture, label, cardTexture 
           setHovered(false)
         }}
       >
-        {/* Backing glassmorphic card (with borders & shadows rendered dynamically) */}
+        {/* Backing glassmorphic card (enlarged to 0.9 for readability) */}
         <mesh castShadow receiveShadow>
-          <planeGeometry args={[0.72, 0.72]} />
+          <planeGeometry args={[0.9, 0.9]} />
           <meshBasicMaterial 
             map={cardTexture} 
             transparent 
@@ -132,9 +126,9 @@ function OrbitingNode({ radius, speed, startOffset, texture, label, cardTexture 
           />
         </mesh>
 
-        {/* Front SVG icon texture (offset slightly forward on Z to prevent z-fighting) */}
-        <mesh position={[0, 0, 0.015]}>
-          <planeGeometry args={[0.42, 0.42]} />
+        {/* Front SVG icon texture (enlarged to 0.6 and offset slightly forward) */}
+        <mesh position={[0, 0, 0.02]}>
+          <planeGeometry args={[0.6, 0.6]} />
           <meshBasicMaterial 
             map={texture} 
             transparent 
@@ -172,28 +166,38 @@ function SceneContent() {
     skillyug: "/skillyug.svg",
   })
 
-  // 3. Dynamically draw rounded square card backgrounds reacting to light/dark theme changes
+  // Set correct colorspace for vivid rendering to prevent dark/washed-out textures
+  useEffect(() => {
+    Object.values(textures).forEach((tex) => {
+      if (tex) {
+        tex.colorSpace = THREE.SRGBColorSpace
+        tex.needsUpdate = true
+      }
+    })
+  }, [textures])
+
+  // 3. Dynamically draw rounded square card backgrounds (High res 512x512 for crispness)
   const cardTexture = useMemo(() => {
     const canvas = document.createElement("canvas")
-    canvas.width = 256
-    canvas.height = 256
+    canvas.width = 512
+    canvas.height = 512
     const ctx = canvas.getContext("2d")
     if (ctx) {
-      ctx.clearRect(0, 0, 256, 256)
+      ctx.clearRect(0, 0, 512, 512)
       
       // Card Shadow
-      ctx.shadowColor = isDark ? "rgba(0, 0, 0, 0.45)" : "rgba(0, 0, 0, 0.06)"
-      ctx.shadowBlur = 14
+      ctx.shadowColor = isDark ? "rgba(0, 0, 0, 0.45)" : "rgba(0, 0, 0, 0.08)"
+      ctx.shadowBlur = 28
       ctx.shadowOffsetX = 0
-      ctx.shadowOffsetY = 4
+      ctx.shadowOffsetY = 8
 
       // White/slate backdrop fill
-      ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.82)" : "rgba(255, 255, 255, 0.85)"
-      const r = 40
-      const w = 216
-      const h = 216
-      const x = 20
-      const y = 20
+      ctx.fillStyle = isDark ? "rgba(15, 23, 42, 0.85)" : "rgba(255, 255, 255, 0.88)"
+      const r = 80
+      const w = 432
+      const h = 432
+      const x = 40
+      const y = 40
       
       ctx.beginPath()
       ctx.moveTo(x + r, y)
@@ -207,8 +211,8 @@ function SceneContent() {
       // Card Border
       ctx.shadowBlur = 0
       ctx.shadowColor = "transparent"
-      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(226, 232, 240, 0.75)"
-      ctx.lineWidth = 5
+      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(226, 232, 240, 0.85)"
+      ctx.lineWidth = 10
       ctx.stroke()
     }
     
@@ -218,25 +222,25 @@ function SceneContent() {
     return texture
   }, [isDark])
 
-  // 4. Dynamically draw central logo background circle reacting to theme
+  // 4. Dynamically draw central logo background circle (High res 512x512)
   const coreLogoBgTexture = useMemo(() => {
     const canvas = document.createElement("canvas")
-    canvas.width = 256
-    canvas.height = 256
+    canvas.width = 512
+    canvas.height = 512
     const ctx = canvas.getContext("2d")
     if (ctx) {
-      ctx.clearRect(0, 0, 256, 256)
+      ctx.clearRect(0, 0, 512, 512)
       
       // Backdrop fill
-      ctx.fillStyle = isDark ? "rgba(10, 15, 28, 0.75)" : "rgba(255, 255, 255, 0.8)"
+      ctx.fillStyle = isDark ? "rgba(10, 15, 28, 0.8)" : "rgba(255, 255, 255, 0.85)"
       ctx.beginPath()
-      ctx.arc(128, 128, 108, 0, Math.PI * 2)
+      ctx.arc(256, 256, 216, 0, Math.PI * 2)
       ctx.closePath()
       ctx.fill()
 
       // Border
-      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(226, 232, 240, 0.8)"
-      ctx.lineWidth = 5
+      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(226, 232, 240, 0.85)"
+      ctx.lineWidth = 10
       ctx.stroke()
     }
     
@@ -246,13 +250,13 @@ function SceneContent() {
     return texture
   }, [isDark])
 
-  // Responsive calculations
+  // Responsive calculations (enlarged radius and scale bounds)
   const radius = useMemo(() => {
-    return Math.min(3.4, width * 0.35)
+    return Math.min(3.8, width * 0.38)
   }, [width])
 
   const coreScale = useMemo(() => {
-    return Math.min(1.2, width * 0.12)
+    return Math.min(1.3, width * 0.13)
   }, [width])
 
   const centralLogoRef = useRef<THREE.Group>(null)
@@ -285,27 +289,27 @@ function SceneContent() {
 
       {/* ── CENTRAL REFRACTIVE CORE ── */}
       <group>
-        {/* Physical 3D glass core sphere */}
+        {/* Physical 3D glass core sphere (transmission increased to 0.95 for maximum clarity) */}
         <mesh scale={[coreScale, coreScale, coreScale]}>
-          <sphereGeometry args={[1.3, 64, 64]} />
+          <sphereGeometry args={[1.35, 64, 64]} />
           <meshPhysicalMaterial
             roughness={0.05}
             metalness={0.1}
             clearcoat={1.0}
             clearcoatRoughness={0.1}
-            transmission={0.9}
+            transmission={0.95}
             thickness={1.5}
             transparent
-            opacity={0.35}
+            opacity={0.25}
             color="#ffffff"
           />
         </mesh>
         
-        {/* Core Skillyug logo billboard (rendered inside WebGL to respect depth sorting) */}
+        {/* Core Skillyug logo billboard (enlarged and positioned slightly forward for clarity) */}
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
           {/* Logo Circular Background */}
           <mesh>
-            <planeGeometry args={[1.35, 1.35]} />
+            <planeGeometry args={[1.6, 1.6]} />
             <meshBasicMaterial 
               map={coreLogoBgTexture} 
               transparent 
@@ -314,8 +318,8 @@ function SceneContent() {
           </mesh>
           
           {/* Logo Graphic Decal */}
-          <mesh position={[0, 0, 0.015]}>
-            <planeGeometry args={[0.9, 0.9]} />
+          <mesh position={[0, 0, 0.035]}>
+            <planeGeometry args={[1.15, 1.15]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
               transparent 
@@ -453,7 +457,7 @@ export default function InteractiveHero3D() {
 
   if (!mounted) {
     return (
-      <div className="w-full h-[70vh] min-h-[500px] lg:h-full lg:min-h-[600px] flex items-center justify-center bg-transparent">
+      <div className="w-full h-[80vh] min-h-[550px] lg:h-full lg:min-h-[700px] flex items-center justify-center bg-transparent">
         {/* Premium skeleton loading spinner */}
         <div className="relative w-32 h-32 flex items-center justify-center">
           <div className="absolute w-20 h-20 rounded-full border-2 border-slate-200 dark:border-white/10 animate-pulse flex items-center justify-center p-2">
@@ -470,7 +474,7 @@ export default function InteractiveHero3D() {
   }
 
   return (
-    <div className="relative w-full h-[70vh] min-h-[500px] lg:h-full lg:min-h-[600px] flex items-center justify-center overflow-hidden">
+    <div className="relative w-full h-[80vh] min-h-[550px] lg:h-full lg:min-h-[700px] flex items-center justify-center overflow-hidden">
       <Canvas 
         camera={{ position: [3.5, 2.5, 7.5], fov: 55 }} 
         className="w-full h-full"

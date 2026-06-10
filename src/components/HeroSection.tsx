@@ -133,7 +133,7 @@ export default function HeroSection() {
           
           {/* Left Column: Copy & CTAs */}
           <div
-            className="w-full lg:w-[58%] flex flex-col items-center lg:items-start text-center lg:text-left"
+            className="w-full lg:w-[50%] flex flex-col items-center lg:items-start text-center lg:text-left"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5 shadow-sm mb-6">
               <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
@@ -147,7 +147,7 @@ export default function HeroSection() {
               </span>
             </h2>
 
-            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-xl mb-10 font-light leading-relaxed">
+            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-350 max-w-xl mb-10 font-light leading-relaxed">
               In a highly competitive world, standard school education isn&apos;t
               enough. We train your child to leverage advanced AI, giving them a
               massive edge in academics and their future career.
@@ -176,7 +176,7 @@ export default function HeroSection() {
 
           {/* Right Column: Interactive 3D Orbit */}
           <div
-            className="w-full lg:w-[42%] h-[400px] sm:h-[600px] flex items-center justify-center relative"
+            className="w-full lg:w-[50%] h-[500px] sm:h-[700px] flex items-center justify-center relative"
           >
             <InteractiveHero3D />
           </div>
