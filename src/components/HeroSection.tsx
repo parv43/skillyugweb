@@ -3,50 +3,11 @@
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import dynamic from "next/dynamic"
 import { useAccessControl } from "@/hooks/useAccessControl"
 import { Phone } from "lucide-react"
 
-// The tool cards orbiting the central badge
-interface OrbitingToolProps {
-  label: string
-  icon: string
-  angle: number
-  radius: number
-  duration: number
-  tilt: number
-}
-
-const OrbitingTool = ({ label, icon, angle, radius, duration, tilt }: OrbitingToolProps) => {
-  return (
-    <div
-      className="absolute top-1/2 left-1/2 -ml-[45px] -mt-[45px] w-[90px] h-[90px] z-20 pointer-events-none animate-orbit"
-      style={{
-        '--start-angle': `${angle}deg`,
-        '--duration': `${duration}s`
-      } as React.CSSProperties}
-    >
-      {/* Container that pushes the card outward by radius value */}
-      <div 
-        className="w-full h-full absolute inset-0 will-change-transform" 
-        style={{ transform: `translateY(-${radius}px)` }}
-      >
-        <div
-          className="w-full h-full pointer-events-auto animate-counter-orbit flex flex-col items-center justify-center bg-white/90 dark:bg-[#0f172a]/80 backdrop-blur-sm border border-slate-200/85 dark:border-white/8 rounded-[16px] overflow-hidden shadow-sm hover:bg-white hover:border-blue-300 hover:shadow-md dark:hover:bg-[#0f172a] dark:hover:border-blue-500/50 transition-all duration-300"
-          style={{
-            '--start-angle': `${angle}deg`,
-            '--tilt': `${tilt}deg`,
-            '--duration': `${duration}s`
-          } as React.CSSProperties}
-        >
-          <span className="text-3xl mb-1">{icon}</span>
-          <span className="text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-slate-350 tracking-wide uppercase leading-none text-center px-1">
-            {label}
-          </span>
-        </div>
-      </div>
-    </div>
-  )
-}
+const InteractiveHero3D = dynamic(() => import("./InteractiveHero3D"), { ssr: false })
 
 // ─── Mobile-Only Hero ───────────────────────────────────────────────────────
 function MobileHero() {
@@ -136,23 +97,8 @@ function MobileHero() {
 
 // ─── Main Export ─────────────────────────────────────────────────────────────
 export default function HeroSection() {
-  const [orbitRadius, setOrbitRadius] = useState(230)
   const { isLoggedIn, hasSlot, loading } = useAccessControl();
   const [showSticky, setShowSticky] = useState(false)
-
-  useEffect(() => {
-    const updateRadius = () => {
-      if (window.innerWidth < 768) {
-        setOrbitRadius(170)
-      } else {
-        setOrbitRadius(230)
-      }
-    }
-    
-    updateRadius()
-    window.addEventListener('resize', updateRadius)
-    return () => window.removeEventListener('resize', updateRadius)
-  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -165,15 +111,6 @@ export default function HeroSection() {
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
-
-  const tools = [
-    { label: "ChatGPT", icon: "💬", tilt: 0 },
-    { label: "Midjourney", icon: "🎨", tilt: 0 },
-    { label: "DALL-E", icon: "🌠", tilt: 0 },
-    { label: "Claude", icon: "🧠", tilt: 0 },
-    { label: "Canva AI", icon: "🖼️", tilt: 0 },
-    { label: "Runway", icon: "🎬", tilt: 0 },
-  ]
 
   return (
     <>
@@ -237,37 +174,11 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column: Orbit Animation */}
+          {/* Right Column: Interactive 3D Orbit */}
           <div
-            className="w-full lg:w-[42%] h-[300px] sm:h-[600px] flex items-center justify-center relative"
+            className="w-full lg:w-[42%] h-[400px] sm:h-[600px] flex items-center justify-center relative"
           >
-            {/* Faint Orbit Ring */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div 
-                className="absolute rounded-full border border-slate-200 dark:border-white/5 transition-all duration-500" 
-                style={{ width: orbitRadius * 2, height: orbitRadius * 2 }}
-              />
-            </div>
-
-            {/* Central Pill Badge */}
-            <div className="relative z-30 px-8 py-4 rounded-full bg-white dark:bg-slate-950 border border-slate-200/80 dark:border-white/40 shadow-md dark:shadow-[0_0_30px_rgba(255,255,255,0.3)] flex items-center justify-center text-black dark:text-white">
-              <span className="text-xl md:text-2xl font-black text-black dark:text-white tracking-[0.2em] relative z-10">SKILLYUG</span>
-              <div className="absolute inset-0 rounded-full border border-slate-200 dark:border-white/20 animate-pulse opacity-50" />
-            </div>
-
-            {/* Orbiting Tool Cards */}
-            {tools.map((tool, i) => (
-              <OrbitingTool
-                key={i}
-                icon={tool.icon}
-                label={tool.label}
-                angle={(360 / tools.length) * i}
-                radius={orbitRadius}
-                duration={18}
-                tilt={tool.tilt}
-              />
-            ))}
-            
+            <InteractiveHero3D />
           </div>
 
         </div>
