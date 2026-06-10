@@ -520,7 +520,7 @@ export default function InteractiveHero3D() {
   return (
     <div className="relative w-full h-[80vh] min-h-[550px] lg:h-full lg:min-h-[800px] flex items-center justify-center overflow-hidden">
       <Canvas 
-        camera={{ position: [3.5, 2.5, 7.5], fov: 55 }} 
+        camera={{ position: [0, 0, 8.2], fov: 55 }} 
         className="w-full h-full"
       >
         <React.Suspense fallback={null}>
