@@ -332,71 +332,59 @@ function SceneContent() {
       </group>
 
       {/* ── STATIC ORBITAL RINGS (Visually Tilt-Rotated) ── */}
-      {/* Ring 1 (Tilted 45° X) */}
+      {/* Ring 1 (Tilted 45° X) - Indigo/Blue Glow */}
       <group rotation={[Math.PI / 4, 0, 0]}>
         <mesh>
-          <torusGeometry args={[radius, 0.006, 8, 120]} />
-          <meshBasicMaterial color="#a78bfa" transparent opacity={0.35} />
-        </mesh>
-        <mesh>
-          <torusGeometry args={[radius, 0.035, 24, 120]} />
+          <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
-            roughness={0.1}
-            transmission={0.8}
-            thickness={0.5}
+            roughness={0.2}
+            metalness={0.8}
             clearcoat={1.0}
             clearcoatRoughness={0.1}
-            transparent
-            opacity={0.25}
-            color="#818cf8"
-            emissive="#818cf8"
-            emissiveIntensity={0.2}
+            transparent={true}
+            opacity={isDark ? 0.35 : 0.45}
+            depthWrite={false}
+            color={isDark ? "#a5b4fc" : "#818cf8"}
+            emissive={isDark ? "#4f46e5" : "#6366f1"}
+            emissiveIntensity={1.2}
           />
         </mesh>
       </group>
 
-      {/* Ring 2 (Tilted -45° Y) */}
+      {/* Ring 2 (Tilted -45° Y) - Pink/Fuchsia Glow */}
       <group rotation={[0, -Math.PI / 4, 0]}>
         <mesh>
-          <torusGeometry args={[radius, 0.006, 8, 120]} />
-          <meshBasicMaterial color="#a78bfa" transparent opacity={0.35} />
-        </mesh>
-        <mesh>
-          <torusGeometry args={[radius, 0.035, 24, 120]} />
+          <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
-            roughness={0.1}
-            transmission={0.8}
-            thickness={0.5}
+            roughness={0.2}
+            metalness={0.8}
             clearcoat={1.0}
             clearcoatRoughness={0.1}
-            transparent
-            opacity={0.25}
-            color="#818cf8"
-            emissive="#818cf8"
-            emissiveIntensity={0.2}
+            transparent={true}
+            opacity={isDark ? 0.35 : 0.45}
+            depthWrite={false}
+            color={isDark ? "#fbcfe8" : "#ec4899"}
+            emissive={isDark ? "#be185d" : "#db2777"}
+            emissiveIntensity={1.2}
           />
         </mesh>
       </group>
 
-      {/* Ring 3 (Horizontal X: 90°) */}
+      {/* Ring 3 (Horizontal X: 90°) - Purple/Violet Glow */}
       <group rotation={[Math.PI / 2, 0, 0]}>
         <mesh>
-          <torusGeometry args={[radius, 0.006, 8, 120]} />
-          <meshBasicMaterial color="#a78bfa" transparent opacity={0.35} />
-        </mesh>
-        <mesh>
-          <torusGeometry args={[radius, 0.035, 24, 120]} />
+          <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
-            roughness={0.1}
-            transmission={0.8}
-            thickness={0.5}
+            roughness={0.2}
+            metalness={0.8}
             clearcoat={1.0}
             clearcoatRoughness={0.1}
-            transparent
-            opacity={0.25}
-            color="#818cf8"
-            emissive="#818cf8"
-            emissiveIntensity={0.2}
+            transparent={true}
+            opacity={isDark ? 0.35 : 0.45}
+            depthWrite={false}
+            color={isDark ? "#e9d5ff" : "#a855f7"}
+            emissive={isDark ? "#7e22ce" : "#9333ea"}
+            emissiveIntensity={1.2}
           />
         </mesh>
       </group>
