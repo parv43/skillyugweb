@@ -311,7 +311,7 @@ function SceneContent() {
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
           {/* Logo Circular Background */}
           <mesh renderOrder={2}>
-            <planeGeometry args={[1.5, 1.5]} />
+            <planeGeometry args={[1.1, 1.1]} />
             <meshBasicMaterial 
               map={coreLogoBgTexture} 
               transparent 
@@ -322,7 +322,7 @@ function SceneContent() {
           
           {/* Logo Graphic Decal - Larger size overlapping the circular background */}
           <mesh position={[0, 0, 0.035]} renderOrder={3}>
-            <planeGeometry args={[1.9, 1.9]} />
+            <planeGeometry args={[2.0, 2.0]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
               transparent 
