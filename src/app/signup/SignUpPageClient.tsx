@@ -302,6 +302,30 @@ function SignUpForm() {
               >
                 {loading ? "Creating Account..." : "Create Account"}
               </button>
+
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-slate-200 dark:border-white/10"></div>
+                <span className="flex-shrink-0 mx-4 text-slate-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider">Or</span>
+                <div className="flex-grow border-t border-slate-200 dark:border-white/10"></div>
+              </div>
+              
+              <button
+                type="button"
+                onClick={async () => {
+                  setErrorMsg("");
+                  const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+                    },
+                  });
+                  if (error) setErrorMsg(error.message);
+                }}
+                className="w-full bg-white dark:bg-transparent border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 font-bold py-4 rounded-full shadow-sm hover:shadow transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+              >
+                <img src="/Google.png" alt="Google" className="w-5 h-5 object-contain" />
+                Continue with Google
+              </button>
             </form>
 
             <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/80 text-center relative z-10">
