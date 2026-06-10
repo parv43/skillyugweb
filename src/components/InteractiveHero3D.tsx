@@ -224,19 +224,29 @@ function SceneContent() {
     return texture
   }, [isDark])
 
-  // 4. Dynamically draw central logo background circle (High res 512x512)
+  // 4. Dynamically draw central logo background rounded card (High res 512x256)
   const coreLogoBgTexture = useMemo(() => {
     const canvas = document.createElement("canvas")
     canvas.width = 512
-    canvas.height = 512
+    canvas.height = 256
     const ctx = canvas.getContext("2d")
     if (ctx) {
-      ctx.clearRect(0, 0, 512, 512)
+      ctx.clearRect(0, 0, 512, 256)
       
       // Backdrop fill - High-contrast white fill for both themes to make the logo pop
       ctx.fillStyle = "rgba(255, 255, 255, 0.95)"
+      const r = 50
+      const w = 472
+      const h = 216
+      const x = 20
+      const y = 20
+      
       ctx.beginPath()
-      ctx.arc(256, 256, 216, 0, Math.PI * 2)
+      ctx.moveTo(x + r, y)
+      ctx.arcTo(x + w, y, x + w, y + h, r)
+      ctx.arcTo(x + w, y + h, x, y + h, r)
+      ctx.arcTo(x, y + h, x, y, r)
+      ctx.arcTo(x, y, x + w, y, r)
       ctx.closePath()
       ctx.fill()
 
@@ -274,7 +284,7 @@ function SceneContent() {
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 10, 5]} intensity={3.5} color="#ffffff" />
       <pointLight position={[-8, -8, -4]} intensity={2.0} color="#f472b6" distance={15} />
-      <pointLight position={[0, 0, 0]} intensity={5.0} color="#818cf8" distance={10} decay={1.5} />
+      <pointLight position={[0, 0, 0]} intensity={2.0} color="#818cf8" distance={10} decay={1.5} />
 
       {/* Interactive OrbitControls */}
       <OrbitControls 
@@ -298,18 +308,18 @@ function SceneContent() {
             clearcoat={1.0}
             clearcoatRoughness={0.05}
             transparent={true}
-            opacity={0.12}
+            opacity={0.06}
             color={isDark ? "#c7d2fe" : "#ffffff"}
             emissive={isDark ? "#4338ca" : "#f1f5f9"}
-            emissiveIntensity={isDark ? 0.08 : 0.03}
+            emissiveIntensity={isDark ? 0.05 : 0.02}
           />
         </mesh>
         
         {/* Core Skillyug logo billboard (renderOrder and depthWrite ensure it draws on top of background) */}
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
-          {/* Logo Circular Background */}
+          {/* Logo Rounded Card Background */}
           <mesh renderOrder={1}>
-            <planeGeometry args={[1.5, 1.5]} />
+            <planeGeometry args={[1.55, 0.7]} />
             <meshBasicMaterial 
               map={coreLogoBgTexture} 
               transparent 
@@ -319,7 +329,7 @@ function SceneContent() {
           
           {/* Logo Graphic Decal */}
           <mesh position={[0, 0, 0.035]} renderOrder={2}>
-            <planeGeometry args={[1.5, 1.5]} />
+            <planeGeometry args={[1.7, 1.7]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
               transparent 
