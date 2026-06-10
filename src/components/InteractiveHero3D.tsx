@@ -307,8 +307,8 @@ function SceneContent() {
       </group>
 
       {/* ── STATIC ORBITAL RINGS (Visually Tilt-Rotated) ── */}
-      {/* Ring 1 (Tilted X & Y) - Indigo/Blue Glow */}
-      <group rotation={[-0.61548, Math.PI / 4, 0]}>
+      {/* Ring 1 (Tilted Y) - Indigo/Blue Glow */}
+      <group rotation={[0, Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -326,8 +326,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 2 (Tilted -X & -Y) - Pink/Fuchsia Glow */}
-      <group rotation={[0.61548, -Math.PI / 4, 0]}>
+      {/* Ring 2 (Tilted -X & Y) - Pink/Fuchsia Glow */}
+      <group rotation={[-0.65906, 0.46365, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -345,8 +345,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 3 (Tilted X & -Y) - Purple/Violet Glow */}
-      <group rotation={[-0.61548, -Math.PI / 4, 0]}>
+      {/* Ring 3 (Tilted -X & -Y) - Purple/Violet Glow */}
+      <group rotation={[-0.65906, -0.46365, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -364,8 +364,8 @@ function SceneContent() {
         </mesh>
       </group>
 
-      {/* Ring 4 (Tilted -X & Y) - Teal/Cyan Glow */}
-      <group rotation={[0.61548, Math.PI / 4, 0]}>
+      {/* Ring 4 (Tilted -Y) - Teal/Cyan Glow */}
+      <group rotation={[0, -Math.PI / 4, 0]}>
         <mesh>
           <torusGeometry args={[radius, 0.012, 16, 120]} />
           <meshPhysicalMaterial
@@ -383,64 +383,106 @@ function SceneContent() {
         </mesh>
       </group>
 
+      {/* Ring 5 (Tilted X & -Y) - Orange/Amber Glow */}
+      <group rotation={[0.65906, -0.46365, 0]}>
+        <mesh>
+          <torusGeometry args={[radius, 0.012, 16, 120]} />
+          <meshPhysicalMaterial
+            roughness={0.2}
+            metalness={0.8}
+            clearcoat={1.0}
+            clearcoatRoughness={0.1}
+            transparent={true}
+            opacity={isDark ? 0.35 : 0.45}
+            depthWrite={false}
+            color={isDark ? "#fed7aa" : "#f97316"}
+            emissive={isDark ? "#c2410c" : "#ea580c"}
+            emissiveIntensity={1.2}
+          />
+        </mesh>
+      </group>
+
+      {/* Ring 6 (Tilted X & Y) - Green/Emerald Glow */}
+      <group rotation={[0.65906, 0.46365, 0]}>
+        <mesh>
+          <torusGeometry args={[radius, 0.012, 16, 120]} />
+          <meshPhysicalMaterial
+            roughness={0.2}
+            metalness={0.8}
+            clearcoat={1.0}
+            clearcoatRoughness={0.1}
+            transparent={true}
+            opacity={isDark ? 0.35 : 0.45}
+            depthWrite={false}
+            color={isDark ? "#a7f3d0" : "#10b981"}
+            emissive={isDark ? "#047857" : "#059669"}
+            emissiveIntensity={1.2}
+          />
+        </mesh>
+      </group>
+
       {/* ── ROOT-LEVEL ORBITING NODES (Perfect billboarding, no parent tilt interference) ── */}
-      {/* Nodes on Ring 1 */}
+      {/* Node 1 on Ring 1 - Claude AI */}
       <OrbitingNode 
         radius={radius} 
-        speed={0.65} 
+        speed={0.55} 
         startOffset={0} 
-        ringRotation={[-0.61548, Math.PI / 4, 0]}
+        ringRotation={[0, Math.PI / 4, 0]}
         texture={textures.claude} 
         label="Claude AI" 
         cardTexture={cardTexture}
       />
+
+      {/* Node 2 on Ring 2 - Perplexity */}
       <OrbitingNode 
         radius={radius} 
-        speed={0.65} 
-        startOffset={Math.PI} 
-        ringRotation={[-0.61548, Math.PI / 4, 0]}
+        speed={-0.50} 
+        startOffset={Math.PI / 3} 
+        ringRotation={[-0.65906, 0.46365, 0]}
         texture={textures.perplexity} 
         label="Perplexity" 
         cardTexture={cardTexture}
       />
 
-      {/* Nodes on Ring 2 */}
+      {/* Node 3 on Ring 3 - Google Gemini */}
       <OrbitingNode 
         radius={radius} 
-        speed={-0.55} 
-        startOffset={Math.PI / 2} 
-        ringRotation={[0.61548, -Math.PI / 4, 0]}
+        speed={0.45} 
+        startOffset={2 * Math.PI / 3} 
+        ringRotation={[-0.65906, -0.46365, 0]}
         texture={textures.gemini} 
         label="Google Gemini" 
         cardTexture={cardTexture}
       />
+
+      {/* Node 4 on Ring 4 - Canva AI */}
       <OrbitingNode 
         radius={radius} 
-        speed={-0.55} 
-        startOffset={-Math.PI / 2} 
-        ringRotation={[0.61548, -Math.PI / 4, 0]}
+        speed={-0.60} 
+        startOffset={Math.PI} 
+        ringRotation={[0, -Math.PI / 4, 0]}
         texture={textures.canva} 
         label="Canva AI" 
         cardTexture={cardTexture}
       />
 
-      {/* Node on Ring 3 */}
+      {/* Node 5 on Ring 5 - Antigravity AI */}
       <OrbitingNode 
         radius={radius} 
-        speed={0.45} 
-        startOffset={0} 
-        ringRotation={[-0.61548, -Math.PI / 4, 0]}
+        speed={0.50} 
+        startOffset={4 * Math.PI / 3} 
+        ringRotation={[0.65906, -0.46365, 0]}
         texture={textures.antigravity} 
         label="Antigravity AI" 
         cardTexture={cardTexture}
       />
 
-      {/* Node on Ring 4 */}
+      {/* Node 6 on Ring 6 - Figma */}
       <OrbitingNode 
         radius={radius} 
-        speed={-0.5} 
-        startOffset={0} 
-        ringRotation={[0.61548, Math.PI / 4, 0]}
+        speed={-0.55} 
+        startOffset={5 * Math.PI / 3} 
+        ringRotation={[0.65906, 0.46365, 0]}
         texture={textures.figma} 
         label="Figma" 
         cardTexture={cardTexture}
