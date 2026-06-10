@@ -233,15 +233,15 @@ function SceneContent() {
     if (ctx) {
       ctx.clearRect(0, 0, 512, 512)
       
-      // Backdrop fill
-      ctx.fillStyle = isDark ? "rgba(10, 15, 28, 0.8)" : "rgba(255, 255, 255, 0.85)"
+      // Backdrop fill - High-contrast white fill for both themes to make the logo pop
+      ctx.fillStyle = "rgba(255, 255, 255, 0.95)"
       ctx.beginPath()
       ctx.arc(256, 256, 216, 0, Math.PI * 2)
       ctx.closePath()
       ctx.fill()
 
       // Border
-      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(226, 232, 240, 0.85)"
+      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.2)" : "rgba(226, 232, 240, 0.85)"
       ctx.lineWidth = 10
       ctx.stroke()
     }
@@ -298,10 +298,10 @@ function SceneContent() {
             clearcoat={1.0}
             clearcoatRoughness={0.05}
             transparent={true}
-            opacity={0.28}
+            opacity={0.12}
             color={isDark ? "#c7d2fe" : "#ffffff"}
             emissive={isDark ? "#4338ca" : "#f1f5f9"}
-            emissiveIntensity={isDark ? 0.15 : 0.05}
+            emissiveIntensity={isDark ? 0.08 : 0.03}
           />
         </mesh>
         
@@ -309,7 +309,7 @@ function SceneContent() {
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
           {/* Logo Circular Background */}
           <mesh renderOrder={1}>
-            <planeGeometry args={[1.6, 1.6]} />
+            <planeGeometry args={[1.5, 1.5]} />
             <meshBasicMaterial 
               map={coreLogoBgTexture} 
               transparent 
@@ -319,7 +319,7 @@ function SceneContent() {
           
           {/* Logo Graphic Decal */}
           <mesh position={[0, 0, 0.035]} renderOrder={2}>
-            <planeGeometry args={[1.15, 1.15]} />
+            <planeGeometry args={[1.5, 1.5]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
               transparent 
