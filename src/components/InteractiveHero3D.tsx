@@ -207,7 +207,7 @@ function SceneContent() {
     gemini: "/gemini.svg",
     canva: "/canva.svg",
     antigravity: "/antigravity.svg",
-    skillyug: "/skillyug.png",
+    skillyug: "/Mask_Center.webp",
     figma: "/figma.svg",
   })
 
