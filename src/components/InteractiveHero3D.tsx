@@ -327,7 +327,7 @@ function SceneContent() {
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
           {/* Logo Graphic Decal */}
           <mesh position={[0, 0, 0]} renderOrder={2}>
-            <planeGeometry args={[2.0, 2.0]} />
+            <circleGeometry args={[1.35, 64]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
               transparent 
