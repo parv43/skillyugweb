@@ -55,14 +55,14 @@ interface OrbitingNodeProps {
   radius: number
   speed: number
   startOffset: number
-  theta: number
-  psi: number
+  alpha: number
+  tilt: number
   texture: THREE.Texture
   label: string
   cardTexture: THREE.Texture
 }
 
-function OrbitingNode({ radius, speed, startOffset, theta, psi, texture, label, cardTexture }: OrbitingNodeProps) {
+function OrbitingNode({ radius, speed, startOffset, alpha, tilt, texture, label, cardTexture }: OrbitingNodeProps) {
   const groupRef = useRef<THREE.Group>(null)
   const angleRef = useRef(startOffset)
   const [hovered, setHovered] = useState(false)
@@ -80,33 +80,30 @@ function OrbitingNode({ radius, speed, startOffset, theta, psi, texture, label, 
   }, [hovered])
 
   useFrame((state, delta) => {
-    // 1. Orbit calculations (apply nested rotations manually to flat coordinates)
     angleRef.current += speed * delta
-    const currentAngle = angleRef.current
+    const t = angleRef.current
 
     if (groupRef.current) {
-      const localX = radius * Math.cos(currentAngle)
-      const localY = radius * Math.sin(currentAngle)
-      const localZ = 0
+      // ── Core orbital math: parametric ellipse in screen XY plane ──
+      const a = radius          // semi-major axis (full radius)
+      const b = radius * tilt   // semi-minor axis (controls ellipse squish)
 
-      // Rotate local coordinates to match the nested ring rotation
-      const pos = new THREE.Vector3(localX, localY, localZ)
-      // 1. Pitch about X-axis
-      pos.applyAxisAngle(new THREE.Vector3(1, 0, 0), theta)
-      // 2. Roll about Z-axis
-      pos.applyAxisAngle(new THREE.Vector3(0, 0, 1), psi)
+      // Rotate the parametric ellipse by alpha degrees in screen space
+      const localX = a * Math.cos(t) * Math.cos(alpha) - b * Math.sin(t) * Math.sin(alpha)
+      const localY = a * Math.cos(t) * Math.sin(alpha) + b * Math.sin(t) * Math.cos(alpha)
+      const localZ = 0  // stays in screen plane — no depth needed
 
-      groupRef.current.position.copy(pos)
-      
-      // 2. Billboarding: copy camera rotation directly to root-level group
-      // This guarantees they always face front, regardless of where they orbit
+      groupRef.current.position.set(localX, localY, localZ)
+
+      // ── Billboarding: always face camera ──
       groupRef.current.quaternion.copy(state.camera.quaternion)
 
-      // 3. Smooth Scale LERP on Hover
+      // ── Smooth scale LERP on hover ──
       const targetScale = hovered ? 1.15 : 1.0
-      groupRef.current.scale.x = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.15)
-      groupRef.current.scale.y = THREE.MathUtils.lerp(groupRef.current.scale.y, targetScale, 0.15)
-      groupRef.current.scale.z = THREE.MathUtils.lerp(groupRef.current.scale.z, targetScale, 0.15)
+      const lerpFactor = 0.15
+      groupRef.current.scale.x = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, lerpFactor)
+      groupRef.current.scale.y = THREE.MathUtils.lerp(groupRef.current.scale.y, targetScale, lerpFactor)
+      groupRef.current.scale.z = THREE.MathUtils.lerp(groupRef.current.scale.z, targetScale, lerpFactor)
     }
   })
 
@@ -146,6 +143,48 @@ function OrbitingNode({ radius, speed, startOffset, theta, psi, texture, label, 
 }
 
 // ─── SCENE LOADING CONTENT (SUSPENSE SUPPORTED) ──────────────────────────
+const ORBIT_CONFIGS = [
+  { 
+    alpha: 0, 
+    tilt: 0.3, 
+    speed: 0.55, 
+    colorLight: "#818cf8", 
+    colorDark: "#a5b4fc", 
+    emissiveLight: "#6366f1", 
+    emissiveDark: "#4f46e5", 
+    label1: "Claude AI", 
+    label2: "Perplexity", 
+    texKey1: "claude" as const, 
+    texKey2: "perplexity" as const 
+  },
+  { 
+    alpha: Math.PI / 3, 
+    tilt: 0.3, 
+    speed: -0.50, 
+    colorLight: "#ec4899", 
+    colorDark: "#fbcfe8", 
+    emissiveLight: "#db2777", 
+    emissiveDark: "#be185d", 
+    label1: "Google Gemini", 
+    label2: "Canva AI", 
+    texKey1: "gemini" as const, 
+    texKey2: "canva" as const 
+  },
+  { 
+    alpha: 2 * Math.PI / 3, 
+    tilt: 0.3, 
+    speed: 0.48, 
+    colorLight: "#a855f7", 
+    colorDark: "#e9d5ff", 
+    emissiveLight: "#9333ea", 
+    emissiveDark: "#7e22ce", 
+    label1: "Antigravity AI", 
+    label2: "Figma", 
+    texKey1: "antigravity" as const, 
+    texKey2: "figma" as const 
+  },
+]
+
 function SceneContent() {
   const { width } = useThree((state) => state.viewport)
   
@@ -310,9 +349,8 @@ function SceneContent() {
       </group>
 
       {/* ── STATIC ORBITAL RINGS (Visually Tilt-Rotated) ── */}
-      {/* Ring 1 (Horizontal - Tilted X) - Indigo/Blue Glow */}
-      <group rotation={[0, 0, 0]}>
-        <group rotation={[0.8, 0, 0]}>
+      {ORBIT_CONFIGS.map((config, idx) => (
+        <group key={`ring-${idx}`} rotation={[0, 0, config.alpha]} scale={[1, config.tilt, 1]}>
           <mesh>
             <torusGeometry args={[radius, 0.012, 16, 120]} />
             <meshPhysicalMaterial
@@ -323,122 +361,39 @@ function SceneContent() {
               transparent={true}
               opacity={isDark ? 0.35 : 0.45}
               depthWrite={false}
-              color={isDark ? "#a5b4fc" : "#818cf8"}
-              emissive={isDark ? "#4f46e5" : "#6366f1"}
+              color={isDark ? config.colorDark : config.colorLight}
+              emissive={isDark ? config.emissiveDark : config.emissiveLight}
               emissiveIntensity={1.2}
             />
           </mesh>
         </group>
-      </group>
+      ))}
 
-      {/* Ring 2 (Diagonal 1 - Tilted Left) - Pink/Fuchsia Glow */}
-      <group rotation={[0, 0, Math.PI / 4]}>
-        <group rotation={[0.8, 0, 0]}>
-          <mesh>
-            <torusGeometry args={[radius, 0.012, 16, 120]} />
-            <meshPhysicalMaterial
-              roughness={0.2}
-              metalness={0.8}
-              clearcoat={1.0}
-              clearcoatRoughness={0.1}
-              transparent={true}
-              opacity={isDark ? 0.35 : 0.45}
-              depthWrite={false}
-              color={isDark ? "#fbcfe8" : "#ec4899"}
-              emissive={isDark ? "#be185d" : "#db2777"}
-              emissiveIntensity={1.2}
-            />
-          </mesh>
-        </group>
-      </group>
-
-      {/* Ring 3 (Diagonal 2 - Tilted Right) - Purple/Violet Glow */}
-      <group rotation={[0, 0, 3 * Math.PI / 4]}>
-        <group rotation={[0.8, 0, 0]}>
-          <mesh>
-            <torusGeometry args={[radius, 0.012, 16, 120]} />
-            <meshPhysicalMaterial
-              roughness={0.2}
-              metalness={0.8}
-              clearcoat={1.0}
-              clearcoatRoughness={0.1}
-              transparent={true}
-              opacity={isDark ? 0.35 : 0.45}
-              depthWrite={false}
-              color={isDark ? "#e9d5ff" : "#a855f7"}
-              emissive={isDark ? "#7e22ce" : "#9333ea"}
-              emissiveIntensity={1.2}
-            />
-          </mesh>
-        </group>
-      </group>
-
-      {/* ── ROOT-LEVEL ORBITING NODES (Perfect billboarding, no parent tilt interference) ── */}
-      {/* Nodes on Ring 1 (Horizontal) - Claude AI & Perplexity */}
-      <OrbitingNode 
-        radius={radius} 
-        speed={0.55} 
-        startOffset={0} 
-        theta={0.8}
-        psi={0}
-        texture={textures.claude} 
-        label="Claude AI" 
-        cardTexture={cardTexture}
-      />
-      <OrbitingNode 
-        radius={radius} 
-        speed={0.55} 
-        startOffset={Math.PI} 
-        theta={0.8}
-        psi={0}
-        texture={textures.perplexity} 
-        label="Perplexity" 
-        cardTexture={cardTexture}
-      />
-
-      {/* Nodes on Ring 2 (Diagonal 1) - Google Gemini & Canva AI */}
-      <OrbitingNode 
-        radius={radius} 
-        speed={-0.50} 
-        startOffset={0} 
-        theta={0.8}
-        psi={Math.PI / 4}
-        texture={textures.gemini} 
-        label="Google Gemini" 
-        cardTexture={cardTexture}
-      />
-      <OrbitingNode 
-        radius={radius} 
-        speed={-0.50} 
-        startOffset={Math.PI} 
-        theta={0.8}
-        psi={Math.PI / 4}
-        texture={textures.canva} 
-        label="Canva AI" 
-        cardTexture={cardTexture}
-      />
-
-      {/* Nodes on Ring 3 (Diagonal 2) - Antigravity AI & Figma */}
-      <OrbitingNode 
-        radius={radius} 
-        speed={0.48} 
-        startOffset={0} 
-        theta={0.8}
-        psi={3 * Math.PI / 4}
-        texture={textures.antigravity} 
-        label="Antigravity AI" 
-        cardTexture={cardTexture}
-      />
-      <OrbitingNode 
-        radius={radius} 
-        speed={0.48} 
-        startOffset={Math.PI} 
-        theta={0.8}
-        psi={3 * Math.PI / 4}
-        texture={textures.figma} 
-        label="Figma" 
-        cardTexture={cardTexture}
-      />
+      {/* ── ROOT-LEVEL ORBITING NODES ── */}
+      {ORBIT_CONFIGS.map((config, idx) => (
+        <React.Fragment key={`nodes-${idx}`}>
+          <OrbitingNode 
+            radius={radius} 
+            speed={config.speed} 
+            startOffset={0} 
+            alpha={config.alpha}
+            tilt={config.tilt}
+            texture={textures[config.texKey1]} 
+            label={config.label1} 
+            cardTexture={cardTexture}
+          />
+          <OrbitingNode 
+            radius={radius} 
+            speed={config.speed} 
+            startOffset={Math.PI} 
+            alpha={config.alpha}
+            tilt={config.tilt}
+            texture={textures[config.texKey2]} 
+            label={config.label2} 
+            cardTexture={cardTexture}
+          />
+        </React.Fragment>
+      ))}
     </>
   )
 }
