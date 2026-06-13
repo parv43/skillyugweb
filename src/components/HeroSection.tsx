@@ -73,15 +73,6 @@ export default function HeroSection() {
               0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
               50% { transform: translate3d(0, -8px, 0) rotate(2deg); }
             }
-            @keyframes flowPath {
-              to {
-                stroke-dashoffset: -40;
-              }
-            }
-            .connection-line {
-              stroke-dasharray: 1.5 2.5;
-              animation: flowPath 25s linear infinite;
-            }
             .clay-badge {
               border-radius: 50%;
               display: flex;
@@ -129,31 +120,9 @@ export default function HeroSection() {
             }
           `}</style>
 
-          {/* SVG Connection Path - Weaving through the new corridor coordinates */}
-          <svg 
-            className="absolute inset-0 w-full h-full pointer-events-none select-none" 
-            viewBox="0 0 100 100" 
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
-                <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#ec4899" stopOpacity="0.4" />
-              </linearGradient>
-            </defs>
-            <path 
-              d="M 48,12 C 52,18 53,21 54,25 C 51,32 49,35 48,40 C 51,48 52,50 53,55 C 51,62 50,65 49,70" 
-              fill="none" 
-              stroke="url(#line-grad)" 
-              strokeWidth="0.3" 
-              className="connection-line"
-            />
-          </svg>
-
           {/* 1. Gemini Badge */}
           <div 
-            className="absolute top-[12%] left-[48%] w-[68px] h-[68px] pointer-events-auto select-none"
+            className="absolute top-[14%] left-[62%] w-[68px] h-[68px] pointer-events-auto select-none"
             style={{ animation: "float1 6s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[16px]">
@@ -163,7 +132,7 @@ export default function HeroSection() {
 
           {/* 2. Perplexity Badge */}
           <div 
-            className="absolute top-[25%] left-[54%] w-[65px] h-[65px] pointer-events-auto select-none"
+            className="absolute top-[10%] left-[76%] w-[65px] h-[65px] pointer-events-auto select-none"
             style={{ animation: "float2 7s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[16px]">
@@ -173,7 +142,7 @@ export default function HeroSection() {
 
           {/* 3. Claude AI Badge */}
           <div 
-            className="absolute top-[40%] left-[48%] w-[70px] h-[70px] pointer-events-auto select-none"
+            className="absolute top-[15%] left-[91%] w-[70px] h-[70px] pointer-events-auto select-none"
             style={{ animation: "float3 8s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[18px]">
@@ -183,7 +152,7 @@ export default function HeroSection() {
 
           {/* 4. Napkin AI Badge */}
           <div 
-            className="absolute top-[55%] left-[53%] w-[70px] h-[70px] pointer-events-auto select-none"
+            className="absolute top-[42%] left-[93%] w-[70px] h-[70px] pointer-events-auto select-none"
             style={{ animation: "float4 7.5s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[14px] overflow-hidden">
@@ -193,7 +162,7 @@ export default function HeroSection() {
 
           {/* 5. Gamma Badge */}
           <div 
-            className="absolute top-[70%] left-[49%] w-[66px] h-[66px] pointer-events-auto select-none"
+            className="absolute top-[68%] left-[91%] w-[66px] h-[66px] pointer-events-auto select-none"
             style={{ animation: "float5 5s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[16px]">
