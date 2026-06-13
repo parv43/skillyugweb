@@ -200,14 +200,14 @@ function SceneContent() {
     return () => observer.disconnect()
   }, [])
 
-  // 2. Pre-load all SVG textures in WebGL (crisp and cached)
+  // 2. Pre-load all SVG and PNG textures in WebGL (crisp and cached)
   const textures = useTexture({
     claude: "/claude-ai-icon.svg",
     perplexity: "/perplexity.svg",
     gemini: "/gemini.svg",
     canva: "/canva.svg",
     antigravity: "/antigravity.svg",
-    skillyug: "/skillyug.svg",
+    skillyug: "/skillyug.png",
     figma: "/figma.svg",
   })
 
