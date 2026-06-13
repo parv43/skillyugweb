@@ -841,23 +841,43 @@ export default function MyBatchPage() {
                             day: "numeric",
                             month: "short",
                             weekday: "long"
-                          })}, 1:00 PM IST
+                          })}, 2:00 PM IST
                         </p>
                       </div>
                       {nextSession.status === "live" ? (
                         <a 
-                          href="https://meet.google.com/abc-defg-hij"
+                          href="https://meet.google.com/wxd-yqum-mij"
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-red-500/10"
                         >
-                          <Video className="w-4 h-4" />
+                          <svg className="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 87.5 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#fff" d="M49.5 36l8.53 9.75 11.47 7.33 2-17.02-2-16.64-11.69 6.44z"/>
+                            <path fill="#fff" d="M0 51.5V66c0 3.315 2.685 6 6 6h14.5l3-10.96-3-9.54-9.95-3z"/>
+                            <path fill="#fff" d="M20.5 0L0 20.5l10.55 3 9.95-3 2.95-9.41z"/>
+                            <path fill="#fff" d="M20.5 20.5H0v31h20.5z"/>
+                            <path fill="#fff" d="M82.6 8.68L69.5 19.42v33.66l13.16 10.79c1.97 1.54 4.85.135 4.85-2.37V11c0-2.535-2.945-3.925-4.91-2.32zM49.5 36v15.5h-29V72h43c3.315 0 6-2.685 6-6V53.08z"/>
+                            <path fill="#fff" d="M63.5 0h-43v20.5h29V36l20-16.57V6c0-3.315-2.685-6-6-6z"/>
+                          </svg>
                           Join Meeting
                         </a>
                       ) : (
-                        <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 px-3 py-1.5 rounded-lg border border-blue-100 dark:border-blue-900/30">
-                          1:00 PM IST
-                        </div>
+                        <a 
+                          href="https://meet.google.com/wxd-yqum-mij"
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 dark:border-white/10 dark:bg-slate-900/60 dark:hover:bg-slate-900/80 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition-all hover:scale-105 active:scale-95 shadow-sm"
+                        >
+                          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 87.5 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#00832d" d="M49.5 36l8.53 9.75 11.47 7.33 2-17.02-2-16.64-11.69 6.44z"/>
+                            <path fill="#0066da" d="M0 51.5V66c0 3.315 2.685 6 6 6h14.5l3-10.96-3-9.54-9.95-3z"/>
+                            <path fill="#e94235" d="M20.5 0L0 20.5l10.55 3 9.95-3 2.95-9.41z"/>
+                            <path fill="#2684fc" d="M20.5 20.5H0v31h20.5z"/>
+                            <path fill="#00ac47" d="M82.6 8.68L69.5 19.42v33.66l13.16 10.79c1.97 1.54 4.85.135 4.85-2.37V11c0-2.535-2.945-3.925-4.91-2.32zM49.5 36v15.5h-29V72h43c3.315 0 6-2.685 6-6V53.08z"/>
+                            <path fill="#ffba00" d="M63.5 0h-43v20.5h29V36l20-16.57V6c0-3.315-2.685-6-6-6z"/>
+                          </svg>
+                          Google Meet
+                        </a>
                       )}
                     </div>
                   </>
@@ -1332,7 +1352,7 @@ export default function MyBatchPage() {
                         {nextSession.date.toLocaleDateString("en-IN", {
                           day: "numeric",
                           month: "short"
-                        })}, 1:00 PM IST
+                        })}, 2:00 PM IST
                       </p>
                       <p className="mt-2 text-sm text-slate-600 dark:text-slate-350">
                         Day {nextSession.dayNumber}: {nextSession.topic}
