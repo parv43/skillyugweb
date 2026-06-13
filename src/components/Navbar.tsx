@@ -14,10 +14,14 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [theme, setTheme] = useState<string | null>(null)
+  const [isIPhone, setIsIPhone] = useState(false)
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains("dark")
     setTheme(isDark ? "dark" : "light")
+    if (typeof window !== "undefined") {
+      setIsIPhone(/iPhone/i.test(navigator.userAgent))
+    }
   }, [])
 
   const toggleTheme = () => {
@@ -135,7 +139,11 @@ export default function Navbar() {
   return (
     <>
       <header 
-        className={`animate-slide-down fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+        className={`animate-slide-down fixed top-0 inset-x-0 z-50 duration-300 ${
+          isIPhone 
+            ? "transition-[padding,background-color,border-color,box-shadow]" 
+            : "transition-all"
+        } ${
           scrolled 
             ? "bg-background/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 py-4 shadow-sm" 
             : "bg-transparent py-6"

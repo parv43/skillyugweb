@@ -8,8 +8,15 @@ import { Home, Sparkles, MessageSquare, BookOpen } from "lucide-react"
 export default function MobileNavbar() {
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("home")
+  const [isIPhone, setIsIPhone] = useState(false)
   const pathname = usePathname()
   const rafRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsIPhone(/iPhone/i.test(navigator.userAgent))
+    }
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -108,6 +115,53 @@ export default function MobileNavbar() {
     { name: "Testimonials", id: "testimonials", href: "/#testimonials", targetId: "testimonials", icon: MessageSquare },
     { name: "Blogs", id: "blogs", href: "/blog", icon: BookOpen },
   ]
+
+  if (isIPhone) {
+    return (
+      <div className="fixed bottom-[calc(8px+env(safe-area-inset-bottom,0px))] left-0 right-0 z-50 flex justify-center md:hidden pointer-events-none">
+        <div
+          className={`pointer-events-auto w-[90%] transition-[max-width,padding,background-color,border-color,box-shadow,opacity,transform] duration-500 ease-out transform-gpu ${
+            scrolled
+              ? "max-w-[340px] py-2.5 px-4 bg-white/75 dark:bg-[#0f172a]/75 backdrop-blur-lg border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] scale-100"
+              : "max-w-[280px] py-1.5 px-3 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/40 dark:border-slate-800/40 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.06)] scale-90 opacity-95"
+          }`}
+        >
+          <nav className="flex items-center justify-between w-full">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const isActive = activeSection === item.id || (item.id === "blogs" && pathname.startsWith("/blog"))
+              
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href, item.targetId || "")}
+                  className="relative flex items-center justify-center transition-all duration-300 cursor-pointer"
+                >
+                  {isActive ? (
+                    <div
+                      className={`flex items-center gap-1.5 text-blue-600 dark:text-blue-400 bg-blue-500/15 dark:bg-blue-400/15 rounded-full transition-all duration-300 transform-gpu scale-105 ${
+                        scrolled ? "py-1.5 px-3.5 text-sm" : "py-1 px-2.5 text-xs"
+                      }`}
+                    >
+                      <Icon className={scrolled ? "w-4 h-4 animate-[pulse_2s_infinite]" : "w-3.5 h-3.5"} />
+                      <span className="font-bold tracking-tight">{item.name}</span>
+                    </div>
+                  ) : (
+                    <div
+                      className={`flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all rounded-full p-2`}
+                    >
+                      <Icon className={scrolled ? "w-5 h-5" : "w-4 h-4"} />
+                    </div>
+                  )}
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div
