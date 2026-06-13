@@ -51,27 +51,27 @@ export default function HeroSection() {
         </div>
 
         {/* ── Dynamic Claymorphic Constellation & Floating Badges ── */}
-        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden hidden md:block">
+        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden hidden lg:block">
           <style>{`
             @keyframes float1 {
               0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-              50% { transform: translate3d(0, -14px, 0) rotate(2deg); }
+              50% { transform: translate3d(0, -12px, 0) rotate(2deg); }
             }
             @keyframes float2 {
               0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-              50% { transform: translate3d(0, -18px, 0) rotate(-4deg); }
+              50% { transform: translate3d(0, -15px, 0) rotate(-3deg); }
             }
             @keyframes float3 {
               0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-              50% { transform: translate3d(0, -12px, 0) rotate(1.5deg); }
+              50% { transform: translate3d(0, -10px, 0) rotate(1.5deg); }
             }
             @keyframes float4 {
               0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-              50% { transform: translate3d(0, -16px, 0) rotate(-2deg); }
+              50% { transform: translate3d(0, -14px, 0) rotate(-2deg); }
             }
             @keyframes float5 {
               0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-              50% { transform: translate3d(0, -10px, 0) rotate(3deg); }
+              50% { transform: translate3d(0, -8px, 0) rotate(2deg); }
             }
             @keyframes flowPath {
               to {
@@ -129,9 +129,9 @@ export default function HeroSection() {
             }
           `}</style>
 
-          {/* SVG Connection Path */}
+          {/* SVG Connection Path - Weaving through the new corridor coordinates */}
           <svg 
-            className="absolute inset-0 w-full h-full pointer-events-none select-none hidden md:block" 
+            className="absolute inset-0 w-full h-full pointer-events-none select-none" 
             viewBox="0 0 100 100" 
             preserveAspectRatio="none"
           >
@@ -143,61 +143,61 @@ export default function HeroSection() {
               </linearGradient>
             </defs>
             <path 
-              d="M 54,22 C 65,18 75,12 82,15 C 78,25 74,32 70,38 C 76,48 80,55 85,62 C 72,60 62,58 50,55" 
+              d="M 48,12 C 52,18 53,21 54,25 C 51,32 49,35 48,40 C 51,48 52,50 53,55 C 51,62 50,65 49,70" 
               fill="none" 
               stroke="url(#line-grad)" 
-              strokeWidth="0.4" 
+              strokeWidth="0.3" 
               className="connection-line"
             />
           </svg>
 
           {/* 1. Gemini Badge */}
           <div 
-            className="absolute top-[22%] left-[62%] md:left-[54%] w-14 h-14 md:w-[72px] md:h-[72px] pointer-events-auto select-none"
+            className="absolute top-[12%] left-[48%] w-[68px] h-[68px] pointer-events-auto select-none"
             style={{ animation: "float1 6s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-3.5 md:p-[18px]">
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[16px]">
               <img src="/gemini.svg" alt="Gemini" className="w-full h-full object-contain" />
             </div>
           </div>
 
           {/* 2. Perplexity Badge */}
           <div 
-            className="absolute top-[14%] left-[82%] w-12 h-12 md:w-[65px] md:h-[65px] pointer-events-auto select-none"
+            className="absolute top-[25%] left-[54%] w-[65px] h-[65px] pointer-events-auto select-none"
             style={{ animation: "float2 7s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-3 md:p-[16px]">
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[16px]">
               <img src="/perplexity.svg" alt="Perplexity" className="w-full h-full object-contain" />
             </div>
           </div>
 
           {/* 3. Claude AI Badge */}
           <div 
-            className="absolute top-[35%] left-[78%] md:left-[70%] w-16 h-16 md:w-[78px] md:h-[78px] pointer-events-auto select-none"
+            className="absolute top-[40%] left-[48%] w-[70px] h-[70px] pointer-events-auto select-none"
             style={{ animation: "float3 8s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-4 md:p-[20px]">
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[18px]">
               <img src="/claude-ai-icon.svg" alt="Claude AI" className="w-full h-full object-contain" />
             </div>
           </div>
 
-          {/* 4. Gamma Badge */}
+          {/* 4. Napkin AI Badge */}
           <div 
-            className="absolute top-[64%] left-[80%] md:left-[85%] w-13 h-13 md:w-[68px] md:h-[68px] pointer-events-auto select-none"
-            style={{ animation: "float4 5s ease-in-out infinite" }}
+            className="absolute top-[55%] left-[53%] w-[70px] h-[70px] pointer-events-auto select-none"
+            style={{ animation: "float4 7.5s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-3.5 md:p-[17px]">
-              <img src="/Gamma.Icon" alt="Gamma" className="w-full h-full object-contain" />
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[14px] overflow-hidden">
+              <img src="/napkin_logos.jpeg" alt="Napkin AI" className="w-full h-full object-cover rounded-full" />
             </div>
           </div>
 
-          {/* 5. Napkin AI Badge */}
+          {/* 5. Gamma Badge */}
           <div 
-            className="absolute top-[52%] left-[55%] md:left-[50%] w-15 h-15 md:w-[74px] md:h-[74px] pointer-events-auto select-none"
-            style={{ animation: "float5 7.5s ease-in-out infinite" }}
+            className="absolute top-[70%] left-[49%] w-[66px] h-[66px] pointer-events-auto select-none"
+            style={{ animation: "float5 5s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-3 md:p-[15px] overflow-hidden">
-              <img src="/napkin_logos.jpeg" alt="Napkin AI" className="w-full h-full object-cover rounded-full" />
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-[16px]">
+              <img src="/Gamma.Icon" alt="Gamma" className="w-full h-full object-contain" />
             </div>
           </div>
         </div>
