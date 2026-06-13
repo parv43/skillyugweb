@@ -94,11 +94,6 @@ export default function HeroSection() {
               cursor: pointer;
               backdrop-filter: blur(8px);
               -webkit-backdrop-filter: blur(8px);
-            }
-            .clay-badge-square {
-              border-radius: 1.25rem;
-            }
-            .clay-badge-light {
               background: rgba(255, 255, 255, 0.94);
               border: 1px solid rgba(241, 245, 249, 0.85);
               box-shadow: 
@@ -107,29 +102,30 @@ export default function HeroSection() {
                 inset 3px 3px 6px rgba(255, 255, 255, 1),
                 inset -3px -3px 6px rgba(0, 0, 0, 0.02);
             }
-            .clay-badge-dark {
-              background: rgba(20, 26, 46, 0.9);
-              border: 1px solid rgba(255, 255, 255, 0.08);
+            .dark .clay-badge {
+              background: rgba(20, 26, 46, 0.9) !important;
+              border: 1px solid rgba(255, 255, 255, 0.08) !important;
               box-shadow: 
                 0 15px 30px -5px rgba(0, 0, 0, 0.5),
                 0 5px 12px -3px rgba(0, 0, 0, 0.3),
                 inset 2px 2px 4px rgba(255, 255, 255, 0.1),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.75);
+                inset -3px -3px 6px rgba(0, 0, 0, 0.75) !important;
+            }
+            .clay-badge-square {
+              border-radius: 1.25rem;
             }
             .clay-badge:hover {
               transform: scale(1.1) !important;
-            }
-            .clay-badge-light:hover {
               box-shadow: 
                 0 20px 35px -5px rgba(99, 102, 241, 0.22),
                 inset 3px 3px 6px rgba(255, 255, 255, 1),
                 inset -3px -3px 6px rgba(99, 102, 241, 0.1);
             }
-            .clay-badge-dark:hover {
+            .dark .clay-badge:hover {
               box-shadow: 
                 0 25px 40px -5px rgba(139, 92, 246, 0.35),
                 inset 2px 2px 4px rgba(255, 255, 255, 0.2),
-                inset -3px -3px 6px rgba(0, 0, 0, 0.6);
+                inset -3px -3px 6px rgba(0, 0, 0, 0.6) !important;
             }
           `}</style>
 
@@ -153,7 +149,7 @@ export default function HeroSection() {
             className="absolute top-[38%] left-[2%] w-[105px] h-[105px] pointer-events-auto select-none"
             style={{ animation: "float6 7s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-square clay-badge-light dark:clay-badge-dark w-full h-full flex flex-col items-center justify-center p-3">
+            <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3">
               <img src="/canva.svg" alt="Canva" className="w-[38px] h-[38px] object-contain mb-1.5" />
               <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">Canva AI</span>
             </div>
@@ -164,7 +160,7 @@ export default function HeroSection() {
             className="absolute top-[15%] left-[10%] w-[105px] h-[105px] pointer-events-auto select-none"
             style={{ animation: "float1 6.5s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-square clay-badge-light dark:clay-badge-dark w-full h-full flex flex-col items-center justify-center p-3">
+            <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3">
               <img src="/antigravity.svg" alt="Antigravity" className="w-[38px] h-[38px] object-contain mb-1.5" />
               <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">Antigravity</span>
             </div>
@@ -175,7 +171,7 @@ export default function HeroSection() {
             className="absolute top-[7%] left-[45%] w-[105px] h-[105px] pointer-events-auto select-none"
             style={{ animation: "float2 8s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-square clay-badge-light dark:clay-badge-dark w-full h-full flex flex-col items-center justify-center p-3">
+            <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3">
               <img src="/gemini.svg" alt="Gemini" className="w-[38px] h-[38px] object-contain mb-1.5" />
               <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 tracking-tight">Gemini</span>
             </div>
@@ -186,7 +182,7 @@ export default function HeroSection() {
             className="absolute top-[16%] left-[70%] w-[105px] h-[105px] pointer-events-auto select-none"
             style={{ animation: "float3 7.5s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-square clay-badge-light dark:clay-badge-dark w-full h-full flex flex-col items-center justify-center p-3">
+            <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3">
               <svg viewBox="0 0 28 37" className="w-[38px] h-[38px] text-[#484848] dark:text-slate-200 mb-1.5" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9.02257 35.1681C9.23542 35.9609 10.2252 36.227 10.8052 35.647L25.9552 20.4863L7.88379 30.9163L9.02257 35.1734V35.1681Z" fill="currentColor" />
                 <path d="M2.63646 0.578489C1.92871 0.168742 1.04004 0.679596 1.04004 1.49909V10.7157L10.6132 5.18682L2.63646 0.578489Z" fill="currentColor" />
@@ -202,7 +198,7 @@ export default function HeroSection() {
             className="absolute top-[40%] left-[80%] w-[105px] h-[105px] pointer-events-auto select-none"
             style={{ animation: "float4 9s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-square clay-badge-light dark:clay-badge-dark w-full h-full flex flex-col items-center justify-center p-3">
+            <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3">
               <img src="/claude-ai-icon.svg" alt="Claude" className="w-[38px] h-[38px] object-contain mb-1.5" />
               <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">Claude</span>
             </div>
@@ -213,7 +209,7 @@ export default function HeroSection() {
             className="absolute top-[60%] left-[80%] w-[105px] h-[105px] pointer-events-auto select-none"
             style={{ animation: "float5 6s ease-in-out infinite" }}
           >
-            <div className="clay-badge clay-badge-square clay-badge-light dark:clay-badge-dark w-full h-full flex flex-col items-center justify-center p-3">
+            <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3">
               <img src="/perplexity.svg" alt="Perplexity" className="w-[38px] h-[38px] object-contain dark:invert mb-1.5" />
               <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">perplexity</span>
             </div>
