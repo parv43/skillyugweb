@@ -46,8 +46,222 @@ export default function HeroSection() {
           {/* Mobile Full-screen Soft Fade & Bottom Blend */}
           <div className="absolute inset-0 bg-white/75 dark:bg-[#0a0f1c]/75 md:hidden z-10 pointer-events-none" />
           
-          {/* Bottom Edge Blend */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent dark:from-[#0a0f1c] dark:to-transparent z-10 pointer-events-none" />
+          {/* Bottom Edge Blend (faded backing for the cloud border) */}
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent dark:from-[#0a0f1c] dark:to-transparent z-10 pointer-events-none" />
+        </div>
+
+        {/* ── Dynamic Claymorphic Constellation & Floating Badges ── */}
+        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden hidden md:block">
+          <style>{`
+            @keyframes float1 {
+              0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+              50% { transform: translate3d(0, -14px, 0) rotate(2deg); }
+            }
+            @keyframes float2 {
+              0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+              50% { transform: translate3d(0, -18px, 0) rotate(-4deg); }
+            }
+            @keyframes float3 {
+              0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+              50% { transform: translate3d(0, -12px, 0) rotate(1.5deg); }
+            }
+            @keyframes float4 {
+              0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+              50% { transform: translate3d(0, -16px, 0) rotate(-2deg); }
+            }
+            @keyframes float5 {
+              0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+              50% { transform: translate3d(0, -10px, 0) rotate(3deg); }
+            }
+            @keyframes flowPath {
+              to {
+                stroke-dashoffset: -40;
+              }
+            }
+            .connection-line {
+              stroke-dasharray: 1.5 2.5;
+              animation: flowPath 25s linear infinite;
+            }
+            .clay-badge {
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+              cursor: pointer;
+              backdrop-filter: blur(8px);
+              -webkit-backdrop-filter: blur(8px);
+            }
+            .clay-badge-light {
+              background: rgba(255, 255, 255, 0.82);
+              border: 1.5px solid rgba(255, 255, 255, 0.95);
+              box-shadow: 
+                0 15px 35px -5px rgba(99, 102, 241, 0.16),
+                0 8px 15px -6px rgba(0, 0, 0, 0.06),
+                inset 4px 4px 8px rgba(255, 255, 255, 1),
+                inset -5px -5px 10px rgba(129, 140, 248, 0.28);
+            }
+            .clay-badge-dark {
+              background: rgba(20, 26, 46, 0.75);
+              border: 1.5px solid rgba(255, 255, 255, 0.12);
+              box-shadow: 
+                0 20px 40px -5px rgba(0, 0, 0, 0.5),
+                0 10px 20px -8px rgba(0, 0, 0, 0.3),
+                inset 3px 3px 6px rgba(255, 255, 255, 0.15),
+                inset -5px -5px 12px rgba(0, 0, 0, 0.85),
+                inset 0 0 10px rgba(139, 92, 246, 0.2);
+            }
+            .clay-badge:hover {
+              transform: scale(1.15) !important;
+            }
+            .clay-badge-light:hover {
+              box-shadow: 
+                0 25px 45px -5px rgba(99, 102, 241, 0.35),
+                inset 4px 4px 8px rgba(255, 255, 255, 1),
+                inset -5px -5px 10px rgba(99, 102, 241, 0.4);
+            }
+            .clay-badge-dark:hover {
+              box-shadow: 
+                0 30px 50px -5px rgba(139, 92, 246, 0.45),
+                inset 4px 4px 6px rgba(255, 255, 255, 0.25),
+                inset -5px -5px 12px rgba(0, 0, 0, 0.7),
+                inset 0 0 16px rgba(139, 92, 246, 0.4);
+            }
+          `}</style>
+
+          {/* SVG Connection Path */}
+          <svg 
+            className="absolute inset-0 w-full h-full pointer-events-none select-none hidden md:block" 
+            viewBox="0 0 100 100" 
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
+                <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#ec4899" stopOpacity="0.4" />
+              </linearGradient>
+            </defs>
+            <path 
+              d="M 54,22 C 65,18 75,12 82,15 C 78,25 74,32 70,38 C 76,48 80,55 85,62 C 72,60 62,58 50,55" 
+              fill="none" 
+              stroke="url(#line-grad)" 
+              strokeWidth="0.4" 
+              className="connection-line"
+            />
+          </svg>
+
+          {/* 1. Gemini Badge */}
+          <div 
+            className="absolute top-[22%] left-[62%] md:left-[54%] w-14 h-14 md:w-[72px] md:h-[72px] pointer-events-auto select-none"
+            style={{ animation: "float1 6s ease-in-out infinite" }}
+          >
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-3.5 md:p-[18px]">
+              <img src="/gemini.svg" alt="Gemini" className="w-full h-full object-contain" />
+            </div>
+          </div>
+
+          {/* 2. Perplexity Badge */}
+          <div 
+            className="absolute top-[14%] left-[82%] w-12 h-12 md:w-[65px] md:h-[65px] pointer-events-auto select-none"
+            style={{ animation: "float2 7s ease-in-out infinite" }}
+          >
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-3 md:p-[16px]">
+              <img src="/perplexity.svg" alt="Perplexity" className="w-full h-full object-contain" />
+            </div>
+          </div>
+
+          {/* 3. Claude AI Badge */}
+          <div 
+            className="absolute top-[35%] left-[78%] md:left-[70%] w-16 h-16 md:w-[78px] md:h-[78px] pointer-events-auto select-none"
+            style={{ animation: "float3 8s ease-in-out infinite" }}
+          >
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-4 md:p-[20px]">
+              <img src="/claude-ai-icon.svg" alt="Claude AI" className="w-full h-full object-contain" />
+            </div>
+          </div>
+
+          {/* 4. Gamma Badge */}
+          <div 
+            className="absolute top-[64%] left-[80%] md:left-[85%] w-13 h-13 md:w-[68px] md:h-[68px] pointer-events-auto select-none"
+            style={{ animation: "float4 5s ease-in-out infinite" }}
+          >
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-3.5 md:p-[17px]">
+              <img src="/Gamma.Icon" alt="Gamma" className="w-full h-full object-contain" />
+            </div>
+          </div>
+
+          {/* 5. Napkin AI Badge */}
+          <div 
+            className="absolute top-[52%] left-[55%] md:left-[50%] w-15 h-15 md:w-[74px] md:h-[74px] pointer-events-auto select-none"
+            style={{ animation: "float5 7.5s ease-in-out infinite" }}
+          >
+            <div className="clay-badge clay-badge-light dark:clay-badge-dark w-full h-full p-3 md:p-[15px] overflow-hidden">
+              <img src="/napkin_logos.jpeg" alt="Napkin AI" className="w-full h-full object-cover rounded-full" />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Puffed Cloud-Like Claymorphic Bottom Divider ── */}
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-30 pointer-events-none translate-y-[1px]">
+          <svg 
+            viewBox="0 0 1440 120" 
+            className="relative block w-full h-10 sm:h-16 md:h-24 lg:h-28 text-white dark:text-[#020617]" 
+            preserveAspectRatio="none"
+          >
+            <defs>
+              {/* Light Theme Highlight Gradient */}
+              <linearGradient id="cloud-highlight-light" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+                <stop offset="40%" stopColor="#e0e7ff" stopOpacity="0.45" />
+                <stop offset="100%" stopColor="#818cf8" stopOpacity="0.0" />
+              </linearGradient>
+              {/* Dark Theme Highlight Gradient */}
+              <linearGradient id="cloud-highlight-dark" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.2" />
+                <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.06" />
+                <stop offset="100%" stopColor="#000000" stopOpacity="0.45" />
+              </linearGradient>
+            </defs>
+            
+            {/* Shadow layer underneath to lift the cloud up */}
+            <path 
+              d="M0,80 C 180,20 360,20 540,60 C 720,100 900,100 1080,60 C 1260,20 1380,30 1440,50 L 1440,120 L 0,120 Z" 
+              fill="currentColor"
+              className="opacity-15 translate-y-[-4px] blur-sm text-slate-450 dark:text-black"
+            />
+            
+            {/* Main background filled path */}
+            <path 
+              d="M0,80 C 180,20 360,20 540,60 C 720,100 900,100 1080,60 C 1260,20 1380,30 1440,50 L 1440,120 L 0,120 Z" 
+              fill="currentColor"
+            />
+            
+            {/* Clay highlight/inner shadow layer */}
+            <path 
+              d="M0,80 C 180,20 360,20 540,60 C 720,100 900,100 1080,60 C 1260,20 1380,30 1440,50" 
+              fill="none" 
+              stroke="url(#cloud-highlight-light)" 
+              strokeWidth="6" 
+              className="dark:hidden opacity-95"
+            />
+            <path 
+              d="M0,80 C 180,20 360,20 540,60 C 720,100 900,100 1080,60 C 1260,20 1380,30 1440,50" 
+              fill="none" 
+              stroke="url(#cloud-highlight-dark)" 
+              strokeWidth="6" 
+              className="hidden dark:block opacity-95"
+            />
+
+            {/* Thin crisp top light reflection line */}
+            <path 
+              d="M0,80 C 180,20 360,20 540,60 C 720,100 900,100 1080,60 C 1260,20 1380,30 1440,50" 
+              fill="none" 
+              stroke="#ffffff" 
+              strokeWidth="1.5" 
+              className="opacity-50 dark:opacity-20"
+            />
+          </svg>
         </div>
 
         <div className="container mx-auto px-6 relative z-20 flex items-center justify-start w-full">
