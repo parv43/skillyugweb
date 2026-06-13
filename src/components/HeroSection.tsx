@@ -94,13 +94,13 @@ export default function HeroSection() {
               cursor: pointer;
               backdrop-filter: blur(8px);
               -webkit-backdrop-filter: blur(8px);
-              background: rgba(255, 255, 255, 0.95);
-              border: 1px solid rgba(255, 255, 255, 0.9);
+              background: rgba(255, 255, 255, 0.98);
+              border: 1px solid rgba(226, 232, 240, 0.9);
               box-shadow: 
-                0 16px 32px -4px rgba(0, 0, 0, 0.08),
-                0 6px 16px -3px rgba(0, 0, 0, 0.04),
-                inset 5px 5px 10px rgba(255, 255, 255, 1),
-                inset -5px -5px 10px rgba(165, 180, 252, 0.22);
+                0 20px 35px -8px rgba(0, 0, 0, 0.12),
+                0 8px 18px -6px rgba(0, 0, 0, 0.06),
+                inset 6px 6px 12px rgba(255, 255, 255, 1),
+                inset -6px -6px 12px rgba(148, 163, 184, 0.32);
             }
             .dark .clay-badge {
               background: rgba(24, 30, 54, 0.92) !important;
@@ -117,10 +117,10 @@ export default function HeroSection() {
             .clay-badge:hover {
               transform: scale(1.12) translateY(-4px) !important;
               box-shadow: 
-                0 28px 45px -8px rgba(99, 102, 241, 0.25),
-                0 10px 20px -6px rgba(99, 102, 241, 0.15),
-                inset 5px 5px 10px rgba(255, 255, 255, 1),
-                inset -5px -5px 10px rgba(99, 102, 241, 0.15);
+                0 30px 50px -10px rgba(99, 102, 241, 0.3),
+                0 12px 24px -8px rgba(0, 0, 0, 0.12),
+                inset 6px 6px 12px rgba(255, 255, 255, 1),
+                inset -6px -6px 12px rgba(99, 102, 241, 0.22);
             }
             .dark .clay-badge:hover {
               box-shadow: 
