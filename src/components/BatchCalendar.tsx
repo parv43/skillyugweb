@@ -285,7 +285,7 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
                     <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500">
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span>1:00 PM - 2:00 PM IST</span>
+                        <span>2:00 PM - 3:00 PM IST</span>
                       </div>
                     </div>
                   </div>

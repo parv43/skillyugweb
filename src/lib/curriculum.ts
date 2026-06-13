@@ -266,13 +266,13 @@ export function getNextLiveSession(now: Date = new Date()) {
         status: "upcoming" as const
       };
     } else if (classDateStart.getTime() === todayStart.getTime()) {
-      // It's today! Class runs 1:00 PM - 2:00 PM IST (so we keep showing it until 3 PM / 15:00)
-      if (now.getHours() < 15) {
+      // It's today! Class runs 2:00 PM - 3:00 PM IST (so we keep showing it until 4 PM / 16:00)
+      if (now.getHours() < 16) {
         return {
           dayNumber: day.dayNumber,
           topic: day.topic,
           date: day.date,
-          status: now.getHours() >= 13 ? ("live" as const) : ("upcoming" as const)
+          status: now.getHours() >= 14 ? ("live" as const) : ("upcoming" as const)
         };
       }
     }
@@ -289,7 +289,7 @@ export function getCompletedDaysCount(now: Date = new Date()): number {
     if (classDateStart < todayStart) {
       count++;
     } else if (classDateStart.getTime() === todayStart.getTime()) {
-      if (now.getHours() >= 15) {
+      if (now.getHours() >= 16) {
         count++;
       }
     }

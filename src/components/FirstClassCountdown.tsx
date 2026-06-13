@@ -115,7 +115,7 @@ export default function FirstClassCountdown() {
                 {timeLeft.isExpired ? "First Class has started!" : "First Class starts in"}
               </h3>
               <p className="text-xs text-slate-600 font-medium">
-                Thursday, 28th May at 1:00 PM IST
+                Thursday, 28th May at 2:00 PM IST
               </p>
             </div>
           </div>
