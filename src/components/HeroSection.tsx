@@ -6,6 +6,90 @@ import Image from "next/image"
 import { useAccessControl } from "@/hooks/useAccessControl"
 import { Phone } from "lucide-react"
 
+// ─── Mobile-Only Hero ───────────────────────────────────────────────────────
+function MobileHero() {
+  const { isLoggedIn, hasSlot, loading } = useAccessControl()
+
+  return (
+    <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-white dark:bg-[#0a0f1c] overflow-hidden">
+      {/* Subtle Background Glows matching the screenshot */}
+      <div className="absolute inset-0 pointer-events-none -z-10">
+        <div className="absolute top-[5%] left-[0%] w-[300px] h-[300px] bg-purple-600/5 dark:bg-purple-600/10 rounded-full blur-[100px]" />
+      </div>
+
+      <div className="px-6 relative z-20 w-full flex flex-col items-start text-left">
+        {/* Header Copy */}
+        <h2
+          className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-slate-900 dark:text-white"
+        >
+          Help your child build <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-fuchsia-600 dark:from-blue-400 dark:via-indigo-400 dark:to-fuchsia-400">
+            AI skills that improve study, projects, and creative confidence.
+          </span>
+        </h2>
+        <p
+          className="text-slate-600 dark:text-slate-300 text-[17px] leading-relaxed max-w-sm mb-10 font-normal"
+        >
+          In a highly competitive world, standard school education isn&apos;t enough. We train your child to leverage advanced AI, giving them a massive edge in academics and their future career.
+        </p>
+
+        {/* CTAs */}
+        <div className="w-full mb-6">
+          {!loading && !hasSlot ? (
+            <div className="flex gap-3 w-full">
+              <Link
+                href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
+                className="flex-[1.25] py-4 px-4 rounded-full text-[15px] sm:text-[17px] font-bold text-white text-center active:scale-95 transition-transform flex items-center justify-center"
+                style={{ 
+                  background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
+                  boxShadow: "0 4px 20px rgba(139,92,246,0.3)" 
+                }}
+              >
+                Join Bootcamp
+              </Link>
+              <a
+                href="tel:7835049710"
+                className="flex-1 py-4 px-4 rounded-full text-[15px] sm:text-[17px] font-bold text-slate-800 dark:text-slate-200 text-center active:scale-95 transition-all border border-slate-350 dark:border-white/20 bg-white/50 dark:bg-white/5 flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <Phone size={16} />
+                Call Advisor
+              </a>
+            </div>
+          ) : (
+            !loading && (
+              <a
+                href="tel:7835049710"
+                className="w-full py-4 px-4 rounded-full text-[15px] sm:text-[17px] font-bold text-slate-800 dark:text-slate-200 text-center active:scale-95 transition-all border border-slate-350 dark:border-white/20 bg-white/50 dark:bg-white/5 flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <Phone size={16} />
+                Talk to Advisor
+              </a>
+            )
+          )}
+        </div>
+      </div>
+
+      {/* Full-width Hero Image bleeding to edges */}
+      <div
+        className="relative w-full mt-[-120px] flex items-end justify-center z-10"
+      >
+        <Image
+          src="/hero-mobile-optimized.webp"
+          alt="Father and son learning AI together on a laptop"
+          width={800}
+          height={1376}
+          className="w-full h-auto object-cover object-top"
+          priority
+          sizes="100vw"
+          quality={85}
+        />
+        {/* Connection gradients: Top for text legibility, Bottom for section transition */}
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white via-white/40 to-transparent dark:from-[#0a0f1c] dark:via-[#0a0f1c]/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent dark:from-[#0a0f1c] dark:to-transparent pointer-events-none" />
+      </div>
+    </section>
+  )
+}
+
 export default function HeroSection() {
   const { isLoggedIn, hasSlot, loading } = useAccessControl()
   const [showSticky, setShowSticky] = useState(false)
@@ -24,8 +108,13 @@ export default function HeroSection() {
 
   return (
     <>
-      {/* ── Responsive Unified Hero Section ── */}
-      <section className="relative w-full min-h-[90vh] lg:min-h-[95vh] flex items-center bg-white dark:bg-[#0a0f1c] overflow-hidden pt-24 pb-20">
+      {/* ── Mobile Hero (< md) ── */}
+      <div className="md:hidden">
+        <MobileHero />
+      </div>
+
+      {/* ── Responsive Unified Hero Section (Desktop only: md and up) ── */}
+      <section className="hidden md:flex relative w-full min-h-[90vh] lg:min-h-[95vh] items-center bg-white dark:bg-[#0a0f1c] overflow-hidden pt-24 pb-20">
         
         {/* Full-bleed Background Image with priority loading for LCP optimization */}
         <div className="absolute inset-0 pointer-events-none z-0">
