@@ -200,14 +200,14 @@ function SceneContent() {
     return () => observer.disconnect()
   }, [])
 
-  // 2. Pre-load all SVG and PNG textures in WebGL (crisp and cached)
+  // 2. Pre-load all SVG textures in WebGL (crisp and cached)
   const textures = useTexture({
     claude: "/claude-ai-icon.svg",
     perplexity: "/perplexity.svg",
     gemini: "/gemini.svg",
     canva: "/canva.svg",
     antigravity: "/antigravity.svg",
-    skillyug: "/skillyug.png",
+    skillyug: "/Mask_Center.webp",
     figma: "/figma.svg",
   })
 
@@ -219,15 +219,6 @@ function SceneContent() {
         tex.needsUpdate = true
       }
     })
-
-    // Zoom in on the central Skillyug logo to fill the circle geometry from edge to edge
-    if (textures.skillyug) {
-      textures.skillyug.repeat.set(0.75, 0.75) // Zoom in by ~33%
-      textures.skillyug.offset.set(0.125, 0.125) // Center the zoom window
-      textures.skillyug.wrapS = THREE.ClampToEdgeWrapping
-      textures.skillyug.wrapT = THREE.ClampToEdgeWrapping
-      textures.skillyug.needsUpdate = true
-    }
   }, [textures])
 
   // 3. Dynamically draw rounded square card backgrounds (High res 512x512 for crispness)
@@ -334,13 +325,8 @@ function SceneContent() {
         
         {/* Core Skillyug logo billboard (floating transparent PNG, rendered on top of the sphere's front face) */}
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
-          {/* White Backing Circle for High Contrast */}
-          <mesh position={[0, 0, 0]} renderOrder={2}>
-            <circleGeometry args={[1.35, 64]} />
-            <meshBasicMaterial color="#ffffff" />
-          </mesh>
           {/* Logo Graphic Decal */}
-          <mesh position={[0, 0, 0.01]} renderOrder={3}>
+          <mesh position={[0, 0, 0]} renderOrder={2}>
             <circleGeometry args={[1.35, 64]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
