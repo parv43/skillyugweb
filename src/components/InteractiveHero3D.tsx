@@ -219,6 +219,15 @@ function SceneContent() {
         tex.needsUpdate = true
       }
     })
+
+    // Zoom in on the central Skillyug logo to fill the circle geometry from edge to edge
+    if (textures.skillyug) {
+      textures.skillyug.repeat.set(0.75, 0.75) // Zoom in by ~33%
+      textures.skillyug.offset.set(0.125, 0.125) // Center the zoom window
+      textures.skillyug.wrapS = THREE.ClampToEdgeWrapping
+      textures.skillyug.wrapT = THREE.ClampToEdgeWrapping
+      textures.skillyug.needsUpdate = true
+    }
   }, [textures])
 
   // 3. Dynamically draw rounded square card backgrounds (High res 512x512 for crispness)
