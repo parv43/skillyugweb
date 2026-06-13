@@ -207,7 +207,7 @@ function SceneContent() {
     gemini: "/gemini.svg",
     canva: "/canva.svg",
     antigravity: "/antigravity.svg",
-    skillyug: "/Mask_Center.webp",
+    skillyug: "/skillyug.svg",
     figma: "/figma.svg",
   })
 
@@ -325,8 +325,13 @@ function SceneContent() {
         
         {/* Core Skillyug logo billboard (floating transparent PNG, rendered on top of the sphere's front face) */}
         <group ref={centralLogoRef} scale={[coreScale, coreScale, coreScale]}>
-          {/* Logo Graphic Decal */}
+          {/* White Backing Circle for High Contrast */}
           <mesh position={[0, 0, 0]} renderOrder={2}>
+            <circleGeometry args={[1.35, 64]} />
+            <meshBasicMaterial color="#ffffff" />
+          </mesh>
+          {/* Logo Graphic Decal */}
+          <mesh position={[0, 0, 0.01]} renderOrder={3}>
             <circleGeometry args={[1.35, 64]} />
             <meshBasicMaterial 
               map={textures.skillyug} 
