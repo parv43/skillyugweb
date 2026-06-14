@@ -37,7 +37,7 @@ export default async function RootLayout({
   const supabaseHost = supabaseUrl ? new URL(supabaseUrl).host : null
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           nonce={nonce}
