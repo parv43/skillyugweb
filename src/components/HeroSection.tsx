@@ -138,6 +138,134 @@ export default function HeroSection() {
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent dark:from-[#0a0f1c] dark:to-transparent z-10 pointer-events-none" />
         </div>
 
+        {/* ── Static 3D Claymorphic Background Elements ── */}
+        <div className="absolute inset-0 pointer-events-none z-10 hidden lg:block overflow-hidden">
+          {/* Left Side: 3D Open Book */}
+          <div className="absolute top-[12%] left-[3%] w-24 h-24 opacity-45 select-none">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_12px_24px_rgba(0,0,0,0.15)]">
+              <defs>
+                <linearGradient id="bookCover" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#8b5cf6" />
+                  <stop offset="100%" stopColor="#4c1d95" />
+                </linearGradient>
+                <linearGradient id="bookPage" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#f3f4f6" />
+                </linearGradient>
+                <linearGradient id="bookSpineShadow" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#d1d5db" stopOpacity="0" />
+                  <stop offset="50%" stopColor="#9ca3af" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="#d1d5db" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <rect x="6" y="24" width="88" height="58" rx="8" fill="url(#bookCover)" />
+              <rect x="6" y="28" width="88" height="54" rx="8" fill="#311075" opacity="0.3" />
+              <path d="M12 28 C25 24, 42 26, 48 31 L48 76 C42 71, 25 69, 12 73 Z" fill="url(#bookPage)" />
+              <path d="M14 29 C25 26, 40 28, 46 32 L46 74 C40 70, 25 68, 14 71 Z" fill="#ffffff" opacity="0.6" />
+              <path d="M88 28 C75 24, 58 26, 52 31 L52 76 C58 71, 75 69, 88 73 Z" fill="url(#bookPage)" />
+              <path d="M86 29 C75 26, 60 28, 54 32 L54 74 C60 70, 75 68, 86 71 Z" fill="#ffffff" opacity="0.6" />
+              <rect x="47" y="29" width="6" height="48" fill="url(#bookSpineShadow)" />
+              <path d="M18 38 H38 M18 46 H40 M18 54 H35 M18 62 H38" stroke="#cbd5e1" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
+              <path d="M62 38 H82 M60 46 H82 M65 54 H82 M62 62 H82" stroke="#cbd5e1" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
+            </svg>
+          </div>
+
+          {/* Left Side: 3D Lightbulb */}
+          <div className="absolute top-[75%] left-[6%] w-20 h-20 opacity-40 select-none">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_12px_24px_rgba(245,158,11,0.25)]">
+              <defs>
+                <radialGradient id="bulbGlass" cx="50%" cy="40%" r="50%" fx="30%" fy="30%">
+                  <stop offset="0%" stopColor="#ffedd5" />
+                  <stop offset="40%" stopColor="#fbbf24" />
+                  <stop offset="100%" stopColor="#d97706" />
+                </radialGradient>
+                <linearGradient id="bulbBase" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#94a3b8" />
+                  <stop offset="50%" stopColor="#e2e8f0" />
+                  <stop offset="100%" stopColor="#64748b" />
+                </linearGradient>
+                <filter id="bulbGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="8" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+              <circle cx="50" cy="45" r="28" fill="#f59e0b" opacity="0.25" filter="url(#bulbGlow)" />
+              <path d="M50 15 C30 15, 26 38, 38 52 C42 56, 42 66, 44 70 H56 C58 66, 58 56, 62 52 C74 38, 70 15, 50 15 Z" fill="url(#bulbGlass)" />
+              <path d="M38 25 C34 30, 32 38, 36 44" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" opacity="0.6" />
+              <path d="M44 48 L46 32 C47 30, 53 30, 54 32 L56 48" stroke="#ffedd5" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="50" cy="31" r="3" fill="#ffedd5" />
+              <rect x="42" y="70" width="16" height="5" rx="2.5" fill="url(#bulbBase)" />
+              <rect x="42" y="76" width="16" height="5" rx="2.5" fill="url(#bulbBase)" />
+              <rect x="44" y="82" width="12" height="4" rx="2" fill="url(#bulbBase)" />
+              <path d="M47 86 H53 L50 90 Z" fill="#334155" />
+            </svg>
+          </div>
+
+          {/* Right Side: 3D Space Rocket */}
+          <div className="absolute top-[18%] right-[8%] w-24 h-24 select-none">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_16px_32px_rgba(239,68,68,0.25)]">
+              <defs>
+                <linearGradient id="rocketBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="40%" stopColor="#f1f5f9" />
+                  <stop offset="100%" stopColor="#cbd5e1" />
+                </linearGradient>
+                <linearGradient id="rocketAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ef4444" />
+                  <stop offset="100%" stopColor="#b91c1c" />
+                </linearGradient>
+                <radialGradient id="rocketWindow" cx="40%" cy="40%" r="60%">
+                  <stop offset="0%" stopColor="#e0f2fe" />
+                  <stop offset="100%" stopColor="#0284c7" />
+                </radialGradient>
+                <linearGradient id="rocketFlame" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#fbbf24" />
+                  <stop offset="50%" stopColor="#f97316" />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M43 78 C43 92, 50 98, 50 98 C50 98, 57 92, 57 78 Z" fill="url(#rocketFlame)" />
+              <path d="M46 78 C46 86, 50 90, 50 90 C50 90, 54 86, 54 78 Z" fill="#fbbf24" />
+              <path d="M40 60 L24 74 C22 76, 26 80, 30 78 L42 70 Z" fill="url(#rocketAccent)" />
+              <path d="M25 73 L29 77 L40 67 Z" fill="#7f1d1d" opacity="0.3" />
+              <path d="M60 60 L76 74 C78 76, 74 80, 70 78 L58 70 Z" fill="url(#rocketAccent)" />
+              <path d="M75 73 L71 77 L60 67 Z" fill="#7f1d1d" opacity="0.3" />
+              <rect x="44" y="72" width="12" height="6" rx="2" fill="#475569" />
+              <path d="M50 8 C64 24, 60 56, 58 72 H42 C40 56, 36 24, 50 8 Z" fill="url(#rocketBody)" />
+              <path d="M47 16 C39 30, 42 52, 44 68" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" opacity="0.6" />
+              <path d="M50 8 C57 16, 58 24, 58 28 H42 C42 24, 43 16, 50 8 Z" fill="url(#rocketAccent)" />
+              <circle cx="50" cy="38" r="9" fill="#475569" />
+              <circle cx="50" cy="38" r="7.5" fill="url(#rocketWindow)" />
+              <path d="M46.5 35 C45 38, 47 42, 50 43.5" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
+            </svg>
+          </div>
+
+          {/* Right Side: 3D AI Chat Bubble */}
+          <div className="absolute top-[55%] right-[4%] w-24 h-24 select-none">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_16px_32px_rgba(99,102,241,0.25)]">
+              <defs>
+                <radialGradient id="bubbleGrad" cx="30%" cy="30%" r="75%">
+                  <stop offset="0%" stopColor="#818cf8" />
+                  <stop offset="60%" stopColor="#4f46e5" />
+                  <stop offset="100%" stopColor="#312e81" />
+                </radialGradient>
+                <filter id="sparkleGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+              <rect x="8" y="16" width="84" height="58" rx="22" fill="url(#bubbleGrad)" />
+              <rect x="10" y="18" width="80" height="54" rx="20" stroke="#a5b4fc" strokeWidth="2.5" strokeLinecap="round" opacity="0.4" />
+              <rect x="9" y="20" width="82" height="52" rx="20" stroke="#1e1b4b" strokeWidth="2.5" strokeLinecap="round" opacity="0.3" />
+              <path d="M28 73 C30 84, 18 90, 18 90 C18 90, 36 88, 42 74 Z" fill="#312e81" />
+              <path d="M28 73 C30 84, 18 90, 18 90 C18 90, 36 88, 42 74 Z" fill="url(#bubbleGrad)" />
+              <path d="M20 28 C32 22, 68 22, 80 28" stroke="#ffffff" strokeWidth="4.5" strokeLinecap="round" opacity="0.45" />
+              <path d="M50 28 L53 39 L64 42 L53 45 L50 56 L47 45 L36 42 L47 39 Z" fill="#ffffff" filter="url(#sparkleGlow)" />
+              <path d="M68 46 L69.5 51.5 L75 53 L69.5 54.5 L68 60 L66.5 54.5 L61 53 L66.5 51.5 Z" fill="#a5b4fc" />
+            </svg>
+          </div>
+        </div>
+
         {/* ── Dynamic Claymorphic Constellation & Floating Badges ── */}
         {/* Right-aligned container to keep the constellation perfectly in sync with the father/son image */}
         <div className="absolute right-0 top-0 bottom-0 w-[50%] pointer-events-none z-10 hidden lg:block overflow-hidden">
