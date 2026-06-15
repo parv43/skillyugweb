@@ -7,9 +7,9 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-border: var(--card-border);
-  --font-sans: var(--font-roboto), sans-serif;
+  --font-sans: var(--font-figtree), sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
-  --font-heading: var(--font-eczar), serif;
+  --font-heading: var(--font-montserrat), sans-serif;
   --font-accent: var(--font-chivo), sans-serif;
 }
 
@@ -45,13 +45,17 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-weight: 700; /* Default body font weight to bold */
+  line-height: 1.625; /* Relaxed leading to prevent vertical visual clutter */
+  letter-spacing: 0.01em; /* Slight tracking for bold font readability */
+  font-size-adjust: from-font; /* Prevent layout shift on load */
   overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
 /* ── Global Typography Overrides ── */
 h1, h2, h3, h4, h5, h6, .font-heading {
-  font-family: var(--font-eczar), serif !important;
+  font-family: var(--font-montserrat), sans-serif !important;
 }
 
 button,

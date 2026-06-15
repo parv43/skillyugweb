@@ -103,35 +103,6 @@ export default function SkillsSection() {
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img src="/classroom.webp" alt="Classroom Environment" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-slate-50/60 dark:bg-slate-950/85" />
-        {/* Left Side: 3D Open Book */}
-        <div className="absolute top-[32%] left-[4%] w-24 h-24 opacity-35 hidden lg:block select-none">
-          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_12px_24px_rgba(0,0,0,0.15)]">
-            <defs>
-              <linearGradient id="bookCover" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#8b5cf6" />
-                <stop offset="100%" stopColor="#4c1d95" />
-              </linearGradient>
-              <linearGradient id="bookPage" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="100%" stopColor="#f3f4f6" />
-              </linearGradient>
-              <linearGradient id="bookSpineShadow" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#d1d5db" stopOpacity="0" />
-                <stop offset="50%" stopColor="#9ca3af" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#d1d5db" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <rect x="6" y="24" width="88" height="58" rx="8" fill="url(#bookCover)" />
-            <rect x="6" y="28" width="88" height="54" rx="8" fill="#311075" opacity="0.3" />
-            <path d="M12 28 C25 24, 42 26, 48 31 L48 76 C42 71, 25 69, 12 73 Z" fill="url(#bookPage)" />
-            <path d="M14 29 C25 26, 40 28, 46 32 L46 74 C40 70, 25 68, 14 71 Z" fill="#ffffff" opacity="0.6" />
-            <path d="M88 28 C75 24, 58 26, 52 31 L52 76 C58 71, 75 69, 88 73 Z" fill="url(#bookPage)" />
-            <path d="M86 29 C75 26, 60 28, 54 32 L54 74 C60 70, 75 68, 86 71 Z" fill="#ffffff" opacity="0.6" />
-            <rect x="47" y="29" width="6" height="48" fill="url(#bookSpineShadow)" />
-            <path d="M18 38 H38 M18 46 H40 M18 54 H35 M18 62 H38" stroke="#cbd5e1" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
-            <path d="M62 38 H82 M60 46 H82 M65 54 H82 M62 62 H82" stroke="#cbd5e1" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
-          </svg>
-        </div>
       </div>
 
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-purple-500/0 to-transparent pointer-events-none rounded-full z-10" />

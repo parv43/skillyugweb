@@ -4,11 +4,11 @@ import { createMetadata, getOrganizationSchema, siteConfig } from "@/lib/seo"
 import { PostHogProvider } from './providers'
 import PostHogPageView from './PostHogPageView'
 import { Suspense } from 'react'
-import { Eczar, Chivo, Roboto } from "next/font/google"
+import { Montserrat, Chivo, Figtree } from "next/font/google"
 
-const eczar = Eczar({
+const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: "--font-eczar",
+  variable: "--font-montserrat",
   display: "swap",
 })
 
@@ -18,10 +18,9 @@ const chivo = Chivo({
   display: "swap",
 })
 
-const roboto = Roboto({
-  weight: ["300", "400", "500", "700", "900"],
+const figtree = Figtree({
   subsets: ["latin"],
-  variable: "--font-roboto",
+  variable: "--font-figtree",
   display: "swap",
 })
 
@@ -57,7 +56,7 @@ export default async function RootLayout({
   const supabaseHost = supabaseUrl ? new URL(supabaseUrl).host : null
 
   return (
-    <html lang="en" className={`${eczar.variable} ${chivo.variable} ${roboto.variable}`}>
+    <html lang="en" className={`${montserrat.variable} ${chivo.variable} ${figtree.variable}`}>
       <head>
         <script
           nonce={nonce}

@@ -92,63 +92,6 @@ export default function AIToolsSection() {
       <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 dark:from-blue-500/15 via-blue-500/0 to-transparent rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/5 dark:from-purple-500/15 via-purple-500/0 to-transparent rounded-full pointer-events-none" />
 
-      {/* ── Static 3D Claymorphic Background Elements ── */}
-      {/* Left Side: 3D Lightbulb */}
-      <div className="absolute top-[30%] left-[4%] w-20 h-20 opacity-35 select-none hidden lg:block z-0 pointer-events-none">
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_12px_24px_rgba(245,158,11,0.25)]">
-          <defs>
-            <radialGradient id="bulbGlass" cx="50%" cy="40%" r="50%" fx="30%" fy="30%">
-              <stop offset="0%" stopColor="#ffedd5" />
-              <stop offset="40%" stopColor="#fbbf24" />
-              <stop offset="100%" stopColor="#d97706" />
-            </radialGradient>
-            <linearGradient id="bulbBase" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#94a3b8" />
-              <stop offset="50%" stopColor="#e2e8f0" />
-              <stop offset="100%" stopColor="#64748b" />
-            </linearGradient>
-            <filter id="bulbGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="8" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-          </defs>
-          <circle cx="50" cy="45" r="28" fill="#f59e0b" opacity="0.25" filter="url(#bulbGlow)" />
-          <path d="M50 15 C30 15, 26 38, 38 52 C42 56, 42 66, 44 70 H56 C58 66, 58 56, 62 52 C74 38, 70 15, 50 15 Z" fill="url(#bulbGlass)" />
-          <path d="M38 25 C34 30, 32 38, 36 44" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" opacity="0.6" />
-          <path d="M44 48 L46 32 C47 30, 53 30, 54 32 L56 48" stroke="#ffedd5" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="50" cy="31" r="3" fill="#ffedd5" />
-          <rect x="42" y="70" width="16" height="5" rx="2.5" fill="url(#bulbBase)" />
-          <rect x="42" y="76" width="16" height="5" rx="2.5" fill="url(#bulbBase)" />
-          <rect x="44" y="82" width="12" height="4" rx="2" fill="url(#bulbBase)" />
-          <path d="M47 86 H53 L50 90 Z" fill="#334155" />
-        </svg>
-      </div>
-
-      {/* Right Side: 3D AI Chat Bubble */}
-      <div className="absolute top-[60%] right-[3%] w-24 h-24 select-none hidden lg:block z-0 pointer-events-none">
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_16px_32px_rgba(99,102,241,0.25)]">
-          <defs>
-            <radialGradient id="bubbleGrad" cx="30%" cy="30%" r="75%">
-              <stop offset="0%" stopColor="#818cf8" />
-              <stop offset="60%" stopColor="#4f46e5" />
-              <stop offset="100%" stopColor="#312e81" />
-            </radialGradient>
-            <filter id="sparkleGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-          </defs>
-          <rect x="8" y="16" width="84" height="58" rx="22" fill="url(#bubbleGrad)" />
-          <rect x="10" y="18" width="80" height="54" rx="20" stroke="#a5b4fc" strokeWidth="2.5" strokeLinecap="round" opacity="0.4" />
-          <rect x="9" y="20" width="82" height="52" rx="20" stroke="#1e1b4b" strokeWidth="2.5" strokeLinecap="round" opacity="0.3" />
-          <path d="M28 73 C30 84, 18 90, 18 90 C18 90, 36 88, 42 74 Z" fill="#312e81" />
-          <path d="M28 73 C30 84, 18 90, 18 90 C18 90, 36 88, 42 74 Z" fill="url(#bubbleGrad)" />
-          <path d="M20 28 C32 22, 68 22, 80 28" stroke="#ffffff" strokeWidth="4.5" strokeLinecap="round" opacity="0.45" />
-          <path d="M50 28 L53 39 L64 42 L53 45 L50 56 L47 45 L36 42 L47 39 Z" fill="#ffffff" filter="url(#sparkleGlow)" />
-          <path d="M68 46 L69.5 51.5 L75 53 L69.5 54.5 L68 60 L66.5 54.5 L61 53 L66.5 51.5 Z" fill="#a5b4fc" />
-        </svg>
-      </div>
-
       {/* Header */}
       <div className="text-center mb-24 z-20 px-6 max-w-3xl">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-300 dark:to-purple-300 mb-6 drop-shadow-sm tracking-tight leading-tight">

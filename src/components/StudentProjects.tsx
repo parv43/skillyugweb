@@ -59,45 +59,6 @@ export default function StudentProjects() {
     <section id="projects" className="relative w-full py-16 md:py-32 bg-white dark:bg-[#020617] overflow-hidden flex flex-col border-t border-slate-100 dark:border-slate-900">
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 dark:from-blue-500/15 via-blue-500/0 to-transparent pointer-events-none rounded-full z-0" />
 
-      {/* Right Side: 3D Space Rocket */}
-      <div className="absolute top-[32%] right-[4%] w-24 h-24 pointer-events-none z-10 hidden lg:block select-none">
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_16px_32px_rgba(239,68,68,0.25)]">
-          <defs>
-            <linearGradient id="rocketBody" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="40%" stopColor="#f1f5f9" />
-              <stop offset="100%" stopColor="#cbd5e1" />
-            </linearGradient>
-            <linearGradient id="rocketAccent" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ef4444" />
-              <stop offset="100%" stopColor="#b91c1c" />
-            </linearGradient>
-            <radialGradient id="rocketWindow" cx="40%" cy="40%" r="60%">
-              <stop offset="0%" stopColor="#e0f2fe" />
-              <stop offset="100%" stopColor="#0284c7" />
-            </radialGradient>
-            <linearGradient id="rocketFlame" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#fbbf24" />
-              <stop offset="50%" stopColor="#f97316" />
-              <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path d="M43 78 C43 92, 50 98, 50 98 C50 98, 57 92, 57 78 Z" fill="url(#rocketFlame)" />
-          <path d="M46 78 C46 86, 50 90, 50 90 C50 90, 54 86, 54 78 Z" fill="#fbbf24" />
-          <path d="M40 60 L24 74 C22 76, 26 80, 30 78 L42 70 Z" fill="url(#rocketAccent)" />
-          <path d="M25 73 L29 77 L40 67 Z" fill="#7f1d1d" opacity="0.3" />
-          <path d="M60 60 L76 74 C78 76, 74 80, 70 78 L58 70 Z" fill="url(#rocketAccent)" />
-          <path d="M75 73 L71 77 L60 67 Z" fill="#7f1d1d" opacity="0.3" />
-          <rect x="44" y="72" width="12" height="6" rx="2" fill="#475569" />
-          <path d="M50 8 C64 24, 60 56, 58 72 H42 C40 56, 36 24, 50 8 Z" fill="url(#rocketBody)" />
-          <path d="M47 16 C39 30, 42 52, 44 68" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" opacity="0.6" />
-          <path d="M50 8 C57 16, 58 24, 58 28 H42 C42 24, 43 16, 50 8 Z" fill="url(#rocketAccent)" />
-          <circle cx="50" cy="38" r="9" fill="#475569" />
-          <circle cx="50" cy="38" r="7.5" fill="url(#rocketWindow)" />
-          <path d="M46.5 35 C45 38, 47 42, 50 43.5" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
-        </svg>
-      </div>
-
       {/* Heading */}
       <div className="text-center mb-10 md:mb-20 z-20 px-6 max-w-3xl mx-auto">
         <h2 className="text-3xl md:text-5xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 mb-4 md:mb-6 drop-shadow-sm tracking-tight">

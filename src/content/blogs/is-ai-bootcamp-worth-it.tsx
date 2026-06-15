@@ -21,7 +21,7 @@ export default function IsAiBootcampWorthIt() {
 <p>An AI Bootcamp shifts the focus from writing repetitive code to solving complex problems using modern tools. Instead of learning how to spell <code>print(&apos;hello&apos;)</code>, students learn how to think critically, generate ideas, and instruct AI to do the heavy lifting.</p>
 
 <div className="my-10 p-6 border-l-4 border-blue-500 bg-blue-500/10 rounded-r-lg">
-  <div className="text-xl md:text-2xl text-blue-100 font-light m-0 leading-relaxed">
+  <div className="text-xl md:text-2xl text-blue-800 dark:text-blue-100 font-normal m-0 leading-relaxed">
     &ldquo;This is the difference between learning how to use a calculator and learning how to solve the math.&rdquo;
   </div>
 </div>
