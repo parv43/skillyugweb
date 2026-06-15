@@ -7,8 +7,10 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-border: var(--card-border);
-  --font-sans: var(--font-geist-sans), sans-serif;
+  --font-sans: var(--font-roboto), sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
+  --font-heading: var(--font-eczar), serif;
+  --font-accent: var(--font-chivo), sans-serif;
 }
 
 :root {
@@ -46,6 +48,25 @@ body {
   overflow-x: hidden;
   scroll-behavior: smooth;
 }
+
+/* ── Global Typography Overrides ── */
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-eczar), serif !important;
+}
+
+button,
+.button,
+.btn,
+nav a,
+nav button,
+a.glow-button,
+.glow-button,
+.clay-badge,
+.clay-badge span,
+.font-accent {
+  font-family: var(--font-chivo), sans-serif !important;
+}
+
 
 /* Glassmorphism utilities */
 .glass-panel {
