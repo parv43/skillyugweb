@@ -4,6 +4,25 @@ import { createMetadata, getOrganizationSchema, siteConfig } from "@/lib/seo"
 import { PostHogProvider } from './providers'
 import PostHogPageView from './PostHogPageView'
 import { Suspense } from 'react'
+import { Montserrat, Chivo, Figtree } from "next/font/google"
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  display: "swap",
+})
+
+const chivo = Chivo({
+  subsets: ["latin"],
+  variable: "--font-chivo",
+  display: "swap",
+})
+
+const figtree = Figtree({
+  subsets: ["latin"],
+  variable: "--font-figtree",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   ...createMetadata({
@@ -37,7 +56,7 @@ export default async function RootLayout({
   const supabaseHost = supabaseUrl ? new URL(supabaseUrl).host : null
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${montserrat.variable} ${chivo.variable} ${figtree.variable}`}>
       <head>
         <script
           nonce={nonce}

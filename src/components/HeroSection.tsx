@@ -20,7 +20,7 @@ function MobileHero() {
       <div className="px-6 relative z-20 w-full flex flex-col items-start text-left">
         {/* Header Copy */}
         <h2
-          className="text-[38px] font-extrabold leading-[1.1] tracking-tight mb-5 text-slate-900 dark:text-white"
+          className="text-[38px] font-extrabold leading-[1.2] tracking-tight mb-5 text-slate-900 dark:text-white"
         >
           Help your child build <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-fuchsia-600 dark:from-blue-400 dark:via-indigo-400 dark:to-fuchsia-400">
             AI skills that improve study, projects, and creative confidence.
@@ -137,6 +137,8 @@ export default function HeroSection() {
           {/* Bottom Edge Blend (faded backing for the cloud border) */}
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent dark:from-[#0a0f1c] dark:to-transparent z-10 pointer-events-none" />
         </div>
+
+
 
         {/* ── Dynamic Claymorphic Constellation & Floating Badges ── */}
         {/* Right-aligned container to keep the constellation perfectly in sync with the father/son image */}
@@ -347,8 +349,7 @@ export default function HeroSection() {
               </span>
             </div>
 
-            {/* Main Title */}
-            <h1 className="text-[34px] sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-br dark:from-white dark:via-slate-200 dark:to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.15]">
+            <h1 className="text-[34px] sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-br dark:from-white dark:via-slate-200 dark:to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.2]">
               Give Your Child the AI Tools<br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
                 They Need to Build Real World Things

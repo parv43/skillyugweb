@@ -103,7 +103,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-900/10 blur-[150px] rounded-full pointer-events-none" />
 
       <div className="text-center mb-10 px-6 max-w-3xl mx-auto relative z-20">
-        <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 mb-6 drop-shadow-sm tracking-tight">
+        <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 pb-2 mb-4 drop-shadow-sm tracking-tight">
           Master the Art of Prompting
         </h2>
         <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl font-light mb-4">
