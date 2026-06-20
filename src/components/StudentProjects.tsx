@@ -61,7 +61,7 @@ export default function StudentProjects() {
 
       {/* Heading */}
       <div className="text-center mb-10 md:mb-20 z-20 px-6 max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-5xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 mb-4 md:mb-6 drop-shadow-sm tracking-tight">
+        <h2 className="text-3xl md:text-5xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 pb-2 mb-2 md:mb-4 drop-shadow-sm tracking-tight">
           How This Bootcamp Gives Students an Advantage With AI
         </h2>
         <p className="text-slate-600 dark:text-slate-400 text-base md:text-lg font-light">

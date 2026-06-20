@@ -81,8 +81,8 @@ export default function CommentForm({ blogSlug, user, onCommentPosted }: Comment
           </svg>
         </div>
         <div className="flex-1">
-          <p className="text-slate-300 font-medium text-sm mb-1">Sign in to join the discussion</p>
-          <p className="text-slate-500 text-xs">Your comment will go live immediately after passing our content checks.</p>
+          <p className="text-slate-800 dark:text-slate-200 font-medium text-sm mb-1">Sign in to join the discussion</p>
+          <p className="text-slate-500 dark:text-slate-450 text-xs">Your comment will go live immediately after passing our content checks.</p>
         </div>
         <Link
           href="/login"
@@ -115,10 +115,10 @@ export default function CommentForm({ blogSlug, user, onCommentPosted }: Comment
             {(user.user_metadata?.full_name || user.email || "?")[0].toUpperCase()}
           </div>
         )}
-        <span className="text-sm text-slate-300 font-medium">
+        <span className="text-sm text-slate-800 dark:text-slate-200 font-medium">
           {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "You"}
         </span>
-        <span className="ml-auto text-[10px] font-mono text-slate-600 uppercase tracking-widest">
+        <span className="ml-auto text-[10px] font-mono text-slate-500 dark:text-slate-500 uppercase tracking-widest">
           Posting as yourself
         </span>
       </div>
@@ -134,7 +134,7 @@ export default function CommentForm({ blogSlug, user, onCommentPosted }: Comment
           rows={4}
           maxLength={MAX_CHARS + 10}
           disabled={isSubmitting}
-          className="w-full resize-none rounded-xl bg-white/[0.04] border border-white/10 focus:border-blue-500/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 px-4 py-3 text-sm text-slate-200 placeholder:text-slate-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full resize-none rounded-xl bg-white/[0.04] border border-white/10 focus:border-blue-500/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         />
         {/* Character counter */}
         <span
@@ -160,7 +160,7 @@ export default function CommentForm({ blogSlug, user, onCommentPosted }: Comment
       {error && (
         <div
           role="alert"
-          className="flex items-start gap-2.5 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-300"
+          className="flex items-start gap-2.5 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-800 dark:text-red-300"
         >
           <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -173,7 +173,7 @@ export default function CommentForm({ blogSlug, user, onCommentPosted }: Comment
       {successMsg && (
         <div
           role="status"
-          className="flex items-center gap-2.5 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-3 text-sm text-green-300"
+          className="flex items-center gap-2.5 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-3 text-sm text-green-800 dark:text-green-300"
         >
           <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />

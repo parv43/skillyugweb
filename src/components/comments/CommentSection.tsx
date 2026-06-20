@@ -67,10 +67,10 @@ export default function CommentSection({ blogSlug }: CommentSectionProps) {
             />
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-white">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
           Discussion
           {commentCount !== null && commentCount > 0 && (
-            <span className="ml-2 text-sm font-mono text-slate-500 font-normal">
+            <span className="ml-2 text-sm font-mono text-slate-500 dark:text-slate-450 font-normal">
               ({commentCount + newComments.length > commentCount
                 ? newComments.length + (commentCount - newComments.length)
                 : commentCount})
