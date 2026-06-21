@@ -25,6 +25,7 @@
   --glass-border: rgba(15, 23, 42, 0.08);
   --glass-border-top: rgba(15, 23, 42, 0.05);
   --glass-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --skillyug-bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 40%, #ffebd6 75%, #dbeafe 100%);
 }
 
 .dark {
@@ -39,10 +40,21 @@
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-top: rgba(255, 255, 255, 0.15);
   --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --skillyug-bg-gradient: linear-gradient(135deg, #020617 0%, #090d16 40%, #271206 75%, #031627 100%);
+}
+
+::selection {
+  background-color: rgba(255, 139, 18, 0.15);
+  color: #c2410c;
+}
+
+.dark ::selection {
+  background-color: rgba(255, 139, 18, 0.25);
+  color: #ffedd5;
 }
 
 body {
-  background: var(--background);
+  background: var(--skillyug-bg-gradient);
   color: var(--foreground);
   font-family: var(--font-sans);
   font-weight: 700; /* Default body font weight to bold */

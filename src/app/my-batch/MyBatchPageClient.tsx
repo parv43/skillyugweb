@@ -712,8 +712,8 @@ export default function MyBatchPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center text-slate-600 dark:text-slate-400">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="min-h-screen bg-transparent flex items-center justify-center text-slate-600 dark:text-slate-400">
+        <Loader2 className="w-8 h-8 animate-spin text-[#0060aa] dark:text-[#ff9d3b]" />
       </div>
     );
   }
@@ -726,19 +726,19 @@ export default function MyBatchPage() {
     (userId !== null && CERT_ALLOWED_UIDS.includes(userId));
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800 dark:bg-[#020617] dark:text-slate-200 relative overflow-x-hidden select-none">
+    <main className="min-h-screen bg-transparent text-slate-800 dark:text-slate-200 relative overflow-x-hidden select-none">
       {/* Screen recording deterrence overlay */}
       {isBlurred && (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-50/95 dark:bg-[#020617]/95 backdrop-blur-3xl px-4 text-center">
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#f8fafc]/90 dark:bg-[#020617]/90 backdrop-blur-2xl px-4 text-center">
           <EyeOff className="w-16 h-16 text-slate-400 mb-6" />
           <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Content Protected</h2>
-          <p className="mt-2 text-slate-600 dark:text-slate-400 text-sm max-w-md mx-auto">
+          <p className="mt-2 text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto">
             For security reasons, this dashboard is hidden when the window loses focus. Please click back into the window to continue.
           </p>
         </div>
       )}
       <div className="fixed inset-0 pointer-events-none opacity-80">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.04),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(168,85,247,0.03),_transparent_28%),linear-gradient(to_bottom,_rgba(241,245,249,0.3),_rgba(248,250,252,0.95))] dark:bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.08),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(168,85,247,0.06),_transparent_28%),linear-gradient(to_bottom,_rgba(2,6,23,0.3),_rgba(2,6,23,0.95))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(0,96,170,0.04),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(255,139,18,0.03),_transparent_28%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(0,96,170,0.08),_transparent_35%),radial-gradient(circle_at_top_right,_rgba(255,139,18,0.06),_transparent_28%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.12)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:72px_72px]" />
       </div>
 
@@ -751,9 +751,9 @@ export default function MyBatchPage() {
 
           {/* Top Section: Profile & Circular Progress */}
           <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-            <div className="rounded-[2rem] border border-slate-200 bg-white backdrop-blur-xl p-6 md:p-6 md:p-10 shadow-sm self-start dark:border-white/10 dark:bg-[#0a0f1c]">
-              <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-blue-600 dark:text-blue-400">
-                <span className="rounded-full border border-blue-200 bg-blue-50 px-4 py-2 dark:bg-blue-950/40 dark:border-blue-900/30 dark:text-blue-400">
+            <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-6 md:p-10 shadow-sm self-start dark:border-white/5">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-[#ff8b12] dark:text-[#ff9d3b]">
+                <span className="rounded-full border border-orange-200/60 bg-orange-50/50 px-4 py-2 dark:bg-[#ff8b12]/10 dark:border-[#ff8b12]/20 text-[#ff8b12] dark:text-[#ff9d3b]">
                   My Batch Workspace
                 </span>
                 <span className="text-slate-500 dark:text-slate-400">Live cohort dashboard</span>
@@ -767,7 +767,7 @@ export default function MyBatchPage() {
                       className="h-16 w-16 rounded-full border border-slate-200 object-cover dark:border-white/10"
                     />
                   ) : (
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full border border-slate-200 bg-blue-50 text-xl font-black text-blue-600 dark:bg-blue-950/40 dark:border-white/10 dark:text-blue-400">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full border border-slate-200/60 bg-white/50 dark:bg-white/5 text-xl font-black text-[#0060aa] dark:text-[#ff9d3b]">
                       {user?.fullName.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -782,7 +782,7 @@ export default function MyBatchPage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 md:p-8 shadow-sm flex flex-col items-center justify-center relative dark:border-white/10 dark:bg-[#0a0f1c]">
+            <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-8 shadow-sm flex flex-col items-center justify-center relative dark:border-white/5">
               <p className="absolute top-6 left-6 md:top-8 md:left-8 text-[11px] font-bold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
                 Bootcamp Progress
               </p>
@@ -795,7 +795,7 @@ export default function MyBatchPage() {
                   <circle 
                     cx="50" cy="50" r="40" fill="transparent" strokeWidth="12"
                     strokeDasharray="251.2" strokeDashoffset={strokeDashoffset}
-                    className="stroke-blue-500 dark:stroke-blue-400 drop-shadow-[0_2px_4px_rgba(59,130,246,0.1)]"
+                    className="stroke-[#ff8b12] dark:stroke-[#ff8b12] drop-shadow-[0_2px_4px_rgba(255,139,18,0.1)]"
                     strokeLinecap="round"
                   />
                 </svg>
@@ -808,20 +808,20 @@ export default function MyBatchPage() {
 
           {/* Middle Section 1: Next Live Session & Locked Certificate */}
           <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-2">
-            <div className="rounded-[2rem] border border-slate-200 bg-white backdrop-blur-xl p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0a0f1c]">
+            <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-8 shadow-sm dark:border-white/5">
               <div className="flex items-center gap-3">
-                <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <Calendar className="h-6 w-6 text-[#ff8b12] dark:text-[#ff9d3b]" />
                 <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Next Live Session</h2>
               </div>
-              <div className="mt-8 rounded-[1.5rem] border border-slate-100 bg-slate-50 p-6 md:p-8 flex flex-col justify-between min-h-[200px] dark:border-white/5 dark:bg-[#0f172a]/50">
+              <div className="mt-8 rounded-[1.5rem] border border-slate-200/60 dark:border-white/5 bg-white/40 dark:bg-white/5 backdrop-filter blur-sm p-6 md:p-8 flex flex-col justify-between min-h-[200px]">
                 {nextSession ? (
                   <>
                     <div>
                       <div className="flex items-center gap-2">
                         <span className={`text-[10px] font-bold uppercase tracking-[0.24em] px-2.5 py-1 rounded-full border ${
                           nextSession.status === "live" 
-                            ? "bg-red-500/10 border-red-500/25 text-red-655 dark:text-red-400 animate-pulse" 
-                            : "bg-blue-500/10 border-blue-500/25 text-blue-655 dark:text-blue-450"
+                            ? "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-450 animate-pulse" 
+                            : "bg-[#0060aa]/10 border-[#0060aa]/20 text-[#0060aa] dark:text-blue-400"
                         }`}>
                           {nextSession.status === "live" ? "Live Now" : "Upcoming Session"}
                         </span>
@@ -883,7 +883,7 @@ export default function MyBatchPage() {
                   </>
                 ) : (
                   <div className="flex flex-col items-center justify-center flex-1 text-center py-4">
-                    <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 flex items-center justify-center mb-3 text-emerald-600 dark:text-emerald-400">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3 text-emerald-600 dark:text-emerald-400">
                       <BadgeCheck className="w-6 h-6" />
                     </div>
                     <p className="text-base font-bold text-slate-800 dark:text-slate-200">Bootcamp Completed</p>
@@ -895,14 +895,14 @@ export default function MyBatchPage() {
 
             {/* Certificate Card — unlocked only for allowlisted users */}
             {canDownloadCert ? (
-              <div className="rounded-[2rem] border border-blue-200 bg-gradient-to-br from-blue-500/5 to-purple-500/5 dark:border-blue-900/30 dark:from-blue-950/20 dark:to-purple-950/20 p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-center group">
-                <div className="absolute -right-12 -top-12 w-32 h-32 bg-blue-500/5 blur-[60px] rounded-full transition-opacity group-hover:opacity-100 opacity-50"></div>
+              <div className="rounded-[2rem] border border-[#ff8b12]/30 bg-gradient-to-br from-[#0060aa]/5 to-[#ff8b12]/5 dark:border-[#ff8b12]/20 dark:from-[#0060aa]/10 dark:to-[#ff8b12]/10 p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-center group">
+                <div className="absolute -right-12 -top-12 w-32 h-32 bg-[#ff8b12]/5 blur-[60px] rounded-full transition-opacity group-hover:opacity-100 opacity-50"></div>
                 
                 <div className="flex items-start justify-between gap-4">
-                  <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 shadow-inner dark:border-blue-900/30 dark:bg-blue-950/45">
-                    <BadgeCheck className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white/50 dark:bg-[#0a0f1c]/50 p-4 shadow-inner">
+                    <BadgeCheck className="h-6 w-6 text-[#ff8b12] dark:text-[#ff9d3b]" />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-blue-600 dark:text-blue-400">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-[#ff8b12] dark:text-[#ff9d3b]">
                     OFFICIAL
                   </span>
                 </div>
@@ -916,7 +916,7 @@ export default function MyBatchPage() {
                   type="button"
                   onClick={openCertModal}
                   disabled={isGenerating}
-                  className="mt-8 w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mt-8 w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] py-3 text-xs font-bold uppercase tracking-[0.24em] text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-orange-500/10 cursor-pointer"
                 >
                   {isGenerating ? (
                     <>
@@ -933,11 +933,11 @@ export default function MyBatchPage() {
               </div>
             ) : (
               /* Locked Certificate — shown to everyone else */
-              <div className="rounded-[2rem] border border-slate-200 bg-white p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-center dark:border-white/10 dark:bg-[#0a0f1c]">
+              <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-center dark:border-white/5">
                 {/* Blurred background content */}
                 <div className="absolute inset-0 p-6 md:p-8 blur-[10px] opacity-40 pointer-events-none select-none flex flex-col justify-center transition-all duration-500 hover:blur-[6px] hover:opacity-60">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 dark:border-blue-900/30 dark:bg-blue-950/45">
+                    <div className="rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white/50 dark:bg-[#0a0f1c]/50 p-4">
                       <BadgeCheck className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-blue-600 dark:text-blue-400">
@@ -955,13 +955,13 @@ export default function MyBatchPage() {
 
                 {/* Lock overlay */}
                 <div className="relative z-10 flex flex-col items-center justify-center text-center">
-                  <div className="rounded-full bg-slate-50 p-5 border border-slate-200 mb-6 shadow-sm relative dark:bg-[#020617] dark:border-white/10">
+                  <div className="rounded-full bg-white/50 dark:bg-white/5 p-5 border border-slate-200/60 mb-6 shadow-sm relative dark:border-white/10">
                     <Lock className="w-8 h-8 text-slate-500 dark:text-slate-400" />
                     {/* Chain element */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-1.5 bg-slate-300/80 dark:bg-slate-700/80 rotate-45 pointer-events-none rounded-full blur-[0.5px]" />
                   </div>
                   <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Certificate Locked</h3>
-                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400 max-w-[200px] mx-auto leading-relaxed">
+                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.25em] text-[#ff8b12] dark:text-[#ff9d3b] max-w-[200px] mx-auto leading-relaxed">
                     Complete the course to download certificate
                   </p>
                 </div>
@@ -970,7 +970,7 @@ export default function MyBatchPage() {
           </div>
 
           {/* Middle Section 2: Resource Library */}
-          <div className="rounded-[2rem] border border-slate-200 bg-white backdrop-blur-xl p-6 md:p-8 shadow-sm dark:border-white/10 dark:bg-[#0a0f1c]">
+          <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-8 shadow-sm dark:border-white/5">
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-5">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
@@ -986,13 +986,13 @@ export default function MyBatchPage() {
                 return (
                   <article
                     key={card.title}
-                    className={`rounded-[1.75rem] border border-slate-100 bg-gradient-to-br ${card.accent} dark:border-white/5 dark:from-blue-950/20 dark:to-cyan-950/10 p-6 shadow-sm`}
+                    className={`rounded-[1.75rem] border border-slate-200/60 bg-gradient-to-br ${card.accent} dark:border-white/5 dark:from-[#0060aa]/10 dark:to-[#ff8b12]/5 p-6 shadow-sm`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#020617]">
-                        <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                        <Icon className="h-6 w-6 text-[#ff8b12] dark:text-[#ff9d3b]" />
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500 dark:text-slate-455">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500 dark:text-slate-400">
                         {card.meta}
                       </span>
                     </div>
@@ -1004,7 +1004,7 @@ export default function MyBatchPage() {
                     </p>
                     <button
                       type="button"
-                      className="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                      className="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-[#ff8b12] hover:text-[#e0770b] dark:text-[#ff9d3b] dark:hover:text-[#ff8b12] transition-colors"
                     >
                       Download
                       <Download className="h-4 w-4" />
@@ -1020,10 +1020,10 @@ export default function MyBatchPage() {
           </div>
 
           {/* Middle Section 3: Secure Video Player */}
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm overflow-hidden dark:border-white/10 dark:bg-[#0a0f1c]">
+          <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-4 shadow-sm overflow-hidden dark:border-white/5">
             <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[600px]">
               {/* Left Side: Video List (30%) */}
-              <div className="lg:w-[30%] bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-slate-100 dark:border-white/5 p-4 flex flex-col h-[300px] lg:h-full">
+              <div className="lg:w-[30%] bg-white/40 dark:bg-white/5 backdrop-filter blur-sm rounded-3xl border border-slate-200/60 dark:border-white/5 p-4 flex flex-col h-[300px] lg:h-full">
                 <div className="px-4 py-3 border-b border-slate-200 dark:border-white/5 mb-4 flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-black text-slate-900 dark:text-white">Session Recordings</h3>
@@ -1033,7 +1033,7 @@ export default function MyBatchPage() {
                     <button
                       onClick={handleSyncVideos}
                       disabled={isSyncing}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600/80 hover:bg-blue-600 disabled:bg-slate-800 disabled:text-slate-500 text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:scale-100 cursor-pointer shadow-md"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:scale-100 cursor-pointer shadow-md"
                     >
                       {isSyncing ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1047,8 +1047,8 @@ export default function MyBatchPage() {
                 {syncStatus && (
                   <div className={`mx-4 mb-3 px-3 py-2 rounded-xl text-center text-xs font-semibold border ${
                     syncStatus.type === "success" 
-                      ? "bg-green-500/10 border-green-500/20 text-green-400" 
-                      : "bg-red-500/10 border-red-500/20 text-red-400"
+                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                      : "bg-[#ff8b12]/10 border-[#ff8b12]/20 text-[#ff8b12] dark:text-[#ff9d3b]"
                   }`}>
                     {syncStatus.message}
                   </div>
@@ -1061,12 +1061,12 @@ export default function MyBatchPage() {
                         setActiveVideo(video);
                         setIsPlaying(false);
                       }}
-                      className={`w-full text-left p-4 rounded-2xl transition-all ${activeVideo.id === video.id ? 'bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-950/30 dark:border-blue-500/30 dark:text-blue-400' : 'hover:bg-slate-100/50 border border-transparent text-slate-700 dark:hover:bg-white/5 dark:text-slate-300'}`}
+                      className={`w-full text-left p-4 rounded-2xl transition-all cursor-pointer ${activeVideo.id === video.id ? 'bg-[#ff8b12]/10 border border-[#ff8b12]/20 text-[#ff8b12] dark:text-[#ff9d3b]' : 'hover:bg-white/50 dark:hover:bg-white/5 border border-transparent text-slate-700 dark:text-slate-300'}`}
                     >
                       <div className="flex items-center gap-3">
-                        <PlayCircle className={`w-8 h-8 flex-shrink-0 ${activeVideo.id === video.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-550'}`} />
+                        <PlayCircle className={`w-8 h-8 flex-shrink-0 ${activeVideo.id === video.id ? 'text-[#ff8b12] dark:text-[#ff9d3b]' : 'text-slate-400 dark:text-slate-500'}`} />
                         <div>
-                          <p className={`text-sm font-bold ${activeVideo.id === video.id ? 'text-blue-700 dark:text-blue-450 font-bold' : 'text-slate-700 dark:text-slate-300'}`}>{video.title}</p>
+                          <p className={`text-sm font-bold ${activeVideo.id === video.id ? 'text-[#ff8b12] dark:text-[#ff9d3b] font-bold' : 'text-slate-700 dark:text-slate-300'}`}>{video.title}</p>
                           <p className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-1">{video.date}</p>
                         </div>
                       </div>
@@ -1076,7 +1076,7 @@ export default function MyBatchPage() {
               </div>
               
               {/* Right Side: Secure Video Player (70%) */}
-              <div className="lg:w-[70%] bg-black rounded-3xl relative flex flex-col overflow-hidden border border-slate-200 dark:border-white/10 min-h-[350px] lg:min-h-0">
+              <div className="lg:w-[70%] bg-slate-950 rounded-3xl relative flex flex-col overflow-hidden border border-slate-200/60 dark:border-white/10 min-h-[350px] lg:min-h-0">
 
                 {/* React YouTube component mount point */}
                 <div className="flex-1 w-full h-[75%] lg:h-[80%] relative bg-black flex items-center justify-center overflow-hidden">
@@ -1146,7 +1146,7 @@ export default function MyBatchPage() {
                 </div>
 
                 {/* Custom Controls */}
-                <div className="bg-slate-900 p-4 flex flex-col justify-center z-40 border-t border-slate-800 h-[25%] lg:h-[20%]">
+                <div className="bg-[#0a0f1c]/90 backdrop-filter blur-sm p-4 flex flex-col justify-center z-40 border-t border-slate-800/80 h-[25%] lg:h-[20%]">
                   {activeVideo.videoId ? (
                     <div className="w-full flex flex-col gap-3">
                       {/* Timeline Slider with custom tracks */}
@@ -1162,13 +1162,13 @@ export default function MyBatchPage() {
                         
                         {/* Progress Bar */}
                         <div 
-                          className="absolute left-0 h-1 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 pointer-events-none"
+                          className="absolute left-0 h-1 rounded-full bg-gradient-to-r from-[#0060aa] to-[#ff8b12] pointer-events-none"
                           style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                         />
 
                         {/* Slider Thumb */}
                         <div 
-                          className="absolute w-3 h-3 rounded-full bg-blue-400 border border-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none transform -translate-x-1/2"
+                          className="absolute w-3 h-3 rounded-full bg-[#ff8b12] border border-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none transform -translate-x-1/2"
                           style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                         />
 

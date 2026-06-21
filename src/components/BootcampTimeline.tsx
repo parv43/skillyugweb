@@ -100,17 +100,17 @@ export default function BootcampTimeline() {
     <section
       ref={sectionRef}
       id="curriculum"
-      className="relative w-full py-24 bg-white dark:bg-[#020617] overflow-hidden border-t border-slate-100 dark:border-slate-900 flex flex-col items-center select-none"
+      className="relative w-full py-24 bg-transparent overflow-hidden border-t border-slate-200/40 dark:border-white/5 flex flex-col items-center select-none"
     >
       {/* Custom Animations for Glowing Nodes */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 15px rgba(59,130,246,0.4); transform: scale(1.05); }
-          50% { box-shadow: 0 0 35px rgba(59,130,246,0.8); transform: scale(1.15); }
+          0%, 100% { box-shadow: 0 0 15px rgba(255,139,18,0.4); transform: scale(1.05); }
+          50% { box-shadow: 0 0 35px rgba(255,139,18,0.8); transform: scale(1.15); }
         }
         @keyframes fade-in-glow {
-          from { box-shadow: 0 0 0px rgba(59,130,246,0); }
-          to { box-shadow: 0 0 15px rgba(59,130,246,0.3); }
+          from { box-shadow: 0 0 0px rgba(255,139,18,0); }
+          to { box-shadow: 0 0 15px rgba(255,139,18,0.3); }
         }
         .node-current {
           animation: pulse-glow 2s infinite ease-in-out;
@@ -123,7 +123,7 @@ export default function BootcampTimeline() {
 
       {/* Header Section */}
       <div className="text-center mb-16 px-6 max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">
+        <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mb-4 tracking-tight leading-tight">
           Learning Progression
         </h2>
         <p className="text-slate-600 dark:text-slate-350 text-base md:text-lg font-light">
@@ -189,12 +189,12 @@ export default function BootcampTimeline() {
                   <path
                     d={pathData}
                     fill="none"
-                    stroke="#3b82f6"
+                    stroke="#ff8b12"
                     strokeWidth="3"
                     strokeDasharray="8 8"
-                    className="stroke-blue-500 dark:stroke-blue-400"
+                    className="stroke-[#ff8b12] dark:stroke-[#ff9d3b]"
                     mask={`url(#glow-mask-${i})`}
-                    style={{ filter: "drop-shadow(0 0 8px rgba(59,130,246,0.3))" }}
+                    style={{ filter: "drop-shadow(0 0 8px rgba(255,139,18,0.3))" }}
                   />
                 </g>
               )
@@ -214,10 +214,10 @@ export default function BootcampTimeline() {
             const Icon = step.icon
 
             // Dynamic Styling based on state
-            const ringColor = isCompleted || isCurrent ? "border-[#3b82f6]" : "border-slate-200 dark:border-slate-800"
-            const bgColor = isCurrent ? "bg-blue-50 dark:bg-blue-950/30" : "bg-white dark:bg-[#0a0f1c]"
+            const ringColor = isCompleted || isCurrent ? "border-[#ff8b12]" : "border-slate-200 dark:border-slate-800"
+            const bgColor = isCurrent ? "bg-orange-50 dark:bg-orange-950/30" : "bg-white dark:bg-[#0a0f1c]"
             const iconColor = isCompleted || isCurrent 
-                                ? (i === 4 ? "text-yellow-500" : "text-[#3b82f6]") 
+                                ? (i === 4 ? "text-yellow-500" : "text-[#ff8b12] dark:text-[#ff9d3b]") 
                                 : "text-slate-400 dark:text-slate-600"
             
             const textOpacity = isLocked ? "opacity-45" : "opacity-100"
@@ -235,7 +235,7 @@ export default function BootcampTimeline() {
                     textAlign: isLeft ? "left" : "right",
                   }}
                 >
-                  <span className="text-[10px] font-bold tracking-[0.15em] text-[#3b82f6] dark:text-blue-400 uppercase mb-1 drop-shadow-sm">
+                  <span className="text-[10px] font-bold tracking-[0.15em] text-[#ff8b12] dark:text-[#ff9d3b] uppercase mb-1 drop-shadow-sm">
                     {step.week}
                   </span>
                   <h3 className={`text-base font-bold leading-tight mb-1 ${isLocked ? "text-slate-400 dark:text-slate-600" : "text-slate-900 dark:text-white"}`}>
@@ -248,7 +248,7 @@ export default function BootcampTimeline() {
 
                 {/* Circular Icon Node */}
                 <div
-                  className={`absolute w-16 h-16 rounded-full border-2 ${ringColor} ${bgColor} flex items-center justify-center cursor-pointer transition-colors duration-500 z-10 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 ${isCurrent ? "node-current" : ""} ${isCompleted ? "node-completed" : ""}`}
+                  className={`absolute w-16 h-16 rounded-full border-2 ${ringColor} ${bgColor} flex items-center justify-center cursor-pointer transition-colors duration-500 z-10 hover:bg-orange-50/50 dark:hover:bg-orange-950/20 ${isCurrent ? "node-current" : ""} ${isCompleted ? "node-completed" : ""}`}
                   style={{ 
                     top: cy - 32, 
                     left: cx - 32
@@ -267,7 +267,7 @@ export default function BootcampTimeline() {
                   
                   {/* Completion checkmark badge */}
                   {isCompleted && (
-                     <div className="absolute -right-1 -top-1 w-5 h-5 bg-[#3b82f6] rounded-full border-[2px] border-white dark:border-[#020617] flex items-center justify-center">
+                     <div className="absolute -right-1 -top-1 w-5 h-5 bg-[#ff8b12] rounded-full border-[2px] border-white dark:border-[#020617] flex items-center justify-center">
                         <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>

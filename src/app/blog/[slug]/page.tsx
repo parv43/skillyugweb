@@ -65,20 +65,20 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
   const nonce = (await headers()).get("x-nonce") ?? "";
 
   return (
-    <main className="bg-slate-50 dark:bg-[#020617] min-h-screen text-slate-800 dark:text-slate-200 font-sans selection:bg-blue-500/10 selection:text-blue-900 relative pb-0 transition-colors duration-300">
+    <main className="bg-transparent min-h-screen text-slate-800 dark:text-slate-200 font-sans relative pb-0 transition-colors duration-300">
       <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }} />
 
       {/* Background Gradients */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-[0%] left-[50%] -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/5 via-purple-500/2 to-transparent rounded-b-[100%]" />
-        <div className="absolute bottom-[20%] right-[0%] w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-500/2 via-purple-500/2 to-transparent rounded-full" />
+        <div className="absolute top-[0%] left-[50%] -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0060aa]/5 via-[#ff8b12]/2 to-transparent rounded-b-[100%]" />
+        <div className="absolute bottom-[20%] right-[0%] w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#ff8b12]/2 via-[#0060aa]/2 to-transparent rounded-full" />
       </div>
 
       <Navbar />
 
       <article className="container mx-auto px-6 relative z-10 pt-32 lg:pt-40 pb-20 max-w-4xl">
         <div className="mb-6">
-          <Link href="/blog" className="group inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm w-fit dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 dark:text-slate-400 dark:hover:text-white">
+          <Link href="/blog" className="group inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 bg-white/70 hover:bg-slate-50/80 border border-slate-200 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm w-fit dark:bg-[#0a0f1c]/70 dark:hover:bg-[#0f172a]/80 dark:border-white/5 dark:text-slate-400 dark:hover:text-white">
             <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -99,12 +99,12 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/40 px-3 py-1.5 rounded-md border border-blue-200 dark:border-blue-900/30">
+            <span className="text-xs font-bold text-[#ff8b12] dark:text-[#ff9d3b] uppercase tracking-widest bg-orange-50 dark:bg-orange-950/40 px-3 py-1.5 rounded-md border border-orange-200/50 dark:border-orange-900/30">
               {blog.category}
             </span>
-            <span className="text-sm text-slate-500 dark:text-slate-450 font-medium whitespace-nowrap">By Skillyug</span>
+            <span className="text-sm text-slate-500 dark:text-slate-455 font-medium whitespace-nowrap">By Skillyug</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700 hidden sm:block"></span>
-            <span className="text-sm text-slate-500 dark:text-slate-450 font-mono flex items-center">
+            <span className="text-sm text-slate-500 dark:text-slate-455 font-mono flex items-center">
               <svg className="w-4 h-4 mr-1 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -132,47 +132,40 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
         </header>
 
         {/* Content Body */}
-        <div className="prose prose-slate prose-lg max-w-none text-slate-700 dark:prose-invert">
+        <div className="prose prose-slate prose-lg max-w-none text-slate-750 dark:prose-invert">
           
           {MdxContent ? (
             <MdxContent />
           ) : (
             <>
-              <p className="text-xl md:text-2xl text-slate-800 dark:text-slate-100 leading-relaxed font-light mb-12 border-l-4 border-blue-500 pl-6 bg-blue-50 dark:bg-blue-950/20 py-4 rounded-r-lg whitespace-pre-wrap">
+              <p className="text-xl md:text-2xl text-slate-800 dark:text-slate-100 leading-relaxed font-light mb-12 border-l-4 border-l-[#ff8b12] pl-6 bg-orange-50/40 dark:bg-orange-950/10 py-4 rounded-r-lg whitespace-pre-wrap">
                 {blog.content.intro}
               </p>
 
-              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 mt-12 mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mt-12 mb-6">
                 {blog.content.whatIsTopicHeader || "What is the Topic"}
               </h2>
-              <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-650 dark:text-slate-350">
-                {blog.content.whatIsTopic}
-              </div>
-
-              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 mt-12 mb-6">
-                {blog.content.whyItMattersHeader || "Why It Matters for Students"}
-              </h2>
               <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-655 dark:text-slate-350">
-                {blog.content.whyItMatters}
+                {blog.content.whatIsTopic}
               </div>
 
               {/* Dynamic Content: List or standard content */}
               {requiresToolsList && blog.content.tools ? (
                 <>
-                  <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 mt-12 mb-8">
+                  <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mt-12 mb-8">
                     Top AI Tools for Students
                   </h2>
                   <div className="space-y-6 mb-12">
                     {blog.content.tools.map((tool, idx) => (
-                      <div key={idx} className="bg-slate-50 dark:bg-[#0a0f1c] border border-slate-200 dark:border-white/10 rounded-[16px] p-6 hover:bg-white dark:hover:bg-[#0a0f1c]/80 transition-colors">
+                      <div key={idx} className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 rounded-[16px] p-6 hover:bg-white dark:hover:bg-[#0a0f1c]/90 transition-colors">
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center">
-                          <span className="w-8 h-8 rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/30 flex items-center justify-center text-sm mr-3 font-mono">
+                          <span className="w-8 h-8 rounded-full bg-orange-50 text-[#ff8b12] border border-orange-200 dark:bg-orange-950/40 dark:text-[#ff9d3b] dark:border-orange-900/30 flex items-center justify-center text-sm mr-3 font-mono">
                             {idx + 1}
                           </span>
                           {tool.name}
                         </h3>
                         <div className="pl-11">
-                          <p className="text-sm font-semibold text-purple-700 dark:text-purple-400 mb-2 uppercase tracking-wide">
+                          <p className="text-sm font-semibold text-[#0060aa] dark:text-[#ff9d3b] mb-2 uppercase tracking-wide">
                             Best For: {tool.useCase}
                           </p>
                           <p className="text-slate-650 dark:text-slate-350 leading-relaxed text-base m-0 whitespace-pre-wrap">
@@ -185,7 +178,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
                 </>
               ) : blog.content.mainContent ? (
                 <>
-                  <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 mt-12 mb-6">
+                  <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mt-12 mb-6">
                     {blog.content.mainContentHeader || "Deep Dive Tutorial"}
                   </h2>
                   <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-655 dark:text-slate-350">
@@ -194,14 +187,14 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
                 </>
               ) : null}
 
-              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 mt-12 mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mt-12 mb-6">
                 {blog.content.practicalUsageHeader || "Practical Usage"}
               </h2>
               <div className="mb-10 leading-relaxed whitespace-pre-wrap text-slate-655 dark:text-slate-350">
                 {blog.content.practicalUsage}
               </div>
 
-              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 mt-12 mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mt-12 mb-6">
                 {blog.content.conclusionHeader || "Conclusion"}
               </h2>
               <div className="mb-12 leading-relaxed whitespace-pre-wrap text-slate-655 dark:text-slate-350">
@@ -210,8 +203,8 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             </>
           )}
 
-          <div className="rounded-[1.75rem] border border-blue-200 dark:border-white/10 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-blue-950/30 dark:via-[#0a0f1c] dark:to-purple-950/30 p-6 md:p-8 shadow-sm">
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-700 dark:text-blue-400">
+          <div className="rounded-[1.75rem] border border-orange-200/60 dark:border-white/5 bg-gradient-to-br from-orange-50/40 via-white/80 to-blue-50/40 dark:from-orange-950/10 dark:via-[#0a0f1c]/80 dark:to-blue-950/10 backdrop-filter blur-md p-6 md:p-8 shadow-sm">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#ff8b12] dark:text-[#ff9d3b]">
               Continue With Skillyug
             </p>
             <h2 className="mt-4 text-2xl md:text-3xl font-black text-slate-900 dark:text-white">
@@ -224,17 +217,17 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/book-slot"
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-md"
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-md"
               >
                 Reserve Your Bootcamp Spot
               </Link>
             </div>
             <div className="mt-6 flex flex-wrap gap-3 text-sm">
-              <Link href="/#curriculum" className="text-blue-600 dark:text-blue-400 font-semibold transition-colors hover:text-blue-850 dark:hover:text-blue-300">
+              <Link href="/#curriculum" className="text-[#0060aa] dark:text-[#ff9d3b] font-semibold transition-colors hover:text-[#005291] dark:hover:text-[#ff8b12]">
                 Explore the bootcamp curriculum
               </Link>
               <span className="text-slate-350 dark:text-slate-700">|</span>
-              <Link href="/blog" className="text-blue-600 dark:text-blue-400 font-semibold transition-colors hover:text-blue-850 dark:hover:text-blue-300">
+              <Link href="/blog" className="text-[#0060aa] dark:text-[#ff9d3b] font-semibold transition-colors hover:text-[#005291] dark:hover:text-[#ff8b12]">
                 Browse all AI learning guides
               </Link>
             </div>
@@ -258,8 +251,8 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Suggested Articles</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {relatedBlogs.map(related => (
-                  <Link href={`/blog/${related.slug}`} key={related.slug} className="group block p-5 rounded-xl bg-white dark:bg-[#0a0f1c] border border-slate-200 dark:border-white/10 hover:border-blue-300 dark:hover:border-blue-500/50 hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition duration-300 shadow-sm">
-                    <h3 className="text-[17px] font-semibold text-blue-750 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300 mb-2 leading-tight line-clamp-2">{related.title}</h3>
+                  <Link href={`/blog/${related.slug}`} key={related.slug} className="group block p-5 rounded-xl bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/20 hover:bg-slate-50/50 dark:hover:bg-[#0a0f1c]/90 transition duration-300 shadow-sm animate-fade-in">
+                    <h3 className="text-[17px] font-semibold text-slate-900 dark:text-white group-hover:text-[#0060aa] dark:group-hover:text-[#ff9d3b] mb-2 leading-tight line-clamp-2">{related.title}</h3>
                     <p className="text-sm text-slate-500 dark:text-slate-450 line-clamp-2 m-0">{related.shortDescription}</p>
                   </Link>
                 ))}
@@ -271,20 +264,20 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
       </article>
 
       {/* Mandatory CTA Section */}
-      <section className="relative w-full py-20 mt-10 bg-white dark:bg-[#020617] border-t border-slate-200 dark:border-slate-900">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent opacity-60" />
+      <section className="relative w-full py-20 mt-10 bg-transparent border-t border-slate-200/40 dark:border-white/5">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0060aa]/5 via-transparent to-transparent opacity-60" />
 
         <div className="container mx-auto px-6 relative z-10 text-center max-w-4xl">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 dark:border-blue-900/30 mb-8 bg-blue-50 dark:bg-blue-950/40">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-            <span className="text-[11px] sm:text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-widest">Next Steps</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-orange-200 bg-orange-50/70 text-[#ff8b12] dark:border-orange-900/30 dark:bg-orange-950/40 dark:text-[#ff9d3b] mb-8">
+            <span className="w-2 h-2 rounded-full bg-[#ff8b12] animate-pulse" />
+            <span className="text-[11px] sm:text-xs font-bold text-[#ff8b12] dark:text-[#ff9d3b] uppercase tracking-widest">Next Steps</span>
           </div>
 
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 mb-6">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mb-6">
             Join the Skillyug AI Bootcamp for Students (Classes 6–12)
           </h2>
 
-          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 font-light max-w-2xl mx-auto mb-12">
+          <p className="text-lg md:text-xl text-slate-655 dark:text-slate-350 font-light max-w-2xl mx-auto mb-12">
             Reserve your bootcamp seat and give your child the AI skills they
             need to stand out academically and creatively.
           </p>
@@ -292,7 +285,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full sm:w-auto">
             <Link
               href="/book-slot"
-              className="px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md block"
+              className="px-8 py-4 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] shadow-md block"
             >
               Reserve Your Bootcamp Spot
             </Link>
@@ -301,22 +294,22 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
       </section>
 
       {/* Shared Footer */}
-      <footer className="relative z-10 w-full bg-slate-50 dark:bg-[#020617] border-t border-slate-200/80 dark:border-slate-800/80 pt-8 pb-20 flex flex-col items-center">
-        <div className="bg-slate-100/50 dark:bg-slate-900/50 p-6 md:p-16 px-10 md:px-48 rounded-[2rem] md:rounded-[2.5rem] mb-16 backdrop-blur-sm overflow-hidden group border border-slate-200/50 dark:border-slate-800/50">
+      <footer className="relative z-10 w-full bg-transparent border-t border-slate-200/40 dark:border-white/5 pt-8 pb-20 flex flex-col items-center">
+        <div className="bg-white/80 dark:bg-[#0a0f1c]/80 p-6 md:p-16 px-10 md:px-48 rounded-[2rem] md:rounded-[2.5rem] mb-16 backdrop-blur-sm overflow-hidden group border border-slate-200/60 dark:border-white/5 shadow-sm">
           <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" width={300} height={150} className="h-14 md:h-36 w-auto object-contain scale-[1.8] md:scale-[2.0] transition-transform group-hover:scale-[2.4] duration-500 transform-gpu" />
         </div>
 
         <nav className="mb-6">
           <ul className="flex flex-wrap justify-center gap-6 text-sm font-semibold text-slate-500 dark:text-slate-400">
-            <li><Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</Link></li>
-            <li><Link href="/blog" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Blog</Link></li>
+            <li><Link href="/" className="hover:text-[#0060aa] dark:hover:text-[#ff9d3b] transition-colors">Home</Link></li>
+            <li><Link href="/blog" className="hover:text-[#0060aa] dark:hover:text-[#ff9d3b] transition-colors">Blog</Link></li>
           </ul>
         </nav>
 
         <div className="mb-8 flex gap-4 text-xs text-slate-400 dark:text-slate-500">
-          <Link href="/refund-policy" className="hover:text-slate-600 dark:hover:text-slate-350 transition-colors">Refund Policy</Link>
+          <Link href="/refund-policy" className="hover:text-slate-650 dark:hover:text-slate-350 transition-colors">Refund Policy</Link>
           <span>|</span>
-          <Link href="/terms-and-conditions" className="hover:text-slate-600 dark:hover:text-slate-350 transition-colors">Terms & Conditions</Link>
+          <Link href="/terms-and-conditions" className="hover:text-slate-655 dark:hover:text-slate-350 transition-colors">Terms & Conditions</Link>
         </div>
 
         <p className="text-xs font-mono text-slate-400 dark:text-slate-500 tracking-widest text-center">

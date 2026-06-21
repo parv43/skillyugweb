@@ -109,14 +109,14 @@ function RecoveryHandler() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
+    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center gap-4">
       {status === "processing" ? (
         <>
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-          <p className="text-slate-600 text-sm font-medium">Verifying your reset link…</p>
+          <Loader2 className="w-8 h-8 text-[#0060aa] dark:text-[#ff9d3b] animate-spin" />
+          <p className="text-slate-600 dark:text-slate-300 text-sm font-medium">Verifying your reset link…</p>
         </>
       ) : (
-        <p className="text-red-650 text-sm font-medium">Something went wrong. Redirecting…</p>
+        <p className="text-rose-600 dark:text-rose-450 text-sm font-medium">Something went wrong. Redirecting…</p>
       )}
     </div>
   )
@@ -126,8 +126,8 @@ export default function AuthRecoveryPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+        <div className="min-h-screen bg-transparent flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-[#0060aa] dark:text-[#ff9d3b] animate-spin" />
         </div>
       }
     >

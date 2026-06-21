@@ -49,12 +49,12 @@ export default function VoucherCard() {
             transition: isHovered ? "none" : "transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)",
             transformStyle: "preserve-3d"
           }}
-          className="relative w-full aspect-[1.6/1] bg-[#020617] rounded-[1.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(99,102,241,0.2)] transform-gpu group cursor-crosshair"
+          className="relative w-full aspect-[1.6/1] bg-[#020617] rounded-[1.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(255,139,18,0.2)] transform-gpu group cursor-crosshair"
         >
           <div 
             className="absolute inset-0 z-10 flex flex-col justify-between text-white p-5 md:p-8 rounded-[1.5rem] border border-white/10"
             style={{
-              background: "linear-gradient(135deg, rgba(99, 102, 241, 0.8) 0%, rgba(124, 58, 237, 0.8) 100%)",
+              background: "linear-gradient(135deg, rgba(0, 96, 170, 0.8) 0%, rgba(255, 139, 18, 0.8) 100%)",
               backdropFilter: "blur(10px)",
               WebkitBackdropFilter: "blur(10px)",
               boxShadow: "inset 0 0 20px rgba(255,255,255,0.1)"
@@ -64,7 +64,7 @@ export default function VoucherCard() {
             <div 
               className="absolute top-0 right-0 w-[60%] h-full z-0 pointer-events-none transition-transform duration-700 group-hover:scale-105"
               style={{
-                background: "linear-gradient(135deg, rgba(165, 180, 252, 0.4) 0%, rgba(196, 181, 253, 0.4) 100%)",
+                background: "linear-gradient(135deg, rgba(255, 237, 213, 0.2) 0%, rgba(219, 234, 254, 0.2) 100%)",
                 borderRadius: "40% 0 1.5rem 60%"
               }}
             ></div>
@@ -96,14 +96,14 @@ export default function VoucherCard() {
               <div className="bg-white/10 rounded-lg backdrop-blur-md border border-white/20 px-3 py-2 md:px-4 md:py-3 flex items-center shadow-lg">
                 <span className="font-mono tracking-widest font-bold text-[10px] md:text-xs flex items-center text-white/90">
                   <Lock className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 opacity-80" />
-                  CODE: <span className="text-white/40 ml-1 md:ml-2">XXXXX</span>
+                  CODE: <span className="text-white/60 ml-1 md:ml-2">XXXXX</span>
                 </span>
               </div>
             </div>
             
             {/* Decorative geometric element inside the card */}
             <div className="absolute bottom-[-10%] right-[-5%] w-32 h-32 bg-white/10 rounded-full blur-3xl z-0 pointer-events-none"></div>
-            <div className="absolute top-[-5%] left-[-5%] w-40 h-40 bg-indigo-500/30 rounded-full blur-3xl z-0 pointer-events-none"></div>
+            <div className="absolute top-[-5%] left-[-5%] w-40 h-40 bg-orange-500/20 rounded-full blur-3xl z-0 pointer-events-none"></div>
           </div>
         </div>
       </div>

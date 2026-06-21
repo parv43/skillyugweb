@@ -97,20 +97,20 @@ export default function SkillsSection() {
     <section
       ref={sectionRef}
       id="what-they-learn"
-      className="relative w-full py-16 md:py-32 bg-white dark:bg-[#020617] overflow-hidden flex flex-col items-center justify-center border-t border-slate-100 dark:border-slate-900 border-b"
+      className="relative w-full py-16 md:py-32 bg-transparent overflow-hidden flex flex-col items-center justify-center border-t border-slate-200/40 dark:border-white/5 border-b border-slate-200/40 dark:border-white/5"
     >
       {/* Background Layer with subtle Classroom Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img src="/classroom.webp" alt="Classroom Environment" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-slate-50/60 dark:bg-slate-950/85" />
+        <div className="absolute inset-0 bg-[#f8fafc]/75 dark:bg-[#020617]/90" />
       </div>
 
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-purple-500/0 to-transparent pointer-events-none rounded-full z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0060aa]/10 dark:from-[#0060aa]/15 via-[#ff8b12]/0 to-transparent pointer-events-none rounded-full z-10" />
 
       {/* Header */}
       <div className="w-full flex justify-center mb-10 md:mb-20 z-20 px-6">
         <div className="text-center max-w-[800px] w-full mx-auto">
-          <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 mb-4 md:mb-6 tracking-tight leading-tight">
+          <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mb-4 md:mb-6 tracking-tight leading-tight">
             What Students Will Actually Learn
           </h2>
           <p className="text-slate-600 dark:text-slate-350 text-base md:text-xl font-light">

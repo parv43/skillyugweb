@@ -109,18 +109,18 @@ export default function ContactUs() {
   };
 
   return (
-    <section className="relative w-full pt-24 pb-8 bg-white dark:bg-[#020617] overflow-hidden flex justify-center border-t border-slate-100 dark:border-slate-900 z-10" id="contact">
+    <section className="relative w-full pt-24 pb-8 bg-transparent overflow-hidden flex justify-center border-t border-slate-200/40 dark:border-white/5 z-10" id="contact">
       {/* Background Glows */}
-      <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none"></div>
-      <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-[#0060aa]/5 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-[#ff8b12]/5 blur-[120px] rounded-full pointer-events-none"></div>
       
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6">
         {/* Header Section */}
         <div className="text-center mb-16 relative">
-          <span className="inline-block px-4 py-1.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/40 dark:text-blue-400 text-sm font-bold tracking-widest mb-6 uppercase shadow-sm">
+          <span className="inline-block px-4 py-1.5 rounded-full border border-orange-200 bg-orange-50/70 text-[#ff8b12] dark:border-orange-900/30 dark:bg-orange-950/40 dark:text-[#ff9d3b] text-sm font-bold tracking-widest mb-6 uppercase shadow-sm">
             Reach Out
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.1]">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mb-6 drop-shadow-sm tracking-tight leading-tight">
             Contact Skillyug
           </h2>
           <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-light leading-relaxed">
@@ -132,8 +132,8 @@ export default function ContactUs() {
           
           {/* Contact Form Section */}
           <div className="lg:col-span-7">
-            <div className="bg-slate-50 border border-slate-200/80 rounded-[2rem] p-8 pb-10 md:p-10 relative overflow-hidden shadow-sm group dark:bg-[#0a0f1c] dark:border-white/10">
-              <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
+            <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 rounded-[2rem] p-8 pb-10 md:p-10 relative overflow-hidden shadow-sm group">
+              <div className="absolute -top-32 -right-32 w-64 h-64 bg-[#0060aa]/5 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
 
               <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                 <label htmlFor="contact-bot-check" className="sr-only">
@@ -170,7 +170,7 @@ export default function ContactUs() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-slate-800 placeholder:text-slate-400 dark:bg-[#020617] dark:border-white/10 dark:text-white dark:placeholder:text-slate-500" 
+                      className="w-full bg-white/70 border border-slate-200 rounded-xl px-5 py-4 focus:outline-none focus:border-[#ff8b12] focus:ring-1 focus:ring-[#ff8b12]/20 transition-all text-slate-800 placeholder:text-slate-400 dark:bg-[#020617]/70 dark:border-white/10 dark:text-white dark:placeholder:text-slate-500" 
                       placeholder="Full name" 
                       required
                     />
@@ -183,7 +183,7 @@ export default function ContactUs() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-slate-800 placeholder:text-slate-400 dark:bg-[#020617] dark:border-white/10 dark:text-white dark:placeholder:text-slate-500" 
+                      className="w-full bg-white/70 border border-slate-200 rounded-xl px-5 py-4 focus:outline-none focus:border-[#ff8b12] focus:ring-1 focus:ring-[#ff8b12]/20 transition-all text-slate-800 placeholder:text-slate-400 dark:bg-[#020617]/70 dark:border-white/10 dark:text-white dark:placeholder:text-slate-500" 
                       placeholder="+91 0000-0000" 
                       required
                     />
@@ -197,7 +197,7 @@ export default function ContactUs() {
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-slate-800 appearance-none dark:bg-[#020617] dark:border-white/10 dark:text-white"
+                    className="w-full bg-white/70 border border-slate-200 rounded-xl px-5 py-4 focus:outline-none focus:border-[#ff8b12] focus:ring-1 focus:ring-[#ff8b12]/20 transition-all text-slate-800 appearance-none dark:bg-[#020617]/70 dark:border-white/10 dark:text-white"
                   >
                     <option value="Select Option">Select Option</option>
                     <option value="Grade 6-8">Grade 6-8</option>
@@ -217,7 +217,7 @@ export default function ContactUs() {
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-slate-800 placeholder:text-slate-400 resize-none dark:bg-[#020617] dark:border-white/10 dark:text-white dark:placeholder:text-slate-500" 
+                    className="w-full bg-white/70 border border-slate-200 rounded-xl px-5 py-4 focus:outline-none focus:border-[#ff8b12] focus:ring-1 focus:ring-[#ff8b12]/20 transition-all text-slate-800 placeholder:text-slate-400 resize-none dark:bg-[#020617]/70 dark:border-white/10 dark:text-white dark:placeholder:text-slate-500" 
                     placeholder="How can we help you?" 
                     rows={4}
                     required
@@ -227,7 +227,7 @@ export default function ContactUs() {
                 <button 
                   type="submit" 
                   disabled={isSubmitting || isCheckingAuth}
-                  className="w-full glow-button bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-full font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_0_20px_rgba(59,130,246,0.3)] mt-2 disabled:opacity-50"
+                  className="w-full glow-button bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white py-4 rounded-full font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_0_20px_rgba(0,96,170,0.3)] mt-2 disabled:opacity-50"
                 >
                   {isCheckingAuth ? "Checking..." : isSubmitting ? "Sending..." : "Send Message"}
                 </button>
@@ -238,10 +238,10 @@ export default function ContactUs() {
           {/* Contact Info Section */}
           <div className="lg:col-span-5 space-y-6 pt-4 lg:pt-0">
             {/* Email Card */}
-            <div className="group p-8 rounded-[1.5rem] bg-slate-50 border border-slate-200 border-l-4 border-l-blue-500 hover:bg-slate-100/50 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative dark:bg-[#0a0f1c] dark:border-white/5 dark:hover:bg-[#0f172a]/50">
-              <div className="absolute right-0 top-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
+            <div className="group p-8 rounded-[1.5rem] bg-white/85 dark:bg-[#0a0f1c]/85 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 border-l-4 border-l-[#0060aa] dark:border-l-[#0060aa] hover:bg-slate-50/50 dark:hover:bg-[#0f172a]/55 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative">
+              <div className="absolute right-0 top-0 w-32 h-32 bg-[#0060aa]/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
               <div className="flex items-start gap-5 relative z-10">
-                <div className="bg-white p-4 rounded-2xl text-blue-600 shadow-sm border border-slate-205 dark:bg-white/5 dark:border-white/10 dark:text-blue-450">
+                <div className="bg-white p-4 rounded-2xl text-[#0060aa] shadow-sm border border-slate-100 dark:bg-white/5 dark:border-white/10 dark:text-[#ff9d3b]">
                   <Mail className="w-7 h-7" />
                 </div>
                 <div>
@@ -253,10 +253,10 @@ export default function ContactUs() {
             </div>
 
             {/* Phone Card */}
-            <div className="group p-8 rounded-[1.5rem] bg-slate-50 border border-slate-200 border-l-4 border-l-purple-500 hover:bg-slate-100/50 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative dark:bg-[#0a0f1c] dark:border-white/5 dark:hover:bg-[#0f172a]/50">
-              <div className="absolute right-0 top-0 w-32 h-32 bg-purple-500/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
+            <div className="group p-8 rounded-[1.5rem] bg-white/85 dark:bg-[#0a0f1c]/85 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 border-l-4 border-l-[#ff8b12] dark:border-l-[#ff8b12] hover:bg-slate-50/50 dark:hover:bg-[#0f172a]/55 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative">
+              <div className="absolute right-0 top-0 w-32 h-32 bg-[#ff8b12]/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
               <div className="flex items-start gap-5 relative z-10">
-                <div className="bg-white p-4 rounded-2xl text-purple-600 shadow-sm border border-slate-205 dark:bg-white/5 dark:border-white/10 dark:text-purple-450">
+                <div className="bg-white p-4 rounded-2xl text-[#ff8b12] shadow-sm border border-slate-100 dark:bg-white/5 dark:border-white/10 dark:text-[#ff9d3b]">
                   <Phone className="w-7 h-7" />
                 </div>
                 <div>
@@ -272,11 +272,11 @@ export default function ContactUs() {
               href="https://www.linkedin.com/company/skillyug-official/"
               target="_blank"
               rel="noopener noreferrer"
-              className="group block p-8 rounded-[1.5rem] bg-slate-50 border border-slate-200 border-l-4 border-l-sky-500 hover:bg-slate-100/50 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative dark:bg-[#0a0f1c] dark:border-white/5 dark:hover:bg-[#0f172a]/50"
+              className="group block p-8 rounded-[1.5rem] bg-white/85 dark:bg-[#0a0f1c]/85 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 border-l-4 border-l-[#0060aa] dark:border-l-[#0060aa] hover:bg-slate-50/50 dark:hover:bg-[#0f172a]/55 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative"
             >
-              <div className="absolute right-0 top-0 w-32 h-32 bg-sky-500/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
+              <div className="absolute right-0 top-0 w-32 h-32 bg-[#0060aa]/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
               <div className="flex items-start gap-5 relative z-10">
-                <div className="bg-white p-4 rounded-2xl text-sky-600 shadow-sm border border-slate-205 dark:bg-white/5 dark:border-white/10 dark:text-sky-450">
+                <div className="bg-white p-4 rounded-2xl text-[#0060aa] shadow-sm border border-slate-100 dark:bg-white/5 dark:border-white/10 dark:text-[#ff9d3b]">
                   <Linkedin className="w-7 h-7" />
                 </div>
                 <div>

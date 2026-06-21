@@ -11,10 +11,10 @@ function MobileHero() {
   const { isLoggedIn, hasSlot, loading } = useAccessControl()
 
   return (
-    <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-white dark:bg-[#0a0f1c] overflow-hidden">
+    <section className="relative min-h-[90vh] pt-[120px] pb-0 flex flex-col justify-start bg-transparent overflow-hidden">
       {/* Subtle Background Glows matching the screenshot */}
       <div className="absolute inset-0 pointer-events-none -z-10">
-        <div className="absolute top-[5%] left-[0%] w-[300px] h-[300px] bg-purple-600/5 dark:bg-purple-600/10 rounded-full blur-[100px]" />
+        <div className="absolute top-[5%] left-[0%] w-[300px] h-[300px] bg-[#0060aa]/10 dark:bg-[#0060aa]/15 rounded-full blur-[100px]" />
       </div>
 
       <div className="px-6 relative z-20 w-full flex flex-col items-start text-left">
@@ -22,7 +22,7 @@ function MobileHero() {
         <h2
           className="text-[38px] font-extrabold leading-[1.2] tracking-tight mb-5 text-slate-900 dark:text-white"
         >
-          Help your child build <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-fuchsia-600 dark:from-blue-400 dark:via-indigo-400 dark:to-fuchsia-400">
+          Help your child build <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12]">
             AI skills that improve study, projects, and creative confidence.
           </span>
         </h2>
@@ -40,8 +40,8 @@ function MobileHero() {
                 href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
                 className="flex-[1.25] py-4 px-4 rounded-full text-[15px] sm:text-[17px] font-bold text-white text-center active:scale-95 transition-transform flex items-center justify-center"
                 style={{ 
-                  background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
-                  boxShadow: "0 4px 20px rgba(139,92,246,0.3)" 
+                  background: "linear-gradient(90deg, #0060aa 0%, #ff8b12 100%)",
+                  boxShadow: "0 4px 20px rgba(255,139,18,0.2)" 
                 }}
               >
                 Join Bootcamp
@@ -114,7 +114,7 @@ export default function HeroSection() {
       </div>
 
       {/* ── Responsive Unified Hero Section (Desktop only: md and up) ── */}
-      <section className="hidden md:flex relative w-full min-h-[90vh] lg:min-h-[95vh] items-center bg-white dark:bg-[#0a0f1c] overflow-hidden pt-24 pb-20">
+      <section className="hidden md:flex relative w-full min-h-[90vh] lg:min-h-[95vh] items-center bg-transparent overflow-hidden pt-24 pb-20">
         
         {/* Full-bleed Background Image with priority loading for LCP optimization */}
         <div className="absolute inset-0 pointer-events-none z-0">
@@ -129,13 +129,13 @@ export default function HeroSection() {
           
           {/* Gradients for text legibility and page transition */}
           {/* Desktop Left-to-Right Fade */}
-          <div className="absolute inset-y-0 left-0 w-full lg:w-[65%] bg-gradient-to-r from-white via-white/90 to-transparent dark:from-[#0a0f1c] dark:via-[#0a0f1c]/95 dark:to-transparent z-10 pointer-events-none hidden md:block" />
+          <div className="absolute inset-y-0 left-0 w-full lg:w-[65%] bg-gradient-to-r from-[#f8fafc] via-[#f8fafc]/90 to-transparent dark:from-[#020617] dark:via-[#020617]/95 dark:to-transparent z-10 pointer-events-none hidden md:block" />
           
           {/* Mobile Full-screen Soft Fade & Bottom Blend */}
-          <div className="absolute inset-0 bg-white/75 dark:bg-[#0a0f1c]/75 md:hidden z-10 pointer-events-none" />
+          <div className="absolute inset-0 bg-[#f8fafc]/75 dark:bg-[#020617]/75 md:hidden z-10 pointer-events-none" />
           
           {/* Bottom Edge Blend (faded backing for the cloud border) */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent dark:from-[#0a0f1c] dark:to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#f8fafc] to-transparent dark:from-[#020617] dark:to-transparent z-10 pointer-events-none" />
         </div>
 
 
@@ -342,16 +342,16 @@ export default function HeroSection() {
           <div className="w-full lg:max-w-[48%] xl:max-w-[48%] flex flex-col items-center md:items-start text-center md:text-left">
             
             {/* Top Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5 shadow-sm mb-6">
-              <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-              <span className="text-[10px] sm:text-xs font-bold text-blue-700 dark:text-blue-200 uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-orange-205 dark:border-orange-950/30 bg-orange-50/50 dark:bg-orange-950/20 shadow-sm mb-6">
+              <span className="w-2 h-2 rounded-full bg-[#ff8b12] animate-pulse" />
+              <span className="text-[10px] sm:text-xs font-bold text-[#ff8b12] dark:text-[#ff9d3b] uppercase tracking-widest">
                 Skillyug Summer AI Bootcamp • Classes 6–12
               </span>
             </div>
 
             <h1 className="text-[34px] sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-br dark:from-white dark:via-slate-200 dark:to-slate-400 mb-6 drop-shadow-sm tracking-tight leading-[1.2]">
               Give Your Child the AI Tools<br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12]">
                 They Need to Build Real World Things
               </span>
             </h1>
@@ -366,10 +366,10 @@ export default function HeroSection() {
               {!loading && !hasSlot && (
                 <Link 
                   href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
-                  className="glow-button px-8 py-4 rounded-full text-white font-bold text-[16px] sm:text-lg hover:scale-105 transition-transform w-full sm:w-auto text-center inline-block"
+                  className="px-8 py-4 rounded-full text-white font-bold text-[16px] sm:text-lg hover:scale-105 transition-all w-full sm:w-auto text-center inline-block shadow-lg hover:shadow-orange-500/10"
                   style={{
-                    background: "linear-gradient(90deg, #4b6cb7 0%, #8b5cf6 100%)",
-                    boxShadow: "0 4px 20px rgba(139,92,246,0.3)"
+                    background: "linear-gradient(90deg, #0060aa 0%, #ff8b12 100%)",
+                    boxShadow: "0 4px 20px rgba(255,139,18,0.2)"
                   }}
                 >
                   Join the Bootcamp
@@ -391,7 +391,7 @@ export default function HeroSection() {
       {/* Sticky Floating CTA Button */}
       <a
         href="tel:7835049710"
-        className={`fixed bottom-24 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 border border-blue-400/20 ${
+        className={`fixed bottom-24 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 border border-orange-400/20 ${
           showSticky ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"
         }`}
         title="Talk to Advisor"

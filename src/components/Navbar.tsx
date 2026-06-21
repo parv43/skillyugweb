@@ -227,7 +227,7 @@ export default function Navbar() {
                 </Link>
                 <Link 
                   href="/signup" 
-                  className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_4px_15px_rgba(59,130,246,0.35)] hover:shadow-[0_6px_20px_rgba(139,92,246,0.45)] hover:scale-105 transition-all duration-300 block border border-blue-500/20"
+                  className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] shadow-[0_4px_15px_rgba(0,96,170,0.25)] hover:shadow-[0_6px_20px_rgba(255,139,18,0.35)] hover:scale-105 transition-all duration-300 block border border-orange-500/20"
                 >
                   Sign up
                 </Link>
