@@ -127,8 +127,8 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Bootcamp", href: "/bootcamp" },
-    { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI bootcamp" },
+    { name: "Courses", href: "/courses" },
+    { name: "Ask AI", href: "/#ask-ai", ariaLabel: "Ask questions about the AI courses" },
     { name: "Testimonials", href: "/#testimonials" },
     { name: "Blog", href: "/blog" },
   ]

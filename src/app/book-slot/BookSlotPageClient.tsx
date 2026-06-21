@@ -75,7 +75,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromParam = searchParams.get("from");
-  const paymentTier = fromParam === "bootcamp" ? "full" : "partial";
+  const paymentTier = (fromParam === "bootcamp" || fromParam === "courses") ? "full" : "partial";
   const displayAmount = paymentTier === "full" ? FULL_BOOK_SLOT_AMOUNT_RUPEES : PARTIAL_BOOK_SLOT_AMOUNT_RUPEES;
   const [errorMsg, setErrorMsg] = useState("");
   const [gatewayNotice, setGatewayNotice] = useState("");
@@ -414,7 +414,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           >
             <div className="mb-6">
               <Link
-                href={fromParam === "bootcamp" ? "/bootcamp" : "/"}
+                href={fromParam === "courses" ? "/courses" : fromParam === "bootcamp" ? "/bootcamp" : "/"}
                 className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-450 dark:hover:text-white transition-colors font-headline font-bold text-sm group w-fit"
               >
                 <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">

@@ -2,33 +2,18 @@
 > skillyugweb1.0@0.1.0 dev
 > next dev
 
-▲ Next.js 16.1.6 (Turbopack)
-- Local:         http://localhost:3000
-- Network:       http://192.168.0.176:3000
+⚠ Port 3000 is in use by process 8660, using available port 3002 instead.
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3002
+- Network:       http://192.168.0.100:3002
 - Environments: .env.local
+✓ Ready in 286ms
+⨯ Another next dev server is already running.
 
-✓ Starting...
-✓ Ready in 558ms
- GET /my-batch 200 in 657ms (compile: 566ms, render: 91ms)
- GET /api/my-batch/access 200 in 922ms (compile: 94ms, render: 828ms)
- GET /api/my-batch/access 200 in 289ms (compile: 9ms, render: 281ms)
- GET /api/my-batch/access 200 in 294ms (compile: 4ms, render: 291ms)
-✓ Compiled in 51ms
- GET /api/my-batch/access 200 in 652ms (compile: 19ms, render: 633ms)
- GET /my-batch 200 in 119ms (compile: 42ms, render: 76ms)
- GET /api/my-batch/access 200 in 728ms (compile: 1414µs, render: 727ms)
- GET /api/my-batch/access 200 in 290ms (compile: 1672µs, render: 288ms)
- GET /api/my-batch/access 200 in 331ms (compile: 3ms, render: 328ms)
-✓ Compiled in 63ms
- GET /api/my-batch/access 200 in 726ms (compile: 4ms, render: 723ms)
- GET /api/my-batch/access 200 in 894ms (compile: 9ms, render: 884ms)
-✓ Compiled in 56ms
- GET /api/my-batch/access 200 in 618ms (compile: 5ms, render: 613ms)
- GET /api/my-batch/access 200 in 716ms (compile: 6ms, render: 710ms)
- GET /api/my-batch/access 200 in 7.1s (compile: 4ms, render: 7.1s)
- GET /api/my-batch/access 200 in 525ms (compile: 7ms, render: 517ms)
- GET /api/my-batch/access 200 in 832ms (compile: 37ms, render: 796ms)
- GET /api/my-batch/access 200 in 954ms (compile: 3ms, render: 951ms)
- GET /api/my-batch/access 200 in 299ms (compile: 6ms, render: 292ms)
- GET /api/my-batch/access 200 in 722ms (compile: 94ms, render: 628ms)
+- Local:        http://localhost:3000
+- PID:          8660
+- Dir:          /Users/tanujpathak/Desktop/skillyugweb-new
+- Log:          .next/dev/logs/next-development.log
+
+Run kill 8660 to stop it.
 [?25h
