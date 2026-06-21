@@ -751,7 +751,7 @@ export default function MyBatchPage() {
 
           {/* Top Section: Profile & Circular Progress */}
           <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
-            <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-6 md:p-10 shadow-sm self-start dark:border-white/5">
+            <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 md:p-6 md:p-10 shadow-sm self-start dark:border-white/5">
               <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-[#ff8b12] dark:text-[#ff9d3b]">
                 <span className="rounded-full border border-orange-200/60 bg-orange-50/50 px-4 py-2 dark:bg-[#ff8b12]/10 dark:border-[#ff8b12]/20 text-[#ff8b12] dark:text-[#ff9d3b]">
                   My Batch Workspace
@@ -782,7 +782,7 @@ export default function MyBatchPage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-8 shadow-sm flex flex-col items-center justify-center relative dark:border-white/5">
+            <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 md:p-8 shadow-sm flex flex-col items-center justify-center relative dark:border-white/5">
               <p className="absolute top-6 left-6 md:top-8 md:left-8 text-[11px] font-bold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
                 Bootcamp Progress
               </p>
@@ -808,12 +808,12 @@ export default function MyBatchPage() {
 
           {/* Middle Section 1: Next Live Session & Locked Certificate */}
           <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-2">
-            <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-8 shadow-sm dark:border-white/5">
+            <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 md:p-8 shadow-sm dark:border-white/5">
               <div className="flex items-center gap-3">
                 <Calendar className="h-6 w-6 text-[#ff8b12] dark:text-[#ff9d3b]" />
                 <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Next Live Session</h2>
               </div>
-              <div className="mt-8 rounded-[1.5rem] border border-slate-200/60 dark:border-white/5 bg-white/40 dark:bg-white/5 backdrop-filter blur-sm p-6 md:p-8 flex flex-col justify-between min-h-[200px]">
+              <div className="mt-8 rounded-[1.5rem] border border-slate-200/60 dark:border-white/5 bg-white/40 dark:bg-white/5 backdrop-blur-sm p-6 md:p-8 flex flex-col justify-between min-h-[200px]">
                 {nextSession ? (
                   <>
                     <div>
@@ -933,7 +933,7 @@ export default function MyBatchPage() {
               </div>
             ) : (
               /* Locked Certificate — shown to everyone else */
-              <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-center dark:border-white/5">
+              <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-center dark:border-white/5">
                 {/* Blurred background content */}
                 <div className="absolute inset-0 p-6 md:p-8 blur-[10px] opacity-40 pointer-events-none select-none flex flex-col justify-center transition-all duration-500 hover:blur-[6px] hover:opacity-60">
                   <div className="flex items-start justify-between gap-4">
@@ -970,7 +970,7 @@ export default function MyBatchPage() {
           </div>
 
           {/* Middle Section 2: Resource Library */}
-          <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-8 shadow-sm dark:border-white/5">
+          <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 md:p-8 shadow-sm dark:border-white/5">
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-5">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
@@ -1020,10 +1020,10 @@ export default function MyBatchPage() {
           </div>
 
           {/* Middle Section 3: Secure Video Player */}
-          <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-4 shadow-sm overflow-hidden dark:border-white/5">
+          <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-4 shadow-sm overflow-hidden dark:border-white/5">
             <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[600px]">
               {/* Left Side: Video List (30%) */}
-              <div className="lg:w-[30%] bg-white/40 dark:bg-white/5 backdrop-filter blur-sm rounded-3xl border border-slate-200/60 dark:border-white/5 p-4 flex flex-col h-[300px] lg:h-full">
+              <div className="lg:w-[30%] bg-white/40 dark:bg-white/5 backdrop-blur-sm rounded-3xl border border-slate-200/60 dark:border-white/5 p-4 flex flex-col h-[300px] lg:h-full">
                 <div className="px-4 py-3 border-b border-slate-200 dark:border-white/5 mb-4 flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-black text-slate-900 dark:text-white">Session Recordings</h3>
@@ -1146,7 +1146,7 @@ export default function MyBatchPage() {
                 </div>
 
                 {/* Custom Controls */}
-                <div className="bg-[#0a0f1c]/90 backdrop-filter blur-sm p-4 flex flex-col justify-center z-40 border-t border-slate-800/80 h-[25%] lg:h-[20%]">
+                <div className="bg-[#0a0f1c]/90 backdrop-blur-sm p-4 flex flex-col justify-center z-40 border-t border-slate-800/80 h-[25%] lg:h-[20%]">
                   {activeVideo.videoId ? (
                     <div className="w-full flex flex-col gap-3">
                       {/* Timeline Slider with custom tracks */}

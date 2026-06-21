@@ -64,7 +64,7 @@ export default async function BlogListingPage() {
 
         {/* Featured Article */}
         {featuredBlog && (
-          <div className="mb-20 group relative rounded-[24px] overflow-hidden bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 shadow-md transition-all duration-300 hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/20 hover:shadow-lg hover:-translate-y-1">
+          <div className="mb-20 group relative rounded-[24px] overflow-hidden bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 shadow-md transition-all duration-300 hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/20 hover:shadow-lg hover:-translate-y-1">
             <div className="flex flex-col lg:flex-row">
               <div className="w-full lg:w-1/2 aspect-video lg:aspect-auto h-64 lg:h-auto overflow-hidden relative">
                 <Image

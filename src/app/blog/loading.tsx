@@ -15,7 +15,7 @@ export default function BlogLoading() {
         </div>
 
         {/* Featured card skeleton */}
-        <div className="mb-20 rounded-[24px] overflow-hidden bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 shadow-sm">
+        <div className="mb-20 rounded-[24px] overflow-hidden bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 shadow-sm">
           <div className="flex flex-col lg:flex-row">
             <div className="w-full lg:w-1/2 h-64 bg-slate-200 dark:bg-slate-800 animate-pulse" />
             <div className="w-full lg:w-1/2 p-8 lg:p-12 space-y-4">
@@ -31,7 +31,7 @@ export default function BlogLoading() {
         {/* Blog grid skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="rounded-[20px] bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 overflow-hidden shadow-sm">
+            <div key={i} className="rounded-[20px] bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 overflow-hidden shadow-sm">
               <div className="w-full h-48 bg-slate-200 dark:bg-slate-800 animate-pulse" />
               <div className="p-6 space-y-3">
                 <div className="h-3 w-1/3 rounded bg-slate-200 dark:bg-slate-700 animate-pulse" />

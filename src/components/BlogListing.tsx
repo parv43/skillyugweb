@@ -49,7 +49,7 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
             <div key={blog.slug}>
               <Link 
                 href={`/blog/${blog.slug}`} 
-                className="group flex flex-col h-full rounded-[20px] bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 overflow-hidden transition-all duration-300 hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/20 hover:shadow-md hover:-translate-y-1.5"
+                className="group flex flex-col h-full rounded-[20px] bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 overflow-hidden transition-all duration-300 hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/20 hover:shadow-md hover:-translate-y-1.5"
                 aria-label={`Read ${blog.title}`}
               >
                 <div className="w-full h-48 overflow-hidden relative">

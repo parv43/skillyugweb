@@ -108,7 +108,7 @@ function SignUpForm() {
           </div>
 
           <div className="w-full max-w-xl z-10">
-            <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 p-8 md:p-12 rounded-[2rem] shadow-lg relative overflow-hidden text-center">
+            <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 p-8 md:p-12 rounded-[2rem] shadow-lg relative overflow-hidden text-center">
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#0060aa]/5 blur-3xl"></div>
 
               {/* Icon */}
@@ -183,7 +183,7 @@ function SignUpForm() {
           </div>
 
           {/* Signup Card */}
-          <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 rounded-xl p-8 md:p-12 shadow-lg relative overflow-hidden">
+          <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 rounded-xl p-8 md:p-12 shadow-lg relative overflow-hidden">
             {/* Internal Glow */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#0060aa]/5 blur-[80px] rounded-full pointer-events-none"></div>
 

@@ -141,7 +141,7 @@ export default function AdminCommentDashboard() {
   if (isAdmin === false) {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center p-6">
-        <div className="text-center max-w-md bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 p-8 rounded-3xl shadow-lg">
+        <div className="text-center max-w-md bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 p-8 rounded-3xl shadow-lg">
           <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-rose-500 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -157,7 +157,7 @@ export default function AdminCommentDashboard() {
   return (
     <div className="min-h-screen bg-transparent text-slate-800 dark:text-slate-200 font-sans">
       {/* Top bar */}
-      <header className="sticky top-0 z-20 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border-b border-slate-200/60 dark:border-white/5 px-6 py-4">
+      <header className="sticky top-0 z-20 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border-b border-slate-200/60 dark:border-white/5 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4 flex-wrap">
           <div>
             <p className="text-[10px] font-bold text-[#ff8b12] dark:text-[#ff9d3b] uppercase tracking-widest mb-0.5">Skillyug Admin</p>
@@ -208,7 +208,7 @@ export default function AdminCommentDashboard() {
         {isLoading && (
           <div className="space-y-3 animate-pulse">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="rounded-xl border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-4 flex gap-3">
+              <div key={i} className="rounded-xl border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-4 flex gap-3">
                 <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 flex-shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-3 bg-slate-200 dark:bg-white/10 rounded w-40" />
@@ -286,7 +286,7 @@ function AdminCommentRow({
 }) {
   return (
     <article
-      className={`group rounded-xl border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md hover:bg-white dark:hover:bg-[#0a0f1c] hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/30 p-4 flex gap-3 transition-all ${
+      className={`group rounded-xl border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md hover:bg-white dark:hover:bg-[#0a0f1c] hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/30 p-4 flex gap-3 transition-all ${
         isDeleting ? "opacity-40 pointer-events-none" : ""
       }`}
     >

@@ -157,7 +157,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
                   </h2>
                   <div className="space-y-6 mb-12">
                     {blog.content.tools.map((tool, idx) => (
-                      <div key={idx} className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 rounded-[16px] p-6 hover:bg-white dark:hover:bg-[#0a0f1c]/90 transition-colors">
+                      <div key={idx} className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 rounded-[16px] p-6 hover:bg-white dark:hover:bg-[#0a0f1c]/90 transition-colors">
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center">
                           <span className="w-8 h-8 rounded-full bg-orange-50 text-[#ff8b12] border border-orange-200 dark:bg-orange-950/40 dark:text-[#ff9d3b] dark:border-orange-900/30 flex items-center justify-center text-sm mr-3 font-mono">
                             {idx + 1}
@@ -203,7 +203,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
             </>
           )}
 
-          <div className="rounded-[1.75rem] border border-orange-200/60 dark:border-white/5 bg-gradient-to-br from-orange-50/40 via-white/80 to-blue-50/40 dark:from-orange-950/10 dark:via-[#0a0f1c]/80 dark:to-blue-950/10 backdrop-filter blur-md p-6 md:p-8 shadow-sm">
+          <div className="rounded-[1.75rem] border border-orange-200/60 dark:border-white/5 bg-gradient-to-br from-orange-50/40 via-white/80 to-blue-50/40 dark:from-orange-950/10 dark:via-[#0a0f1c]/80 dark:to-blue-950/10 backdrop-blur-md p-6 md:p-8 shadow-sm">
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#ff8b12] dark:text-[#ff9d3b]">
               Continue With Skillyug
             </p>
@@ -251,7 +251,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Suggested Articles</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {relatedBlogs.map(related => (
-                  <Link href={`/blog/${related.slug}`} key={related.slug} className="group block p-5 rounded-xl bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/20 hover:bg-slate-50/50 dark:hover:bg-[#0a0f1c]/90 transition duration-300 shadow-sm animate-fade-in">
+                  <Link href={`/blog/${related.slug}`} key={related.slug} className="group block p-5 rounded-xl bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/20 hover:bg-slate-50/50 dark:hover:bg-[#0a0f1c]/90 transition duration-300 shadow-sm animate-fade-in">
                     <h3 className="text-[17px] font-semibold text-slate-900 dark:text-white group-hover:text-[#0060aa] dark:group-hover:text-[#ff9d3b] mb-2 leading-tight line-clamp-2">{related.title}</h3>
                     <p className="text-sm text-slate-500 dark:text-slate-450 line-clamp-2 m-0">{related.shortDescription}</p>
                   </Link>

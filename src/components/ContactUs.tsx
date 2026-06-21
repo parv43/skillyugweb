@@ -132,7 +132,7 @@ export default function ContactUs() {
           
           {/* Contact Form Section */}
           <div className="lg:col-span-7">
-            <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 rounded-[2rem] p-8 pb-10 md:p-10 relative overflow-hidden shadow-sm group">
+            <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 rounded-[2rem] p-8 pb-10 md:p-10 relative overflow-hidden shadow-sm group">
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-[#0060aa]/5 blur-[80px] rounded-full transition-opacity opacity-50 group-hover:opacity-100"></div>
 
               <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
@@ -238,7 +238,7 @@ export default function ContactUs() {
           {/* Contact Info Section */}
           <div className="lg:col-span-5 space-y-6 pt-4 lg:pt-0">
             {/* Email Card */}
-            <div className="group p-8 rounded-[1.5rem] bg-white/85 dark:bg-[#0a0f1c]/85 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 border-l-4 border-l-[#0060aa] dark:border-l-[#0060aa] hover:bg-slate-50/50 dark:hover:bg-[#0f172a]/55 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative">
+            <div className="group p-8 rounded-[1.5rem] bg-white/85 dark:bg-[#0a0f1c]/85 backdrop-blur-md border border-slate-200/60 dark:border-white/5 border-l-4 border-l-[#0060aa] dark:border-l-[#0060aa] hover:bg-slate-50/50 dark:hover:bg-[#0f172a]/55 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative">
               <div className="absolute right-0 top-0 w-32 h-32 bg-[#0060aa]/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
               <div className="flex items-start gap-5 relative z-10">
                 <div className="bg-white p-4 rounded-2xl text-[#0060aa] shadow-sm border border-slate-100 dark:bg-white/5 dark:border-white/10 dark:text-[#ff9d3b]">
@@ -253,7 +253,7 @@ export default function ContactUs() {
             </div>
 
             {/* Phone Card */}
-            <div className="group p-8 rounded-[1.5rem] bg-white/85 dark:bg-[#0a0f1c]/85 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 border-l-4 border-l-[#ff8b12] dark:border-l-[#ff8b12] hover:bg-slate-50/50 dark:hover:bg-[#0f172a]/55 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative">
+            <div className="group p-8 rounded-[1.5rem] bg-white/85 dark:bg-[#0a0f1c]/85 backdrop-blur-md border border-slate-200/60 dark:border-white/5 border-l-4 border-l-[#ff8b12] dark:border-l-[#ff8b12] hover:bg-slate-50/50 dark:hover:bg-[#0f172a]/55 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative">
               <div className="absolute right-0 top-0 w-32 h-32 bg-[#ff8b12]/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
               <div className="flex items-start gap-5 relative z-10">
                 <div className="bg-white p-4 rounded-2xl text-[#ff8b12] shadow-sm border border-slate-100 dark:bg-white/5 dark:border-white/10 dark:text-[#ff9d3b]">
@@ -272,7 +272,7 @@ export default function ContactUs() {
               href="https://www.linkedin.com/company/skillyug-official/"
               target="_blank"
               rel="noopener noreferrer"
-              className="group block p-8 rounded-[1.5rem] bg-white/85 dark:bg-[#0a0f1c]/85 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 border-l-4 border-l-[#0060aa] dark:border-l-[#0060aa] hover:bg-slate-50/50 dark:hover:bg-[#0f172a]/55 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative"
+              className="group block p-8 rounded-[1.5rem] bg-white/85 dark:bg-[#0a0f1c]/85 backdrop-blur-md border border-slate-200/60 dark:border-white/5 border-l-4 border-l-[#0060aa] dark:border-l-[#0060aa] hover:bg-slate-50/50 dark:hover:bg-[#0f172a]/55 hover:shadow-sm hover:-translate-y-1 transition-all overflow-hidden relative"
             >
               <div className="absolute right-0 top-0 w-32 h-32 bg-[#0060aa]/5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 transition-opacity opacity-0 group-hover:opacity-100"></div>
               <div className="flex items-start gap-5 relative z-10">

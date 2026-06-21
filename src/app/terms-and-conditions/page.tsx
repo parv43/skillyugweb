@@ -54,7 +54,7 @@ export default function TermsAndConditions() {
 
       {/* Shared Footer */}
       <footer className="relative z-10 w-full bg-transparent border-t border-slate-200/60 dark:border-white/5 pt-8 pb-20 flex flex-col items-center">
-        <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md p-6 md:p-16 px-10 md:px-48 rounded-[2rem] md:rounded-[2.5rem] mb-16 overflow-hidden group border border-slate-200/60 dark:border-white/5 shadow-sm">
+        <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 md:p-16 px-10 md:px-48 rounded-[2rem] md:rounded-[2.5rem] mb-16 overflow-hidden group border border-slate-200/60 dark:border-white/5 shadow-sm">
           <Image src="/skillyug-optimized.svg" alt="Skillyug Logo" width={300} height={150} className="h-14 md:h-36 w-auto object-contain scale-[1.8] md:scale-[2.0] transition-transform group-hover:scale-[2.4] duration-500 transform-gpu" />
         </div>
 

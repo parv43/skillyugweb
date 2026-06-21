@@ -62,7 +62,7 @@ export default function ProfilePage() {
           </Link>
 
           {/* Card Container */}
-          <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 rounded-2xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
+          <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 rounded-2xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
             
             {/* Header section */}
             <div className="flex justify-between items-start mb-8">
@@ -118,7 +118,7 @@ export default function ProfilePage() {
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white/90 dark:bg-[#0a0f1c]/90 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 rounded-2xl p-6 w-full max-w-sm shadow-xl animate-in zoom-in-95 duration-200">
+          <div className="bg-white/90 dark:bg-[#0a0f1c]/90 backdrop-blur-md border border-slate-200/60 dark:border-white/5 rounded-2xl p-6 w-full max-w-sm shadow-xl animate-in zoom-in-95 duration-200">
             <div className="flex flex-col items-center text-center">
               <div className="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-950/40 flex items-center justify-center text-rose-500 dark:text-rose-450 mb-4">
                 <AlertTriangle size={24} />

@@ -47,7 +47,7 @@ export default async function VerifyCertificatePage({ params }: { params: { cert
           </h1>
 
           {isValid ? (
-            <div className="mt-12 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-filter blur-md border border-slate-200/60 dark:border-white/5 shadow-lg p-8 md:p-12 rounded-[2.5rem] text-left">
+            <div className="mt-12 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 shadow-lg p-8 md:p-12 rounded-[2.5rem] text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-8">
                   <div>
