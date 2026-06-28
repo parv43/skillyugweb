@@ -140,7 +140,7 @@ export default function MobileNavbar() {
                 >
                   {isActive ? (
                     <div
-                      className={`flex items-center gap-1.5 text-blue-600 dark:text-blue-400 bg-blue-500/15 dark:bg-blue-400/15 rounded-full transition-all duration-300 transform-gpu scale-105 ${
+                      className={`flex items-center gap-1.5 text-[#ff8b12] dark:text-[#ff9d3b] bg-[#ff8b12]/10 dark:bg-[#ff8b12]/15 rounded-full transition-all duration-300 transform-gpu scale-105 ${
                         scrolled ? "py-1.5 px-3.5 text-sm" : "py-1 px-2.5 text-xs"
                       }`}
                     >
@@ -185,7 +185,7 @@ export default function MobileNavbar() {
             >
               {isActive ? (
                 <div
-                  className={`flex items-center gap-1.5 text-blue-600 dark:text-blue-400 bg-blue-500/15 dark:bg-blue-400/15 rounded-full transition-all duration-300 transform-gpu scale-105 ${
+                  className={`flex items-center gap-1.5 text-[#ff8b12] dark:text-[#ff9d3b] bg-[#ff8b12]/10 dark:bg-[#ff8b12]/15 rounded-full transition-all duration-300 transform-gpu scale-105 ${
                     scrolled ? "py-1.5 px-3.5 text-sm" : "py-1 px-2.5 text-xs"
                   }`}
                 >

@@ -33,8 +33,8 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
               onClick={() => setActiveCategory(cat)}
               className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                 isActive
-                  ? "bg-blue-600 text-white border border-blue-600 shadow-sm" 
-                  : "bg-white text-slate-650 border border-slate-200 hover:text-slate-900 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-350 dark:border-slate-805 dark:hover:text-white dark:hover:bg-slate-800 shadow-sm"
+                  ? "bg-gradient-to-r from-[#0060aa] to-[#ff8b12] text-white shadow-sm border-none" 
+                  : "bg-white/70 text-slate-600 border border-slate-200 hover:text-slate-900 hover:bg-slate-50/80 dark:bg-slate-900/60 dark:text-slate-350 dark:border-white/5 dark:hover:text-white dark:hover:bg-slate-800/80 shadow-sm"
               }`}
             >
               {cat}
@@ -49,7 +49,7 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
             <div key={blog.slug}>
               <Link 
                 href={`/blog/${blog.slug}`} 
-                className="group flex flex-col h-full rounded-[20px] bg-white dark:bg-[#0a0f1c] border border-slate-200 dark:border-white/10 overflow-hidden transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-md hover:-translate-y-1.5"
+                className="group flex flex-col h-full rounded-[20px] bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 overflow-hidden transition-all duration-300 hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/20 hover:shadow-md hover:-translate-y-1.5"
                 aria-label={`Read ${blog.title}`}
               >
                 <div className="w-full h-48 overflow-hidden relative">
@@ -63,17 +63,17 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
                 </div>
                 <div className="p-6 flex flex-col flex-grow relative z-10">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/40 px-2 py-1 rounded-md">{blog.category}</span>
+                    <span className="text-xs font-semibold text-[#ff8b12] dark:text-[#ff9d3b] uppercase tracking-widest bg-orange-50 dark:bg-orange-950/40 px-2.5 py-1 rounded-md">{blog.category}</span>
                     <div className="flex items-center gap-2">
-                       <span className="text-[11px] text-slate-500 dark:text-slate-450 font-medium whitespace-nowrap">By Skillyug</span>
+                       <span className="text-[11px] text-slate-500 dark:text-slate-455 font-medium whitespace-nowrap">By Skillyug</span>
                        <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700 hidden sm:block"></span>
-                       <span className="text-xs text-slate-500 dark:text-slate-450 font-mono hidden sm:block">{blog.readTime}</span>
+                       <span className="text-xs text-slate-500 dark:text-slate-455 font-mono hidden sm:block">{blog.readTime}</span>
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 leading-snug group-hover:text-[#0060aa] dark:group-hover:text-[#ff9d3b] transition-colors">
                     {blog.title}
                   </h3>
-                  <p className="text-slate-600 dark:text-slate-350 text-sm mb-6 leading-relaxed flex-grow line-clamp-3">
+                  <p className="text-slate-600 dark:text-slate-355 text-sm mb-6 leading-relaxed flex-grow line-clamp-3">
                     {blog.shortDescription}
                   </p>
                   <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/80">
@@ -81,7 +81,7 @@ export default function BlogListing({ categories, blogs, reactionCounts = {} }: 
                       <AnonymousReactionBar itemId={blog.slug} initialCounts={reactionCounts[blog.slug] || {}} />
                       <ShareButton url={`/blog/${blog.slug}`} title={blog.title} />
                     </div>
-                    <div className="flex items-center text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-650 dark:group-hover:text-blue-400 transition-colors">
+                    <div className="flex items-center text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-[#0060aa] dark:group-hover:text-[#ff9d3b] transition-colors">
                       Read More 
                       <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />

@@ -97,13 +97,13 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
   }
 
   return (
-    <section id={id} className="relative w-full py-32 bg-slate-50 dark:bg-[#020617] overflow-hidden border-t border-slate-100 dark:border-slate-900">
+    <section id={id} className="relative w-full py-32 bg-transparent overflow-hidden border-t border-slate-200/60 dark:border-white/5">
       
       {/* Background Ambience */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-900/10 blur-[150px] rounded-full pointer-events-none" />
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#0060aa]/10 dark:bg-[#0060aa]/15 blur-[150px] rounded-full pointer-events-none" />
 
       <div className="text-center mb-10 px-6 max-w-3xl mx-auto relative z-20">
-        <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 pb-2 mb-4 drop-shadow-sm tracking-tight">
+        <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-[#0060aa] dark:via-[#8b5cf6] dark:to-[#ff8b12] pb-2 mb-4 drop-shadow-sm tracking-tight">
           Master the Art of Prompting
         </h2>
         <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl font-light mb-4">
@@ -215,13 +215,13 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
                 onChange={(e) => setInputVal(e.target.value)}
                 placeholder="Message the AI..."
                 disabled={isTyping}
-                className="w-full bg-background dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-xl py-4 pl-4 pr-14 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 dark:focus:ring-blue-500/20 shadow-sm transition-all disabled:opacity-50"
+                className="w-full bg-white/70 dark:bg-[#0a0f1c]/70 border border-slate-200/60 dark:border-white/10 rounded-xl py-4 pl-4 pr-14 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#ff8b12] focus:ring-1 focus:ring-[#ff8b12]/25 shadow-sm transition-all disabled:opacity-50"
               />
               <button 
                 type="submit"
                 disabled={!inputVal.trim() || isTyping}
                 aria-label="Send message"
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-blue-500 hover:bg-blue-600 rounded-lg flex items-center justify-center text-white disabled:opacity-50 disabled:hover:bg-blue-500 transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] rounded-lg flex items-center justify-center text-white disabled:opacity-50 transition-all shadow-md cursor-pointer"
               >
                 <Send className="w-4 h-4" aria-hidden="true" />
               </button>

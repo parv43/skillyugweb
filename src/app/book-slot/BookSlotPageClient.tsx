@@ -75,7 +75,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromParam = searchParams.get("from");
-  const paymentTier = fromParam === "bootcamp" ? "full" : "partial";
+  const paymentTier = (fromParam === "bootcamp" || fromParam === "courses") ? "full" : "partial";
   const displayAmount = paymentTier === "full" ? FULL_BOOK_SLOT_AMOUNT_RUPEES : PARTIAL_BOOK_SLOT_AMOUNT_RUPEES;
   const [errorMsg, setErrorMsg] = useState("");
   const [gatewayNotice, setGatewayNotice] = useState("");
@@ -378,11 +378,11 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
         rel="stylesheet"
       />
 
-      <div className="text-slate-800 dark:text-slate-200 font-body selection:bg-[#d1c4ff] selection:text-[#2b0064] min-h-screen flex flex-col relative overflow-hidden bg-slate-50 dark:bg-[#020617] transition-colors duration-300">
+      <div className="text-slate-800 dark:text-slate-200 font-body min-h-screen flex flex-col relative overflow-hidden bg-transparent transition-colors duration-300">
         {isCheckingAuth && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-50 dark:bg-[#020617]">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#f8fafc] dark:bg-[#020617]">
             <div className="text-center">
-              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
+              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-orange-200 border-t-[#0060aa]" />
               <p className="text-sm font-medium text-slate-650 dark:text-slate-400">Loading your booking...</p>
             </div>
           </div>
@@ -392,15 +392,15 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           <img
             src="/classroom.webp"
             alt="Background Classroom"
-            className="w-full h-full object-cover object-[center_20%] opacity-20"
+            className="w-full h-full object-cover object-[center_20%] opacity-5"
           />
-          <div className="absolute inset-0 bg-slate-50/80 dark:bg-[#020617]/90" />
+          <div className="absolute inset-0 bg-transparent" />
         </div>
 
-        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[140px] pointer-events-none z-0" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none z-0" />
+        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#0060aa]/5 rounded-full blur-[140px] pointer-events-none z-0" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#ff8b12]/5 rounded-full blur-[120px] pointer-events-none z-0" />
 
-        <header className="w-full top-0 sticky z-[100] bg-white/80 dark:bg-[#020617]/80 border-b border-slate-200/80 dark:border-slate-800/80 backdrop-blur-md flex justify-between items-center px-6 py-4">
+        <header className="w-full top-0 sticky z-[100] bg-white/70 dark:bg-[#020617]/70 border-b border-slate-200/40 dark:border-white/5 backdrop-blur-md flex justify-between items-center px-6 py-4">
           <img
             src="/skillyug-optimized.svg"
             alt="Skillyug Logo"
@@ -410,11 +410,11 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
 
         <main className="flex-grow flex items-center justify-center px-6 py-12 md:py-24 relative z-10">
           <div 
-            className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-slate-200 dark:border-white/10 shadow-lg animate-slide-down"
+            className="w-full max-w-xl spotlight-card glass-panel rounded-xl p-8 md:p-12 luminous-glow border border-slate-200/60 dark:border-white/5 shadow-lg animate-slide-down"
           >
             <div className="mb-6">
               <Link
-                href={fromParam === "bootcamp" ? "/bootcamp" : "/"}
+                href={fromParam === "courses" ? "/courses" : fromParam === "bootcamp" ? "/bootcamp" : "/"}
                 className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-450 dark:hover:text-white transition-colors font-headline font-bold text-sm group w-fit"
               >
                 <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">
@@ -436,7 +436,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             </div>
 
             {userEmail && (
-              <div className="mb-6 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a] px-4 py-3 text-sm text-slate-655 dark:text-slate-300">
+              <div className="mb-6 rounded-xl border border-slate-200/60 dark:border-white/5 bg-white/70 dark:bg-[#0f172a]/70 px-4 py-3 text-sm text-slate-655 dark:text-slate-300">
                 Logged in as <span className="font-semibold text-slate-900 dark:text-white">{userEmail}</span>
               </div>
             )}
@@ -470,7 +470,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 <button
                   type="button"
                   onClick={handleRetryRazorpayScript}
-                  className="flex w-full items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-5 py-4 text-center text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100 hover:text-blue-900"
+                  className="flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white/80 dark:bg-[#0a0f1c]/80 px-5 py-4 text-center text-sm font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors hover:bg-slate-50 dark:hover:bg-[#0f172a]/95"
                 >
                   Retry payment gateway
                 </button>
@@ -481,7 +481,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
               <div className="mb-6">
                 <Link
                   href="/#contact"
-                  className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 text-center text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:from-blue-500 hover:to-indigo-500"
+                  className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-orange-200/50 bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] px-5 py-4 text-center text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5"
                 >
                   <span className="material-symbols-outlined text-[20px]">support_agent</span>
                   If you faced any problem during payment, contact us so we can help.
@@ -495,7 +495,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
             <form className="space-y-8" onSubmit={handlePayment}>
               <div className="space-y-6">
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-blue-600 transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-[#0060aa] dark:group-focus-within:text-[#ff9d3b] transition-colors">
                     Student Name
                   </label>
                   <div className="relative">
@@ -504,7 +504,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       required
                       value={studentName}
                       onChange={(e) => setStudentName(e.currentTarget.value)}
-                      className="w-full bg-slate-50 border border-slate-300 dark:bg-slate-900 dark:border-white/10 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium"
+                      className="w-full bg-white/70 border border-slate-200 dark:bg-slate-900/60 dark:border-white/5 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-505 focus:ring-1 focus:ring-[#ff8b12]/20 focus:border-[#ff8b12] dark:focus:ring-[#ff9d3b]/20 dark:focus:border-[#ff9d3b] transition-all font-medium"
                       placeholder="Enter full name"
                       type="text"
                      />
@@ -512,7 +512,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 </div>
 
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-blue-600 transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-[#0060aa] dark:group-focus-within:text-[#ff9d3b] transition-colors">
                     Phone Number
                   </label>
                   <div className="relative">
@@ -529,7 +529,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       onChange={(e) =>
                         setPhoneNumber(e.currentTarget.value.replace(/[^0-9]/g, "").slice(0, 10))
                       }
-                      className="w-full bg-slate-50 border border-slate-300 dark:bg-slate-900 dark:border-white/10 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium"
+                      className="w-full bg-white/70 border border-slate-200 dark:bg-slate-900/60 dark:border-white/5 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-505 focus:ring-1 focus:ring-[#ff8b12]/20 focus:border-[#ff8b12] dark:focus:ring-[#ff9d3b]/20 dark:focus:border-[#ff9d3b] transition-all font-medium"
                       placeholder="9876543210"
                       type="tel"
                     />
@@ -537,7 +537,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 </div>
 
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-blue-600 transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-[#0060aa] dark:group-focus-within:text-[#ff9d3b] transition-colors">
                     Class/Grade
                   </label>
                   <div className="relative">
@@ -546,7 +546,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       required
                       value={grade}
                       onChange={(e) => setGrade(e.currentTarget.value)}
-                      className="w-full bg-slate-50 border border-slate-300 dark:bg-slate-900 dark:border-white/10 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium appearance-none"
+                      className="w-full bg-white/70 border border-slate-200 dark:bg-slate-900/60 dark:border-white/5 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 focus:ring-1 focus:ring-[#ff8b12]/20 focus:border-[#ff8b12] dark:focus:ring-[#ff9d3b]/20 dark:focus:border-[#ff9d3b] transition-all font-medium appearance-none"
                     >
                       <option disabled value="">
                         Select class or grade
@@ -566,7 +566,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 </div>
 
                 <div className="group">
-                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-blue-600 transition-colors">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-[#0060aa] dark:group-focus-within:text-[#ff9d3b] transition-colors">
                     Promo Code (Optional)
                   </label>
                   <div className="relative">
@@ -574,7 +574,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       name="promoCode"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.currentTarget.value.toUpperCase())}
-                      className="w-full bg-slate-50 border border-slate-300 dark:bg-slate-900 dark:border-white/10 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium uppercase"
+                      className="w-full bg-white/70 border border-slate-200 dark:bg-slate-900/60 dark:border-white/5 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-505 focus:ring-1 focus:ring-[#ff8b12]/20 focus:border-[#ff8b12] dark:focus:ring-[#ff9d3b]/20 dark:focus:border-[#ff9d3b] transition-all font-medium uppercase"
                       placeholder="Enter promo code"
                       type="text"
                     />
@@ -589,7 +589,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                      isCheckingAuth ||
                      razorpayScriptStatus !== "ready"
                   }
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-5 rounded-full shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
+                  className="w-full bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white font-bold py-5 rounded-full shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
                   type="submit"
                 >
                   <span className="material-symbols-outlined">payments</span>
@@ -615,7 +615,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
         {/* Sticky Floating Call Advisor CTA Button */}
         <a
           href="tel:7835049710"
-          className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 border border-blue-400/20"
+          className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 border border-orange-400/20"
           title="Call our advisor"
         >
           <Phone size={18} className="animate-pulse" />

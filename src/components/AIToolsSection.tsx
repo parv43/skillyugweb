@@ -87,14 +87,14 @@ export default function AIToolsSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-32 bg-white dark:bg-[#020617] overflow-hidden flex flex-col items-center border-t border-slate-100 dark:border-slate-900"
+      className="relative w-full py-32 bg-transparent overflow-hidden flex flex-col items-center border-t border-slate-200/40 dark:border-white/5"
     >
-      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 dark:from-blue-500/15 via-blue-500/0 to-transparent rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/5 dark:from-purple-500/15 via-purple-500/0 to-transparent rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0060aa]/10 dark:from-[#0060aa]/15 via-[#0060aa]/0 to-transparent rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#ff8b12]/5 dark:from-[#ff8b12]/10 via-[#ff8b12]/0 to-transparent rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="text-center mb-24 z-20 px-6 max-w-3xl">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-300 dark:to-purple-300 mb-6 drop-shadow-sm tracking-tight leading-tight">
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] mb-6 drop-shadow-sm tracking-tight leading-tight">
           Tools Students Will Learn
         </h2>
         <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl font-light">
@@ -108,9 +108,9 @@ export default function AIToolsSection() {
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
           <defs>
             <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#3b82f6" opacity="0.4" />
+              <stop offset="0%" stopColor="#0060aa" opacity="0.4" />
               <stop offset="50%" stopColor="#8b5cf6" opacity="0.8" />
-              <stop offset="100%" stopColor="#ec4899" opacity="1" />
+              <stop offset="100%" stopColor="#ff8b12" opacity="1" />
             </linearGradient>
           </defs>
           <path className="animate-draw" pathLength="1" d="M 230 260 Q 350 260 410 110" stroke="url(#flowGradient)" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />

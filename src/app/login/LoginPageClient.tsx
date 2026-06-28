@@ -75,16 +75,11 @@ function LoginForm() {
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-200 min-h-screen selection:bg-[#a4a6ff]/30 relative overflow-hidden font-sans transition-colors duration-300">
+    <div className="bg-transparent text-slate-800 dark:text-slate-200 min-h-screen relative overflow-hidden font-sans transition-colors duration-300">
       {/* Background Layer */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-slate-50/80 dark:bg-[#020617]/90 z-10" />
-        <img 
-          alt="Abstract flow" 
-          className="w-full h-full object-cover opacity-5 scale-110 blur-3xl" 
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKcLNe4nCx6jDQ4EVV_02UM6m6QJi_0LiI7l7BOYGCvUfePGpBf-4iq0oD97lRJqplgkKfvQWD0GBG99GEyd5o7D02N-7QpzqTdXC4UupM-OfyKFoKrQi8DHlPUrvTCvJQQ4DSYmJHKMrwmmGcspe4XyEhsPcvtyRW5UHFUk1gh7Oq1ax02nkjQ7vXBzrilSRlKcbMzcGwTuJpnS6BO9md1N6C7rmanrP1-JFEYbcgO-oyUxhepXupvaNomp79iKCHAibUpyvnVGU" 
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(85,22,190,0.02)_0%,_transparent_70%)] z-20"></div>
+        <div className="absolute inset-0 bg-transparent z-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,96,170,0.03)_0%,_transparent_70%)] z-20"></div>
       </div>
 
       {/* Layout Shell */}
@@ -98,12 +93,12 @@ function LoginForm() {
           </div>
 
           {/* Login Card */}
-          <div className="bg-white dark:bg-[#0a0f1c] border border-slate-200 dark:border-white/10 rounded-xl p-8 md:p-12 shadow-lg relative overflow-hidden">
+          <div className="bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 rounded-xl p-8 md:p-12 shadow-lg relative overflow-hidden">
             {/* Internal Glow */}
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none"></div>
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#0060aa]/5 blur-[80px] rounded-full pointer-events-none"></div>
             
             <header className="mb-10 relative z-10">
-              <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm mb-6 w-fit dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 dark:text-slate-400 dark:hover:text-white">
+              <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 bg-white/70 hover:bg-slate-50/80 border border-slate-200 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm mb-6 w-fit dark:bg-[#0a0f1c]/70 dark:hover:bg-[#0f172a]/80 dark:border-white/5 dark:text-slate-400 dark:hover:text-white">
                 <span className="font-bold tracking-widest text-xs uppercase pl-2">← BACK</span>
               </Link>
               <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">Welcome Back</h1>
@@ -128,7 +123,7 @@ function LoginForm() {
                 <div className="group">
                   <input 
                     type="email"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-lg py-4 px-5 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 outline-none dark:bg-[#020617] dark:border-white/10 dark:text-white dark:placeholder:text-slate-500" 
+                    className="w-full bg-white/70 border border-slate-200 rounded-lg py-4 px-5 text-slate-800 placeholder:text-slate-400 focus:ring-1 focus:ring-[#ff8b12]/20 focus:border-[#ff8b12] dark:focus:ring-[#ff9d3b]/20 dark:focus:border-[#ff9d3b] transition-all duration-300 outline-none dark:bg-[#020617]/70 dark:border-white/10 dark:text-white dark:placeholder:text-slate-550" 
                     placeholder="name@gmail.com"
                     value={email}
                     onChange={e => {
@@ -140,7 +135,7 @@ function LoginForm() {
                   />
                 </div>
                 {emailSuggestion && (
-                  <div className="mt-2 text-sm text-blue-600 dark:text-blue-450 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                  <div className="mt-2 text-sm text-[#0060aa] dark:text-[#ff9d3b] flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
                     <span>💡 Did you mean </span>
                     <button 
                       type="button"
@@ -149,7 +144,7 @@ function LoginForm() {
                         setEmail(`${name}@${emailSuggestion}`);
                         setEmailSuggestion("");
                       }}
-                      className="font-bold underline text-blue-750 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                      className="font-bold underline text-[#0060aa] dark:text-[#ff9d3b] hover:text-[#005291] dark:hover:text-[#ff8b12]"
                     >
                       {emailSuggestion}
                     </button>
@@ -172,7 +167,7 @@ function LoginForm() {
                 <div className="relative">
                   <input 
                     type={showPassword ? "text" : "password"}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-lg py-4 px-5 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 outline-none dark:bg-[#020617] dark:border-white/10 dark:text-white dark:placeholder:text-slate-500" 
+                    className="w-full bg-white/70 border border-slate-200 rounded-lg py-4 px-5 text-slate-800 placeholder:text-slate-400 focus:ring-1 focus:ring-[#ff8b12]/20 focus:border-[#ff8b12] dark:focus:ring-[#ff9d3b]/20 dark:focus:border-[#ff9d3b] transition-all duration-300 outline-none dark:bg-[#020617]/70 dark:border-white/10 dark:text-white dark:placeholder:text-slate-550" 
                     placeholder="••••••••"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -191,7 +186,7 @@ function LoginForm() {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full glow-button bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-full font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_4px_15px_rgba(59,130,246,0.25)] mt-4 disabled:opacity-50"
+                className="w-full glow-button bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white py-4 rounded-full font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-[0_4px_15px_rgba(255,139,18,0.15)] mt-4 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? "Logging In..." : "Log In"}
               </button>
@@ -214,7 +209,7 @@ function LoginForm() {
                   });
                   if (error) setErrorMsg(error.message);
                 }}
-                className="w-full bg-white dark:bg-transparent border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 font-bold py-4 rounded-full shadow-sm hover:shadow transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                className="w-full bg-white/80 dark:bg-transparent border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 font-bold py-4 rounded-full shadow-sm hover:shadow transition-all flex items-center justify-center gap-3 active:scale-[0.98] cursor-pointer"
               >
                 <img src="/Google.png" alt="Google" className="w-5 h-5 object-contain" />
                 Continue with Google
@@ -226,7 +221,7 @@ function LoginForm() {
                 Don&apos;t have an account?{" "}
                 <Link 
                   href="/signup" 
-                  className="font-bold text-blue-605 dark:text-blue-400 hover:text-blue-750 dark:hover:text-blue-300 transition-colors"
+                  className="font-bold text-[#0060aa] dark:text-[#ff9d3b] hover:text-[#005291] dark:hover:text-[#ff8b12] transition-colors"
                 >
                   Sign Up
                 </Link>
@@ -242,11 +237,11 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="fixed inset-0 flex items-center justify-center bg-slate-50 dark:bg-[#020617]">
-        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
+      <div className="fixed inset-0 flex items-center justify-center bg-[#f8fafc] dark:bg-[#020617]">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-orange-200 border-t-[#0060aa]" />
       </div>
     }>
       <LoginForm />
     </Suspense>
-  )
+  );
 }

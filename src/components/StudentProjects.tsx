@@ -23,20 +23,20 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ title, tech, desc, icon: Icon }: ProjectCardProps) => {
   return (
-    <div className="bg-white dark:bg-[#0a0f1c] p-6 sm:p-8 rounded-[2rem] border border-slate-200/80 dark:border-white/10 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-md transition-all duration-300 group flex flex-col h-full relative overflow-hidden shadow-sm">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+    <div className="bg-white dark:bg-[#0a0f1c] p-6 sm:p-8 rounded-[2rem] border border-slate-200/80 dark:border-white/10 hover:border-orange-200 dark:hover:border-orange-500/20 hover:shadow-md transition-all duration-300 group flex flex-col h-full relative overflow-hidden shadow-sm">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0060aa]/5 to-[#ff8b12]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
       <div className="flex items-center gap-4 mb-6 relative z-10">
-        <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:border-blue-500/30 transition-colors shadow-sm">
-          <Icon className="w-7 h-7 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300" />
+        <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:border-orange-500/30 transition-colors shadow-sm">
+          <Icon className="w-7 h-7 text-[#0060aa] dark:text-[#ff9d3b] group-hover:scale-110 transition-transform duration-300" />
         </div>
         <div>
           <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">{title}</h3>
-          <p className="text-xs font-bold text-purple-600 dark:text-purple-400 mt-1 uppercase tracking-wider">{tech}</p>
+          <p className="text-xs font-bold text-[#ff8b12] dark:text-[#ff9d3b] mt-1 uppercase tracking-wider">{tech}</p>
         </div>
       </div>
       
-      <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed relative z-10 flex-1">
+      <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed relative z-10 flex-1 text-left">
         {desc}
       </p>
     </div>
@@ -56,12 +56,12 @@ export default function StudentProjects() {
   const iconColors = ["blue", "yellow", "pink", "purple", "emerald", "orange"]
 
   return (
-    <section id="projects" className="relative w-full py-16 md:py-32 bg-white dark:bg-[#020617] overflow-hidden flex flex-col border-t border-slate-100 dark:border-slate-900">
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 dark:from-blue-500/15 via-blue-500/0 to-transparent pointer-events-none rounded-full z-0" />
+    <section id="projects" className="relative w-full py-16 md:py-32 bg-transparent overflow-hidden flex flex-col border-t border-slate-200/40 dark:border-white/5">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0060aa]/10 dark:from-[#0060aa]/15 via-[#0060aa]/0 to-transparent pointer-events-none rounded-full z-0" />
 
       {/* Heading */}
       <div className="text-center mb-10 md:mb-20 z-20 px-6 max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-5xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 pb-2 mb-2 md:mb-4 drop-shadow-sm tracking-tight">
+        <h2 className="text-3xl md:text-5xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] pb-2 mb-2 md:mb-4 drop-shadow-sm tracking-tight">
           How This Bootcamp Gives Students an Advantage With AI
         </h2>
         <p className="text-slate-600 dark:text-slate-400 text-base md:text-lg font-light">

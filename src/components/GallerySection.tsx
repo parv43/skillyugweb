@@ -42,7 +42,7 @@ export default function GallerySection() {
   const items = [...galleryItems, ...galleryItems];
 
   return (
-    <section className="py-24 relative overflow-hidden flex flex-col items-center justify-center border-t border-slate-100 dark:border-slate-900 bg-white dark:bg-[#020617]">
+    <section className="py-24 relative overflow-hidden flex flex-col items-center justify-center border-t border-slate-200/60 dark:border-white/5 bg-transparent">
 
       {/* ── CSS keyframe animation ─────────────────────────────────────────────
           GPU-composited: only "transform" is animated (no layout or paint).
@@ -77,11 +77,11 @@ export default function GallerySection() {
       `}</style>
 
       {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-purple-500/2 to-transparent rounded-full z-0 pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0060aa]/5 via-[#ff8b12]/2 to-transparent rounded-full z-0 pointer-events-none" />
 
       <div className="text-center mb-12 relative z-10 w-full px-6">
         <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 mb-6 tracking-tight leading-tight">
-          Skillyug <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Gallery</span>
+          Skillyug <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] to-[#ff8b12]">Gallery</span>
         </h2>
         <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-light font-body">
           See our Company in action.
@@ -101,7 +101,7 @@ export default function GallerySection() {
           {items.map((item, index) => (
             <div
               key={index}
-              className="gallery-item w-[280px] sm:w-[320px] md:w-[400px] lg:w-[480px] aspect-[4/3] rounded-2xl md:rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/5 shadow-sm relative group select-none transition-all duration-500 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-md"
+              className="gallery-item w-[280px] sm:w-[320px] md:w-[400px] lg:w-[480px] aspect-[4/3] rounded-2xl md:rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/5 shadow-sm relative group select-none transition-all duration-500 hover:border-[#ff8b12]/50 dark:hover:border-[#ff8b12]/50 hover:shadow-md"
             >
               {/* Story overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/50 to-transparent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-all duration-500 z-20 pointer-events-none flex flex-col justify-end p-6 md:p-8">

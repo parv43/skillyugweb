@@ -140,28 +140,28 @@ export default function AdminCommentDashboard() {
   // ── States ─────────────────────────────────────────────────────────────────
   if (isAdmin === false) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="min-h-screen bg-transparent flex items-center justify-center p-6">
+        <div className="text-center max-w-md bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/5 p-8 rounded-3xl shadow-lg">
+          <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-rose-500 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
             </svg>
           </div>
-          <h1 className="text-xl font-bold text-white mb-2">Access Denied</h1>
-          <p className="text-slate-400 text-sm">You do not have admin privileges to view this dashboard.</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h1>
+          <p className="text-slate-500 dark:text-slate-450 text-sm">You do not have admin privileges to view this dashboard.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-50">
+    <div className="min-h-screen bg-transparent text-slate-800 dark:text-slate-200 font-sans">
       {/* Top bar */}
-      <header className="sticky top-0 z-20 bg-[#020617]/90 backdrop-blur-md border-b border-white/[0.06] px-6 py-4">
+      <header className="sticky top-0 z-20 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md border-b border-slate-200/60 dark:border-white/5 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-0.5">Skillyug Admin</p>
-            <h1 className="text-lg font-black text-white">Comment Moderation</h1>
+            <p className="text-[10px] font-bold text-[#ff8b12] dark:text-[#ff9d3b] uppercase tracking-widest mb-0.5">Skillyug Admin</p>
+            <h1 className="text-lg font-black text-slate-900 dark:text-white">Comment Moderation</h1>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
             {/* Slug filter */}
@@ -170,11 +170,11 @@ export default function AdminCommentDashboard() {
               placeholder="Filter by blog slug…"
               value={filterSlug}
               onChange={(e) => setFilterSlug(e.target.value)}
-              className="h-9 px-3 rounded-lg bg-white/[0.04] border border-white/10 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 w-48"
+              className="h-9 px-3 rounded-lg bg-white/70 dark:bg-[#0a0f1c]/70 border border-slate-200/60 dark:border-white/10 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-505 focus:outline-none focus:border-[#ff8b12] focus:ring-1 focus:ring-[#ff8b12] w-48 transition-all"
             />
             {/* Search */}
             <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -182,11 +182,11 @@ export default function AdminCommentDashboard() {
                 placeholder="Search content…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-9 pl-8 pr-3 rounded-lg bg-white/[0.04] border border-white/10 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 w-40"
+                className="h-9 pl-8 pr-3 rounded-lg bg-white/70 dark:bg-[#0a0f1c]/70 border border-slate-200/60 dark:border-white/10 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-505 focus:outline-none focus:border-[#ff8b12] focus:ring-1 focus:ring-[#ff8b12] w-40 transition-all"
               />
             </div>
             {/* Count badge */}
-            <span className="text-xs font-mono text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-lg border border-white/[0.06]">
+            <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-white/80 dark:bg-[#0a0f1c]/80 border border-slate-200/60 dark:border-white/5 px-2.5 py-1 rounded-lg">
               {visibleComments.length} comment{visibleComments.length !== 1 ? "s" : ""}
             </span>
           </div>
@@ -208,12 +208,12 @@ export default function AdminCommentDashboard() {
         {isLoading && (
           <div className="space-y-3 animate-pulse">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-white/[0.06] flex-shrink-0" />
+              <div key={i} className="rounded-xl border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-4 flex gap-3">
+                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 flex-shrink-0" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3 bg-white/[0.06] rounded w-40" />
-                  <div className="h-3 bg-white/[0.04] rounded w-full" />
-                  <div className="h-3 bg-white/[0.04] rounded w-2/3" />
+                  <div className="h-3 bg-slate-200 dark:bg-white/10 rounded w-40" />
+                  <div className="h-3 bg-slate-100 dark:bg-white/5 rounded w-full" />
+                  <div className="h-3 bg-slate-100 dark:bg-white/5 rounded w-2/3" />
                 </div>
               </div>
             ))}
@@ -223,13 +223,13 @@ export default function AdminCommentDashboard() {
         {/* Empty state */}
         {!isLoading && visibleComments.length === 0 && (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
-            <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center">
-              <svg className="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center">
+              <svg className="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-slate-400 font-medium">All clear!</p>
-            <p className="text-slate-600 text-sm">No comments match your current filter.</p>
+            <p className="text-slate-800 dark:text-slate-350 font-medium">All clear!</p>
+            <p className="text-slate-505 dark:text-slate-400 text-sm">No comments match your current filter.</p>
           </div>
         )}
 
@@ -253,7 +253,7 @@ export default function AdminCommentDashboard() {
             <button
               onClick={loadMore}
               disabled={isLoadingMore}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-slate-300 hover:text-white border border-white/10 hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.06] transition-all disabled:opacity-40"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10 hover:border-[#ff8b12]/50 dark:hover:border-[#ff8b12]/50 bg-white/50 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 transition-all disabled:opacity-40 cursor-pointer"
             >
               {isLoadingMore ? (
                 <>
@@ -286,12 +286,12 @@ function AdminCommentRow({
 }) {
   return (
     <article
-      className={`group rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.035] hover:border-white/10 p-4 flex gap-3 transition-all ${
+      className={`group rounded-xl border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md hover:bg-white dark:hover:bg-[#0a0f1c] hover:border-[#ff8b12]/30 dark:hover:border-[#ff8b12]/30 p-4 flex gap-3 transition-all ${
         isDeleting ? "opacity-40 pointer-events-none" : ""
       }`}
     >
       {/* Avatar */}
-      <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden ring-1 ring-white/10">
+      <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden ring-1 ring-slate-200 dark:ring-white/10">
         {comment.user_avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={comment.user_avatar} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -300,7 +300,7 @@ function AdminCommentRow({
             size={40}
             name={comment.user_id}
             variant="marble"
-            colors={["#3b82f6", "#8b5cf6", "#06b6d4", "#1e3a5f", "#0f172a"]}
+            colors={["#0060aa", "#8b5cf6", "#ff8b12", "#1e3a5f", "#0f172a"]}
           />
         )}
       </div>
@@ -308,18 +308,18 @@ function AdminCommentRow({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mb-1.5">
-          <span className="text-sm font-semibold text-slate-200">{comment.user_name}</span>
-          <span className="text-[10px] font-mono text-slate-600">
+          <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{comment.user_name}</span>
+          <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
             {timeAgo(comment.created_at)}
           </span>
-          <span className="text-[10px] text-slate-700 font-mono">
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
             /{comment.blog_slug}
           </span>
-          <span className="text-[10px] font-mono text-slate-700 truncate max-w-[120px]">
+          <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
             uid:{comment.user_id.slice(0, 8)}…
           </span>
         </div>
-        <p className="text-sm text-slate-400 leading-relaxed break-words">{comment.content}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-350 leading-relaxed break-words">{comment.content}</p>
       </div>
 
       {/* Delete button */}
@@ -329,7 +329,7 @@ function AdminCommentRow({
           disabled={isDeleting}
           title="Delete comment"
           aria-label={`Delete comment by ${comment.user_name}`}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all"
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-505 hover:text-rose-500 dark:hover:text-rose-450 hover:bg-rose-500/10 transition-all cursor-pointer"
         >
           {isDeleting ? (
             <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
