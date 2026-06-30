@@ -162,6 +162,28 @@ export async function POST(request: Request) {
     const parentName: string = (body.parentName || "").trim();
     const userId: string | null = body.userId || null;
 
+    if (userId) {
+      const startOfToday = new Date();
+      startOfToday.setUTCHours(0, 0, 0, 0);
+      const startOfTodayStr = startOfToday.toISOString();
+
+      const { count, error: countError } = await supabase
+        .from("issued_certificates")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .like("cert_id", "%-S")
+        .gte("created_at", startOfTodayStr);
+
+      if (countError) {
+        console.error("Failed to query certificate limit:", countError);
+      } else if (count !== null && count >= 3) {
+        return NextResponse.json(
+          { error: "Rate limit exceeded. You can only generate certificates 3 times per day." },
+          { status: 429 }
+        );
+      }
+    }
+
     if (!studentName) {
       return NextResponse.json({ error: "Student name is required" }, { status: 400 });
     }

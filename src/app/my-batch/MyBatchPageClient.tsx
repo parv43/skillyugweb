@@ -719,11 +719,8 @@ export default function MyBatchPage() {
   }
 
   const isPaidUser = hasSlotAccess || user.email === "eternallytanuj@gmail.com";
-  // Only allowlisted users can download the certificate
-  const CERT_ALLOWED_UIDS = ["9627ec86-c86d-4fce-8e13-6e8f3f157a83"];
-  const canDownloadCert =
-    user.email === "eternallytanuj@gmail.com" ||
-    (userId !== null && CERT_ALLOWED_UIDS.includes(userId));
+  // Unlocked completely for all verified users
+  const canDownloadCert = true;
 
   return (
     <main className="min-h-screen bg-transparent text-slate-800 dark:text-slate-200 relative overflow-x-hidden select-none">
