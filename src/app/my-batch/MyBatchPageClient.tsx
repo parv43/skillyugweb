@@ -70,7 +70,6 @@ export default function MyBatchPage() {
   // Certificate modal state
   const [showCertModal, setShowCertModal] = useState(false);
   const [certStudentName, setCertStudentName] = useState("");
-  const [certParentName, setCertParentName] = useState("");
   const [certError, setCertError] = useState("");
   const [generatedCerts, setGeneratedCerts] = useState<{ student: { downloadUrl: string }; parent?: { downloadUrl: string } } | null>(null);
   const [isBlurred, setIsBlurred] = useState(false);
@@ -498,7 +497,6 @@ export default function MyBatchPage() {
   const openCertModal = () => {
     if (!user || isGenerating) return;
     setCertStudentName(user.fullName);
-    setCertParentName("");
     setCertError("");
     setGeneratedCerts(null);
     setShowCertModal(true);
@@ -519,7 +517,7 @@ export default function MyBatchPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           studentName: certStudentName.trim(),
-          parentName: certParentName.trim(),
+          parentName: "",
           userId: (await supabase.auth.getSession()).data.session?.user.id,
         }),
       });
@@ -719,11 +717,8 @@ export default function MyBatchPage() {
   }
 
   const isPaidUser = hasSlotAccess || user.email === "eternallytanuj@gmail.com";
-  // Only allowlisted users can download the certificate
-  const CERT_ALLOWED_UIDS = ["9627ec86-c86d-4fce-8e13-6e8f3f157a83"];
-  const canDownloadCert =
-    user.email === "eternallytanuj@gmail.com" ||
-    (userId !== null && CERT_ALLOWED_UIDS.includes(userId));
+  // Unlocked completely for all verified users
+  const canDownloadCert = true;
 
   return (
     <main className="min-h-screen bg-transparent text-slate-800 dark:text-slate-200 relative overflow-x-hidden select-none">
@@ -907,7 +902,7 @@ export default function MyBatchPage() {
                   </span>
                 </div>
                 <h3 className="mt-8 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                  Certificate of Attendance
+                  Completion of Course
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-350">
                   Claim your official Skillyug AI Education Bootcamp certificate. Includes a unique verification ID and scannable QR.
@@ -945,7 +940,7 @@ export default function MyBatchPage() {
                     </span>
                   </div>
                   <h3 className="mt-8 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                    Certificate of Attendance
+                    Completion of Course
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-350">
                     Claim your official Skillyug AI Education Bootcamp certificate.
@@ -1475,7 +1470,7 @@ export default function MyBatchPage() {
                       </span>
                     </div>
                     <h3 className="mt-8 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                      Certificate of Attendance
+                      Completion of Course
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-350">
                       Claim your official Skillyug AI Education Bootcamp certificate. Includes a unique verification ID and scannable QR.
@@ -1540,8 +1535,8 @@ export default function MyBatchPage() {
 
             <p className="text-sm text-slate-600 dark:text-slate-350 mb-6 leading-relaxed">
               {generatedCerts 
-                ? "Your certificates are ready! Click the buttons below to download them."
-                : "We'll generate two certificates — one for the student and one for the parent."
+                ? "Your certificate is ready! Click the button below to download it."
+                : "Please enter the student's full name to generate the certificate."
               }
             </p>
 
@@ -1557,27 +1552,10 @@ export default function MyBatchPage() {
                     <div className="rounded-lg bg-blue-50 dark:bg-blue-950/40 p-2">
                       <Download className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span className="text-sm font-bold text-slate-900 dark:text-white">Student Certificate</span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">Download Certificate</span>
                   </div>
                   <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-slate-800 group-hover:translate-x-1 transition-all" />
                 </a>
-
-                {generatedCerts.parent && (
-                  <a
-                    href={generatedCerts.parent.downloadUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between w-full rounded-xl border border-purple-200 bg-purple-50/50 p-4 transition-all hover:bg-purple-100/50 dark:border-purple-900/30 dark:bg-purple-950/20 dark:hover:bg-purple-900/20 group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-lg bg-purple-50 dark:bg-purple-950/40 p-2">
-                        <Download className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                      </div>
-                      <span className="text-sm font-bold text-slate-900 dark:text-white">Parent Certificate</span>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-slate-800 group-hover:translate-x-1 transition-all" />
-                  </a>
-                )}
 
                 <button
                   onClick={() => setShowCertModal(false)}
@@ -1599,19 +1577,6 @@ export default function MyBatchPage() {
                       value={certStudentName}
                       onChange={e => { setCertStudentName(e.target.value); setCertError(""); }}
                       placeholder="e.g. Tanuj Pathak"
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-550 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all dark:bg-[#020617] dark:border-white/10"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-[0.22em] text-slate-550 dark:text-slate-400 mb-2">
-                      Parent&apos;s Full Name <span className="text-slate-500">(optional)</span>
-                    </label>
-                    <input
-                      id="cert-parent-name"
-                      type="text"
-                      value={certParentName}
-                      onChange={e => setCertParentName(e.target.value)}
-                      placeholder=""
                       className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-550 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all dark:bg-[#020617] dark:border-white/10"
                     />
                   </div>

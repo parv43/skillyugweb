@@ -8,16 +8,15 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 
-// Initialize Supabase Admin
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+// Initialize Supabase Admin (with quotes stripped to prevent JWT formatting issues)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/^['"]|['"]$/g, "");
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!.replace(/^['"]|['"]$/g, "");
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Increase Vercel function timeout to 60s — cold starts download fonts + generate PDFs
 export const maxDuration = 60;
 
-const BACKGROUND_URL =
-  "https://ueexbcwngwqtgtlbnmtp.supabase.co/storage/v1/object/public/assets/Demo_Session_Certificate%20.png";
+const BACKGROUND_PATH = path.join(process.cwd(), "public", "Course_Completition.png");
 const VERIFICATION_BASE_URL = "https://www.skillyugedu.com/verify/";
 
 // Alex Brush — elegant calligraphic font from Google Fonts.
@@ -126,13 +125,13 @@ async function generateCertificatePdf(
     format: [width, height],
   });
   pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-  const pdfBuffer = Buffer.from(pdf.output("arraybuffer"));
+  const pdfUint8Array = new Uint8Array(pdf.output("arraybuffer"));
 
   // ── Upload to Supabase ────────────────────────────────────────────────────
   const fileName = `${certId}.pdf`;
   const { error: storageError } = await supabase.storage
     .from("assets")
-    .upload(fileName, pdfBuffer, {
+    .upload(fileName, pdfUint8Array, {
       contentType: "application/pdf",
       cacheControl: "3600",
       upsert: true,
@@ -163,6 +162,34 @@ export async function POST(request: Request) {
     const parentName: string = (body.parentName || "").trim();
     const userId: string | null = body.userId || null;
 
+    if (userId) {
+      // Fetch user to bypass rate limit for eternallytanuj@gmail.com
+      const { data: userData } = await supabase.auth.admin.getUserById(userId);
+      const email = userData?.user?.email;
+
+      if (email !== "eternallytanuj@gmail.com") {
+        const startOfToday = new Date();
+        startOfToday.setUTCHours(0, 0, 0, 0);
+        const startOfTodayStr = startOfToday.toISOString();
+
+        const { count, error: countError } = await supabase
+          .from("issued_certificates")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .like("cert_id", "%-S")
+          .gte("created_at", startOfTodayStr);
+
+        if (countError) {
+          console.error("Failed to query certificate limit:", countError);
+        } else if (count !== null && count >= 3) {
+          return NextResponse.json(
+            { error: "Rate limit exceeded. You can only generate certificates 3 times per day." },
+            { status: 429 }
+          );
+        }
+      }
+    }
+
     if (!studentName) {
       return NextResponse.json({ error: "Student name is required" }, { status: 400 });
     }
@@ -170,7 +197,7 @@ export async function POST(request: Request) {
     await ensureFontRegistered();
 
     // Load background once — shared between both certificates
-    const background = await loadImage(BACKGROUND_URL);
+    const background = await loadImage(BACKGROUND_PATH);
 
     // Always generate student certificate (suffix -S)
     const studentCert = await generateCertificatePdf(studentName, userId, background, "-S");
