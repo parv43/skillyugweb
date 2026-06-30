@@ -907,7 +907,7 @@ export default function MyBatchPage() {
                   </span>
                 </div>
                 <h3 className="mt-8 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                  Certificate of Attendance
+                  Completion of Course
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-350">
                   Claim your official Skillyug AI Education Bootcamp certificate. Includes a unique verification ID and scannable QR.
@@ -945,7 +945,7 @@ export default function MyBatchPage() {
                     </span>
                   </div>
                   <h3 className="mt-8 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                    Certificate of Attendance
+                    Completion of Course
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-350">
                     Claim your official Skillyug AI Education Bootcamp certificate.
@@ -1475,7 +1475,7 @@ export default function MyBatchPage() {
                       </span>
                     </div>
                     <h3 className="mt-8 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                      Certificate of Attendance
+                      Completion of Course
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-350">
                       Claim your official Skillyug AI Education Bootcamp certificate. Includes a unique verification ID and scannable QR.

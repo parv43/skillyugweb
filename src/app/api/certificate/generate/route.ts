@@ -16,8 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 // Increase Vercel function timeout to 60s — cold starts download fonts + generate PDFs
 export const maxDuration = 60;
 
-const BACKGROUND_URL =
-  "https://ueexbcwngwqtgtlbnmtp.supabase.co/storage/v1/object/public/assets/Demo_Session_Certificate%20.png";
+const BACKGROUND_PATH = path.join(process.cwd(), "public", "Course_Completion_Certificate.png");
 const VERIFICATION_BASE_URL = "https://www.skillyugedu.com/verify/";
 
 // Alex Brush — elegant calligraphic font from Google Fonts.
@@ -170,7 +169,7 @@ export async function POST(request: Request) {
     await ensureFontRegistered();
 
     // Load background once — shared between both certificates
-    const background = await loadImage(BACKGROUND_URL);
+    const background = await loadImage(BACKGROUND_PATH);
 
     // Always generate student certificate (suffix -S)
     const studentCert = await generateCertificatePdf(studentName, userId, background, "-S");
