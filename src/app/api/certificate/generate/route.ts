@@ -8,9 +8,9 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 
-// Initialize Supabase Admin
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+// Initialize Supabase Admin (with quotes stripped to prevent JWT formatting issues)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/^['"]|['"]$/g, "");
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!.replace(/^['"]|['"]$/g, "");
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Increase Vercel function timeout to 60s — cold starts download fonts + generate PDFs
@@ -125,13 +125,13 @@ async function generateCertificatePdf(
     format: [width, height],
   });
   pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-  const pdfBuffer = Buffer.from(pdf.output("arraybuffer"));
+  const pdfUint8Array = new Uint8Array(pdf.output("arraybuffer"));
 
   // ── Upload to Supabase ────────────────────────────────────────────────────
   const fileName = `${certId}.pdf`;
   const { error: storageError } = await supabase.storage
     .from("assets")
-    .upload(fileName, pdfBuffer, {
+    .upload(fileName, pdfUint8Array, {
       contentType: "application/pdf",
       cacheControl: "3600",
       upsert: true,
