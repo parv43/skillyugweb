@@ -16,7 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 // Increase Vercel function timeout to 60s — cold starts download fonts + generate PDFs
 export const maxDuration = 60;
 
-const BACKGROUND_PATH = path.join(process.cwd(), "public", "Course_Completion_Certificate.png");
+const BACKGROUND_PATH = path.join(process.cwd(), "public", "Course_Completition.png");
 const VERIFICATION_BASE_URL = "https://www.skillyugedu.com/verify/";
 
 // Alex Brush — elegant calligraphic font from Google Fonts.
@@ -163,24 +163,30 @@ export async function POST(request: Request) {
     const userId: string | null = body.userId || null;
 
     if (userId) {
-      const startOfToday = new Date();
-      startOfToday.setUTCHours(0, 0, 0, 0);
-      const startOfTodayStr = startOfToday.toISOString();
+      // Fetch user to bypass rate limit for eternallytanuj@gmail.com
+      const { data: userData } = await supabase.auth.admin.getUserById(userId);
+      const email = userData?.user?.email;
 
-      const { count, error: countError } = await supabase
-        .from("issued_certificates")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .like("cert_id", "%-S")
-        .gte("created_at", startOfTodayStr);
+      if (email !== "eternallytanuj@gmail.com") {
+        const startOfToday = new Date();
+        startOfToday.setUTCHours(0, 0, 0, 0);
+        const startOfTodayStr = startOfToday.toISOString();
 
-      if (countError) {
-        console.error("Failed to query certificate limit:", countError);
-      } else if (count !== null && count >= 3) {
-        return NextResponse.json(
-          { error: "Rate limit exceeded. You can only generate certificates 3 times per day." },
-          { status: 429 }
-        );
+        const { count, error: countError } = await supabase
+          .from("issued_certificates")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .like("cert_id", "%-S")
+          .gte("created_at", startOfTodayStr);
+
+        if (countError) {
+          console.error("Failed to query certificate limit:", countError);
+        } else if (count !== null && count >= 3) {
+          return NextResponse.json(
+            { error: "Rate limit exceeded. You can only generate certificates 3 times per day." },
+            { status: 429 }
+          );
+        }
       }
     }
 
