@@ -264,146 +264,54 @@ export default function CoursesPage() {
   const [userInteracted, setUserInteracted] = useState(false)
   const roadmapRef = useRef<HTMLDivElement>(null)
 
-  const [notifyEmail, setNotifyEmail] = useState("")
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [loadingNotify, setLoadingNotify] = useState(false)
-
-  const handleNotifySubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!notifyEmail.trim()) return
-    setLoadingNotify(true)
-    setTimeout(() => {
-      setLoadingNotify(false)
-      setIsSubmitted(true)
-      setNotifyEmail("")
-    }, 800)
-  }
-
   // Toggle to hide courses page under construction
   const SHOW_UNDER_CONSTRUCTION = true;
 
   if (SHOW_UNDER_CONSTRUCTION) {
     return (
-      <main className="min-h-screen overflow-hidden bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-200 selection:bg-orange-100 selection:text-orange-900 transition-colors duration-300 relative flex flex-col">
+      <main className="min-h-screen overflow-hidden bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-200 selection:bg-orange-100 selection:text-orange-900 transition-colors duration-300 relative flex flex-col items-center justify-center">
         <Navbar />
 
-        {/* Mesh Glow Background */}
-        <div className="absolute inset-0 z-0 bg-[linear-gradient(135deg,#f8fafc_0%,#f1f5f9_40%,#ffebd6_75%,#dbeafe_100%)] dark:bg-[linear-gradient(135deg,#020617_0%,#090d16_40%,#271206_75%,#031627_100%)]" />
-        <div className="absolute top-[10%] left-[10%] w-[350px] h-[350px] bg-[#0060aa]/10 dark:bg-[#0060aa]/15 rounded-full blur-[80px] animate-pulse duration-[8000ms]" />
-        <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#ff8b12]/10 dark:bg-[#ff8b12]/15 rounded-full blur-[100px] animate-pulse duration-[6000ms]" />
+        {/* Minimal mesh background glows */}
+        <div className="absolute inset-0 z-0 bg-[linear-gradient(135deg,#f8fafc_0%,#f1f5f9_60%,#ffebd6_100%)] dark:bg-[linear-gradient(135deg,#020617_0%,#050811_60%,#190d05_100%)]" />
+        <div className="absolute top-[20%] left-[20%] w-[300px] h-[300px] bg-[#0060aa]/5 dark:bg-[#0060aa]/8 rounded-full blur-[90px] animate-pulse duration-[10000ms]" />
+        <div className="absolute bottom-[20%] right-[20%] w-[350px] h-[350px] bg-[#ff8b12]/5 dark:bg-[#ff8b12]/8 rounded-full blur-[100px] animate-pulse duration-[8000ms]" />
 
         <style dangerouslySetInnerHTML={{ __html: `
           @keyframes rotate-slow {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
           }
-          @keyframes progress-stripe {
-            from { background-position: 0 0; }
-            to { background-position: 30px 0; }
-          }
           .animate-rotate-slow {
-            animation: rotate-slow 12s linear infinite;
-          }
-          .animate-progress-stripe {
-            background-image: linear-gradient(
-              45deg,
-              rgba(255, 255, 255, 0.15) 25%,
-              transparent 25%,
-              transparent 50%,
-              rgba(255, 255, 255, 0.15) 50%,
-              rgba(255, 255, 255, 0.15) 75%,
-              transparent 75%,
-              transparent
-            );
-            background-size: 30px 30px;
-            animation: progress-stripe 1s linear infinite;
+            animation: rotate-slow 15s linear infinite;
           }
         `}} />
 
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-24 md:py-32 max-w-4xl mx-auto text-center w-full">
-          {/* Animated Construction Card */}
-          <div className="w-full rounded-[2.5rem] border border-slate-200/50 bg-white/40 p-8 md:p-12 shadow-2xl backdrop-blur-xl dark:border-white/5 dark:bg-white/5 relative overflow-hidden">
-            {/* Glass Card Accent Line */}
-            <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12]" />
-
-            {/* Animated Icons Floating */}
-            <div className="flex justify-center mb-8 relative">
-              <div className="relative p-6 rounded-3xl bg-gradient-to-br from-[#0060aa]/10 to-[#ff8b12]/10 dark:from-[#0060aa]/20 dark:to-[#ff8b12]/20 border border-slate-200/40 dark:border-white/5">
-                <Compass className="h-12 w-12 text-[#0060aa] dark:text-[#ff9d3b] animate-rotate-slow" />
-                <div className="absolute -top-1 -right-1 p-2 rounded-full bg-[#ff8b12] text-white shadow-lg animate-bounce">
-                  <Sparkles className="h-4 w-4" />
-                </div>
-              </div>
-            </div>
-
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-[0.22em] bg-orange-100 text-orange-800 dark:bg-orange-950/45 dark:text-orange-350 border border-orange-200/50 dark:border-orange-900/30 mb-6 animate-pulse">
-              Under Construction
-            </span>
-
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white mb-4">
-              Something Amazing is <br className="hidden md:inline" />
-              <span className="bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] bg-clip-text text-transparent">
-                in the Works
-              </span>
-            </h1>
-
-            <p className="text-base md:text-lg text-slate-600 dark:text-slate-350 max-w-xl mx-auto mb-8 leading-relaxed">
-              We are redesigning and upgrading our courses catalog to provide you with the world's most immersive, hands-on AI learning experiences.
-            </p>
-
-            {/* Status Progress Indicator */}
-            <div className="max-w-md mx-auto mb-10 bg-slate-100 dark:bg-[#020617]/50 rounded-2xl p-4 border border-slate-200/30 dark:border-white/5 text-left">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-                  Upgrading Systems
-                </span>
-                <span className="text-xs font-bold text-[#ff8b12]">84% Complete</span>
-              </div>
-              <div className="h-3 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-[#0060aa] to-[#ff8b12] rounded-full animate-progress-stripe"
-                  style={{ width: '84%' }}
-                />
-              </div>
-            </div>
-
-            {/* Update Notifications Form */}
-            <div className="max-w-md mx-auto">
-              {isSubmitted ? (
-                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-900/30 text-emerald-800 dark:text-emerald-400 flex items-center justify-center gap-3">
-                  <Check className="h-5 w-5 flex-shrink-0" />
-                  <span className="text-sm font-semibold">You're on the list! We'll notify you.</span>
-                </div>
-              ) : (
-                <form onSubmit={handleNotifySubmit} className="flex gap-2">
-                  <input
-                    type="email"
-                    required
-                    value={notifyEmail}
-                    onChange={e => setNotifyEmail(e.target.value)}
-                    placeholder="Enter your email to get notified"
-                    className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-550 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all dark:bg-[#020617] dark:border-white/10"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loadingNotify}
-                    className="rounded-xl bg-[#0060aa] hover:bg-[#004e8a] px-6 text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
-                  >
-                    Notify Me
-                  </button>
-                </form>
-              )}
-            </div>
+        <div className="relative z-10 max-w-xl mx-auto px-6 text-center flex flex-col items-center">
+          {/* Subtle spinning logo */}
+          <div className="relative mb-8 p-4 rounded-2xl bg-slate-200/30 dark:bg-white/5 border border-slate-200/40 dark:border-white/5 animate-fade-in">
+            <Compass className="h-10 w-10 text-[#0060aa] dark:text-[#ff9d3b] animate-rotate-slow" />
           </div>
 
-          {/* Back Home Link */}
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ff8b12] dark:text-[#ff9d3b] mb-4">
+            Under Construction
+          </span>
+
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-4">
+            New courses catalog is coming
+          </h1>
+
+          <p className="text-sm md:text-base text-slate-500 dark:text-slate-450 max-w-md mb-10 leading-relaxed font-normal">
+            We are upgrading our coding and AI bootcamps list. Check back soon for our fresh batch launches and learning paths.
+          </p>
+
+          {/* Simple Clean CTA */}
           <Link
             href="/"
-            className="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-slate-650 transition-all hover:text-slate-900 dark:text-slate-450 dark:hover:text-white group"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-slate-650 dark:text-slate-400 hover:text-[#0060aa] dark:hover:text-[#ff9d3b] transition-all group"
           >
             Go Back Home
-            <ArrowRight className="h-4 w-4 transform transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="h-3.5 w-3.5 transform transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </main>
