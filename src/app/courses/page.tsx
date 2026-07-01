@@ -264,6 +264,60 @@ export default function CoursesPage() {
   const [userInteracted, setUserInteracted] = useState(false)
   const roadmapRef = useRef<HTMLDivElement>(null)
 
+  // Toggle to hide courses page under construction
+  const SHOW_UNDER_CONSTRUCTION = true;
+
+  if (SHOW_UNDER_CONSTRUCTION) {
+    return (
+      <main className="min-h-screen overflow-hidden bg-slate-50 dark:bg-[#020617] text-slate-800 dark:text-slate-200 selection:bg-orange-100 selection:text-orange-900 transition-colors duration-300 relative flex flex-col items-center justify-center">
+        <Navbar />
+
+        {/* Minimal mesh background glows */}
+        <div className="absolute inset-0 z-0 bg-[linear-gradient(135deg,#f8fafc_0%,#f1f5f9_60%,#ffebd6_100%)] dark:bg-[linear-gradient(135deg,#020617_0%,#050811_60%,#190d05_100%)]" />
+        <div className="absolute top-[20%] left-[20%] w-[300px] h-[300px] bg-[#0060aa]/5 dark:bg-[#0060aa]/8 rounded-full blur-[90px] animate-pulse duration-[10000ms]" />
+        <div className="absolute bottom-[20%] right-[20%] w-[350px] h-[350px] bg-[#ff8b12]/5 dark:bg-[#ff8b12]/8 rounded-full blur-[100px] animate-pulse duration-[8000ms]" />
+
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+          .animate-rotate-slow {
+            animation: rotate-slow 15s linear infinite;
+          }
+        `}} />
+
+        <div className="relative z-10 max-w-xl mx-auto px-6 text-center flex flex-col items-center">
+          {/* Subtle spinning logo */}
+          <div className="relative mb-8 p-4 rounded-2xl bg-slate-200/30 dark:bg-white/5 border border-slate-200/40 dark:border-white/5 animate-fade-in">
+            <Compass className="h-10 w-10 text-[#0060aa] dark:text-[#ff9d3b] animate-rotate-slow" />
+          </div>
+
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ff8b12] dark:text-[#ff9d3b] mb-4">
+            Under Construction
+          </span>
+
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-4">
+            New courses catalog is coming
+          </h1>
+
+          <p className="text-sm md:text-base text-slate-500 dark:text-slate-450 max-w-md mb-10 leading-relaxed font-normal">
+            We are upgrading our coding and AI bootcamps list. Check back soon for our fresh batch launches and learning paths.
+          </p>
+
+          {/* Simple Clean CTA */}
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-slate-650 dark:text-slate-400 hover:text-[#0060aa] dark:hover:text-[#ff9d3b] transition-all group"
+          >
+            Go Back Home
+            <ArrowRight className="h-3.5 w-3.5 transform transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
