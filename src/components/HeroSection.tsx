@@ -345,7 +345,7 @@ export default function HeroSection() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-orange-205 dark:border-orange-950/30 bg-orange-50/50 dark:bg-orange-950/20 shadow-sm mb-6">
               <span className="w-2 h-2 rounded-full bg-[#ff8b12] animate-pulse" />
               <span className="text-[10px] sm:text-xs font-bold text-[#ff8b12] dark:text-[#ff9d3b] uppercase tracking-widest">
-                Skillyug Summer AI Bootcamp • Classes 6–12
+                Skillyug Summer AI Bootcamp • Classes 6–10
               </span>
             </div>
 
