@@ -10,7 +10,7 @@ import { createMetadata, getHomeFaqSchema } from "@/lib/seo"
 const SkillsSection = dynamic(() => import("@/components/SkillsSection"))
 const StudentProjects = dynamic(() => import("@/components/StudentProjects"))
 const BootcampTimeline = dynamic(() => import("@/components/BootcampTimeline"))
-const AIToolsSection = dynamic(() => import("@/components/AIToolsSection"))
+const OurTopBuilders = dynamic(() => import("@/components/OurTopBuilders"))
 const InteractiveChatDemo = dynamic(() => import("@/components/InteractiveChatDemo"))
 const GallerySection = dynamic(() => import("@/components/GallerySection"))
 const Testimonials = dynamic(() => import("@/components/Testimonials"))
@@ -78,7 +78,7 @@ export default function Home() {
         <InteractiveChatDemo id="ask-ai-mobile" />
       </div>
       
-      <AIToolsSection />
+      <OurTopBuilders />
       
       {/* Gallery — right after AITools on desktop */}
       <div className="hidden md:block">

@@ -231,7 +231,7 @@ export const formatDate = (date: Date): string => {
 export const CURRICULUM_DAYS: CurriculumDay[] = [];
 
 // Populate dates dynamically skipping weekends
-let currentGenDate = new Date(BOOTCAMP_START.getTime());
+const currentGenDate = new Date(BOOTCAMP_START.getTime());
 let genIndex = 0;
 while (genIndex < rawCurriculumData.length) {
   const dayOfWeek = currentGenDate.getDay();
