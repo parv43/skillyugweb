@@ -270,9 +270,17 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
               throw new Error(verifyResult.error || "Payment verification failed.");
             }
 
+            // SUCCESS! Clear checkout form so it doesn't persist
+            try {
+              sessionStorage.removeItem(SESSION_STORAGE_KEY);
+              sessionStorage.removeItem("mybatch_access");
+            } catch (e) {
+              /* ignore */
+            }
+
             setSuccessMsg("Payment successful! Redirecting you to your batch dashboard...");
             setTimeout(() => {
-              router.push("/my-batch");
+              window.location.href = "/my-batch"; // Use hard navigation to force fresh cache and context
             }, 1500);
           } catch (verifyError) {
             console.error("Payment verification failure:", verifyError);
