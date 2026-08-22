@@ -38,7 +38,7 @@ export default function CTASection() {
                 href={isLoggedIn ? "/book-slot" : "/signup?redirect=/book-slot"}
                 className="glow-button px-10 py-5 rounded-full bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white font-bold text-xl tracking-wide shadow-lg shadow-orange-500/10 hover:scale-[1.03] transition-transform w-full sm:w-auto text-center inline-block"
               >
-                Join the Bootcamp
+                Join Bootcamp 2.0
               </Link>
             )}
             <button className="px-10 py-5 rounded-full text-slate-800 dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 font-bold text-xl tracking-wide transition-colors w-full sm:w-auto text-center">

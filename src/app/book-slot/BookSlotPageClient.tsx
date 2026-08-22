@@ -435,7 +435,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
               <p className="text-slate-600 dark:text-slate-350 font-medium">
                 {paymentTier === "full"
                   ? `Complete the full payment to enroll in the upcoming bootcamp.`
-                  : `Complete this payment to reserve your spot. The total bootcamp price is ₹10000.`}
+                  : `Complete this payment to reserve your spot. The total bootcamp price is ₹10.`}
               </p>
             </div>
 

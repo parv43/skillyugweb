@@ -44,7 +44,7 @@ function MobileHero() {
                   boxShadow: "0 4px 20px rgba(255,139,18,0.2)" 
                 }}
               >
-                Join Bootcamp
+                Join Bootcamp 2.0
               </Link>
               <a
                 href="tel:7835049710"
@@ -377,7 +377,7 @@ export default function HeroSection() {
                     boxShadow: "0 4px 20px rgba(255,139,18,0.2)"
                   }}
                 >
-                  Join the Bootcamp
+                  Join Bootcamp 2.0
                 </Link>
               )}
               <a 
