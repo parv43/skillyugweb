@@ -194,7 +194,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          tier: paymentTier,
+          paymentTier,
           studentName,
           phoneNumber,
           grade,
