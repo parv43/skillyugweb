@@ -79,7 +79,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromParam = searchParams.get("from");
-  const paymentTier = (fromParam === "bootcamp" || fromParam === "courses") ? "full" : "partial";
+  const paymentTier = (!fromParam || fromParam === "bootcamp" || fromParam === "courses") ? "full" : "partial";
   const [promoCode, setPromoCode] = useState("");
   const displayAmount = paymentTier === "full" ? calculateBootcampPriceRupees(promoCode) : PARTIAL_BOOK_SLOT_AMOUNT_RUPEES;
   const [errorMsg, setErrorMsg] = useState("");
@@ -434,8 +434,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
               </h1>
               <p className="text-slate-600 dark:text-slate-350 font-medium">
                 {paymentTier === "full"
-                  ? "Complete the full payment to enroll in the upcoming bootcamp."
-                  : "Complete this payment to reserve your spot. The total bootcamp price is ₹3800."}
+                  ? `Complete the full payment to enroll in the upcoming bootcamp.`
+                  : `Complete this payment to reserve your spot. The total bootcamp price is ₹10000.`}
               </p>
             </div>
 
