@@ -8,13 +8,13 @@ export const FULL_BOOK_SLOT_AMOUNT_PAISE = FULL_BOOK_SLOT_AMOUNT_RUPEES * 100
 export const BOOK_SLOT_AMOUNT_LABEL = `₹${FULL_BOOK_SLOT_AMOUNT_RUPEES}`
 
 export function calculateBootcampPriceRupees(promoCode?: string | null): number {
-  if (!promoCode) return 10;
+  if (!promoCode) return 10000;
   
   const code = promoCode.trim().toUpperCase();
-  if (code === "TOP60") return 8;
-  if (code === "TOP80") return 7;
+  if (code === "TOP60") return 8500;
+  if (code === "TOP80") return 7800;
   
-  return 10;
+  return 10000;
 }
 
 export function calculateBootcampPricePaise(promoCode?: string | null): number {
