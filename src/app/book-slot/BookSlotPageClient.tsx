@@ -272,7 +272,6 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
 
             // SUCCESS! Clear checkout form so it doesn't persist
             try {
-              sessionStorage.removeItem(SESSION_STORAGE_KEY);
               sessionStorage.removeItem("mybatch_access");
             } catch (e) {
               /* ignore */
