@@ -97,6 +97,11 @@ async function saveBookingRow<TBookingRow extends { razorpay_payment_id: string 
 
   const { error } = await supabaseAdmin.from(table).insert(payload);
   if (error) {
+    // 23505 = unique_violation. This happens if the webhook and client both try to insert at the exact same millisecond.
+    if (error.code === "23505") {
+      console.log(`[saveBookingRow] Race condition resolved: row already inserted for ${payload.razorpay_payment_id}`);
+      return;
+    }
     throw error;
   }
 }
