@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, MouseEvent } from "react";
+import Image from "next/image";
 import { Lock } from "lucide-react";
 
 export default function VoucherCard() {
@@ -71,11 +72,15 @@ export default function VoucherCard() {
             
             {/* Top Section: Logo & Brand */}
             <div className="relative z-20 flex items-center gap-3 transform-gpu" style={{ transform: "translateZ(30px)" }}>
-              <img 
-                alt="Skillyug Logo" 
-                className="w-auto h-20 md:h-28 object-contain drop-shadow-xl" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaLDtPLJdtYtLv7h3BpCI-2V0TEyavDu-CIZlHmTw9NZCET4Hrl6Gwuat-8zMLTXdmmu1RbxmFKw8cg8jLDhGCxNJqUaAS6SC5bYSrx_S65Ie7dBr0RQJEbECi1jLaI6A8zej8M2j_tHZ-fFDiHFgKKrJyBUd25poMnXG5OGtfSt7GH55mted7jFGDQl21ReJ2Tj17RCSDQ5uAzhGIC4HR6PkGy0xjPX7L-dyuMJa8olbTjYXZSmERXVrkAN0GdvkShTSX9PiCIPkH"
-              />
+              <div className="relative w-auto h-20 md:h-28 aspect-video">
+                <Image 
+                  alt="Skillyug Logo" 
+                  className="object-contain drop-shadow-xl" 
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaLDtPLJdtYtLv7h3BpCI-2V0TEyavDu-CIZlHmTw9NZCET4Hrl6Gwuat-8zMLTXdmmu1RbxmFKw8cg8jLDhGCxNJqUaAS6SC5bYSrx_S65Ie7dBr0RQJEbECi1jLaI6A8zej8M2j_tHZ-fFDiHFgKKrJyBUd25poMnXG5OGtfSt7GH55mted7jFGDQl21ReJ2Tj17RCSDQ5uAzhGIC4HR6PkGy0xjPX7L-dyuMJa8olbTjYXZSmERXVrkAN0GdvkShTSX9PiCIPkH"
+                  fill
+                  sizes="(max-width: 768px) 160px, 200px"
+                />
+              </div>
             </div>
             
             {/* Middle Section: Value Proposition */}

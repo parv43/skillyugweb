@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { persistSlotBooking } from "@/lib/bookingPersistence";
-import { PARTIAL_BOOK_SLOT_AMOUNT_PAISE, FULL_BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
+import { PARTIAL_BOOK_SLOT_AMOUNT_PAISE, FULL_BOOK_SLOT_AMOUNT_PAISE, calculateBootcampPricePaise } from "@/lib/pricing";
 import {
   ensureCapturedRazorpayPayment,
   fetchRazorpayOrder,
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     const notes = parseBookingOrderNotes(order.notes);
 
     if (notes.bookingType === "slot_booking") {
-      const expectedAmount = notes.paymentTier === "full" ? FULL_BOOK_SLOT_AMOUNT_PAISE : PARTIAL_BOOK_SLOT_AMOUNT_PAISE;
+      const expectedAmount = notes.paymentTier === "full" ? calculateBootcampPricePaise(notes.promoCode) : PARTIAL_BOOK_SLOT_AMOUNT_PAISE;
       if (
         payment.amount !== order.amount ||
         order.amount !== expectedAmount ||

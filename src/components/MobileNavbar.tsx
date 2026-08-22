@@ -14,6 +14,7 @@ export default function MobileNavbar() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsIPhone(/iPhone/i.test(navigator.userAgent))
     }
   }, [])
@@ -41,8 +42,10 @@ export default function MobileNavbar() {
   useEffect(() => {
     if (pathname !== "/") {
       if (pathname.startsWith("/blog")) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveSection("blogs")
       } else {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveSection("")
       }
       return

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Menu, X, Sun, Moon } from "lucide-react"
+import { Sun, Moon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
@@ -18,8 +18,10 @@ export default function Navbar() {
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains("dark")
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(isDark ? "dark" : "light")
     if (typeof window !== "undefined") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsIPhone(/iPhone/i.test(navigator.userAgent))
     }
   }, [])

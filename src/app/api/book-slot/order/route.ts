@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getRequiredEnv, getRazorpayAuthHeader } from "@/lib/razorpayServer";
-import { PARTIAL_BOOK_SLOT_AMOUNT_PAISE, FULL_BOOK_SLOT_AMOUNT_PAISE } from "@/lib/pricing";
+import { PARTIAL_BOOK_SLOT_AMOUNT_PAISE, FULL_BOOK_SLOT_AMOUNT_PAISE, calculateBootcampPricePaise } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     const grade = typeof body.grade === "string" ? body.grade.trim() : "";
     const promoCode = typeof body.promoCode === "string" ? body.promoCode.trim().toUpperCase() : "";
     const paymentTier = body.paymentTier === "full" ? "full" : "partial";
-    const amount = paymentTier === "full" ? FULL_BOOK_SLOT_AMOUNT_PAISE : PARTIAL_BOOK_SLOT_AMOUNT_PAISE;
+    const amount = paymentTier === "full" ? calculateBootcampPricePaise(promoCode) : PARTIAL_BOOK_SLOT_AMOUNT_PAISE;
 
     if (!studentName || !grade || !/^\d{10}$/.test(phoneNumber)) {
       return NextResponse.json(

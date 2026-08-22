@@ -8,7 +8,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Phone } from "lucide-react";
 
 import { markPaymentSupportNoticePending } from "@/lib/paymentSupportNotice";
-import { PARTIAL_BOOK_SLOT_AMOUNT_RUPEES, FULL_BOOK_SLOT_AMOUNT_RUPEES } from "@/lib/pricing";
+import { 
+  PARTIAL_BOOK_SLOT_AMOUNT_RUPEES, 
+  FULL_BOOK_SLOT_AMOUNT_RUPEES,
+  calculateBootcampPriceRupees
+} from "@/lib/pricing";
 import { supabase } from "@/lib/supabaseClient";
 
 interface RazorpayOrderResponse {
@@ -76,7 +80,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const searchParams = useSearchParams();
   const fromParam = searchParams.get("from");
   const paymentTier = (fromParam === "bootcamp" || fromParam === "courses") ? "full" : "partial";
-  const displayAmount = paymentTier === "full" ? FULL_BOOK_SLOT_AMOUNT_RUPEES : PARTIAL_BOOK_SLOT_AMOUNT_RUPEES;
+  const [promoCode, setPromoCode] = useState("");
+  const displayAmount = paymentTier === "full" ? calculateBootcampPriceRupees(promoCode) : PARTIAL_BOOK_SLOT_AMOUNT_RUPEES;
   const [errorMsg, setErrorMsg] = useState("");
   const [gatewayNotice, setGatewayNotice] = useState("");
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -90,7 +95,6 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const [studentName, setStudentName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [grade, setGrade] = useState("");
-  const [promoCode, setPromoCode] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const showPaymentHelpCta = Boolean(successMsg || errorMsg);
 

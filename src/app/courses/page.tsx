@@ -171,7 +171,7 @@ interface RoadNodeProps {
   onClick: () => void
   onMouseEnter: () => void
   color: string
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
   size?: "default" | "sm"
   animate: boolean
 }
@@ -264,6 +264,81 @@ export default function CoursesPage() {
   const [userInteracted, setUserInteracted] = useState(false)
   const roadmapRef = useRef<HTMLDivElement>(null)
 
+
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setAnimate(true)
+          setAnimationKey((prev) => prev + 1) // Force remount to restart animations on entering view
+          setUserInteracted(false) // Reset user interaction on scroll in
+        } else {
+          setAnimate(false) // Reset the road glow when section is out of viewport
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    if (roadmapRef.current) {
+      observer.observe(roadmapRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const timers: NodeJS.Timeout[] = []
+
+    if (animate && !userInteracted) {
+      setTimeout(() => {
+        setActiveWeek(1)
+        setRevealedWeeks([1])
+      }, 0)
+      
+      timers.push(setTimeout(() => { 
+        if (!userInteracted) { 
+          setActiveWeek(2)
+          setRevealedWeeks(prev => prev.includes(2) ? prev : [...prev, 2])
+        } 
+      }, 2000))
+      
+      timers.push(setTimeout(() => { 
+        if (!userInteracted) { 
+          setActiveWeek(3)
+          setRevealedWeeks(prev => prev.includes(3) ? prev : [...prev, 3])
+        } 
+      }, 4000))
+      
+      timers.push(setTimeout(() => { 
+        if (!userInteracted) { 
+          setActiveWeek(4)
+          setRevealedWeeks(prev => prev.includes(4) ? prev : [...prev, 4])
+        } 
+      }, 6000))
+      
+      timers.push(setTimeout(() => { 
+        if (!userInteracted) { 
+          setActiveWeek(5)
+          setRevealedWeeks(prev => prev.includes(5) ? prev : [...prev, 5])
+        } 
+      }, 8000))
+    } else if (userInteracted) {
+      setTimeout(() => {
+        setRevealedWeeks([1, 2, 3, 4, 5])
+      }, 0)
+    }
+
+    return () => {
+      timers.forEach(clearTimeout)
+    }
+  }, [animate, animationKey, userInteracted])
+
+  const handleSelectWeek = (week: number) => {
+    setActiveWeek(week)
+    setUserInteracted(true)
+  }
+
   // Toggle to hide courses page under construction
   const SHOW_UNDER_CONSTRUCTION = true;
 
@@ -316,75 +391,6 @@ export default function CoursesPage() {
         </div>
       </main>
     );
-  }
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setAnimate(true)
-          setAnimationKey((prev) => prev + 1) // Force remount to restart animations on entering view
-          setUserInteracted(false) // Reset user interaction on scroll in
-        } else {
-          setAnimate(false) // Reset the road glow when section is out of viewport
-        }
-      },
-      { threshold: 0.1 }
-    )
-
-    if (roadmapRef.current) {
-      observer.observe(roadmapRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    let timers: NodeJS.Timeout[] = []
-
-    if (animate && !userInteracted) {
-      setActiveWeek(1)
-      setRevealedWeeks([1])
-      
-      timers.push(setTimeout(() => { 
-        if (!userInteracted) { 
-          setActiveWeek(2)
-          setRevealedWeeks(prev => prev.includes(2) ? prev : [...prev, 2])
-        } 
-      }, 2000))
-      
-      timers.push(setTimeout(() => { 
-        if (!userInteracted) { 
-          setActiveWeek(3)
-          setRevealedWeeks(prev => prev.includes(3) ? prev : [...prev, 3])
-        } 
-      }, 4000))
-      
-      timers.push(setTimeout(() => { 
-        if (!userInteracted) { 
-          setActiveWeek(4)
-          setRevealedWeeks(prev => prev.includes(4) ? prev : [...prev, 4])
-        } 
-      }, 6000))
-      
-      timers.push(setTimeout(() => { 
-        if (!userInteracted) { 
-          setActiveWeek(5)
-          setRevealedWeeks(prev => prev.includes(5) ? prev : [...prev, 5])
-        } 
-      }, 8000))
-    } else if (userInteracted) {
-      setRevealedWeeks([1, 2, 3, 4, 5])
-    }
-
-    return () => {
-      timers.forEach(clearTimeout)
-    }
-  }, [animate, animationKey, userInteracted])
-
-  const handleSelectWeek = (week: number) => {
-    setActiveWeek(week)
-    setUserInteracted(true)
   }
 
   return (
@@ -507,7 +513,7 @@ export default function CoursesPage() {
                 </span>
               </div>
               <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed mb-4 text-left">
-                "Skillyug has transformed my son's screen time from gaming to coding!"
+                &quot;Skillyug has transformed my son&apos;s screen time from gaming to coding!&quot;
               </p>
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#0060aa] to-[#ff8b12] text-white flex items-center justify-center font-bold text-xs shadow-md">
@@ -817,7 +823,7 @@ export default function CoursesPage() {
               </span>
             </h2>
             <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 font-medium">
-              A premium orthogonal roadmap mapping your child's weekly progress. Hover or tap each week to explore details.
+              A premium orthogonal roadmap mapping your child&apos;s weekly progress. Hover or tap each week to explore details.
             </p>
           </div>
 

@@ -11,9 +11,11 @@ const FlipUnit = ({ digit }: { digit: string }) => {
 
   useEffect(() => {
     if (digit !== currentDigit) {
-      setPreviousDigit(currentDigit)
-      setCurrentDigit(digit)
-      setIsFlipping(true)
+      setTimeout(() => {
+        setPreviousDigit(currentDigit)
+        setCurrentDigit(digit)
+        setIsFlipping(true)
+      }, 0)
     }
   }, [digit, currentDigit])
 
@@ -59,7 +61,9 @@ export default function FirstClassCountdown() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    setTimeout(() => {
+      setMounted(true)
+    }, 0)
     const targetDate = new Date("2026-05-28T13:00:00+05:30").getTime()
 
     const calculateTimeLeft = () => {

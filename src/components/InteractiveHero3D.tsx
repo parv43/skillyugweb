@@ -4,10 +4,11 @@ import React, { useRef, useState, useEffect, useMemo } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { OrbitControls, useTexture } from "@react-three/drei"
 import * as THREE from "three"
+import Image from "next/image"
 
 // ─── BACKGROUND STARDUST PARTICLES ─────────────────────────────────────────
 function BackgroundParticles({ count = 25 }) {
-  const points = useMemo(() => {
+  const [points] = useState(() => {
     const temp = []
     for (let i = 0; i < count; i++) {
       const x = (Math.random() - 0.5) * 15
@@ -18,7 +19,7 @@ function BackgroundParticles({ count = 25 }) {
       temp.push({ position: new THREE.Vector3(x, y, z), speed, size, initialY: y })
     }
     return temp
-  }, [count])
+  })
 
   const ref = useRef<THREE.Group>(null)
 
@@ -403,7 +404,9 @@ export default function InteractiveHero3D() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    setTimeout(() => {
+      setMounted(true)
+    }, 0)
   }, [])
 
   if (!mounted) {
@@ -412,11 +415,15 @@ export default function InteractiveHero3D() {
         {/* Premium skeleton loading spinner */}
         <div className="relative w-32 h-32 flex items-center justify-center">
           <div className="absolute w-20 h-20 rounded-full border-2 border-slate-200 dark:border-white/10 animate-pulse flex items-center justify-center p-2">
-            <img 
-              src="/skillyug.svg" 
-              alt="Loading" 
-              className="w-full h-full object-contain opacity-40" 
-            />
+            <div className="relative w-full h-full">
+              <Image 
+                alt="Skillyug Logo" 
+                className="object-contain opacity-50 dark:opacity-40" 
+                src="/skillyug.svg"
+                fill
+                sizes="80px"
+              />
+            </div>
           </div>
           <div className="absolute w-32 h-32 rounded-full border-t-2 border-indigo-500 animate-spin"></div>
         </div>

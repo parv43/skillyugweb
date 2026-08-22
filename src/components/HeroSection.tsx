@@ -166,7 +166,8 @@ export default function HeroSection() {
             style={{ animation: "float6 7s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3 group">
-              <img src="/canva.svg" alt="Canva" className="w-[46px] h-[46px] object-contain transition-transform duration-300 group-hover:scale-110 mb-1" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/canva.svg" alt="Canva" className="w-[46px] h-[46px] object-contain transition-transform duration-300 group-hover:scale-110 mb-1" />
               <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">Canva AI</span>
             </div>
           </div>
@@ -177,7 +178,8 @@ export default function HeroSection() {
             style={{ animation: "float1 6.5s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3 group">
-              <img src="/antigravity.svg" alt="Antigravity" className="w-[46px] h-[46px] object-contain transition-transform duration-300 group-hover:scale-110 mb-1" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/antigravity.svg" alt="Antigravity" className="w-[46px] h-[46px] object-contain transition-transform duration-300 group-hover:scale-110 mb-1" />
               <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">Antigravity</span>
             </div>
           </div>
@@ -188,7 +190,8 @@ export default function HeroSection() {
             style={{ animation: "float2 8s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3 group">
-              <img src="/gemini.svg" alt="Gemini" className="w-[46px] h-[46px] object-contain transition-transform duration-300 group-hover:scale-110 mb-1" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/gemini.svg" alt="Gemini" className="w-[46px] h-[46px] object-contain transition-transform duration-300 group-hover:scale-110 mb-1" />
               <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 tracking-tight">Gemini</span>
             </div>
           </div>
@@ -215,7 +218,8 @@ export default function HeroSection() {
             style={{ animation: "float4 9s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3 group">
-              <img src="/claude-ai-icon.svg" alt="Claude" className="w-[46px] h-[46px] object-contain transition-transform duration-300 group-hover:scale-110 mb-1" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/claude-ai-icon.svg" alt="Claude" className="w-[46px] h-[46px] object-contain transition-transform duration-300 group-hover:scale-110 mb-1" />
               <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">Claude</span>
             </div>
           </div>
@@ -226,7 +230,8 @@ export default function HeroSection() {
             style={{ animation: "float5 6s ease-in-out infinite" }}
           >
             <div className="clay-badge clay-badge-square w-full h-full flex flex-col items-center justify-center p-3 group">
-              <img src="/perplexity.svg" alt="Perplexity" className="w-[46px] h-[46px] object-contain dark:invert transition-transform duration-300 group-hover:scale-110 mb-1" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/perplexity.svg" alt="Perplexity" className="w-[46px] h-[46px] object-contain dark:invert transition-transform duration-300 group-hover:scale-110 mb-1" />
               <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 tracking-tight">perplexity</span>
             </div>
           </div>
