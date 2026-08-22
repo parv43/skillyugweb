@@ -7,7 +7,7 @@ export interface CurriculumDay {
   dateStr: string; // "YYYY-MM-DD"
 }
 
-export const BOOTCAMP_START = new Date(2026, 4, 28); // May 28, 2026 (Month is 0-indexed: 4 = May)
+export const BOOTCAMP_START = new Date(2026, 8, 15); // Sep 15, 2026 (Month is 0-indexed: 8 = Sep)
 
 const rawCurriculumData = [
   {

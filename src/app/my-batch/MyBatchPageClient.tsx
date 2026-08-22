@@ -718,7 +718,7 @@ export default function MyBatchPage() {
 
   const isPaidUser = hasSlotAccess || user.email === "eternallytanuj@gmail.com";
   // Unlocked completely for all verified users
-  const canDownloadCert = true;
+  const canDownloadCert = progressPercentage === 100;
 
   return (
     <main className="min-h-screen bg-transparent text-slate-800 dark:text-slate-200 relative overflow-x-hidden select-none">
