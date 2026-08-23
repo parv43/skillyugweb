@@ -29,6 +29,7 @@ export interface BookingOrderNotes {
   promoCode?: string | null;
   studentName?: string | null;
   userId?: string | null;
+  batchId?: string | null;
 }
 
 interface RazorpayErrorPayload {
@@ -187,5 +188,6 @@ export function parseBookingOrderNotes(notes: unknown): BookingOrderNotes {
     promoCode: readString(record.promo_code),
     studentName: readString(record.student_name),
     userId: readString(record.user_id),
+    batchId: readString(record.batch_id),
   };
 }

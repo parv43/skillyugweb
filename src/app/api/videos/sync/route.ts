@@ -19,6 +19,7 @@ interface Recording {
   title: string;
   published_at: string;
   custom_date: string;
+  batch_id: string;
 }
 
 
@@ -100,13 +101,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Load API credentials
-    const apiKey = process.env.YOUTUBE_API_KEY;
-    const playlistId = process.env.YOUTUBE_PLAYLIST_ID;
+    // 2. Find active batch
+    const admin = createSupabaseAdmin();
+    const { data: activeBatch, error: batchError } = await admin
+      .from("batches")
+      .select("id, youtube_playlist_id")
+      .eq("is_active", true)
+      .single();
 
-    if (!apiKey || !playlistId) {
+    if (batchError || !activeBatch) {
       return NextResponse.json(
-        { error: "YouTube API config not configured on server." },
+        { error: "No active batch found." },
+        { status: 400 }
+      );
+    }
+
+    const playlistId = activeBatch.youtube_playlist_id;
+    if (!playlistId) {
+      return NextResponse.json(
+        { error: "Active batch does not have a YouTube playlist configured.", count: 0 },
+        { status: 200 } // Not an error, just nothing to do
+      );
+    }
+
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "YouTube API Key not configured on server." },
         { status: 500 }
       );
     }
@@ -156,7 +177,8 @@ export async function POST(request: NextRequest) {
         youtube_video_id: videoId,
         title: title,
         published_at: publishedAt,
-        custom_date: formatCustomDate(publishedAt)
+        custom_date: formatCustomDate(publishedAt),
+        batch_id: activeBatch.id,
       };
     }).filter((rec) => {
       const titleLower = rec.title.toLowerCase();
@@ -166,7 +188,6 @@ export async function POST(request: NextRequest) {
     });
 
     // 5. Upsert active recordings and clean up deleted records
-    const admin = createSupabaseAdmin();
 
     if (recordings.length > 0) {
       const { error: upsertError } = await admin
@@ -182,21 +203,23 @@ export async function POST(request: NextRequest) {
       }
 
       // Delete any database recordings that are no longer in the active playlist
+      // IMPORTANT: Scope delete ONLY to the active batch
       const activeIds = recordings.map((r) => r.youtube_video_id);
       const { error: deleteError } = await admin
         .from("session_recordings")
         .delete()
+        .eq("batch_id", activeBatch.id)
         .not("youtube_video_id", "in", `(${activeIds.join(",")})`);
 
       if (deleteError) {
         console.error("[Sync API] Supabase delete inactive error:", deleteError);
       }
     } else {
-      // If the playlist has no valid/active videos, clear the database table
+      // If the playlist has no valid/active videos, clear the active batch's table only
       const { error: deleteError } = await admin
         .from("session_recordings")
         .delete()
-        .neq("youtube_video_id", ""); // matches all
+        .eq("batch_id", activeBatch.id);
 
       if (deleteError) {
         console.error("[Sync API] Supabase clear table error:", deleteError);

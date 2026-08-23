@@ -127,7 +127,7 @@ export async function POST(request: Request) {
         payment: capturedPayment,
       });
     } catch (insertError) {
-      const errStr = insertError instanceof Error ? insertError.message : String(insertError);
+      const errStr = insertError instanceof Error ? insertError.message : JSON.stringify(insertError);
       console.error("Failed to save slot booking after payment:", insertError);
       return NextResponse.json(
         {

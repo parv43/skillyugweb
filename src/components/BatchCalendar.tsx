@@ -12,9 +12,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import {
-  CURRICULUM_DAYS,
-  BOOTCAMP_START,
-  BOOTCAMP_END,
+  getCurriculumDays,
   formatDate,
   getInitialDates
 } from "@/lib/curriculum";
@@ -63,13 +61,14 @@ const getClassStatus = (date: Date) => {
   }
 };
 
-const getBootcampDay = (date: Date) => {
+const getBootcampDay = (date: Date, startDateStr?: string | null) => {
   const targetStr = formatDate(date);
-  return CURRICULUM_DAYS.find(day => day.dateStr === targetStr);
+  const days = getCurriculumDays(startDateStr);
+  return days.find(day => day.dateStr === targetStr);
 };
 
-export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean }) {
-  const initialDates = getInitialDates();
+export default function BatchCalendar({ hasSlot = true, startDateStr }: { hasSlot?: boolean, startDateStr?: string | null }) {
+  const initialDates = getInitialDates(startDateStr);
   const [currentDate, setCurrentDate] = useState(initialDates.current);
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialDates.selected);
 
@@ -98,18 +97,19 @@ export default function BatchCalendar({ hasSlot = true }: { hasSlot?: boolean })
         <div key={`empty-${i}`} aria-hidden="true" className="h-10" />
       );
     } else {
-      const dateObj = new Date(year, month, day);
-      const bootcampDay = getBootcampDay(dateObj);
+      const dayDate = new Date(year, month, day);
+      const bootcampDay = getBootcampDay(dayDate, startDateStr);
+      const status = getClassStatus(dayDate);
       const isBootcamp = !!bootcampDay;
-      const dateStr = formatDate(dateObj);
+      const dateStr = formatDate(dayDate);
       const isSelected = selectedDate != null && formatDate(selectedDate) === dateStr;
       
       let isCompleted = false;
       let isTodayClass = false;
       if (bootcampDay) {
-        const status = getClassStatus(dateObj);
+        const status = getClassStatus(dayDate);
         isCompleted = status.type === "past";
-        isTodayClass = (status.type === "live" || status.type === "upcoming") && dateObj.toDateString() === new Date().toDateString();
+        isTodayClass = (status.type === "live" || status.type === "upcoming") && dayDate.toDateString() === new Date().toDateString();
       }
 
       let cellClass = "relative h-10 w-full rounded-xl flex items-center justify-center text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 ";

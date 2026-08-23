@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getRequiredEnv, getRazorpayAuthHeader } from "@/lib/razorpayServer";
 import { PARTIAL_BOOK_SLOT_AMOUNT_PAISE, FULL_BOOK_SLOT_AMOUNT_PAISE, calculateBootcampPricePaise } from "@/lib/pricing";
+import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export const runtime = "nodejs";
 
@@ -60,6 +61,20 @@ export async function POST(request: Request) {
       );
     }
 
+    const { data: activeBatch, error: batchError } = await supabaseAdmin
+      .from("batches")
+      .select("id")
+      .eq("is_active", true)
+      .single();
+      
+    if (batchError || !activeBatch) {
+      console.error("Failed to find an active batch:", batchError);
+      return NextResponse.json(
+        { error: "No active bootcamp is currently accepting enrollments." },
+        { status: 400 }
+      );
+    }
+
     const receipt = `slot_${Date.now()}`.slice(0, 40);
     const razorpayResponse = await fetch("https://api.razorpay.com/v1/orders", {
       method: "POST",
@@ -81,6 +96,7 @@ export async function POST(request: Request) {
           promo_code: promoCode || "NONE",
           student_name: studentName,
           user_id: user.id,
+          batch_id: activeBatch.id,
         },
       }),
       cache: "no-store",

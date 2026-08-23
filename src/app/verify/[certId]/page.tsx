@@ -1,6 +1,6 @@
 import React from "react";
 import { createClient } from "@supabase/supabase-js";
-import { BadgeCheck, Calendar, ShieldCheck, User } from "lucide-react";
+import { BadgeCheck, Calendar, ShieldCheck, User, BookOpen } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 
@@ -15,7 +15,12 @@ export default async function VerifyCertificatePage({ params }: { params: { cert
   // Query database for the certificate
   const { data: cert, error } = await supabase
     .from("issued_certificates")
-    .select("*")
+    .select(`
+      *,
+      batches (
+        label
+      )
+    `)
     .eq("cert_id", certId)
     .single();
 
@@ -69,6 +74,17 @@ export default async function VerifyCertificatePage({ params }: { params: { cert
                         day: 'numeric',
                         year: 'numeric'
                       })}
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 mb-2">
+                      <BookOpen className="w-4 h-4" />
+                      <span className="text-xs font-bold uppercase tracking-widest">Cohort / Program</span>
+                    </div>
+                    <p className="text-xl font-bold text-slate-700 dark:text-slate-200">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {(cert as any).batches?.label || "Skillyug Bootcamp"}
                     </p>
                   </div>
                 </div>

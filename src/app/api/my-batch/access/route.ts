@@ -62,13 +62,27 @@ async function getAuthenticatedUser(request: NextRequest) {
  * Checks if the user has any row in slot_bookings (any row = verified payment).
  * Matches by user_id first, then falls back to email.
  */
-async function getAccessDetails(userId: string, email: string | null): Promise<{ hasSlot: boolean }> {
+async function getAccessDetails(userId: string, email: string | null): Promise<{ hasSlot: boolean, activeBatch?: Record<string, unknown> }> {
   const admin = createSupabaseAdmin();
 
+  // Find the active batch first
+  const { data: activeBatch, error: batchError } = await admin
+    .from("batches")
+    .select("*")
+    .eq("is_active", true)
+    .single();
+
+  if (batchError || !activeBatch) {
+    console.error("[Access] Failed to find active batch:", batchError);
+    return { hasSlot: false };
+  }
+
   // Single query using OR — avoids a second round trip
+  // Scope it to the active batch ONLY.
   const query = admin
     .from("slot_bookings")
     .select("razorpay_payment_id", { count: "exact", head: true })
+    .eq("batch_id", activeBatch.id)
     .or(`user_id.eq.${userId}${email ? `,email.eq.${email}` : ""}`)
     .limit(1);
 
@@ -76,7 +90,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
 
   if (error) console.error("[Access] slot_bookings query error:", error);
 
-  return { hasSlot: (count ?? 0) > 0 };
+  return { hasSlot: (count ?? 0) > 0, activeBatch };
 }
 
 export async function GET(request: NextRequest) {
@@ -91,12 +105,12 @@ export async function GET(request: NextRequest) {
 
     console.log("[Access] Checking access for user:", user.id, user.email);
 
-    const { hasSlot } = await getAccessDetails(user.id, user.email ?? null);
+    const { hasSlot, activeBatch } = await getAccessDetails(user.id, user.email ?? null);
     const hasAccess = hasSlot;
 
     console.log("[Access] Result — hasSlot:", hasSlot, "hasAccess:", hasAccess);
 
-    const response = NextResponse.json({ hasAccess, hasSlot });
+    const response = NextResponse.json({ hasAccess, hasSlot, activeBatch });
     response.headers.set("Cache-Control", "no-store, max-age=0");
     return response;
   } catch (error) {

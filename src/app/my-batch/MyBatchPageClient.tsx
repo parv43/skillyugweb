@@ -48,6 +48,7 @@ type BatchUser = {
   batchLabel: string;
   email: string;
   fullName: string;
+  activeBatch?: any;
 };
 
 const resourceCards = [
@@ -75,8 +76,8 @@ export default function MyBatchPage() {
   const [isBlurred, setIsBlurred] = useState(false);
 
   // Dynamic Curriculum derived states
-  const nextSession = getNextLiveSession();
-  const completedDays = getCompletedDaysCount();
+  const nextSession = getNextLiveSession(new Date(), user?.activeBatch?.start_date);
+  const completedDays = getCompletedDaysCount(new Date(), user?.activeBatch?.start_date);
   const progressPercentage = Math.round((completedDays / 25) * 100);
   const strokeDashoffset = 251.2 - (251.2 * progressPercentage) / 100;
 
@@ -647,9 +648,10 @@ export default function MyBatchPage() {
             setUserId(session.user.id);
             setUser({
               avatarUrl,
-              batchLabel: "Summer AI Creator Cohort",
+              batchLabel: value.activeBatch?.label || "Skillyug Bootcamp",
               email: session.user.email ?? "",
               fullName,
+              activeBatch: value.activeBatch,
             });
             setLoading(false);
             return; // skip the API call entirely
@@ -660,6 +662,7 @@ export default function MyBatchPage() {
       // ── Slow path: call API (first visit or cache expired) ──
       let hasAccess = false;
       let slotAccess = false;
+      let activeBatch: any = null;
       try {
         const res = await fetch("/api/my-batch/access", {
           method: "GET",
@@ -669,14 +672,16 @@ export default function MyBatchPage() {
             "Cache-Control": "no-cache",
           },
         });
+        
         if (res.ok) {
-          const data = (await res.json()) as { hasAccess?: boolean; hasSlot?: boolean };
+          const data = (await res.json()) as { hasAccess?: boolean; hasSlot?: boolean; activeBatch?: any };
           hasAccess = Boolean(data.hasAccess);
           slotAccess = Boolean(data.hasSlot);
+          activeBatch = data.activeBatch;
           try {
             sessionStorage.setItem(
               "mybatch_access",
-              JSON.stringify({ value: { hasAccess, hasSlot: slotAccess }, expiry: Date.now() + 5 * 60 * 1000 })
+              JSON.stringify({ value: { hasAccess, hasSlot: slotAccess, activeBatch }, expiry: Date.now() + 5 * 60 * 1000 })
             );
           } catch { /* ignore */ }
         } else {
@@ -698,9 +703,10 @@ export default function MyBatchPage() {
       setUserId(session.user.id);
       setUser({
         avatarUrl,
-        batchLabel: "Summer AI Creator Cohort",
+        batchLabel: activeBatch?.label || "Skillyug Bootcamp",
         email: session.user.email ?? "",
         fullName,
+        activeBatch,
       });
       setLoading(false);
     };
@@ -839,40 +845,47 @@ export default function MyBatchPage() {
                           })}, 2:00 PM IST
                         </p>
                       </div>
-                      {nextSession.status === "live" ? (
-                        <a 
-                          href="https://meet.google.com/wxd-yqum-mij"
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-red-500/10"
-                        >
-                          <svg className="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 87.5 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="#fff" d="M49.5 36l8.53 9.75 11.47 7.33 2-17.02-2-16.64-11.69 6.44z"/>
-                            <path fill="#fff" d="M0 51.5V66c0 3.315 2.685 6 6 6h14.5l3-10.96-3-9.54-9.95-3z"/>
-                            <path fill="#fff" d="M20.5 0L0 20.5l10.55 3 9.95-3 2.95-9.41z"/>
-                            <path fill="#fff" d="M20.5 20.5H0v31h20.5z"/>
-                            <path fill="#fff" d="M82.6 8.68L69.5 19.42v33.66l13.16 10.79c1.97 1.54 4.85.135 4.85-2.37V11c0-2.535-2.945-3.925-4.91-2.32zM49.5 36v15.5h-29V72h43c3.315 0 6-2.685 6-6V53.08z"/>
-                            <path fill="#fff" d="M63.5 0h-43v20.5h29V36l20-16.57V6c0-3.315-2.685-6-6-6z"/>
-                          </svg>
-                          Join Meeting
-                        </a>
+                      {user.activeBatch?.meet_link ? (
+                        nextSession.status === "live" ? (
+                          <a 
+                            href={user.activeBatch.meet_link}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-red-500/10"
+                          >
+                            <svg className="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 87.5 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path fill="#fff" d="M49.5 36l8.53 9.75 11.47 7.33 2-17.02-2-16.64-11.69 6.44z"/>
+                              <path fill="#fff" d="M0 51.5V66c0 3.315 2.685 6 6 6h14.5l3-10.96-3-9.54-9.95-3z"/>
+                              <path fill="#fff" d="M20.5 0L0 20.5l10.55 3 9.95-3 2.95-9.41z"/>
+                              <path fill="#fff" d="M20.5 20.5H0v31h20.5z"/>
+                              <path fill="#fff" d="M82.6 8.68L69.5 19.42v33.66l13.16 10.79c1.97 1.54 4.85.135 4.85-2.37V11c0-2.535-2.945-3.925-4.91-2.32zM49.5 36v15.5h-29V72h43c3.315 0 6-2.685 6-6V53.08z"/>
+                              <path fill="#fff" d="M63.5 0h-43v20.5h29V36l20-16.57V6c0-3.315-2.685-6-6-6z"/>
+                            </svg>
+                            Join Meeting
+                          </a>
+                        ) : (
+                          <a 
+                            href={user.activeBatch.meet_link}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 dark:border-white/10 dark:bg-slate-900/60 dark:hover:bg-slate-900/80 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition-all hover:scale-105 active:scale-95 shadow-sm"
+                          >
+                            <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 87.5 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path fill="#00832d" d="M49.5 36l8.53 9.75 11.47 7.33 2-17.02-2-16.64-11.69 6.44z"/>
+                              <path fill="#0066da" d="M0 51.5V66c0 3.315 2.685 6 6 6h14.5l3-10.96-3-9.54-9.95-3z"/>
+                              <path fill="#e94235" d="M20.5 0L0 20.5l10.55 3 9.95-3 2.95-9.41z"/>
+                              <path fill="#2684fc" d="M20.5 20.5H0v31h20.5z"/>
+                              <path fill="#00ac47" d="M82.6 8.68L69.5 19.42v33.66l13.16 10.79c1.97 1.54 4.85.135 4.85-2.37V11c0-2.535-2.945-3.925-4.91-2.32zM49.5 36v15.5h-29V72h43c3.315 0 6-2.685 6-6V53.08z"/>
+                              <path fill="#ffba00" d="M63.5 0h-43v20.5h29V36l20-16.57V6c0-3.315-2.685-6-6-6z"/>
+                            </svg>
+                            Google Meet
+                          </a>
+                        )
                       ) : (
-                        <a 
-                          href="https://meet.google.com/wxd-yqum-mij"
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 dark:border-white/10 dark:bg-slate-900/60 dark:hover:bg-slate-900/80 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition-all hover:scale-105 active:scale-95 shadow-sm"
-                        >
-                          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 87.5 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="#00832d" d="M49.5 36l8.53 9.75 11.47 7.33 2-17.02-2-16.64-11.69 6.44z"/>
-                            <path fill="#0066da" d="M0 51.5V66c0 3.315 2.685 6 6 6h14.5l3-10.96-3-9.54-9.95-3z"/>
-                            <path fill="#e94235" d="M20.5 0L0 20.5l10.55 3 9.95-3 2.95-9.41z"/>
-                            <path fill="#2684fc" d="M20.5 20.5H0v31h20.5z"/>
-                            <path fill="#00ac47" d="M82.6 8.68L69.5 19.42v33.66l13.16 10.79c1.97 1.54 4.85.135 4.85-2.37V11c0-2.535-2.945-3.925-4.91-2.32zM49.5 36v15.5h-29V72h43c3.315 0 6-2.685 6-6V53.08z"/>
-                            <path fill="#ffba00" d="M63.5 0h-43v20.5h29V36l20-16.57V6c0-3.315-2.685-6-6-6z"/>
-                          </svg>
-                          Google Meet
-                        </a>
+                        <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 dark:border-white/5 dark:bg-slate-800/40 px-3.5 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 opacity-80 cursor-not-allowed shadow-sm">
+                          <Video className="w-4 h-4" />
+                          Meeting Link Coming Soon
+                        </div>
                       )}
                     </div>
                   </>
@@ -1295,7 +1308,7 @@ export default function MyBatchPage() {
 
           {/* Bottom Section: Bootcamp Calendar */}
           <div className="rounded-[2rem] border border-slate-200 bg-white backdrop-blur-xl p-6 md:p-8 shadow-sm">
-            <BatchCalendar hasSlot={hasSlotAccess} />
+            <BatchCalendar hasSlot={hasSlotAccess} startDateStr={user.activeBatch?.start_date} />
           </div>
         
             </>
@@ -1497,7 +1510,7 @@ export default function MyBatchPage() {
                 </div>
               </div>
               
-              <BatchCalendar hasSlot={hasSlotAccess} />
+              <BatchCalendar hasSlot={hasSlotAccess} startDateStr={user.activeBatch?.start_date} />
             </section>
 
           </div>

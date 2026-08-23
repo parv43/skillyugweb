@@ -65,6 +65,7 @@ async function ensureFontRegistered() {
 async function generateCertificatePdf(
   name: string,
   userId: string | null,
+  batchId: string | null,
   background: Awaited<ReturnType<typeof loadImage>>,
   suffix: string = ""  // e.g. "-S" for student, "-P" for parent — prevents filename collisions
 ): Promise<{ downloadUrl: string; certId: string }> {
@@ -146,6 +147,7 @@ async function generateCertificatePdf(
       user_name: name,
       cert_id: certId,
       user_id: userId || null,
+      batch_id: batchId || null,
     },
   ]);
   if (dbError) throw new Error(`DB insert failed: ${dbError.message}`);
@@ -199,8 +201,21 @@ export async function POST(request: Request) {
     // Load background once — shared between both certificates
     const background = await loadImage(BACKGROUND_PATH);
 
+    let batchId: string | null = null;
+    if (userId) {
+      const { data: slotBooking } = await supabase
+        .from("slot_bookings")
+        .select("batch_id")
+        .eq("user_id", userId)
+        .limit(1)
+        .single();
+      if (slotBooking?.batch_id) {
+        batchId = slotBooking.batch_id;
+      }
+    }
+
     // Always generate student certificate (suffix -S)
-    const studentCert = await generateCertificatePdf(studentName, userId, background, "-S");
+    const studentCert = await generateCertificatePdf(studentName, userId, batchId, background, "-S");
 
     // Generate parent certificate only if a parent name was provided.
     // We await student first so timestamps differ even without an explicit delay.
@@ -208,7 +223,7 @@ export async function POST(request: Request) {
     if (parentName) {
       // 1ms delay guarantees Date.now() differs from the student cert timestamp
       await new Promise(r => setTimeout(r, 1));
-      parentCert = await generateCertificatePdf(parentName, userId, background, "-P");
+      parentCert = await generateCertificatePdf(parentName, userId, batchId, background, "-P");
     }
 
     return NextResponse.json({

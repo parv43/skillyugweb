@@ -14,6 +14,7 @@ interface SlotFallbackDetails {
   userId?: string | null;
   gradeClass?: string | null;
   promoCode?: string | null;
+  batchId?: string | null;
 }
 
 interface PersistBookingOptions<TFallback> {
@@ -35,6 +36,7 @@ type SlotBookingRow = {
   user_id: string | null;
   grade_class: string;
   promo_code: string | null;
+  batch_id: string | null;
 };
 
 function cleanString(value?: string | null) {
@@ -144,6 +146,7 @@ export async function persistSlotBooking({
     razorpay_order_id: order.id,
     razorpay_payment_id: payment.id,
     user_id: userId,
+    batch_id: notes.batchId ?? fallbackDetails?.batchId ?? null,
   };
 
   await saveBookingRow("slot_bookings", payload);
