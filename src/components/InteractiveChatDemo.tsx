@@ -17,7 +17,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
     },
     {
       role: "ai",
-      content: "Welcome! Skillyug teaches Class 6–12 students how to use modern AI tools like ChatGPT and Canva AI to build creative projects. I'm here to help you understand the program!"
+      content: "Welcome! Skillyug teaches Class 6–10 students how to use advanced AI tools like ChatGPT, Claude, Knapkin, n8n, and Canva AI to build creative, real-world projects. I'm here to help you understand the program!"
     }
   ])
 
@@ -59,16 +59,16 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
     }
 
     if (text.includes("learn") || text.includes("tool") || text.includes("teach") || text.includes("curriculum")) {
-      return "Students learn to use ChatGPT, Canva AI, Midjourney, and automation tools to build creative projects."
+      return "Students learn practical AI skills: using ChatGPT for research and problem-solving, Claude for deeper analysis, Knapkin for creating visual diagrams, n8n for simple workflows, and Canva AI for creative presentations."
     }
     if (text.includes("age") || text.includes("class") || text.includes("who") || text.includes("old") || text.includes("suitable")) {
-      return "Skillyug is designed perfectly for students from Class 6 to 12."
+      return "Skillyug is designed perfectly for students from Class 6 to 10. The lessons are easy enough for school students to understand, focusing on real-world practical AI usage."
     }
     if (text.includes("book") || text.includes("join") || text.includes("enroll") || text.includes("start") || text.includes("spot") || text.includes("reserve")) {
       return "To secure your child's seat, use the Bootcamp page to reserve a spot. Seats are limited per batch!"
     }
     if (text.includes("project") || text.includes("build") || text.includes("create") || text.includes("make")) {
-      return "Students build real-world AI chatbots, AI generated designs, and automation workflows."
+      return "Students build real-world projects like automated workflows in n8n, AI-generated presentations with Canva AI, visual idea maps in Knapkin, and custom chatbots. It's heavily project-oriented!"
     }
     
     // Off-topic fallback

@@ -344,7 +344,7 @@ export default function BatchCalendar({ hasSlot = true, startDateStr }: { hasSlo
               </div>
               <p className="text-slate-700 dark:text-slate-300 font-medium">No sessions scheduled for this day.</p>
               <p className="text-sm text-slate-500 mt-1">
-                Bootcamp runs May 28 – July 1. Highlighted days indicate active classes.
+                Highlighted days indicate active classes.
               </p>
             </div>
           )}
