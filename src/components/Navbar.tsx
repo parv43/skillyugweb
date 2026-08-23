@@ -67,9 +67,6 @@ export default function Navbar() {
 
   // Handle smart scrolling for "Ask AI" specifically
   const getSmartHash = (targetHash: string) => {
-    if (targetHash === "ask-ai") {
-      return window.innerWidth < 768 ? "ask-ai-mobile" : "ask-ai-desktop"
-    }
     return targetHash
   }
 
@@ -106,6 +103,13 @@ export default function Navbar() {
   // Close mobile menu and handle smooth scroll for hash links
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     setMobileMenuOpen(false)
+
+    // Handle home link
+    if (href === "/" && pathname === "/") {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: "smooth" })
+      return
+    }
 
     // Handle hash links
     if (href.includes("#")) {

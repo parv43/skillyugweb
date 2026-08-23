@@ -68,26 +68,23 @@ export default function Home() {
       
 
 
-      {/* Gallery — mobile only, shown right after hero */}
-      <div className="md:hidden">
-        <GallerySection />
-      </div>
-
-      {/* Interactive Chat Demo — mobile only, shown after gallery */}
-      <div className="md:hidden">
-        <InteractiveChatDemo id="ask-ai-mobile" />
-      </div>
-      
-      <OurTopBuilders />
-      
-      {/* Gallery — right after AITools on desktop */}
-      <div className="hidden md:block">
-        <GallerySection />
-      </div>
-      
-      {/* Section 3: Interactive Prompting Chat Demo — desktop only */}
-      <div className="hidden md:block">
-        <InteractiveChatDemo id="ask-ai-desktop" />
+      {/* Flex container to reorder sections across breakpoints without duplicating DOM elements */}
+      <div className="flex flex-col">
+        {/* Mobile: order 1, Desktop: order 3 */}
+        <div className="order-1 md:order-3 w-full">
+          <GallerySection />
+        </div>
+        
+        {/* Mobile: order 2, Desktop: order 4 */}
+        <div className="order-2 md:order-4 w-full">
+          <InteractiveChatDemo id="ask-ai" />
+        </div>
+        
+        {/* Mobile: order 3, Desktop: order 1 */}
+        {/* Since HeroSection is outside, OurTopBuilders immediately follows Hero on desktop */}
+        <div className="order-3 md:order-1 w-full">
+          <OurTopBuilders />
+        </div>
       </div>
       
       <SkillsSection />

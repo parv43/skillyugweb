@@ -72,7 +72,7 @@ export default function MobileNavbar() {
 
     const observer = new IntersectionObserver(handleIntersection, observerOptions)
 
-    const askAiEl = document.getElementById("ask-ai-mobile") || document.getElementById("ask-ai-desktop")
+    const askAiEl = document.getElementById("ask-ai")
     const testimonialsEl = document.getElementById("testimonials")
 
     if (askAiEl) observer.observe(askAiEl)
@@ -99,7 +99,7 @@ export default function MobileNavbar() {
       const element = document.getElementById(targetId)
       if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "start" })
-        setActiveSection(href.replace("/#", "").replace("-mobile", "").replace("-desktop", ""))
+        setActiveSection(href.replace("/#", ""))
       }
     } else if (pathname === "/" && href === "/") {
       e.preventDefault()
@@ -114,7 +114,7 @@ export default function MobileNavbar() {
 
   const navItems = [
     { name: "Home", id: "home", href: "/", icon: Home },
-    { name: "Ask AI", id: "ask-ai", href: "/#ask-ai-mobile", targetId: "ask-ai-mobile", icon: Sparkles },
+    { name: "Ask AI", id: "ask-ai", href: "/#ask-ai", targetId: "ask-ai", icon: Sparkles },
     { name: "Testimonials", id: "testimonials", href: "/#testimonials", targetId: "testimonials", icon: MessageSquare },
     { name: "Blogs", id: "blogs", href: "/blog", icon: BookOpen },
   ]

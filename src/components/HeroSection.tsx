@@ -123,7 +123,6 @@ export default function HeroSection() {
             alt="Skillyug AI Bootcamp background"
             fill
             priority
-            unoptimized
             className="object-cover object-right md:object-right-bottom pointer-events-none select-none opacity-90 dark:opacity-40"
           />
           
