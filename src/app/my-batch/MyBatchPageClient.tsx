@@ -99,10 +99,16 @@ export default function MyBatchPage() {
 
     const fetchVideos = async () => {
       try {
-        const { data: recordings, error } = await supabase
+        let query = supabase
           .from("session_recordings")
           .select("id, title, custom_date, youtube_video_id")
           .order("published_at", { ascending: false });
+
+        if (user.activeBatch?.id) {
+          query = query.eq("batch_id", user.activeBatch.id);
+        }
+
+        const { data: recordings, error } = await query;
 
         if (error) {
           console.error("Error fetching session recordings:", error);
