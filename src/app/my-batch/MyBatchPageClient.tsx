@@ -840,7 +840,7 @@ export default function MyBatchPage() {
                           {nextSession.status === "live" ? "Live Now" : "Upcoming Session"}
                         </span>
                         <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                          Day {nextSession.dayNumber} of 25
+                          Day {nextSession.dayNumber} of {totalDays}
                         </span>
                       </div>
                       <h3 className="mt-4 text-xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
