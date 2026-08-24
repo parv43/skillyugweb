@@ -1,7 +1,7 @@
 export const PARTIAL_BOOK_SLOT_AMOUNT_RUPEES = 1500
 export const PARTIAL_BOOK_SLOT_AMOUNT_PAISE = PARTIAL_BOOK_SLOT_AMOUNT_RUPEES * 100
 
-export const FULL_BOOK_SLOT_AMOUNT_RUPEES = 3800
+export const FULL_BOOK_SLOT_AMOUNT_RUPEES = 10000
 export const FULL_BOOK_SLOT_AMOUNT_PAISE = FULL_BOOK_SLOT_AMOUNT_RUPEES * 100
 
 // Keeping label for places where just a simple string is needed

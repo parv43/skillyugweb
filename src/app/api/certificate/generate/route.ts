@@ -1,17 +1,73 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { createCanvas, loadImage, registerFont } from "canvas";
 import QRCode from "qrcode";
 import { jsPDF } from "jspdf";
 import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import os from "os";
 
+function getRequiredEnv(name: string): string {
+  const val = process.env[name];
+  if (!val) throw new Error(`Missing environment variable: ${name}`);
+  return val;
+}
+
 // Initialize Supabase Admin (with quotes stripped to prevent JWT formatting issues)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/^['"]|['"]$/g, "");
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!.replace(/^['"]|['"]$/g, "");
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+async function getAuthenticatedUser(request: NextRequest) {
+  // 1. Try Bearer token from Authorization header
+  const authHeader = request.headers.get("Authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    const { data, error } = await supabase.auth.getUser(token);
+    if (!error && data.user) {
+      return data.user;
+    }
+  }
+
+  // 2. Fall back to cookie-based session
+  const cookieStore = await cookies();
+  const supabaseClient = createServerClient(
+    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
+    getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // No-op in route handlers
+          }
+        },
+      },
+    }
+  );
+
+  const { data, error } = await supabaseClient.auth.getUser();
+  if (error || !data.user) return null;
+  return data.user;
+}
+
+async function isCallerAdmin(userId: string): Promise<boolean> {
+  const { data: adminRow, error: adminError } = await supabase
+    .from("admins")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  return !adminError && !!adminRow;
+}
 
 // Increase Vercel function timeout to 60s — cold starts download fonts + generate PDFs
 export const maxDuration = 60;
@@ -156,39 +212,40 @@ async function generateCertificatePdf(
   return { downloadUrl: publicUrl, certId };
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const userId = user.id;
+    const isAdmin = await isCallerAdmin(userId);
+
     // Accept studentName + parentName; fall back to legacy `name` field
     const body = await request.json();
     const studentName: string = (body.studentName || body.name || "").trim();
     const parentName: string = (body.parentName || "").trim();
-    const userId: string | null = body.userId || null;
 
-    if (userId) {
-      // Fetch user to bypass rate limit for eternallytanuj@gmail.com
-      const { data: userData } = await supabase.auth.admin.getUserById(userId);
-      const email = userData?.user?.email;
+    // Fetch user to bypass rate limit for admin
+    if (!isAdmin) {
+      const startOfToday = new Date();
+      startOfToday.setUTCHours(0, 0, 0, 0);
+      const startOfTodayStr = startOfToday.toISOString();
 
-      if (email !== "eternallytanuj@gmail.com") {
-        const startOfToday = new Date();
-        startOfToday.setUTCHours(0, 0, 0, 0);
-        const startOfTodayStr = startOfToday.toISOString();
+      const { count, error: countError } = await supabase
+        .from("issued_certificates")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .like("cert_id", "%-S")
+        .gte("created_at", startOfTodayStr);
 
-        const { count, error: countError } = await supabase
-          .from("issued_certificates")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", userId)
-          .like("cert_id", "%-S")
-          .gte("created_at", startOfTodayStr);
-
-        if (countError) {
-          console.error("Failed to query certificate limit:", countError);
-        } else if (count !== null && count >= 3) {
-          return NextResponse.json(
-            { error: "Rate limit exceeded. You can only generate certificates 3 times per day." },
-            { status: 429 }
-          );
-        }
+      if (countError) {
+        console.error("Failed to query certificate limit:", countError);
+      } else if (count !== null && count >= 3) {
+        return NextResponse.json(
+          { error: "Rate limit exceeded. You can only generate certificates 3 times per day." },
+          { status: 429 }
+        );
       }
     }
 
@@ -202,16 +259,19 @@ export async function POST(request: Request) {
     const background = await loadImage(BACKGROUND_PATH);
 
     let batchId: string | null = null;
-    if (userId) {
-      const { data: slotBooking } = await supabase
-        .from("slot_bookings")
-        .select("batch_id")
-        .eq("user_id", userId)
-        .limit(1)
-        .single();
-      if (slotBooking?.batch_id) {
-        batchId = slotBooking.batch_id;
-      }
+    const { data: slotBooking, error: slotError } = await supabase
+      .from("slot_bookings")
+      .select("batch_id")
+      .eq("user_id", userId)
+      .limit(1)
+      .maybeSingle();
+
+    if (!isAdmin && (slotError || !slotBooking?.batch_id)) {
+      return NextResponse.json({ error: "You must be enrolled in a batch to generate a certificate." }, { status: 403 });
+    }
+    
+    if (slotBooking?.batch_id) {
+      batchId = slotBooking.batch_id;
     }
 
     // Always generate student certificate (suffix -S)

@@ -9,7 +9,7 @@ export const siteConfig = {
   url: "https://www.skillyugedu.com",
   locale: "en_IN",
   description:
-    "Skillyug helps Class 6–12 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp in India.",
+    "Skillyug helps Class 6–10 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp in India.",
   ogImagePath: "/opengraph-image",
   email: "contact@skillyugedu.com",
   phone: "7835049710",
@@ -117,7 +117,7 @@ export function getOrganizationSchema() {
         name: "Skillyug AI Bootcamp",
         url: siteConfig.url,
         description:
-          "Skillyug runs a structured AI bootcamp for Class 6–12 students in India, covering practical AI tools, project workflows, and guided prompt practice.",
+          "Skillyug runs a structured AI bootcamp for Class 6–10 students in India, covering practical AI tools, project workflows, and guided prompt practice.",
         parentOrganization: {
           "@id": absoluteUrl("/#organization"),
         },
@@ -127,7 +127,7 @@ export function getOrganizationSchema() {
         "@id": absoluteUrl("/#ai-bootcamp-course"),
         name: "Skillyug AI Bootcamp for Students",
         description:
-          "A hands-on AI bootcamp for Class 6–12 students covering ChatGPT, Canva AI, Gamma, research workflows, and real project building.",
+          "A hands-on AI bootcamp for Class 6–10 students covering ChatGPT, Canva AI, Gamma, research workflows, and real project building.",
         provider: {
           "@id": absoluteUrl("/#educational-organization"),
         },
@@ -195,7 +195,7 @@ export function getBlogCollectionSchema(blogs: BlogPost[]) {
         url: absoluteUrl("/blog"),
         name: "Skillyug AI Learning Blog",
         description:
-          "Guides, tutorials, and insights on AI tools, projects, and future-ready learning for Class 6–12 students in India.",
+          "Guides, tutorials, and insights on AI tools, projects, and future-ready learning for Class 6–10 students in India.",
         isPartOf: {
           "@id": absoluteUrl("/#website"),
         },
@@ -254,7 +254,7 @@ export function getBlogPostingSchema(blog: BlogPost) {
         audience: {
           "@type": "EducationalAudience",
           educationalRole: "student",
-          audienceType: "Class 6–12 students in India",
+          audienceType: "Class 6–10 students in India",
         },
         mainEntityOfPage: {
           "@type": "WebPage",

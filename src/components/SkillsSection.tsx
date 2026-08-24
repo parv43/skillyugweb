@@ -114,7 +114,7 @@ export default function SkillsSection() {
             What Students Will Actually Learn
           </h2>
           <p className="text-slate-600 dark:text-slate-350 text-base md:text-xl font-light">
-            No complex developer tools. At the Skillyug Summer AI Bootcamp, we focus solely on practical AI study tools and homework apps that help Class 6–12 students learn better and finish assignments faster.
+            No complex developer tools. At the Skillyug Summer AI Bootcamp, we focus solely on practical AI study tools and homework apps that help Class 6–10 students learn better and finish assignments faster.
           </p>
         </div>
       </div>

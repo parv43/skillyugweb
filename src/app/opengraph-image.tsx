@@ -94,7 +94,7 @@ export default function OpenGraphImage() {
                   color: "#cbd5e1",
                 }}
               >
-                AI Bootcamp for Students • Classes 6–12
+                AI Bootcamp for Students • Classes 6–10
               </div>
             </div>
           </div>

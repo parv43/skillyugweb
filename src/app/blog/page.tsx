@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   ...createMetadata({
     title: "AI Learning Blog for Students and Parents",
     description:
-      "Explore guides on ChatGPT, Canva AI, presentations, project workflows, and AI study tools for Class 6–12 students and parents.",
+      "Explore guides on ChatGPT, Canva AI, presentations, project workflows, and AI study tools for Class 6–10 students and parents.",
     path: "/blog",
   }),
 };

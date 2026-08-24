@@ -28,10 +28,10 @@ export const homeFaqItems: HomeFaqItem[] = [
     linkLabel: "View student project examples",
   },
   {
-    question: "What is the ₹3800 bootcamp spot booking for?",
+    question: "What is the ₹10,000 bootcamp spot booking for?",
     answer:
-      "The ₹3800 booking is the paid step used to reserve a seat for the upcoming bootcamp session. It is meant for families ready to secure a bootcamp spot and begin the program.",
+      "The ₹10,000 booking is the paid step used to reserve a seat for the upcoming bootcamp session. It is meant for families ready to secure a bootcamp spot and begin the program.",
     href: "/book-slot",
-    linkLabel: "Reserve the ₹3800 spot",
+    linkLabel: "Reserve the ₹10,000 spot",
   },
 ]

@@ -35,7 +35,7 @@ import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import BatchCalendar from "@/components/BatchCalendar";
 import VoucherCard from "@/components/VoucherCard";
-import { getNextLiveSession, getCompletedDaysCount } from "@/lib/curriculum";
+import { getNextLiveSession, getCompletedDaysCount, getCurriculumDays } from "@/lib/curriculum";
 
 const MOCK_VIDEOS = [
   { id: 1, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
@@ -78,7 +78,8 @@ export default function MyBatchPage() {
   // Dynamic Curriculum derived states
   const nextSession = getNextLiveSession(new Date(), user?.activeBatch?.start_date);
   const completedDays = getCompletedDaysCount(new Date(), user?.activeBatch?.start_date);
-  const progressPercentage = Math.round((completedDays / 25) * 100);
+  const totalDays = getCurriculumDays(user?.activeBatch?.start_date).length || 35;
+  const progressPercentage = Math.round((completedDays / totalDays) * 100);
   const strokeDashoffset = 251.2 - (251.2 * progressPercentage) / 100;
 
   // Support Ticket State
@@ -94,7 +95,7 @@ export default function MyBatchPage() {
   useEffect(() => {
     if (!user) return;
 
-    const isPaid = hasSlotAccess || user.email === "eternallytanuj@gmail.com" || isAdmin;
+    const isPaid = hasSlotAccess || isAdmin;
     if (!isPaid) return;
 
     const fetchVideos = async () => {
@@ -734,7 +735,7 @@ export default function MyBatchPage() {
     );
   }
 
-  const isPaidUser = hasSlotAccess || user.email === "eternallytanuj@gmail.com";
+  const isPaidUser = hasSlotAccess || isAdmin;
   // Unlocked completely for all verified users
   const canDownloadCert = progressPercentage === 100;
 

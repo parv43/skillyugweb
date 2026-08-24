@@ -42,6 +42,12 @@ interface RazorpayInstance {
 }
 
 interface RazorpayOptions {
+  config_id?: string;
+  config?: {
+    display?: {
+      hide?: { method: string }[];
+    };
+  };
   amount: number;
   currency: string;
   description: string;
@@ -231,6 +237,12 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
           name: prefilledName || studentName,
           email: orderResult.customerEmail,
           contact: phoneNumber,
+        },
+        config_id: "config_TTjD6zYaTKH6yh",
+        config: {
+          display: {
+            hide: [{ method: "emi" }]
+          }
         },
         theme: {
           color: "#3b82f6",
@@ -442,7 +454,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
               <p className="text-slate-600 dark:text-slate-350 font-medium">
                 {paymentTier === "full"
                   ? `Complete the full payment to enroll in the upcoming bootcamp.`
-                  : `Complete this payment to reserve your spot. The total bootcamp price is ₹10.`}
+                  : `Complete this payment to reserve your spot.`}
               </p>
             </div>
 
@@ -567,8 +579,6 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       <option value="8th">8th</option>
                       <option value="9th">9th</option>
                       <option value="10th">10th</option>
-                      <option value="11th">11th</option>
-                      <option value="12th">12th</option>
                     </select>
                     <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-slate-500">
                       <span className="material-symbols-outlined">expand_more</span>
