@@ -68,24 +68,9 @@ export default function Home() {
       
 
 
-      {/* Flex container to reorder sections across breakpoints without duplicating DOM elements */}
-      <div className="flex flex-col">
-        {/* Mobile: order 1, Desktop: order 3 */}
-        <div className="order-1 md:order-3 w-full">
-          <GallerySection />
-        </div>
-        
-        {/* Mobile: order 2, Desktop: order 4 */}
-        <div className="order-2 md:order-4 w-full">
-          <InteractiveChatDemo id="ask-ai" />
-        </div>
-        
-        {/* Mobile: order 3, Desktop: order 1 */}
-        {/* Since HeroSection is outside, OurTopBuilders immediately follows Hero on desktop */}
-        <div className="order-3 md:order-1 w-full">
-          <OurTopBuilders />
-        </div>
-      </div>
+      <OurTopBuilders />
+      <GallerySection />
+      <InteractiveChatDemo id="ask-ai" />
       
       <SkillsSection />
       <StudentProjects />

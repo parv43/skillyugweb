@@ -183,7 +183,7 @@ export default function OurTopBuilders() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           
           {/* Left Column: Top Builders */}
-          <div className="flex flex-col w-full order-2 lg:order-1">
+          <div className="flex flex-col w-full order-1">
             <div className="mb-6 text-center">
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold text-xs mb-4 border border-blue-200 dark:border-blue-800/30">
                 <Sparkles className="w-3 h-3" />
@@ -208,7 +208,7 @@ export default function OurTopBuilders() {
           </div>
 
           {/* Right Column: Learning In Action */}
-          <div className="flex flex-col w-full order-1 lg:order-2 h-full justify-center">
+          <div className="flex flex-col w-full order-2 h-full justify-center">
             <div className="mb-6 text-center">
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-2 drop-shadow-sm tracking-tight leading-tight">
                 Learning in Action
