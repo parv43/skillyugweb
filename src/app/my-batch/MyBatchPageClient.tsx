@@ -904,11 +904,11 @@ export default function MyBatchPage() {
                   </>
                 ) : (
                   <div className="flex flex-col items-center justify-center flex-1 text-center py-4">
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3 text-emerald-600 dark:text-emerald-400">
-                      <BadgeCheck className="w-6 h-6" />
+                    <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-3 text-blue-600 dark:text-blue-400">
+                      <Calendar className="w-6 h-6" />
                     </div>
-                    <p className="text-base font-bold text-slate-800 dark:text-slate-200">Bootcamp Completed</p>
-                    <p className="text-xs text-slate-505 mt-1">All 25 sessions have been successfully completed.</p>
+                    <p className="text-base font-bold text-slate-800 dark:text-slate-200">Batch starting soon</p>
+                    <p className="text-xs text-slate-500 mt-1">Check back later for your first live session date.</p>
                   </div>
                 )}
               </div>
