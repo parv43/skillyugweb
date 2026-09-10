@@ -76,11 +76,11 @@ export default function MyBatchPage() {
   const [isBlurred, setIsBlurred] = useState(false);
 
   // Dynamic Curriculum derived states
-  const nextSession = getNextLiveSession(new Date(), user?.activeBatch?.start_date);
-  const completedDays = getCompletedDaysCount(new Date(), user?.activeBatch?.start_date);
+  const completedDays: number = 0; // getCompletedDaysCount(user?.activeBatch?.start_date, recordings);
+  const nextSession: any = null; // getNextLiveSession(user?.activeBatch?.start_date);
   const totalDays = getCurriculumDays(user?.activeBatch?.start_date).length || 35;
-  const progressPercentage = Math.round((completedDays / totalDays) * 100);
-  const strokeDashoffset = 251.2 - (251.2 * progressPercentage) / 100;
+  const progressPercentage: number = 0; // Math.round((completedDays / totalDays) * 100);
+  const strokeDashoffset: number = 251.2; // 251.2 - (251.2 * progressPercentage) / 100;
 
   // Support Ticket State
   const [showTicketModal, setShowTicketModal] = useState(false);
@@ -1320,7 +1320,7 @@ export default function MyBatchPage() {
           </div>
 
           {/* Bottom Section: Bootcamp Calendar */}
-          <div className="rounded-[2rem] border border-slate-200 bg-white backdrop-blur-xl p-6 md:p-8 shadow-sm">
+          <div className="hidden rounded-[2rem] border border-slate-200 bg-white backdrop-blur-xl p-6 md:p-8 shadow-sm">
             <BatchCalendar hasSlot={hasSlotAccess} startDateStr={user.activeBatch?.start_date} />
           </div>
         
@@ -1523,7 +1523,9 @@ export default function MyBatchPage() {
                 </div>
               </div>
               
-              <BatchCalendar hasSlot={hasSlotAccess} startDateStr={user.activeBatch?.start_date} />
+              <div className="hidden">
+                <BatchCalendar hasSlot={hasSlotAccess} startDateStr={user.activeBatch?.start_date} />
+              </div>
             </section>
 
           </div>
