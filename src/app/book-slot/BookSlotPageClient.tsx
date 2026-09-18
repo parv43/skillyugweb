@@ -622,7 +622,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                         ? "Payment Gateway Unavailable"
                         : `Pay Now - ₹${displayAmount}`}
                 </button>
-                {displayAmount === 10000 && (
+                {displayAmount !== 10000 && (
                   <p className="mt-4 text-center text-sm font-semibold text-slate-600 dark:text-slate-400 bg-blue-50/50 dark:bg-blue-900/20 py-2.5 px-4 rounded-xl border border-blue-100 dark:border-blue-800/30">
                     Note: This will be your 1st installment.
                   </p>
