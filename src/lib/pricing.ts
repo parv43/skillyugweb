@@ -14,6 +14,7 @@ export function calculateBootcampPriceRupees(promoCode?: string | null): number 
   if (code === "TOP60") return 8500;
   if (code === "TOP80") return 7800;
   if (code === "SPECIAL50") return 5000;
+  if (code === "SLOTBOOKING2.0") return 399;
   
   return 10000;
 }
