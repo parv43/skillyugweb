@@ -9,7 +9,7 @@ import { createMetadata, getHomeFaqSchema } from "@/lib/seo"
 
 const SkillsSection = dynamic(() => import("@/components/SkillsSection"))
 const StudentProjects = dynamic(() => import("@/components/StudentProjects"))
-const BootcampTimeline = dynamic(() => import("@/components/BootcampTimeline"))
+const SeeSkillyugInAction = dynamic(() => import("@/components/SeeSkillyugInAction"))
 const OurTopBuilders = dynamic(() => import("@/components/OurTopBuilders"))
 const InteractiveChatDemo = dynamic(() => import("@/components/InteractiveChatDemo"))
 const GallerySection = dynamic(() => import("@/components/GallerySection"))
@@ -74,7 +74,7 @@ export default function Home() {
       
       <SkillsSection />
       <StudentProjects />
-      <BootcampTimeline />
+      <SeeSkillyugInAction />
       <Testimonials />
 
       
