@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react"
 
 import { Bot, User, Send, Sparkles } from "lucide-react"
-import HomeFaqSection from "@/components/HomeFaqSection"
+
 
 interface InteractiveChatDemoProps {
   id?: string
@@ -231,10 +231,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 relative z-10">
-        <HomeFaqSection />
       </div>
-
     </section>
   )
 }

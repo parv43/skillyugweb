@@ -10,6 +10,7 @@ import { createMetadata, getHomeFaqSchema } from "@/lib/seo"
 const SkillsSection = dynamic(() => import("@/components/SkillsSection"))
 const StudentProjects = dynamic(() => import("@/components/StudentProjects"))
 const SeeSkillyugInAction = dynamic(() => import("@/components/SeeSkillyugInAction"))
+const HomeFaqSection = dynamic(() => import("@/components/HomeFaqSection"))
 const OurTopBuilders = dynamic(() => import("@/components/OurTopBuilders"))
 const InteractiveChatDemo = dynamic(() => import("@/components/InteractiveChatDemo"))
 const GallerySection = dynamic(() => import("@/components/GallerySection"))
@@ -71,10 +72,14 @@ export default function Home() {
       <OurTopBuilders />
       <GallerySection />
       <InteractiveChatDemo id="ask-ai" />
+      <SeeSkillyugInAction />
+      
+      <div className="max-w-4xl mx-auto px-4 relative z-10 w-full mb-20">
+        <HomeFaqSection />
+      </div>
       
       <SkillsSection />
       <StudentProjects />
-      <SeeSkillyugInAction />
       <Testimonials />
 
       
