@@ -142,7 +142,7 @@ const VideoCarousel = ({ title, videos, isShorts = false }: { title: string, vid
       onTouchStart={() => setIsPaused(true)}
     >
       <div className="flex items-center justify-between mb-6 px-6 md:px-0">
-        <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+        <h3 className="text-3xl md:text-4xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
           {title}
         </h3>
         <div className="flex items-center gap-2">
@@ -209,10 +209,10 @@ export default function SeeSkillyugInAction() {
           <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-blue-100/50 dark:bg-blue-900/30 text-[#0060aa] dark:text-blue-300 font-bold text-xs mb-4 border border-blue-200/50 dark:border-blue-800/30 uppercase tracking-[0.2em]">
             Video Gallery
           </div>
-          <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight leading-tight">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter leading-tight drop-shadow-sm">
             See SKILLYUG in Action
           </h2>
-          <p className="text-base md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] max-w-2xl mx-auto">
+          <p className="text-lg md:text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#0060aa] via-[#8b5cf6] to-[#ff8b12] max-w-3xl mx-auto tracking-wide">
             Real classes. Real learning. Real parent experiences.
           </p>
         </div>
