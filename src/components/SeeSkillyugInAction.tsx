@@ -23,10 +23,22 @@ const PARENT_STORIES_VIDEOS: Video[] = [
 
 const LazyYouTube = ({ video, isActive, onActivate }: { video: Video, isActive: boolean, onActivate: () => void }) => {
   const isShort = video.isShort;
+  const [imgSrc, setImgSrc] = useState(`https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`);
+  const [hasError, setHasError] = useState(false);
+
+  const handleError = () => {
+    if (imgSrc.includes("maxresdefault")) {
+      setImgSrc(`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`);
+    } else if (imgSrc.includes("hqdefault")) {
+      setImgSrc(`https://i.ytimg.com/vi/${video.id}/0.jpg`);
+    } else {
+      setHasError(true);
+    }
+  };
   
   return (
     <div 
-      className={`relative w-full rounded-2xl overflow-hidden bg-slate-900 group shrink-0 snap-center shadow-sm border border-slate-200/50 dark:border-white/5 ${
+      className={`relative w-full rounded-2xl overflow-hidden bg-slate-900 group shrink-0 snap-center shadow-sm border border-slate-200/50 dark:border-white/5 flex items-center justify-center ${
         isShort ? "aspect-[9/16]" : "aspect-video"
       }`}
     >
@@ -41,15 +53,29 @@ const LazyYouTube = ({ video, isActive, onActivate }: { video: Video, isActive: 
       ) : (
         <button
           onClick={onActivate}
-          className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none"
+          className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none flex items-center justify-center"
           aria-label={`Play ${video.title}`}
         >
-          <img
-            src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
-            alt={video.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            loading="lazy"
-          />
+          {!hasError ? (
+            <img
+              src={imgSrc}
+              alt={video.title}
+              onError={handleError}
+              onLoad={(e) => {
+                if (e.currentTarget.naturalWidth === 120) {
+                  handleError();
+                }
+              }}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+            />
+          ) : (
+            <img
+              src="/skillyug-optimized.svg"
+              alt="Skillyug"
+              className="w-1/2 h-auto object-contain opacity-40 transition-transform duration-700 group-hover:scale-105 group-hover:opacity-60"
+            />
+          )}
           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-14 h-14 bg-[#ff0000] rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110">
