@@ -38,8 +38,8 @@ const LazyYouTube = ({ video, isActive, onActivate }: { video: Video, isActive: 
   
   return (
     <div 
-      className={`relative w-full rounded-2xl overflow-hidden bg-slate-900 group shrink-0 snap-center shadow-sm border border-slate-200/50 dark:border-white/5 flex items-center justify-center ${
-        isShort ? "aspect-[9/16]" : "aspect-video"
+      className={`relative w-full overflow-hidden bg-slate-900 group shrink-0 snap-center shadow-xl md:shadow-2xl border border-slate-200/50 dark:border-white/5 flex items-center justify-center transition-all duration-500 hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(59,130,246,0.15)] ${
+        isShort ? "aspect-[9/16] rounded-[2rem]" : "aspect-video rounded-[2rem] md:rounded-[2.5rem]"
       }`}
     >
       {isActive ? (
@@ -106,12 +106,18 @@ const VideoCarousel = ({ title, videos, isShorts = false }: { title: string, vid
         if (scrollLeft >= maxScroll - 10) {
           scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
         } else {
-          // Scroll by roughly one item width
-          const itemWidth = isShorts 
-            ? Math.min(280, clientWidth) 
-            : clientWidth > 768 ? clientWidth / 2 : clientWidth;
+          const isDesktop = window.innerWidth >= 1024;
+          const isTablet = window.innerWidth >= 768;
+          const gap = isTablet ? 40 : 24;
+          
+          let itemWidth = 0;
+          if (isShorts) {
+            itemWidth = isDesktop ? 360 : isTablet ? 320 : 280;
+          } else {
+            itemWidth = isDesktop ? 800 : isTablet ? 600 : (window.innerWidth * 0.85);
+          }
             
-          scrollRef.current.scrollBy({ left: itemWidth, behavior: "smooth" });
+          scrollRef.current.scrollBy({ left: itemWidth + gap, behavior: "smooth" });
         }
       }
     }, 4500);
@@ -122,13 +128,19 @@ const VideoCarousel = ({ title, videos, isShorts = false }: { title: string, vid
   const scroll = (direction: "left" | "right") => {
     setIsPaused(true); // Stop auto-sliding when user manually navigates
     if (scrollRef.current) {
-      const { clientWidth } = scrollRef.current;
-      const itemWidth = isShorts 
-        ? Math.min(280, clientWidth) 
-        : clientWidth > 768 ? clientWidth / 2 : clientWidth;
+      const isDesktop = window.innerWidth >= 1024;
+      const isTablet = window.innerWidth >= 768;
+      const gap = isTablet ? 40 : 24;
+      
+      let itemWidth = 0;
+      if (isShorts) {
+        itemWidth = isDesktop ? 360 : isTablet ? 320 : 280;
+      } else {
+        itemWidth = isDesktop ? 800 : isTablet ? 600 : (window.innerWidth * 0.85);
+      }
         
       scrollRef.current.scrollBy({ 
-        left: direction === "left" ? -itemWidth : itemWidth, 
+        left: direction === "left" ? -(itemWidth + gap) : (itemWidth + gap), 
         behavior: "smooth" 
       });
     }
@@ -169,15 +181,21 @@ const VideoCarousel = ({ title, videos, isShorts = false }: { title: string, vid
       */}
       <div 
         ref={scrollRef}
-        className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 px-6 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className={`w-[100vw] relative left-1/2 -translate-x-1/2 flex gap-6 md:gap-10 overflow-x-auto snap-x snap-mandatory pb-12 pt-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${
+          isShorts 
+            ? "px-[calc(50vw-140px)] md:px-[calc(50vw-160px)] lg:px-[calc(50vw-180px)]"
+            : "px-[7.5vw] md:px-[calc(50vw-300px)] lg:px-[calc(50vw-400px)]"
+        }`}
       >
         {videos.map((video) => (
           <div 
             key={video.id} 
-            className={`snap-center shrink-0 ${
+            className={`snap-center shrink-0 transition-transform duration-500 ease-out ${
+              activeVideoId === video.id ? "scale-[1.02]" : "scale-100"
+            } ${
               isShorts 
-                ? "w-[260px] md:w-[280px]" 
-                : "w-[85vw] md:w-[calc(50%-12px)] lg:w-[calc(50%-12px)]"
+                ? "w-[280px] md:w-[320px] lg:w-[360px]" 
+                : "w-[85vw] md:w-[600px] lg:w-[800px]"
             }`}
           >
             <LazyYouTube 
