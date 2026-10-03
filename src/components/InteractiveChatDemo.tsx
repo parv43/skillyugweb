@@ -230,8 +230,6 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
 
         </div>
       </div>
-
-      </div>
     </section>
   )
 }
