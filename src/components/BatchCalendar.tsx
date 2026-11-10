@@ -32,14 +32,14 @@ const getClassStatus = (date: Date) => {
       color: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-950 dark:bg-emerald-950/20 dark:text-emerald-400" 
     };
   } else if (compareDate.getTime() === currentDate.getTime()) {
-    // Today! Class is over after 3 PM (15:00)
-    if (now.getHours() >= 15) {
+    // Today! Class runs 9:00 PM - 10:00 PM IST (21:00 - 22:00)
+    if (now.getHours() >= 22) {
       return { 
         label: "Class is Over", 
         type: "past" as const, 
         color: "border-emerald-250 bg-emerald-50 text-emerald-700 dark:border-emerald-950 dark:bg-emerald-950/20 dark:text-emerald-400 font-bold" 
       };
-    } else if (now.getHours() >= 13) {
+    } else if (now.getHours() >= 21) {
       return { 
         label: "Live Now", 
         type: "live" as const, 
@@ -277,7 +277,7 @@ export default function BatchCalendar({ hasSlot = true, startDateStr }: { hasSlo
                   </div>
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                      Day {selectedClass.dayNumber} of 25
+                      Day {selectedClass.dayNumber}
                     </span>
                     <h4 className="text-lg md:text-xl font-black text-slate-900 dark:text-white mt-1">
                       {selectedClass.topic}
@@ -285,7 +285,7 @@ export default function BatchCalendar({ hasSlot = true, startDateStr }: { hasSlo
                     <div className="mt-2 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500">
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span>2:00 PM - 3:00 PM IST</span>
+                        <span>9:00 PM - 10:00 PM IST</span>
                       </div>
                     </div>
                   </div>

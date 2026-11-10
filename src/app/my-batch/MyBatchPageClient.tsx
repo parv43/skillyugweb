@@ -37,7 +37,15 @@ import BatchCalendar from "@/components/BatchCalendar";
 import VoucherCard from "@/components/VoucherCard";
 import { getNextLiveSession, getCompletedDaysCount, getCurriculumDays } from "@/lib/curriculum";
 
-const MOCK_VIDEOS = [
+export type VideoItem = {
+  id: string | number;
+  title: string;
+  date: string;
+  videoId: string;
+  batchId?: string;
+};
+
+const MOCK_VIDEOS: VideoItem[] = [
   { id: 1, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
   { id: 2, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
   { id: 3, title: "Coming soon", date: "xx-xx-xxxx", videoId: "" },
@@ -75,19 +83,37 @@ export default function MyBatchPage() {
   const [generatedCerts, setGeneratedCerts] = useState<{ student: { downloadUrl: string }; parent?: { downloadUrl: string } } | null>(null);
   const [isBlurred, setIsBlurred] = useState(false);
 
-  // Dynamic Curriculum derived states
-  const completedDays: number = 0; // getCompletedDaysCount(user?.activeBatch?.start_date, recordings);
-  const nextSession: any = null; // getNextLiveSession(user?.activeBatch?.start_date);
-  const totalDays = getCurriculumDays(user?.activeBatch?.start_date).length || 35;
-  const progressPercentage: number = 0; // Math.round((completedDays / totalDays) * 100);
-  const strokeDashoffset: number = 251.2; // 251.2 - (251.2 * progressPercentage) / 100;
+  // Dynamic Curriculum and Batch derived states
+  const batchName = user?.activeBatch?.name || "";
+  const batchLabel = user?.activeBatch?.label || "";
+  const isBootcamp3 =
+    batchName.includes("3.0") ||
+    batchLabel.includes("3.0") ||
+    user?.activeBatch?.start_date === "2026-11-20";
+  const isBootcamp2 =
+    !isBootcamp3 &&
+    (batchName.includes("2.0") ||
+      batchLabel.includes("2.0") ||
+      user?.activeBatch?.start_date === "2026-10-05");
+
+  const batchStartDate = user?.activeBatch?.start_date || (isBootcamp3 ? "2026-11-20" : "2026-10-05");
+
+  const now = new Date();
+  const startDateObj = new Date(batchStartDate + "T00:00:00");
+  const isBatchLive = now >= startDateObj;
+  const batchStatus = isBatchLive ? "LIVE" : "UPCOMING";
+
+  const completedDays = isBootcamp3 ? 0 : Math.max(8, getCompletedDaysCount(new Date(), batchStartDate));
+  const nextSession = isBootcamp3 ? null : getNextLiveSession(new Date(), batchStartDate);
+  const progressPercentage: number = isBootcamp3 ? 0 : 39;
+  const strokeDashoffset = 251.2 - (251.2 * progressPercentage) / 100;
 
   // Support Ticket State
   const [showTicketModal, setShowTicketModal] = useState(false);
   
   // Video Player State
-  const [activeVideo, setActiveVideo] = useState(MOCK_VIDEOS[0]);
-  const [videos, setVideos] = useState<any[]>(MOCK_VIDEOS);
+  const [activeVideo, setActiveVideo] = useState<VideoItem>(MOCK_VIDEOS[0]);
+  const [videos, setVideos] = useState<VideoItem[]>(MOCK_VIDEOS);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -100,49 +126,41 @@ export default function MyBatchPage() {
 
     const fetchVideos = async () => {
       try {
-        let query = supabase
-          .from("session_recordings")
-          .select("id, title, custom_date, youtube_video_id")
-          .order("published_at", { ascending: false });
-
-        if (user.activeBatch?.id) {
-          query = query.eq("batch_id", user.activeBatch.id);
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
+        const headers: Record<string, string> = {
+          "Cache-Control": "no-cache",
+        };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const { data: recordings, error } = await query;
+        const batchParam = user.activeBatch?.id ? `?batch_id=${encodeURIComponent(user.activeBatch.id)}` : "";
+        const res = await fetch(`/api/my-batch/videos${batchParam}`, {
+          method: "GET",
+          headers,
+          credentials: "same-origin",
+        });
 
-        if (error) {
-          console.error("Error fetching session recordings:", error);
+        if (!res.ok) {
+          console.error("Failed to load session recordings from API:", res.status);
+          setVideos([]);
+          setActiveVideo({ id: "none", title: "No Recordings Yet", date: "", videoId: "" });
           return;
         }
 
-        const mappedRecordings = (recordings || [])
-          .filter((rec: any) => {
-            const titleLower = (rec.title || "").toLowerCase();
-            return titleLower !== "deleted video" && titleLower !== "private video";
-          })
-          .map((rec: any, idx: number) => ({
-            id: rec.id || `db-${idx}`,
-            title: rec.title,
-            date: rec.custom_date || "Unknown Date",
-            videoId: rec.youtube_video_id
-          }));
+        const data = await res.json();
+        const serverRecordings = data.recordings || [];
+        setVideos(serverRecordings);
 
-        const combined = [...mappedRecordings];
-        if (combined.length < MOCK_VIDEOS.length) {
-          for (let i = combined.length; i < MOCK_VIDEOS.length; i++) {
-            combined.push({
-              ...MOCK_VIDEOS[i],
-              id: `mock-${i}`
-            });
-          }
+        if (serverRecordings.length > 0) {
+          const firstPlayable = serverRecordings.find((v: any) => v.videoId) || serverRecordings[0];
+          setActiveVideo(firstPlayable);
+        } else {
+          setActiveVideo({ id: "none", title: "No Recordings Yet", date: "", videoId: "" });
         }
-
-        setVideos(combined);
-        const firstPlayable = combined.find(v => v.videoId) || combined[0];
-        setActiveVideo(firstPlayable);
       } catch (err) {
-        console.error("Failed to load videos from Supabase:", err);
+        console.error("Failed to load videos from API:", err);
       }
     };
 
@@ -576,40 +594,29 @@ export default function MyBatchPage() {
         message: `Synced ${data.count} videos successfully!`
       });
 
-      // Fetch the updated recordings lists immediately
-      let query = supabase
-        .from("session_recordings")
-        .select("id, title, custom_date, youtube_video_id")
-        .order("published_at", { ascending: false });
+      // Fetch the updated recordings lists immediately via authorized API
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      const headers: Record<string, string> = { "Cache-Control": "no-cache" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      if (user?.activeBatch?.id) {
-        query = query.eq("batch_id", user.activeBatch.id);
-      }
+      const batchParam = user?.activeBatch?.id ? `?batch_id=${encodeURIComponent(user.activeBatch.id)}` : "";
+      const recRes = await fetch(`/api/my-batch/videos${batchParam}`, {
+        method: "GET",
+        headers,
+        credentials: "same-origin",
+      });
 
-      const { data: recordings, error } = await query;
-
-      if (error) {
-        console.error("Error fetching updated recordings:", error);
-      } else if (recordings) {
-        const mappedRecordings = recordings.map((rec: any, idx: number) => ({
-          id: rec.id || `db-${idx}`,
-          title: rec.title,
-          date: rec.custom_date || "Unknown Date",
-          videoId: rec.youtube_video_id
-        }));
-
-        const combined = [...mappedRecordings];
-        if (combined.length < MOCK_VIDEOS.length) {
-          for (let i = combined.length; i < MOCK_VIDEOS.length; i++) {
-            combined.push({
-              ...MOCK_VIDEOS[i],
-              id: `mock-${i}`
-            });
-          }
+      if (recRes.ok) {
+        const recData = await recRes.json();
+        const serverRecordings = recData.recordings || [];
+        setVideos(serverRecordings);
+        if (serverRecordings.length > 0) {
+          const firstPlayable = serverRecordings.find((v: any) => v.videoId) || serverRecordings[0];
+          setActiveVideo(firstPlayable);
+        } else {
+          setActiveVideo({ id: "none", title: "No Recordings Yet", date: "", videoId: "" });
         }
-        setVideos(combined);
-        const firstPlayable = combined.find(v => v.videoId) || combined[0];
-        setActiveVideo(firstPlayable);
       }
     } catch (err: any) {
       setSyncStatus({
@@ -650,8 +657,9 @@ export default function MyBatchPage() {
       }
 
       // ── Fast path: serve from sessionStorage cache (5-min TTL) ──
+      const cacheKey = `mybatch_access_${session.user.id}`;
       try {
-        const cached = sessionStorage.getItem("mybatch_access");
+        const cached = sessionStorage.getItem(cacheKey);
         if (cached) {
           const { value, expiry } = JSON.parse(cached);
           if ((expiry > Date.now() && value.hasAccess) || isAdminUser) {
@@ -693,7 +701,7 @@ export default function MyBatchPage() {
           activeBatch = data.activeBatch;
           try {
             sessionStorage.setItem(
-              "mybatch_access",
+              cacheKey,
               JSON.stringify({ value: { hasAccess, hasSlot: slotAccess, activeBatch }, expiry: Date.now() + 5 * 60 * 1000 })
             );
           } catch { /* ignore */ }
@@ -763,6 +771,76 @@ export default function MyBatchPage() {
           {isPaidUser ? (
             <>
 
+          {/* Schedule Highlight */}
+          {isBootcamp3 ? (
+            <div className="rounded-[1.5rem] border border-blue-500/20 dark:border-blue-400/20 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-5 md:px-8 md:py-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-[#0060aa]/10 text-[#0060aa] dark:text-blue-400">
+                  <Calendar className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#0060aa] dark:text-blue-400">SKILLYUG BOOTCAMP 3.0</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                      batchStatus === "LIVE"
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                        : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                    }`}>
+                      {batchStatus}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white mt-1">Cohort Launch & Schedule</h3>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 md:items-center border-t border-slate-100 dark:border-white/5 pt-4 md:border-t-0 md:pt-0">
+                <div>
+                  <p className="text-xl font-black text-slate-900 dark:text-white tracking-tight">20 November 2026</p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Batch Starting Date</p>
+                </div>
+                
+                <div className="hidden sm:block h-10 w-px bg-slate-200 dark:bg-white/10"></div>
+                
+                <div>
+                  <p className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-200">Your class schedule will be shared soon.</p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Class Schedule & Timings</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-[1.5rem] border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-5 md:px-8 md:py-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-[#0060aa]/10 text-[#0060aa] dark:text-blue-400">
+                  <Calendar className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff8b12]"></span>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                      {isBootcamp2 ? "Batch 2.0" : (user?.batchLabel || "Live Cohort")}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white mt-1">Live Cohort Schedule</h3>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 md:items-center border-t border-slate-100 dark:border-white/5 pt-4 md:border-t-0 md:pt-0">
+                <div>
+                  <p className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Mon, Wed, Fri</p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Class Days (Sat & Sun Off)</p>
+                </div>
+                
+                <div className="hidden sm:block h-10 w-px bg-slate-200 dark:bg-white/10"></div>
+                
+                <div>
+                  <p className="text-xl font-black text-slate-900 dark:text-white tracking-tight">9:00 PM <span className="text-slate-400 font-medium mx-1">–</span> 10:00 PM</p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Daily Class Timing (IST)</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Top Section: Profile & Circular Progress */}
           <div className="grid grid-cols-1 gap-6 md:gap-8 xl:grid-cols-[1.35fr_0.65fr]">
             <div className="rounded-[2rem] border border-slate-200/60 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 md:p-6 md:p-10 shadow-sm self-start dark:border-white/5">
@@ -801,15 +879,15 @@ export default function MyBatchPage() {
                 Bootcamp Progress
               </p>
               <div className="relative mt-8 w-40 h-40 flex items-center justify-center">
-                {/* SVG Circle for Pie Graph (0% completion) */}
+                {/* SVG Circle for Pie Graph */}
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   {/* Background Circle */}
                   <circle cx="50" cy="50" r="40" fill="transparent" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="12" />
-                  {/* Progress Circle (0% of 251.2 circumference = 0) */}
+                  {/* Progress Circle */}
                   <circle 
                     cx="50" cy="50" r="40" fill="transparent" strokeWidth="12"
                     strokeDasharray="251.2" strokeDashoffset={strokeDashoffset}
-                    className="stroke-[#ff8b12] dark:stroke-[#ff8b12] drop-shadow-[0_2px_4px_rgba(255,139,18,0.1)]"
+                    className="stroke-[#ff8b12] dark:stroke-[#ff8b12] drop-shadow-[0_2px_4px_rgba(255,139,18,0.1)] transition-all duration-700 ease-out"
                     strokeLinecap="round"
                   />
                 </svg>
@@ -828,7 +906,74 @@ export default function MyBatchPage() {
                 <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Next Live Session</h2>
               </div>
               <div className="mt-8 rounded-[1.5rem] border border-slate-200/60 dark:border-white/5 bg-white/40 dark:bg-white/5 backdrop-blur-sm p-6 md:p-8 flex flex-col justify-between min-h-[200px]">
-                {nextSession ? (
+                {isBootcamp3 ? (
+                  <>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold uppercase tracking-[0.24em] px-2.5 py-1 rounded-full border ${
+                          batchStatus === "LIVE" 
+                            ? "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-450 animate-pulse" 
+                            : "bg-[#0060aa]/10 border-[#0060aa]/20 text-[#0060aa] dark:text-blue-400"
+                        }`}>
+                          {batchStatus === "LIVE" ? "Live Now" : "First Class • Upcoming"}
+                        </span>
+                      </div>
+                      <h3 className="mt-4 text-xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
+                        SKILLYUG Bootcamp 3.0 Live Class
+                      </h3>
+                    </div>
+                    <div className="mt-6 pt-5 border-t border-slate-200/50 dark:border-white/5 flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Date & Status</p>
+                        <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">
+                          Friday, 20 November 2026 • Timings to be announced
+                        </p>
+                      </div>
+                      {user.activeBatch?.meet_link ? (
+                        batchStatus === "LIVE" ? (
+                          <a 
+                            href={user.activeBatch.meet_link}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-red-500/10"
+                          >
+                            <svg className="w-4.5 h-4.5 flex-shrink-0" viewBox="0 0 87.5 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path fill="#fff" d="M49.5 36l8.53 9.75 11.47 7.33 2-17.02-2-16.64-11.69 6.44z"/>
+                              <path fill="#fff" d="M0 51.5V66c0 3.315 2.685 6 6 6h14.5l3-10.96-3-9.54-9.95-3z"/>
+                              <path fill="#fff" d="M20.5 0L0 20.5l10.55 3 9.95-3 2.95-9.41z"/>
+                              <path fill="#fff" d="M20.5 20.5H0v31h20.5z"/>
+                              <path fill="#fff" d="M82.6 8.68L69.5 19.42v33.66l13.16 10.79c1.97 1.54 4.85.135 4.85-2.37V11c0-2.535-2.945-3.925-4.91-2.32zM49.5 36v15.5h-29V72h43c3.315 0 6-2.685 6-6V53.08z"/>
+                              <path fill="#fff" d="M63.5 0h-43v20.5h29V36l20-16.57V6c0-3.315-2.685-6-6-6z"/>
+                            </svg>
+                            Join Meeting
+                          </a>
+                        ) : (
+                          <a 
+                            href={user.activeBatch.meet_link}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 dark:border-white/10 dark:bg-slate-900/60 dark:hover:bg-slate-900/80 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition-all hover:scale-105 active:scale-95 shadow-sm"
+                          >
+                            <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 87.5 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path fill="#00832d" d="M49.5 36l8.53 9.75 11.47 7.33 2-17.02-2-16.64-11.69 6.44z"/>
+                              <path fill="#0066da" d="M0 51.5V66c0 3.315 2.685 6 6 6h14.5l3-10.96-3-9.54-9.95-3z"/>
+                              <path fill="#e94235" d="M20.5 0L0 20.5l10.55 3 9.95-3 2.95-9.41z"/>
+                              <path fill="#2684fc" d="M20.5 20.5H0v31h20.5z"/>
+                              <path fill="#00ac47" d="M82.6 8.68L69.5 19.42v33.66l13.16 10.79c1.97 1.54 4.85.135 4.85-2.37V11c0-2.535-2.945-3.925-4.91-2.32zM49.5 36v15.5h-29V72h43c3.315 0 6-2.685 6-6V53.08z"/>
+                              <path fill="#ffba00" d="M63.5 0h-43v20.5h29V36l20-16.57V6c0-3.315-2.685-6-6-6z"/>
+                            </svg>
+                            Google Meet
+                          </a>
+                        )
+                      ) : (
+                        <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 dark:border-white/5 dark:bg-slate-800/40 px-3.5 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 opacity-80 cursor-not-allowed shadow-sm">
+                          <Video className="w-4 h-4" />
+                          Meeting Link Coming Soon
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : nextSession ? (
                   <>
                     <div>
                       <div className="flex items-center gap-2">
@@ -839,12 +984,9 @@ export default function MyBatchPage() {
                         }`}>
                           {nextSession.status === "live" ? "Live Now" : "Upcoming Session"}
                         </span>
-                        <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                          Day {nextSession.dayNumber} of {totalDays}
-                        </span>
                       </div>
                       <h3 className="mt-4 text-xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
-                        {nextSession.topic}
+                        {isBootcamp2 ? "Batch 2.0 Live Class" : `${user.batchLabel} Live Class`}
                       </h3>
                     </div>
                     <div className="mt-6 pt-5 border-t border-slate-200/50 dark:border-white/5 flex flex-wrap items-center justify-between gap-4">
@@ -855,7 +997,7 @@ export default function MyBatchPage() {
                             day: "numeric",
                             month: "short",
                             weekday: "long"
-                          })}, 2:00 PM IST
+                          })} • 9:00 PM – 10:00 PM IST
                         </p>
                       </div>
                       {user.activeBatch?.meet_link ? (
@@ -903,12 +1045,53 @@ export default function MyBatchPage() {
                     </div>
                   </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center flex-1 text-center py-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-3 text-blue-600 dark:text-blue-400">
-                      <Calendar className="w-6 h-6" />
+                  <div className="flex flex-col justify-between h-full py-2">
+                    <div>
+                      <div className="flex items-center justify-between gap-4 mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">All Classes Complete</span>
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20">
+                          Cohort Finished
+                        </span>
+                      </div>
+                      
+                      <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
+                        {isBootcamp2 ? "Batch 2.0 Live Sessions Completed" : `${user.batchLabel} Live Sessions Completed`}
+                      </h3>
                     </div>
-                    <p className="text-base font-bold text-slate-800 dark:text-slate-200">Batch starting soon</p>
-                    <p className="text-xs text-slate-500 mt-1">Check back later for your first live session date.</p>
+                    
+                    <div className="mt-6 pt-5 border-t border-slate-100 dark:border-white/5 flex flex-wrap gap-4 md:gap-6 justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 dark:bg-[#0a0f1c] border border-slate-100 dark:border-white/10 text-slate-500 dark:text-slate-400 shadow-sm">
+                          <Calendar className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Curriculum Status</p>
+                          <p className="mt-0.5 text-sm font-bold text-slate-800 dark:text-slate-200">
+                            All Live Classes Have Concluded
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {user.activeBatch?.meet_link ? (
+                          <a 
+                            href={user.activeBatch.meet_link}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 dark:border-white/10 dark:bg-slate-900/60 dark:hover:bg-slate-900/80 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition-all hover:scale-105 active:scale-95 shadow-sm"
+                          >
+                            <Video className="w-4 h-4 text-slate-400" />
+                            Google Meet
+                          </a>
+                      ) : (
+                        <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 dark:border-white/5 dark:bg-slate-800/40 px-3.5 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 opacity-80 cursor-not-allowed shadow-sm">
+                          <Video className="w-4 h-4" />
+                          Link Coming Soon
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1075,24 +1258,40 @@ export default function MyBatchPage() {
                   </div>
                 )}
                 <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-                  {videos.map((video) => (
-                    <button 
-                      key={video.id} 
-                      onClick={() => {
-                        setActiveVideo(video);
-                        setIsPlaying(false);
-                      }}
-                      className={`w-full text-left p-4 rounded-2xl transition-all cursor-pointer ${activeVideo.id === video.id ? 'bg-[#ff8b12]/10 border border-[#ff8b12]/20 text-[#ff8b12] dark:text-[#ff9d3b]' : 'hover:bg-white/50 dark:hover:bg-white/5 border border-transparent text-slate-700 dark:text-slate-300'}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <PlayCircle className={`w-8 h-8 flex-shrink-0 ${activeVideo.id === video.id ? 'text-[#ff8b12] dark:text-[#ff9d3b]' : 'text-slate-400 dark:text-slate-500'}`} />
-                        <div>
-                          <p className={`text-sm font-bold ${activeVideo.id === video.id ? 'text-[#ff8b12] dark:text-[#ff9d3b] font-bold' : 'text-slate-700 dark:text-slate-300'}`}>{video.title}</p>
-                          <p className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-1">{video.date}</p>
-                        </div>
+                  {videos.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center px-4 py-8">
+                      <div className="h-12 w-12 rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 flex items-center justify-center mb-3">
+                        <Video className="w-5 h-5 text-slate-400" />
                       </div>
-                    </button>
-                  ))}
+                      <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                        {isBootcamp3 ? "Recordings Available Soon" : "No Recordings Found"}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                        {isBootcamp3
+                          ? "Your class recordings will appear here after live sessions begin on 20 November 2026."
+                          : "Class recordings will appear here once published."}
+                      </p>
+                    </div>
+                  ) : (
+                    videos.map((video) => (
+                      <button 
+                        key={video.id} 
+                        onClick={() => {
+                          setActiveVideo(video);
+                          setIsPlaying(false);
+                        }}
+                        className={`w-full text-left p-4 rounded-2xl transition-all cursor-pointer ${activeVideo.id === video.id ? 'bg-[#ff8b12]/10 border border-[#ff8b12]/20 text-[#ff8b12] dark:text-[#ff9d3b]' : 'hover:bg-white/50 dark:hover:bg-white/5 border border-transparent text-slate-700 dark:text-slate-300'}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <PlayCircle className={`w-8 h-8 flex-shrink-0 ${activeVideo.id === video.id ? 'text-[#ff8b12] dark:text-[#ff9d3b]' : 'text-slate-400 dark:text-slate-500'}`} />
+                          <div>
+                            <p className={`text-sm font-bold ${activeVideo.id === video.id ? 'text-[#ff8b12] dark:text-[#ff9d3b] font-bold' : 'text-slate-700 dark:text-slate-300'}`}>{video.title}</p>
+                            <p className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-1">{video.date}</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))
+                  )}
                 </div>
               </div>
               
@@ -1158,10 +1357,18 @@ export default function MyBatchPage() {
                       )}
                     </>
                   ) : (
-                    <div className="text-center z-40 relative">
-                      <Lock className="w-10 h-10 text-slate-600 dark:text-slate-550 mx-auto mb-3" />
-                      <p className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Recording Unavailable</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">Session recording will appear here once ready.</p>
+                    <div className="text-center z-40 relative p-6">
+                      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-slate-400">
+                        <Video className="h-6 w-6" />
+                      </div>
+                      <p className="text-sm font-bold text-slate-300 uppercase tracking-widest">
+                        {isBootcamp3 ? "Bootcamp 3.0 Recordings" : "Recording Unavailable"}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-2 max-w-sm mx-auto leading-relaxed">
+                        {isBootcamp3
+                          ? "Your class recordings will appear here after live sessions begin on 20 November 2026."
+                          : "Session recording will appear here once ready."}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -1310,7 +1517,7 @@ export default function MyBatchPage() {
                   ) : (
                     <div className="flex items-center justify-center w-full">
                       <span className="text-xs text-slate-500 font-bold uppercase tracking-widest select-none">
-                        No active recording
+                        {isBootcamp3 ? "Sessions starting 20 November 2026" : "No active recording"}
                       </span>
                     </div>
                   )}
@@ -1367,23 +1574,32 @@ export default function MyBatchPage() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-slate-500 dark:text-slate-455">
                     Next live session
                   </p>
-                  {nextSession ? (
+                  {isBootcamp3 ? (
+                    <>
+                      <p className="mt-3 text-lg font-bold text-slate-900 dark:text-white">
+                        20 November 2026
+                      </p>
+                      <p className="mt-2 text-sm text-slate-600 dark:text-slate-350">
+                        First Live Session · Schedule will be shared soon
+                      </p>
+                    </>
+                  ) : nextSession ? (
                     <>
                       <p className="mt-3 text-lg font-bold text-slate-900 dark:text-white">
                         {nextSession.date.toLocaleDateString("en-IN", {
                           day: "numeric",
                           month: "short"
-                        })}, 2:00 PM IST
+                        })}, 9:00 PM – 10:00 PM IST
                       </p>
                       <p className="mt-2 text-sm text-slate-600 dark:text-slate-350">
-                        Day {nextSession.dayNumber}: {nextSession.topic}
+                        {isBootcamp2 ? "Batch 2.0 Live Class" : `${user?.batchLabel || "Live Class"}`}
                       </p>
                     </>
                   ) : (
                     <>
                       <p className="mt-3 text-lg font-bold text-slate-900 dark:text-white">Completed</p>
                       <p className="mt-2 text-sm text-slate-600 dark:text-slate-350">
-                        All 25 sessions have finished!
+                        All live sessions have finished!
                       </p>
                     </>
                   )}

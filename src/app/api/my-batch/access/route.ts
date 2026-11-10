@@ -58,39 +58,102 @@ async function getAuthenticatedUser(request: NextRequest) {
   return data.user;
 }
 
+async function isCallerAdmin(admin: ReturnType<typeof createSupabaseAdmin>, userId: string): Promise<boolean> {
+  try {
+    const { data: adminRow } = await admin
+      .from("admins")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    return !!adminRow;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Checks if the user has any row in slot_bookings (any row = verified payment).
+ * Checks if the user has a verified booking in slot_bookings and resolves their assigned batch.
  * Matches by user_id first, then falls back to email.
  */
-async function getAccessDetails(userId: string, email: string | null): Promise<{ hasSlot: boolean, activeBatch?: Record<string, unknown> }> {
+async function getAccessDetails(userId: string, email: string | null): Promise<{
+  hasSlot: boolean;
+  isAdmin: boolean;
+  activeBatch?: Record<string, unknown> | null;
+  enrolledBatches?: Record<string, unknown>[];
+}> {
   const admin = createSupabaseAdmin();
+  const isAdmin = await isCallerAdmin(admin, userId);
 
-  // Find the active batch first
-  const { data: activeBatch, error: batchError } = await admin
+  // 1. Fetch active batch as baseline (e.g. Bootcamp 3.0)
+  const { data: globalActiveBatch } = await admin
     .from("batches")
     .select("*")
     .eq("is_active", true)
-    .single();
+    .maybeSingle();
 
-  if (batchError || !activeBatch) {
-    console.error("[Access] Failed to find active batch:", batchError);
-    return { hasSlot: false };
+  // 2. Query slot_bookings for this user
+  const { data: bookings, error: bookingError } = await admin
+    .from("slot_bookings")
+    .select("batch_id, payment_status, created_at")
+    .or(`user_id.eq.${userId}${email ? `,email.eq.${email}` : ""}`);
+
+  if (bookingError) {
+    console.error("[Access] slot_bookings query error:", bookingError);
   }
 
-  // Single query using OR — avoids a second round trip
-  // Scope it to the active batch ONLY.
-  const query = admin
-    .from("slot_bookings")
-    .select("razorpay_payment_id", { count: "exact", head: true })
-    .eq("batch_id", activeBatch.id)
-    .or(`user_id.eq.${userId}${email ? `,email.eq.${email}` : ""}`)
-    .limit(1);
+  const hasSlot = Boolean(bookings && bookings.length > 0);
 
-  const { count, error } = await query;
+  // If user is Admin, grant access immediately and provide active batch
+  if (isAdmin) {
+    return {
+      hasSlot: true,
+      isAdmin: true,
+      activeBatch: globalActiveBatch,
+    };
+  }
 
-  if (error) console.error("[Access] slot_bookings query error:", error);
+  if (!hasSlot || !bookings) {
+    return {
+      hasSlot: false,
+      isAdmin: false,
+      activeBatch: globalActiveBatch,
+    };
+  }
 
-  return { hasSlot: (count ?? 0) > 0, activeBatch };
+  // 3. Resolve the student's assigned batch from their actual booking record
+  const batchIds = Array.from(
+    new Set(bookings.map((b) => b.batch_id).filter((id): id is string => Boolean(id)))
+  );
+
+  let studentBatch: Record<string, unknown> | null = null;
+  let enrolledBatches: Record<string, unknown>[] = [];
+
+  if (batchIds.length > 0) {
+    const { data: batchRows } = await admin
+      .from("batches")
+      .select("*")
+      .in("id", batchIds);
+
+    if (batchRows && batchRows.length > 0) {
+      enrolledBatches = batchRows;
+      // Prefer active batch if enrolled in multiple, otherwise latest enrolled batch
+      studentBatch =
+        batchRows.find((b) => b.is_active) ||
+        batchRows.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0] ||
+        batchRows[0];
+    }
+  }
+
+  if (!studentBatch) {
+    studentBatch = globalActiveBatch;
+  }
+
+  return {
+    hasSlot: true,
+    isAdmin: false,
+    activeBatch: studentBatch,
+    enrolledBatches,
+  };
 }
 
 export async function GET(request: NextRequest) {
@@ -99,18 +162,19 @@ export async function GET(request: NextRequest) {
 
     // Not authenticated → no access
     if (!user) {
-      console.error("[Access] No authenticated user found");
       return NextResponse.json({ hasAccess: false, hasSlot: false }, { status: 401 });
     }
 
-    console.log("[Access] Checking access for user:", user.id, user.email);
+    const { hasSlot, isAdmin, activeBatch, enrolledBatches } = await getAccessDetails(user.id, user.email ?? null);
+    const hasAccess = hasSlot || isAdmin;
 
-    const { hasSlot, activeBatch } = await getAccessDetails(user.id, user.email ?? null);
-    const hasAccess = hasSlot;
-
-    console.log("[Access] Result — hasSlot:", hasSlot, "hasAccess:", hasAccess);
-
-    const response = NextResponse.json({ hasAccess, hasSlot, activeBatch });
+    const response = NextResponse.json({
+      hasAccess,
+      hasSlot,
+      isAdmin,
+      activeBatch,
+      enrolledBatches,
+    });
     response.headers.set("Cache-Control", "no-store, max-age=0");
     return response;
   } catch (error) {

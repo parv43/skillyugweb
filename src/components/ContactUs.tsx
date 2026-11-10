@@ -200,9 +200,9 @@ export default function ContactUs() {
                     className="w-full bg-white/70 border border-slate-200 rounded-xl px-5 py-4 focus:outline-none focus:border-[#ff8b12] focus:ring-1 focus:ring-[#ff8b12]/20 transition-all text-slate-800 appearance-none dark:bg-[#020617]/70 dark:border-white/10 dark:text-white"
                   >
                     <option value="Select Option">Select Option</option>
-                    <option value="Grade 6-8">Grade 6-8</option>
-                    <option value="Grade 9-10">Grade 9-10</option>
-                    <option value="Grade 11-12">Grade 11-12</option>
+                    <option value="Grade 5-7">Grade 5-7</option>
+                    <option value="Grade 8-9">Grade 8-9</option>
+                    <option value="Grade 10-12">Grade 10-12</option>
                     <option value="Undergraduate">Undergraduate</option>
                     <option value="Parent">Parent</option>
                     <option value="School Administrator">School Administrator</option>
@@ -261,7 +261,7 @@ export default function ContactUs() {
                 </div>
                 <div>
                   <h3 className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-450 font-bold mb-1.5">Call Us</h3>
-                  <p className="text-base md:text-xl font-bold text-slate-900 dark:text-white tracking-wide break-all">7835049710</p>
+                  <p className="text-base md:text-xl font-bold text-slate-900 dark:text-white tracking-wide break-all">7817831143</p>
                   <p className="text-sm text-slate-600 dark:text-slate-350 mt-2 font-medium leading-relaxed">Available Monday to Friday, from 9:00 AM to 6:00 PM IST.</p>
                 </div>
               </div>

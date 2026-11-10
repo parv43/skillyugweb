@@ -439,7 +439,7 @@ export default function CoursesPage() {
               </span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-300 sm:text-xl">
-              Students in Classes 6–10 gain mastery over industry-leading generative platforms, coding structures, and design automation through hands-on project building and live expert sessions.
+              Students in Classes 5–9 gain mastery over industry-leading generative platforms, coding structures, and design automation through hands-on project building and live expert sessions.
             </p>
             <div className="mt-10 flex flex-wrap justify-center lg:justify-start gap-4">
               <a

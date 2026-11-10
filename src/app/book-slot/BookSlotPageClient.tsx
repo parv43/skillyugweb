@@ -574,11 +574,11 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       <option disabled value="">
                         Select class or grade
                       </option>
+                      <option value="5th">5th</option>
                       <option value="6th">6th</option>
                       <option value="7th">7th</option>
                       <option value="8th">8th</option>
                       <option value="9th">9th</option>
-                      <option value="10th">10th</option>
                     </select>
                     <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-slate-500">
                       <span className="material-symbols-outlined">expand_more</span>
@@ -640,7 +640,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
 
         {/* Sticky Floating Call Advisor CTA Button */}
         <a
-          href="tel:7835049710"
+          href="tel:7817831143"
           className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 border border-orange-400/20"
           title="Call our advisor"
         >

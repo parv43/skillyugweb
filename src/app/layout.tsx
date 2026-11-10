@@ -26,12 +26,12 @@ const figtree = Figtree({
 
 export const metadata: Metadata = {
   ...createMetadata({
-    title: "AI Education Bootcamp for Students in Classes 6–10",
+    title: "AI Education Bootcamp for Students in Classes 5–9",
     description: siteConfig.description,
   }),
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: "AI Education Bootcamp for Students in Classes 6–10",
+    default: "AI Education Bootcamp for Students in Classes 5–9",
     template: "%s | Skillyug",
   },
   icons: {

@@ -372,7 +372,7 @@ const rawCurriculumData = [
   }
 ];
 
-export const BOOTCAMP_START_FALLBACK = new Date(2026, 8, 7); // Sept 7, 2026
+export const BOOTCAMP_START_FALLBACK = new Date(2026, 9, 5); // Oct 5, 2026
 
 export const formatDate = (date: Date): string => {
   const year = date.getFullYear();
@@ -381,14 +381,32 @@ export const formatDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
+// Off dates / holidays where scheduled MWF class was not held (e.g. Oct 23)
+const SCHEDULE_OFF_DATES = new Set(["2026-10-23"]);
+
+function parseStartDate(startDateInput?: string | Date | null): Date {
+  if (!startDateInput) return new Date(2026, 9, 5);
+  if (startDateInput instanceof Date) return startDateInput;
+  const parts = startDateInput.split("-").map(Number);
+  if (parts.length === 3) {
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+  const parsed = new Date(startDateInput);
+  return isNaN(parsed.getTime()) ? new Date(2026, 9, 5) : parsed;
+}
+
 function generateCurriculumDays(startDate: Date): CurriculumDay[] {
   const days: CurriculumDay[] = [];
-  const currentGenDate = new Date(startDate.getTime());
+  const currentGenDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
   let genIndex = 0;
   
   while (genIndex < rawCurriculumData.length) {
     const dayOfWeek = currentGenDate.getDay();
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Skip weekends
+    const dateStr = formatDate(currentGenDate);
+    // Classes run every Monday (1), Wednesday (3), Friday (5). Saturday (6), Sunday (0), Tue (2), Thu (4) are off.
+    const isClassDay = (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5) && !SCHEDULE_OFF_DATES.has(dateStr);
+    
+    if (isClassDay) {
       const raw = rawCurriculumData[genIndex];
       days.push({
         dayNumber: genIndex + 1,
@@ -396,7 +414,7 @@ function generateCurriculumDays(startDate: Date): CurriculumDay[] {
         subtopics: raw.subtopics,
         outcome: raw.outcome,
         date: new Date(currentGenDate.getTime()),
-        dateStr: formatDate(currentGenDate)
+        dateStr
       });
       genIndex++;
     }
@@ -406,7 +424,7 @@ function generateCurriculumDays(startDate: Date): CurriculumDay[] {
 }
 
 export function getCurriculumDays(startDateStr?: string | null): CurriculumDay[] {
-  const start = startDateStr ? new Date(startDateStr) : BOOTCAMP_START_FALLBACK;
+  const start = parseStartDate(startDateStr);
   return generateCurriculumDays(start);
 }
 
@@ -427,17 +445,21 @@ export function getNextLiveSession(now: Date = new Date(), startDateStr?: string
         dayNumber: day.dayNumber,
         topic: day.topic,
         date: day.date,
+        timeStr: "9:00 PM – 10:00 PM IST",
         status: "upcoming" as const
       };
     } else if (classDateStart.getTime() === todayStart.getTime()) {
-      if (now.getHours() < 16) {
+      // Today is a class day! Live classes run 9:00 PM - 10:00 PM (21:00 - 22:00 IST)
+      if (now.getHours() < 22) {
         return {
           dayNumber: day.dayNumber,
           topic: day.topic,
           date: day.date,
-          status: now.getHours() >= 14 ? ("live" as const) : ("upcoming" as const)
+          timeStr: "9:00 PM – 10:00 PM IST",
+          status: now.getHours() >= 21 ? ("live" as const) : ("upcoming" as const)
         };
       }
+      // If 22:00 or later, today's session has finished; continue loop to find next upcoming class
     }
   }
   return null;
@@ -453,7 +475,8 @@ export function getCompletedDaysCount(now: Date = new Date(), startDateStr?: str
     if (classDateStart < todayStart) {
       count++;
     } else if (classDateStart.getTime() === todayStart.getTime()) {
-      if (now.getHours() >= 16) {
+      // Completed once the 9:00 PM - 10:00 PM class finishes (22:00 IST)
+      if (now.getHours() >= 22) {
         count++;
       }
     }
@@ -463,7 +486,7 @@ export function getCompletedDaysCount(now: Date = new Date(), startDateStr?: str
 
 export function getInitialDates(startDateStr?: string | null) {
   const today = new Date();
-  const startRaw = startDateStr ? new Date(startDateStr) : BOOTCAMP_START_FALLBACK;
+  const startRaw = parseStartDate(startDateStr);
   const end = getBootcampEnd(startDateStr);
   
   const start = new Date(startRaw.getFullYear(), startRaw.getMonth(), startRaw.getDate());

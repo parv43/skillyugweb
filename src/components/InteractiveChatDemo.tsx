@@ -17,7 +17,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
     },
     {
       role: "ai",
-      content: "Welcome! Skillyug teaches Class 6–10 students how to use advanced AI tools like ChatGPT, Claude, Knapkin, n8n, and Canva AI to build creative, real-world projects. I'm here to help you understand the program!"
+      content: "Welcome! Skillyug teaches Class 5–9 students how to use advanced AI tools like ChatGPT, Claude, Knapkin, n8n, and Canva AI to build creative, real-world projects. I'm here to help you understand the program!"
     }
   ])
 
@@ -62,7 +62,7 @@ export default function InteractiveChatDemo({ id = "ask-ai" }: InteractiveChatDe
       return "Students learn practical AI skills: using ChatGPT for research and problem-solving, Claude for deeper analysis, Knapkin for creating visual diagrams, n8n for simple workflows, and Canva AI for creative presentations."
     }
     if (text.includes("age") || text.includes("class") || text.includes("who") || text.includes("old") || text.includes("suitable")) {
-      return "Skillyug is designed perfectly for students from Class 6 to 10. The lessons are easy enough for school students to understand, focusing on real-world practical AI usage."
+      return "Skillyug is designed perfectly for students from Class 5 to 9. The lessons are easy enough for school students to understand, focusing on real-world practical AI usage."
     }
     if (text.includes("book") || text.includes("join") || text.includes("enroll") || text.includes("start") || text.includes("spot") || text.includes("reserve")) {
       return "To secure your child's seat, use the Bootcamp page to reserve a spot. Seats are limited per batch!"

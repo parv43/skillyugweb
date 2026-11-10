@@ -16,7 +16,7 @@ export const homeFaqItems: HomeFaqItem[] = [
   {
     question: "Is this suitable for a Class 8 student?",
     answer:
-      "Yes. Skillyug is designed for Class 6 to Class 10 students. The bootcamp focuses on age-appropriate AI skills, project work, and guided practice rather than advanced coding prerequisites.",
+      "Yes. Skillyug is designed for Class 5 to Class 9 students. The bootcamp focuses on age-appropriate AI skills, project work, and guided practice rather than advanced coding prerequisites.",
     href: "/blog/ai-basics-for-class-6-12",
     linkLabel: "Read the AI basics guide",
   },

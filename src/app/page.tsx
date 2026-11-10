@@ -19,9 +19,9 @@ const ContactUs = dynamic(() => import("@/components/ContactUs"))
 
 export const metadata: Metadata = {
   ...createMetadata({
-    title: "AI Education Bootcamp for Students in Classes 6–10",
+    title: "AI Education Bootcamp for Students in Classes 5–9",
     description:
-      "Skillyug helps Class 6–10 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp. Reserve your bootcamp spot today.",
+      "Skillyug helps Class 5–9 students learn ChatGPT, Canva AI, Gamma, and real project workflows through a hands-on AI bootcamp. Reserve your bootcamp spot today.",
   }),
 }
 
@@ -62,7 +62,7 @@ export default function Home() {
       <Navbar />
       <PaymentSupportNotice />
       <h1 className="sr-only">
-        AI education bootcamp for students in Classes 6 to 12 with ChatGPT,
+        AI education bootcamp for students in Classes 5 to 9 with ChatGPT,
         Canva AI, Gamma, project skills, and a ₹10,000 bootcamp spot booking.
       </h1>
       <HeroSection />

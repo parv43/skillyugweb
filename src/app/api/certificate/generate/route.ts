@@ -262,7 +262,7 @@ export async function POST(request: NextRequest) {
     const { data: slotBooking, error: slotError } = await supabase
       .from("slot_bookings")
       .select("batch_id")
-      .eq("user_id", userId)
+      .or(`user_id.eq.${userId}${user.email ? `,email.eq.${user.email}` : ""}`)
       .limit(1)
       .maybeSingle();
 
