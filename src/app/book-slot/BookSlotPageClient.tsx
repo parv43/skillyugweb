@@ -88,6 +88,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const paymentTier = (!fromParam || fromParam === "bootcamp" || fromParam === "courses") ? "full" : "partial";
   const [promoCode, setPromoCode] = useState("");
   const displayAmount = paymentTier === "full" ? calculateBootcampPriceRupees(promoCode) : PARTIAL_BOOK_SLOT_AMOUNT_RUPEES;
+  const isFullPayment = displayAmount === 10000 || displayAmount === 8500 || displayAmount === 7800;
+  const isInstallmentPayment = !isFullPayment;
   const [errorMsg, setErrorMsg] = useState("");
   const [gatewayNotice, setGatewayNotice] = useState("");
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -622,9 +624,9 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                         ? "Payment Gateway Unavailable"
                         : `Pay Now - ₹${displayAmount}`}
                 </button>
-                {displayAmount !== 10000 && (
+                {isInstallmentPayment && (
                   <p className="mt-4 text-center text-sm font-semibold text-slate-600 dark:text-slate-400 bg-blue-50/50 dark:bg-blue-900/20 py-2.5 px-4 rounded-xl border border-blue-100 dark:border-blue-800/30">
-                    Note: This will be your 1st installment.
+                    Note: This will be your first installment.
                   </p>
                 )}
               </div>
