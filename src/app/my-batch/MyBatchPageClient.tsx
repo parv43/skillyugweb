@@ -29,7 +29,8 @@ import {
   Pause,
   RotateCcw,
   RotateCw,
-  Video
+  Video,
+  ChevronRight,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
@@ -115,6 +116,13 @@ export default function MyBatchPage() {
   const [activeVideo, setActiveVideo] = useState<VideoItem>(MOCK_VIDEOS[0]);
   const [videos, setVideos] = useState<VideoItem[]>(MOCK_VIDEOS);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [certsUnlocked, setCertsUnlocked] = useState(false);
+  const [adminProfile, setAdminProfile] = useState<{
+    adminName: string;
+    role: string;
+    assignedBatchId: string;
+    assignedBatchName: string;
+  } | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
@@ -581,7 +589,8 @@ export default function MyBatchPage() {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${session.access_token}`
-        }
+        },
+        body: JSON.stringify({ batch_id: user?.activeBatch?.id })
       });
 
       const data = await res.json();
@@ -667,6 +676,8 @@ export default function MyBatchPage() {
             const avatarUrl = session.user.user_metadata?.avatar_url || null;
             setHasSlotAccess(Boolean(value.hasSlot));
             setUserId(session.user.id);
+            if (value.certificatesUnlocked !== undefined) setCertsUnlocked(Boolean(value.certificatesUnlocked));
+            if (value.adminProfile) setAdminProfile(value.adminProfile);
             setUser({
               avatarUrl,
               batchLabel: value.activeBatch?.label || "Skillyug Bootcamp",
@@ -695,14 +706,31 @@ export default function MyBatchPage() {
         });
         
         if (res.ok) {
-          const data = (await res.json()) as { hasAccess?: boolean; hasSlot?: boolean; activeBatch?: any };
+          const data = (await res.json()) as {
+            hasAccess?: boolean;
+            hasSlot?: boolean;
+            activeBatch?: any;
+            certificatesUnlocked?: boolean;
+            adminProfile?: any;
+          };
           hasAccess = Boolean(data.hasAccess);
           slotAccess = Boolean(data.hasSlot);
           activeBatch = data.activeBatch;
+          if (data.certificatesUnlocked !== undefined) setCertsUnlocked(Boolean(data.certificatesUnlocked));
+          if (data.adminProfile) setAdminProfile(data.adminProfile);
           try {
             sessionStorage.setItem(
               cacheKey,
-              JSON.stringify({ value: { hasAccess, hasSlot: slotAccess, activeBatch }, expiry: Date.now() + 5 * 60 * 1000 })
+              JSON.stringify({
+                value: {
+                  hasAccess,
+                  hasSlot: slotAccess,
+                  activeBatch,
+                  certificatesUnlocked: data.certificatesUnlocked,
+                  adminProfile: data.adminProfile,
+                },
+                expiry: Date.now() + 5 * 60 * 1000,
+              })
             );
           } catch { /* ignore */ }
         } else {
@@ -744,8 +772,8 @@ export default function MyBatchPage() {
   }
 
   const isPaidUser = hasSlotAccess || isAdmin;
-  // Unlocked completely for all verified users
-  const canDownloadCert = progressPercentage === 100;
+  // Unlocked completely for all verified users once authorized by admin
+  const canDownloadCert = certsUnlocked || isAdmin;
 
   return (
     <main className="min-h-screen bg-transparent text-slate-800 dark:text-slate-200 relative overflow-x-hidden select-none">
@@ -770,6 +798,28 @@ export default function MyBatchPage() {
         <div className="max-w-7xl mx-auto space-y-10">
           {isPaidUser ? (
             <>
+              {/* Admin Cohort Management Gateway */}
+              {isAdmin && (
+                <div className="rounded-2xl border border-purple-200 dark:border-purple-900/30 bg-purple-50/80 dark:bg-purple-950/30 backdrop-blur-md px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-2.5 w-2.5 rounded-full bg-purple-500 animate-pulse" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300">
+                      {adminProfile?.role || (isBootcamp2 ? "Bootcamp 2.0 Admin" : "Bootcamp 3.0 Admin")}
+                    </span>
+                    <span className="text-slate-400 dark:text-slate-500 text-xs hidden sm:inline">•</span>
+                    <span className="text-xs font-medium text-slate-600 dark:text-slate-400 hidden sm:inline">
+                      Managing {adminProfile?.assignedBatchName || user.batchLabel}
+                    </span>
+                  </div>
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-sm hover:scale-105 active:scale-95"
+                  >
+                    Open Admin Console
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              )}
 
           {/* Schedule Highlight */}
           {isBootcamp3 ? (

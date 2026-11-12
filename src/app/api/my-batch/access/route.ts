@@ -1,26 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { getRequiredEnv } from "@/lib/razorpayServer";
+import {
+  createSupabaseAdmin,
+  getAdminProfile,
+  isBatchCertificatesUnlocked,
+  AdminProfile,
+} from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 
-function createSupabaseAdmin() {
-  return createClient(
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY")
-  );
-}
-
 /**
- * Get the authenticated user — checks Authorization: Bearer header first,
- * then falls back to cookie-based auth.
+ * Extract authenticated user via Bearer token or Supabase cookie session
  */
 async function getAuthenticatedUser(request: NextRequest) {
   const admin = createSupabaseAdmin();
 
-  // 1. Try Bearer token from Authorization header (most reliable, no cookie issues)
+  // 1. Try Bearer token
   const authHeader = request.headers.get("Authorization");
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
@@ -30,68 +27,56 @@ async function getAuthenticatedUser(request: NextRequest) {
     }
   }
 
-  // 2. Fall back to cookie-based session
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // No-op in route handlers.
-          }
-        },
-      },
-    }
-  );
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) return null;
-  return data.user;
-}
-
-async function isCallerAdmin(admin: ReturnType<typeof createSupabaseAdmin>, userId: string): Promise<boolean> {
+  // 2. Cookie session fallback
   try {
-    const { data: adminRow } = await admin
-      .from("admins")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-    return !!adminRow;
+    const cookieStore = await cookies();
+    const supabaseClient = createServerClient(
+      getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
+      getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll() {},
+        },
+      }
+    );
+
+    const { data, error } = await supabaseClient.auth.getUser();
+    if (!error && data.user) return data.user;
   } catch {
-    return false;
+    // Cookie error handling
   }
+
+  return null;
 }
 
 /**
  * Checks if the user has a verified booking in slot_bookings and resolves their assigned batch.
- * Matches by user_id first, then falls back to email.
+ * If user is an Admin, resolves their assigned batch scope (Bootcamp 2.0 for Parv, Bootcamp 3.0 for Arna).
  */
 async function getAccessDetails(userId: string, email: string | null): Promise<{
   hasSlot: boolean;
   isAdmin: boolean;
   activeBatch?: Record<string, unknown> | null;
   enrolledBatches?: Record<string, unknown>[];
+  adminProfile?: AdminProfile | null;
+  certificatesUnlocked?: boolean;
 }> {
   const admin = createSupabaseAdmin();
-  const isAdmin = await isCallerAdmin(admin, userId);
 
-  // 1. Fetch active batch as baseline (e.g. Bootcamp 3.0)
+  // 1. Check if user is an authorized admin
+  const adminProfile = await getAdminProfile(userId, email);
+
+  // 2. Fetch global active batch as baseline fallback
   const { data: globalActiveBatch } = await admin
     .from("batches")
     .select("*")
     .eq("is_active", true)
     .maybeSingle();
 
-  // 2. Query slot_bookings for this user
+  // 3. Query slot_bookings for this user
   const { data: bookings, error: bookingError } = await admin
     .from("slot_bookings")
     .select("batch_id, payment_status, created_at")
@@ -103,12 +88,23 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
 
   const hasSlot = Boolean(bookings && bookings.length > 0);
 
-  // If user is Admin, grant access immediately and provide active batch
-  if (isAdmin) {
+  // If user is Admin, resolve their batch-specific admin scope
+  if (adminProfile && adminProfile.isAdmin) {
+    const { data: adminBatch } = await admin
+      .from("batches")
+      .select("*")
+      .eq("id", adminProfile.assignedBatchId)
+      .maybeSingle();
+
+    const targetBatch = adminBatch || globalActiveBatch;
+    const certUnlocked = targetBatch ? await isBatchCertificatesUnlocked(targetBatch.id) : false;
+
     return {
       hasSlot: true,
       isAdmin: true,
-      activeBatch: globalActiveBatch,
+      activeBatch: targetBatch,
+      adminProfile,
+      certificatesUnlocked: certUnlocked,
     };
   }
 
@@ -117,10 +113,11 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
       hasSlot: false,
       isAdmin: false,
       activeBatch: globalActiveBatch,
+      certificatesUnlocked: false,
     };
   }
 
-  // 3. Resolve the student's assigned batch from their actual booking record
+  // 4. Resolve the student's assigned batch from their actual booking record
   const batchIds = Array.from(
     new Set(bookings.map((b) => b.batch_id).filter((id): id is string => Boolean(id)))
   );
@@ -139,20 +136,23 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
       // Prefer active batch if enrolled in multiple, otherwise latest enrolled batch
       studentBatch =
         batchRows.find((b) => b.is_active) ||
-        batchRows.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0] ||
+        batchRows.sort(
+          (a, b) =>
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+        )[0] ||
         batchRows[0];
     }
   }
 
-  if (!studentBatch) {
-    studentBatch = globalActiveBatch;
-  }
+  const targetBatch = studentBatch || globalActiveBatch;
+  const certUnlocked = targetBatch ? await isBatchCertificatesUnlocked(targetBatch.id) : false;
 
   return {
     hasSlot: true,
     isAdmin: false,
-    activeBatch: studentBatch,
+    activeBatch: targetBatch,
     enrolledBatches,
+    certificatesUnlocked: certUnlocked,
   };
 }
 
@@ -165,23 +165,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ hasAccess: false, hasSlot: false }, { status: 401 });
     }
 
-    const { hasSlot, isAdmin, activeBatch, enrolledBatches } = await getAccessDetails(user.id, user.email ?? null);
-    const hasAccess = hasSlot || isAdmin;
+    const details = await getAccessDetails(user.id, user.email ?? null);
+    const hasAccess = details.hasSlot || details.isAdmin;
 
     const response = NextResponse.json({
       hasAccess,
-      hasSlot,
-      isAdmin,
-      activeBatch,
-      enrolledBatches,
+      hasSlot: details.hasSlot,
+      isAdmin: details.isAdmin,
+      activeBatch: details.activeBatch,
+      enrolledBatches: details.enrolledBatches,
+      adminProfile: details.adminProfile,
+      certificatesUnlocked: details.certificatesUnlocked,
     });
-    response.headers.set("Cache-Control", "no-store, max-age=0");
+
+    response.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate");
     return response;
-  } catch (error) {
-    console.error("[Access] My Batch access check failed:", error);
-    return NextResponse.json(
-      { error: "Unable to verify My Batch access right now." },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Error verifying batch access.";
+    console.error("[MyBatch Access Error]", err);
+    return NextResponse.json({ hasAccess: false, error: message }, { status: 500 });
   }
 }

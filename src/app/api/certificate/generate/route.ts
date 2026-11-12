@@ -5,6 +5,7 @@ import { jsPDF } from "jspdf";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { isBatchCertificatesUnlocked } from "@/lib/adminAuth";
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
@@ -272,6 +273,19 @@ export async function POST(request: NextRequest) {
     
     if (slotBooking?.batch_id) {
       batchId = slotBooking.batch_id;
+    }
+
+    // Verify certificate is unlocked by authorized admin
+    if (!isAdmin && batchId) {
+      const isUnlocked = await isBatchCertificatesUnlocked(batchId);
+      if (!isUnlocked) {
+        return NextResponse.json(
+          {
+            error: "Certificates for your cohort have not been unlocked yet. Please wait for an administrator to release the certificates upon completion of the course.",
+          },
+          { status: 403 }
+        );
+      }
     }
 
     // Always generate student certificate (suffix -S)

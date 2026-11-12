@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
 import { getRequiredEnv } from "@/lib/razorpayServer";
+import {
+  createSupabaseAdmin,
+  getAdminProfile,
+  verifyAdminBatchScope,
+  BOOTCAMP_2_BATCH_ID,
+} from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
 
@@ -22,49 +29,6 @@ interface Recording {
   batch_id: string;
 }
 
-
-function createSupabaseAdmin() {
-  return createClient(
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY")
-  );
-}
-
-// Check if the calling user is an authorized admin
-async function isCallerAdmin(request: NextRequest): Promise<boolean> {
-  try {
-    const admin = createSupabaseAdmin();
-    const authHeader = request.headers.get("Authorization");
-    
-    if (!authHeader?.startsWith("Bearer ")) {
-      return false;
-    }
-    
-    const token = authHeader.slice(7);
-    const { data: { user }, error: authError } = await admin.auth.getUser(token);
-    
-    if (authError || !user) {
-      return false;
-    }
-
-    // Query the public.admins table to see if the user is registered as an admin
-    const { data: adminRow, error: adminError } = await admin
-      .from("admins")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (adminError || !adminRow) {
-      return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.error("[Sync API] Error checking admin status:", err);
-    return false;
-  }
-}
-
 // Convert ISO timestamp to a premium display format, e.g., "20th May, 2026"
 function formatCustomDate(isoString: string): string {
   try {
@@ -74,7 +38,7 @@ function formatCustomDate(isoString: string): string {
     const day = date.getDate();
     const monthNames = [
       "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
     ];
     const month = monthNames[date.getMonth()];
     const year = date.getFullYear();
@@ -90,38 +54,113 @@ function formatCustomDate(isoString: string): string {
   }
 }
 
+async function getAuthenticatedUser(request: NextRequest) {
+  const admin = createSupabaseAdmin();
+
+  // 1. Try Bearer token
+  const authHeader = request.headers.get("Authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    const { data, error } = await admin.auth.getUser(token);
+    if (!error && data.user) {
+      return data.user;
+    }
+  }
+
+  // 2. Cookie session fallback
+  try {
+    const cookieStore = await cookies();
+    const supabaseClient = createServerClient(
+      getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
+      getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll() {},
+        },
+      }
+    );
+    const { data, error } = await supabaseClient.auth.getUser();
+    if (!error && data.user) return data.user;
+  } catch {
+    // Ignore cookie error in route handler
+  }
+
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    // 1. Authorize - only admins can sync
-    const isAdmin = await isCallerAdmin(request);
-    if (!isAdmin) {
+    // 1. Authenticate caller
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
       return NextResponse.json(
-        { error: "Unauthorized. Admin permissions required." },
+        { error: "Unauthorized. Please log in as an administrator." },
+        { status: 401 }
+      );
+    }
+
+    // 2. Resolve admin profile & permitted batch
+    const adminProfile = await getAdminProfile(user.id, user.email);
+    if (!adminProfile || !adminProfile.isAdmin) {
+      return NextResponse.json(
+        { error: "Forbidden. Admin permissions required." },
         { status: 403 }
       );
     }
 
-    // 2. Find active batch
-    const admin = createSupabaseAdmin();
-    const { data: activeBatch, error: batchError } = await admin
-      .from("batches")
-      .select("id, youtube_playlist_id")
-      .eq("is_active", true)
-      .single();
+    // 3. Optional batch_id from query/body - verify admin scope
+    const { searchParams } = new URL(request.url);
+    let requestedBatchId = searchParams.get("batch_id")?.trim() || null;
+    if (!requestedBatchId) {
+      try {
+        const body = await request.clone().json();
+        if (body?.batch_id) requestedBatchId = String(body.batch_id).trim();
+      } catch {
+        // Body is optional
+      }
+    }
 
-    if (batchError || !activeBatch) {
+    const targetBatchId = requestedBatchId || adminProfile.assignedBatchId;
+
+    if (!verifyAdminBatchScope(adminProfile, targetBatchId)) {
       return NextResponse.json(
-        { error: "No active batch found." },
-        { status: 400 }
+        {
+          error: `Forbidden. You are assigned to manage ${adminProfile.assignedBatchName} and cannot modify another batch.`,
+        },
+        { status: 403 }
       );
     }
 
-    const playlistId = activeBatch.youtube_playlist_id;
-    if (!playlistId) {
+    // 4. Retrieve target batch details
+    const admin = createSupabaseAdmin();
+    const { data: targetBatch, error: batchError } = await admin
+      .from("batches")
+      .select("id, name, label, youtube_playlist_id")
+      .eq("id", targetBatchId)
+      .maybeSingle();
+
+    if (batchError || !targetBatch) {
       return NextResponse.json(
-        { error: "Active batch does not have a YouTube playlist configured.", count: 0 },
-        { status: 200 } // Not an error, just nothing to do
+        { error: `Target batch not found for id: ${targetBatchId}` },
+        { status: 404 }
       );
+    }
+
+    // For Bootcamp 2.0, fallback to process.env.YOUTUBE_PLAYLIST_ID if playlist_id is not set
+    let playlistId = targetBatch.youtube_playlist_id;
+    if (!playlistId && targetBatchId === BOOTCAMP_2_BATCH_ID) {
+      playlistId = process.env.YOUTUBE_PLAYLIST_ID || "PLRT09IaUP4Zw";
+    }
+
+    if (!playlistId) {
+      return NextResponse.json({
+        message: `${targetBatch.name} does not have a YouTube playlist configured yet.`,
+        count: 0,
+        batchName: targetBatch.name,
+      });
     }
 
     const apiKey = process.env.YOUTUBE_API_KEY;
@@ -132,22 +171,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Fetch from YouTube API
+    // 5. Fetch from YouTube API
     const ytUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${encodeURIComponent(
       playlistId
     )}&maxResults=50&key=${apiKey}`;
 
-    // Extract the host and protocol to construct a valid Referer.
-    // This is required because server-side fetches don't automatically send a Referer,
-    // which causes Google API Key restrictions to return 403 Forbidden (<empty> referer).
     const host = request.headers.get("host") || "skillyugedu.com";
     const protocol = request.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
     const referer = `${protocol}://${host}/`;
 
     const ytRes = await fetch(ytUrl, {
       headers: {
-        "Referer": referer,
-      }
+        Referer: referer,
+      },
     });
 
     if (!ytRes.ok) {
@@ -163,32 +199,39 @@ export async function POST(request: NextRequest) {
     const items = ytData.items || [];
 
     if (items.length === 0) {
-      return NextResponse.json({ message: "No videos found in YouTube playlist.", count: 0 });
+      return NextResponse.json({
+        message: "No videos found in YouTube playlist.",
+        count: 0,
+        batchName: targetBatch.name,
+      });
     }
 
-    // 4. Map YouTube data to database structure
-    const recordings: Recording[] = (items as YouTubePlaylistItem[]).map((item) => {
-      const snippet = item.snippet || {};
-      const videoId = snippet.resourceId?.videoId || "";
-      const title = snippet.title || "Untitled Video";
-      const publishedAt = snippet.publishedAt || new Date().toISOString();
+    // 6. Map YouTube data to database structure strictly for targetBatchId
+    const recordings: Recording[] = (items as YouTubePlaylistItem[])
+      .map((item) => {
+        const snippet = item.snippet || {};
+        const videoId = snippet.resourceId?.videoId || "";
+        const title = snippet.title || "Untitled Video";
+        const publishedAt = snippet.publishedAt || new Date().toISOString();
 
-      return {
-        youtube_video_id: videoId,
-        title: title,
-        published_at: publishedAt,
-        custom_date: formatCustomDate(publishedAt),
-        batch_id: activeBatch.id,
-      };
-    }).filter((rec) => {
-      const titleLower = rec.title.toLowerCase();
-      return rec.youtube_video_id !== "" && 
-             titleLower !== "deleted video" && 
-             titleLower !== "private video";
-    });
+        return {
+          youtube_video_id: videoId,
+          title: title,
+          published_at: publishedAt,
+          custom_date: formatCustomDate(publishedAt),
+          batch_id: targetBatchId,
+        };
+      })
+      .filter((rec) => {
+        const titleLower = rec.title.toLowerCase();
+        return (
+          rec.youtube_video_id !== "" &&
+          titleLower !== "deleted video" &&
+          titleLower !== "private video"
+        );
+      });
 
-    // 5. Upsert active recordings and clean up deleted records
-
+    // 7. Upsert active recordings and clean up deleted records strictly scoped to targetBatchId
     if (recordings.length > 0) {
       const { error: upsertError } = await admin
         .from("session_recordings")
@@ -203,23 +246,23 @@ export async function POST(request: NextRequest) {
       }
 
       // Delete any database recordings that are no longer in the active playlist
-      // IMPORTANT: Scope delete ONLY to the active batch
+      // IMPORTANT: Scope delete ONLY to the target batch!
       const activeIds = recordings.map((r) => r.youtube_video_id);
       const { error: deleteError } = await admin
         .from("session_recordings")
         .delete()
-        .eq("batch_id", activeBatch.id)
+        .eq("batch_id", targetBatchId)
         .not("youtube_video_id", "in", `(${activeIds.join(",")})`);
 
       if (deleteError) {
         console.error("[Sync API] Supabase delete inactive error:", deleteError);
       }
     } else {
-      // If the playlist has no valid/active videos, clear the active batch's table only
+      // Clear target batch only
       const { error: deleteError } = await admin
         .from("session_recordings")
         .delete()
-        .eq("batch_id", activeBatch.id);
+        .eq("batch_id", targetBatchId);
 
       if (deleteError) {
         console.error("[Sync API] Supabase clear table error:", deleteError);
@@ -227,16 +270,17 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
-      message: "Sync completed successfully.",
+      message: `Sync completed successfully for ${targetBatch.name}.`,
       count: recordings.length,
-      recordings
+      batchId: targetBatchId,
+      batchName: targetBatch.name,
+      admin: adminProfile.adminName,
+      recordings,
     });
   } catch (error) {
     console.error("[Sync API] Sync failed with unexpected error:", error);
-    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred during sync.";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "An unexpected error occurred during sync.";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

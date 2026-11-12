@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { getRequiredEnv } from "@/lib/razorpayServer";
+import {
+  createSupabaseAdmin,
+  getAdminProfile,
+  verifyAdminBatchScope,
+} from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
-
-function createSupabaseAdmin() {
-  return createClient(
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY")
-  );
-}
 
 /**
  * Get authenticated user via Bearer token or cookies
@@ -30,48 +27,28 @@ async function getAuthenticatedUser(request: NextRequest) {
   }
 
   // 2. Fall back to cookie-based session
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // No-op in route handlers
-          }
-        },
-      },
-    }
-  );
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) return null;
-  return data.user;
-}
-
-/**
- * Check if the caller is an authorized admin
- */
-async function isCallerAdmin(admin: ReturnType<typeof createSupabaseAdmin>, userId: string): Promise<boolean> {
   try {
-    const { data: adminRow, error } = await admin
-      .from("admins")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
+      getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll() {},
+        },
+      }
+    );
 
-    return !error && !!adminRow;
+    const { data, error } = await supabase.auth.getUser();
+    if (!error && data.user) return data.user;
   } catch {
-    return false;
+    // Cookie error handling
   }
+
+  return null;
 }
 
 export async function GET(request: NextRequest) {
@@ -85,24 +62,28 @@ export async function GET(request: NextRequest) {
     }
 
     const admin = createSupabaseAdmin();
-    const isAdmin = await isCallerAdmin(admin, user.id);
+    const adminProfile = await getAdminProfile(user.id, user.email);
+    const isAdmin = Boolean(adminProfile?.isAdmin);
 
     const { searchParams } = new URL(request.url);
     const requestedBatchId = searchParams.get("batch_id")?.trim() || null;
 
     let targetBatchId: string | null = null;
 
-    if (isAdmin) {
-      // Admins can query any requested batch, or default to the active batch
+    if (isAdmin && adminProfile) {
+      // ── STRICT ADMIN AUTHORIZATION ──
       if (requestedBatchId) {
+        if (!verifyAdminBatchScope(adminProfile, requestedBatchId)) {
+          return NextResponse.json(
+            {
+              error: `Forbidden. You are assigned to manage ${adminProfile.assignedBatchName} and cannot access recordings from another batch.`,
+            },
+            { status: 403 }
+          );
+        }
         targetBatchId = requestedBatchId;
       } else {
-        const { data: activeBatch } = await admin
-          .from("batches")
-          .select("id")
-          .eq("is_active", true)
-          .maybeSingle();
-        targetBatchId = activeBatch?.id || null;
+        targetBatchId = adminProfile.assignedBatchId;
       }
     } else {
       // ── STRICT STUDENT AUTHORIZATION ──
@@ -158,7 +139,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Query session_recordings strictly for the target batch
-    // Notice: We strictly filter by batch_id and exclude any null or unassigned recordings
     const { data: recordings, error: recError } = await admin
       .from("session_recordings")
       .select("id, title, custom_date, youtube_video_id, published_at, batch_id")
@@ -208,4 +188,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-
