@@ -6,6 +6,8 @@ import {
   createSupabaseAdmin,
   getAdminProfile,
   isBatchCertificatesUnlocked,
+  getBatchProgress,
+  BatchProgressData,
   AdminProfile,
 } from "@/lib/adminAuth";
 
@@ -63,6 +65,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
   enrolledBatches?: Record<string, unknown>[];
   adminProfile?: AdminProfile | null;
   certificatesUnlocked?: boolean;
+  batchProgress?: BatchProgressData | null;
 }> {
   const admin = createSupabaseAdmin();
 
@@ -98,6 +101,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
 
     const targetBatch = adminBatch || globalActiveBatch;
     const certUnlocked = targetBatch ? await isBatchCertificatesUnlocked(targetBatch.id) : false;
+    const progress = targetBatch ? await getBatchProgress(targetBatch.id) : null;
 
     return {
       hasSlot: true,
@@ -105,15 +109,18 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
       activeBatch: targetBatch,
       adminProfile,
       certificatesUnlocked: certUnlocked,
+      batchProgress: progress,
     };
   }
 
   if (!hasSlot || !bookings) {
+    const progress = globalActiveBatch ? await getBatchProgress(globalActiveBatch.id) : null;
     return {
       hasSlot: false,
       isAdmin: false,
       activeBatch: globalActiveBatch,
       certificatesUnlocked: false,
+      batchProgress: progress,
     };
   }
 
@@ -146,6 +153,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
 
   const targetBatch = studentBatch || globalActiveBatch;
   const certUnlocked = targetBatch ? await isBatchCertificatesUnlocked(targetBatch.id) : false;
+  const progress = targetBatch ? await getBatchProgress(targetBatch.id) : null;
 
   return {
     hasSlot: true,
@@ -153,6 +161,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
     activeBatch: targetBatch,
     enrolledBatches,
     certificatesUnlocked: certUnlocked,
+    batchProgress: progress,
   };
 }
 
@@ -176,6 +185,7 @@ export async function GET(request: NextRequest) {
       enrolledBatches: details.enrolledBatches,
       adminProfile: details.adminProfile,
       certificatesUnlocked: details.certificatesUnlocked,
+      batchProgress: details.batchProgress,
     });
 
     response.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate");

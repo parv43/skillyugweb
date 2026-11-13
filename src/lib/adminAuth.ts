@@ -193,3 +193,130 @@ export async function setBatchCertificatesUnlocked(batchId: string, unlocked: bo
     return false;
   }
 }
+
+export interface BatchProgressData {
+  totalSessions: number;
+  completedSessions: number;
+  progressPercentage: number;
+}
+
+/**
+ * Retrieves the session progress configured for a given batch.
+ * Defaults:
+ * - Bootcamp 2.0: 24 total, 18 completed (6 left), 75% progress.
+ * - Bootcamp 3.0: 24 total, 0 completed, 0% progress.
+ */
+export async function getBatchProgress(batchId: string): Promise<BatchProgressData> {
+  const isBootcamp2 = batchId === "6c19c464-2224-40f5-8528-c3d7c4a999fa";
+  const defaultTotal = 24;
+  const defaultCompleted = isBootcamp2 ? 18 : 0;
+  const defaultPercentage = isBootcamp2 ? 75 : 0;
+
+  try {
+    const adminClient = createSupabaseAdmin();
+    const { data } = await adminClient
+      .from("cohort_sessions")
+      .select("join_url")
+      .eq("title", `BATCH_PROGRESS:${batchId}`)
+      .maybeSingle();
+
+    if (data?.join_url) {
+      try {
+        const parsed = JSON.parse(data.join_url);
+        if (typeof parsed.totalSessions === "number" && typeof parsed.completedSessions === "number") {
+          const total = Math.max(1, parsed.totalSessions);
+          const completed = Math.max(0, Math.min(total, parsed.completedSessions));
+          const pct =
+            typeof parsed.progressPercentage === "number"
+              ? Math.max(0, Math.min(100, Math.round(parsed.progressPercentage)))
+              : Math.round((completed / total) * 100);
+          return {
+            totalSessions: total,
+            completedSessions: completed,
+            progressPercentage: pct,
+          };
+        }
+      } catch (parseErr) {
+        console.error("[adminAuth] Failed to parse batch progress JSON:", parseErr);
+      }
+    }
+  } catch (err) {
+    console.error("[adminAuth] Error checking batch progress:", err);
+  }
+
+  return {
+    totalSessions: defaultTotal,
+    completedSessions: defaultCompleted,
+    progressPercentage: defaultPercentage,
+  };
+}
+
+/**
+ * Updates the session progress configured for a given batch.
+ */
+export async function setBatchProgress(
+  batchId: string,
+  progress: { totalSessions: number; completedSessions: number; progressPercentage?: number }
+): Promise<BatchProgressData | null> {
+  try {
+    const adminClient = createSupabaseAdmin();
+    const title = `BATCH_PROGRESS:${batchId}`;
+
+    const total = Math.max(1, Number(progress.totalSessions) || 24);
+    const completed = Math.max(0, Math.min(total, Number(progress.completedSessions) || 0));
+    const percentage =
+      progress.progressPercentage !== undefined
+        ? Math.max(0, Math.min(100, Math.round(Number(progress.progressPercentage))))
+        : Math.round((completed / total) * 100);
+
+    const payload: BatchProgressData = {
+      totalSessions: total,
+      completedSessions: completed,
+      progressPercentage: percentage,
+    };
+
+    const { data: existing } = await adminClient
+      .from("cohort_sessions")
+      .select("id")
+      .eq("title", title)
+      .maybeSingle();
+
+    if (existing) {
+      const { error } = await adminClient
+        .from("cohort_sessions")
+        .update({
+          join_url: JSON.stringify(payload),
+          scheduled_at: new Date().toISOString(),
+          is_active: true,
+        })
+        .eq("title", title);
+
+      if (error) {
+        console.error("[adminAuth] Error updating batch progress:", error);
+        return null;
+      }
+    } else {
+      const { error } = await adminClient
+        .from("cohort_sessions")
+        .insert([
+          {
+            title,
+            join_url: JSON.stringify(payload),
+            is_active: true,
+            scheduled_at: new Date().toISOString(),
+          },
+        ]);
+
+      if (error) {
+        console.error("[adminAuth] Error inserting batch progress:", error);
+        return null;
+      }
+    }
+
+    return payload;
+  } catch (err) {
+    console.error("[adminAuth] Error setting batch progress:", err);
+    return null;
+  }
+}
+

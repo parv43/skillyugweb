@@ -106,8 +106,23 @@ export default function MyBatchPage() {
 
   const completedDays = isBootcamp3 ? 0 : Math.max(8, getCompletedDaysCount(new Date(), batchStartDate));
   const nextSession = isBootcamp3 ? null : getNextLiveSession(new Date(), batchStartDate);
-  const progressPercentage: number = isBootcamp3 ? 0 : 39;
+
+  // Batch Progress State (Live from DB or defaults)
+  const [batchProgress, setBatchProgress] = useState<{
+    totalSessions: number;
+    completedSessions: number;
+    progressPercentage: number;
+  } | null>(null);
+
+  const defaultTotal = 24;
+  const defaultCompleted = isBootcamp3 ? 0 : 18;
+  const defaultPercentage = isBootcamp3 ? 0 : 75;
+
+  const totalSessions = batchProgress?.totalSessions ?? defaultTotal;
+  const completedSessions = batchProgress?.completedSessions ?? defaultCompleted;
+  const progressPercentage: number = batchProgress?.progressPercentage ?? defaultPercentage;
   const strokeDashoffset = 251.2 - (251.2 * progressPercentage) / 100;
+  const remainingSessions = Math.max(0, totalSessions - completedSessions);
 
   // Support Ticket State
   const [showTicketModal, setShowTicketModal] = useState(false);
@@ -678,6 +693,7 @@ export default function MyBatchPage() {
             setUserId(session.user.id);
             if (value.certificatesUnlocked !== undefined) setCertsUnlocked(Boolean(value.certificatesUnlocked));
             if (value.adminProfile) setAdminProfile(value.adminProfile);
+            if (value.batchProgress) setBatchProgress(value.batchProgress);
             setUser({
               avatarUrl,
               batchLabel: value.activeBatch?.label || "Skillyug Bootcamp",
@@ -712,12 +728,18 @@ export default function MyBatchPage() {
             activeBatch?: any;
             certificatesUnlocked?: boolean;
             adminProfile?: any;
+            batchProgress?: {
+              totalSessions: number;
+              completedSessions: number;
+              progressPercentage: number;
+            };
           };
           hasAccess = Boolean(data.hasAccess);
           slotAccess = Boolean(data.hasSlot);
           activeBatch = data.activeBatch;
           if (data.certificatesUnlocked !== undefined) setCertsUnlocked(Boolean(data.certificatesUnlocked));
           if (data.adminProfile) setAdminProfile(data.adminProfile);
+          if (data.batchProgress) setBatchProgress(data.batchProgress);
           try {
             sessionStorage.setItem(
               cacheKey,
@@ -728,6 +750,7 @@ export default function MyBatchPage() {
                   activeBatch,
                   certificatesUnlocked: data.certificatesUnlocked,
                   adminProfile: data.adminProfile,
+                  batchProgress: data.batchProgress,
                 },
                 expiry: Date.now() + 5 * 60 * 1000,
               })
@@ -943,8 +966,22 @@ export default function MyBatchPage() {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">{progressPercentage}%</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Completed</span>
                 </div>
               </div>
+              <p className="mt-4 text-xs font-semibold text-slate-500 dark:text-slate-400 text-center">
+                <span className="font-bold text-slate-900 dark:text-white">{completedSessions}</span> of{" "}
+                <span className="font-bold text-slate-900 dark:text-white">{totalSessions}</span> Sessions Completed
+                {remainingSessions > 0 ? (
+                  <span className="block text-[11px] text-[#ff8b12] font-bold mt-0.5">
+                    ({remainingSessions} session{remainingSessions === 1 ? "" : "s"} left)
+                  </span>
+                ) : (
+                  <span className="block text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">
+                    (Cohort Complete)
+                  </span>
+                )}
+              </p>
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import {
   createSupabaseAdmin,
   getAdminProfile,
   isBatchCertificatesUnlocked,
+  getBatchProgress,
 } from "@/lib/adminAuth";
 
 export const runtime = "nodejs";
@@ -116,6 +117,43 @@ export async function GET(request: NextRequest) {
     // 5. Certificate Unlock State
     const certificatesUnlocked = await isBatchCertificatesUnlocked(targetBatchId);
 
+    // 6. Batch Progress State
+    const batchProgress = await getBatchProgress(targetBatchId);
+
+    // 7. Enrich Students with Certificate Download Status
+    const certsByUserId = new Map<string, { cert_id: string; created_at: string }>();
+    const certsByName = new Map<string, { cert_id: string; created_at: string }>();
+
+    (issuedCerts || []).forEach((c) => {
+      if (c.user_id && !certsByUserId.has(c.user_id)) {
+        certsByUserId.set(c.user_id, { cert_id: c.cert_id, created_at: c.created_at });
+      }
+      const normName = (c.user_name || "").toLowerCase().trim();
+      if (normName && !certsByName.has(normName)) {
+        certsByName.set(normName, { cert_id: c.cert_id, created_at: c.created_at });
+      }
+    });
+
+    const enrichedStudents = (students || []).map((s) => {
+      const matchedCert =
+        (s.user_id && certsByUserId.get(s.user_id)) ||
+        certsByName.get((s.name || "").toLowerCase().trim()) ||
+        null;
+
+      return {
+        ...s,
+        certificate: matchedCert
+          ? {
+              downloaded: true,
+              cert_id: matchedCert.cert_id,
+              issued_at: matchedCert.created_at,
+            }
+          : {
+              downloaded: false,
+            },
+      };
+    });
+
     const response = NextResponse.json({
       admin: {
         name: adminProfile.adminName,
@@ -125,10 +163,11 @@ export async function GET(request: NextRequest) {
         assignedBatchName: adminProfile.assignedBatchName,
       },
       batch: batchData,
-      students: students || [],
+      students: enrichedStudents,
       recordings: recordings || [],
       issuedCertificates: issuedCerts || [],
       certificatesUnlocked,
+      batchProgress,
     });
 
     response.headers.set("Cache-Control", "no-store, max-age=0");
