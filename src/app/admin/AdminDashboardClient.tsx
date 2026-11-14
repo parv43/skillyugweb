@@ -221,6 +221,20 @@ export default function AdminDashboardClient() {
         type: "success",
         message: data.message || `Progress updated to ${data.progress.progressPercentage}% (${data.progress.completedSessions} of ${data.progress.totalSessions} sessions completed).`,
       });
+
+      // Clear cached student session data and notify any open client tabs
+      try {
+        Object.keys(sessionStorage).forEach((key) => {
+          if (key.startsWith("mybatch_access")) {
+            sessionStorage.removeItem(key);
+          }
+        });
+        window.dispatchEvent(
+          new CustomEvent("skillyug:progress_updated", { detail: data.progress })
+        );
+      } catch (e) {
+        /* ignore */
+      }
     } catch (err: any) {
       console.error("[AdminDashboard] Save progress error:", err);
       setProgressStatus({
@@ -378,6 +392,15 @@ export default function AdminDashboardClient() {
           <div className="mt-6 flex flex-col gap-3">
             <Link
               href="/my-batch"
+              onClick={() => {
+                try {
+                  Object.keys(sessionStorage).forEach((key) => {
+                    if (key.startsWith("mybatch_access")) {
+                      sessionStorage.removeItem(key);
+                    }
+                  });
+                } catch {}
+              }}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#0060aa] to-[#ff8b12] text-white font-bold text-xs uppercase tracking-widest shadow-md hover:scale-[1.02] transition-transform"
             >
               Return to My Batch
@@ -400,7 +423,19 @@ export default function AdminDashboardClient() {
       <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Link href="/my-batch" className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors text-xs font-bold uppercase tracking-wider">
+            <Link
+              href="/my-batch"
+              onClick={() => {
+                try {
+                  Object.keys(sessionStorage).forEach((key) => {
+                    if (key.startsWith("mybatch_access")) {
+                      sessionStorage.removeItem(key);
+                    }
+                  });
+                } catch {}
+              }}
+              className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors text-xs font-bold uppercase tracking-wider"
+            >
               <ArrowLeft className="w-4 h-4" />
               Student View
             </Link>

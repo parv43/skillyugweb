@@ -680,13 +680,13 @@ export default function MyBatchPage() {
         console.error("Error checking admin status:", err);
       }
 
-      // ── Fast path: serve from sessionStorage cache (5-min TTL) ──
+      // ── Instant hydration from sessionStorage cache to avoid layout shift ──
       const cacheKey = `mybatch_access_${session.user.id}`;
       try {
         const cached = sessionStorage.getItem(cacheKey);
         if (cached) {
-          const { value, expiry } = JSON.parse(cached);
-          if ((expiry > Date.now() && value.hasAccess) || isAdminUser) {
+          const { value } = JSON.parse(cached);
+          if (value && (value.hasAccess || isAdminUser)) {
             const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
             const avatarUrl = session.user.user_metadata?.avatar_url || null;
             setHasSlotAccess(Boolean(value.hasSlot));
@@ -702,22 +702,24 @@ export default function MyBatchPage() {
               activeBatch: value.activeBatch,
             });
             setLoading(false);
-            return; // skip the API call entirely
+            // Do NOT return here — allow background revalidation to fetch fresh data immediately
           }
         }
       } catch { /* ignore */ }
 
-      // ── Slow path: call API (first visit or cache expired) ──
+      // ── Always fetch fresh access, schedule & progress data from server ──
       let hasAccess = false;
       let slotAccess = false;
       let activeBatch: any = null;
       try {
-        const res = await fetch("/api/my-batch/access", {
+        const res = await fetch(`/api/my-batch/access?t=${Date.now()}`, {
           method: "GET",
           credentials: "same-origin",
+          cache: "no-store",
           headers: {
             "Authorization": `Bearer ${session.access_token}`,
-            "Cache-Control": "no-cache",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
           },
         });
         
@@ -784,6 +786,29 @@ export default function MyBatchPage() {
     };
 
     loadSession();
+
+    // Revalidate on focus / visibility change
+    const handleFocus = () => {
+      loadSession();
+    };
+    const handleProgressEvent = (e: Event) => {
+      const ce = e as CustomEvent;
+      if (ce.detail) {
+        setBatchProgress(ce.detail);
+      } else {
+        loadSession();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("visibilitychange", handleFocus);
+    window.addEventListener("skillyug:progress_updated", handleProgressEvent);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("visibilitychange", handleFocus);
+      window.removeEventListener("skillyug:progress_updated", handleProgressEvent);
+    };
   }, [router]);
 
   if (loading || !user) {
