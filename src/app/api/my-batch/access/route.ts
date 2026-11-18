@@ -5,6 +5,7 @@ import { getRequiredEnv } from "@/lib/razorpayServer";
 import {
   createSupabaseAdmin,
   getAdminProfile,
+  getBatchSettings,
   isBatchCertificatesUnlocked,
   getBatchProgress,
   BatchProgressData,
@@ -66,65 +67,82 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
   adminProfile?: AdminProfile | null;
   certificatesUnlocked?: boolean;
   batchProgress?: BatchProgressData | null;
+  recordings?: Array<{ id: string; title: string; date: string; videoId: string }>;
 }> {
   const admin = createSupabaseAdmin();
 
-  // 1. Check if user is an authorized admin
-  const adminProfile = await getAdminProfile(userId, email);
+  // 1. Query admin profile, global active batch, and slot_bookings concurrently
+  const [adminProfile, globalBatchRes, bookingsRes] = await Promise.all([
+    getAdminProfile(userId, email),
+    admin.from("batches").select("*").eq("is_active", true).maybeSingle(),
+    admin
+      .from("slot_bookings")
+      .select("batch_id, payment_status, created_at")
+      .or(`user_id.eq.${userId}${email ? `,email.eq.${email}` : ""}`),
+  ]);
 
-  // 2. Fetch global active batch as baseline fallback
-  const { data: globalActiveBatch } = await admin
-    .from("batches")
-    .select("*")
-    .eq("is_active", true)
-    .maybeSingle();
+  const globalActiveBatch = globalBatchRes.data || null;
+  const bookings = bookingsRes.data || [];
+  const hasSlot = bookings.length > 0;
 
-  // 3. Query slot_bookings for this user
-  const { data: bookings, error: bookingError } = await admin
-    .from("slot_bookings")
-    .select("batch_id, payment_status, created_at")
-    .or(`user_id.eq.${userId}${email ? `,email.eq.${email}` : ""}`);
-
-  if (bookingError) {
-    console.error("[Access] slot_bookings query error:", bookingError);
-  }
-
-  const hasSlot = Boolean(bookings && bookings.length > 0);
-
-  // If user is Admin, resolve their batch-specific admin scope
+  // ── Admin Flow ──
   if (adminProfile && adminProfile.isAdmin) {
-    const { data: adminBatch } = await admin
-      .from("batches")
-      .select("*")
-      .eq("id", adminProfile.assignedBatchId)
-      .maybeSingle();
+    let targetBatch = globalActiveBatch;
+    if (globalActiveBatch && globalActiveBatch.id === adminProfile.assignedBatchId) {
+      targetBatch = globalActiveBatch;
+    } else {
+      const { data: adminBatch } = await admin
+        .from("batches")
+        .select("*")
+        .eq("id", adminProfile.assignedBatchId)
+        .maybeSingle();
+      if (adminBatch) targetBatch = adminBatch;
+    }
 
-    const targetBatch = adminBatch || globalActiveBatch;
-    const certUnlocked = targetBatch ? await isBatchCertificatesUnlocked(targetBatch.id) : false;
-    const progress = targetBatch ? await getBatchProgress(targetBatch.id) : null;
+    const targetBatchId = targetBatch?.id || adminProfile.assignedBatchId;
+
+    // Concurrently fetch batch settings and recordings
+    const [batchSettings, recordingsRes] = await Promise.all([
+      getBatchSettings(targetBatchId),
+      admin
+        .from("session_recordings")
+        .select("id, title, custom_date, youtube_video_id, published_at")
+        .eq("batch_id", targetBatchId)
+        .order("published_at", { ascending: false }),
+    ]);
+
+    const recordings = (recordingsRes.data || []).map((r) => ({
+      id: r.id,
+      title: r.title || "Class Recording",
+      date: r.custom_date || (r.published_at ? new Date(r.published_at).toISOString().split("T")[0] : ""),
+      videoId: r.youtube_video_id || "",
+    }));
 
     return {
       hasSlot: true,
       isAdmin: true,
       activeBatch: targetBatch,
       adminProfile,
-      certificatesUnlocked: certUnlocked,
-      batchProgress: progress,
+      certificatesUnlocked: batchSettings.certificatesUnlocked,
+      batchProgress: batchSettings.batchProgress,
+      recordings,
     };
   }
 
-  if (!hasSlot || !bookings) {
-    const progress = globalActiveBatch ? await getBatchProgress(globalActiveBatch.id) : null;
+  // ── Unenrolled Student Flow ──
+  if (!hasSlot) {
+    const batchSettings = globalActiveBatch ? await getBatchSettings(globalActiveBatch.id) : null;
     return {
       hasSlot: false,
       isAdmin: false,
       activeBatch: globalActiveBatch,
       certificatesUnlocked: false,
-      batchProgress: progress,
+      batchProgress: batchSettings ? batchSettings.batchProgress : null,
+      recordings: [],
     };
   }
 
-  // 4. Resolve the student's assigned batch from their actual booking record
+  // ── Enrolled Student Flow ──
   const batchIds = Array.from(
     new Set(bookings.map((b) => b.batch_id).filter((id): id is string => Boolean(id)))
   );
@@ -133,35 +151,68 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
   let enrolledBatches: Record<string, unknown>[] = [];
 
   if (batchIds.length > 0) {
-    const { data: batchRows } = await admin
-      .from("batches")
-      .select("*")
-      .in("id", batchIds);
+    // If user's only enrolled batch is already globalActiveBatch, avoid extra DB query
+    if (batchIds.length === 1 && globalActiveBatch && globalActiveBatch.id === batchIds[0]) {
+      studentBatch = globalActiveBatch;
+      enrolledBatches = [globalActiveBatch];
+    } else {
+      const { data: batchRows } = await admin
+        .from("batches")
+        .select("*")
+        .in("id", batchIds);
 
-    if (batchRows && batchRows.length > 0) {
-      enrolledBatches = batchRows;
-      // Prefer active batch if enrolled in multiple, otherwise latest enrolled batch
-      studentBatch =
-        batchRows.find((b) => b.is_active) ||
-        batchRows.sort(
-          (a, b) =>
-            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-        )[0] ||
-        batchRows[0];
+      if (batchRows && batchRows.length > 0) {
+        enrolledBatches = batchRows;
+        studentBatch =
+          batchRows.find((b) => b.is_active) ||
+          batchRows.sort(
+            (a, b) =>
+              new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+          )[0] ||
+          batchRows[0];
+      }
     }
   }
 
   const targetBatch = studentBatch || globalActiveBatch;
-  const certUnlocked = targetBatch ? await isBatchCertificatesUnlocked(targetBatch.id) : false;
-  const progress = targetBatch ? await getBatchProgress(targetBatch.id) : null;
+  const targetBatchId = targetBatch?.id;
+
+  if (targetBatchId) {
+    const [batchSettings, recordingsRes] = await Promise.all([
+      getBatchSettings(targetBatchId),
+      admin
+        .from("session_recordings")
+        .select("id, title, custom_date, youtube_video_id, published_at")
+        .eq("batch_id", targetBatchId)
+        .order("published_at", { ascending: false }),
+    ]);
+
+    const recordings = (recordingsRes.data || []).map((r) => ({
+      id: r.id,
+      title: r.title || "Class Recording",
+      date: r.custom_date || (r.published_at ? new Date(r.published_at).toISOString().split("T")[0] : ""),
+      videoId: r.youtube_video_id || "",
+    }));
+
+    return {
+      hasSlot: true,
+      isAdmin: false,
+      activeBatch: targetBatch,
+      enrolledBatches,
+      certificatesUnlocked: batchSettings.certificatesUnlocked,
+      batchProgress: batchSettings.batchProgress,
+      recordings,
+    };
+  }
 
   return {
     hasSlot: true,
     isAdmin: false,
-    activeBatch: targetBatch,
+    activeBatch: null,
     enrolledBatches,
-    certificatesUnlocked: certUnlocked,
-    batchProgress: progress,
+    certificatesUnlocked: false,
+    batchProgress: null,
+    recordings: [],
   };
 }
 
@@ -186,6 +237,7 @@ export async function GET(request: NextRequest) {
       adminProfile: details.adminProfile,
       certificatesUnlocked: details.certificatesUnlocked,
       batchProgress: details.batchProgress,
+      recordings: details.recordings || [],
     });
 
     response.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate");

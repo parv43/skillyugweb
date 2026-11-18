@@ -5,6 +5,7 @@ import { getRequiredEnv } from "@/lib/razorpayServer";
 import {
   createSupabaseAdmin,
   getAdminProfile,
+  getBatchSettings,
   isBatchCertificatesUnlocked,
   getBatchProgress,
 } from "@/lib/adminAuth";
@@ -67,58 +68,55 @@ export async function GET(request: NextRequest) {
     const adminClient = createSupabaseAdmin();
     const targetBatchId = adminProfile.assignedBatchId;
 
-    // 1. Batch Details
-    const { data: batchData, error: batchErr } = await adminClient
-      .from("batches")
-      .select("*")
-      .eq("id", targetBatchId)
-      .maybeSingle();
+    // Execute all batch data and settings queries concurrently
+    const [
+      batchRes,
+      studentsRes,
+      recordingsRes,
+      issuedCertsRes,
+      batchSettings,
+    ] = await Promise.all([
+      adminClient.from("batches").select("*").eq("id", targetBatchId).maybeSingle(),
+      adminClient
+        .from("slot_bookings")
+        .select("name, email, phone, grade_class, payment_status, amount_paid, promo_code, created_at, user_id")
+        .eq("batch_id", targetBatchId)
+        .order("created_at", { ascending: false }),
+      adminClient
+        .from("session_recordings")
+        .select("id, title, custom_date, youtube_video_id, published_at")
+        .eq("batch_id", targetBatchId)
+        .order("published_at", { ascending: false }),
+      adminClient
+        .from("issued_certificates")
+        .select("id, user_name, cert_id, created_at, user_id")
+        .eq("batch_id", targetBatchId)
+        .order("created_at", { ascending: false }),
+      getBatchSettings(targetBatchId),
+    ]);
 
-    if (batchErr || !batchData) {
+    const batchData = batchRes.data;
+    if (batchRes.error || !batchData) {
       return NextResponse.json(
         { error: `Could not load batch data for ${adminProfile.assignedBatchName}` },
         { status: 404 }
       );
     }
 
-    // 2. Enrolled Students strictly for this batch
-    const { data: students, error: studentErr } = await adminClient
-      .from("slot_bookings")
-      .select("name, email, phone, grade_class, payment_status, amount_paid, promo_code, created_at, user_id")
-      .eq("batch_id", targetBatchId)
-      .order("created_at", { ascending: false });
-
-    if (studentErr) {
-      console.error("[Admin API] Error loading students:", studentErr);
+    if (studentsRes.error) {
+      console.error("[Admin API] Error loading students:", studentsRes.error);
+    }
+    if (recordingsRes.error) {
+      console.error("[Admin API] Error loading recordings:", recordingsRes.error);
+    }
+    if (issuedCertsRes.error) {
+      console.error("[Admin API] Error loading certificates:", issuedCertsRes.error);
     }
 
-    // 3. Session Recordings strictly for this batch
-    const { data: recordings, error: recErr } = await adminClient
-      .from("session_recordings")
-      .select("id, title, custom_date, youtube_video_id, published_at")
-      .eq("batch_id", targetBatchId)
-      .order("published_at", { ascending: false });
-
-    if (recErr) {
-      console.error("[Admin API] Error loading recordings:", recErr);
-    }
-
-    // 4. Issued Certificates strictly for this batch
-    const { data: issuedCerts, error: certErr } = await adminClient
-      .from("issued_certificates")
-      .select("id, user_name, cert_id, created_at, user_id")
-      .eq("batch_id", targetBatchId)
-      .order("created_at", { ascending: false });
-
-    if (certErr) {
-      console.error("[Admin API] Error loading certificates:", certErr);
-    }
-
-    // 5. Certificate Unlock State
-    const certificatesUnlocked = await isBatchCertificatesUnlocked(targetBatchId);
-
-    // 6. Batch Progress State
-    const batchProgress = await getBatchProgress(targetBatchId);
+    const students = studentsRes.data;
+    const recordings = recordingsRes.data;
+    const issuedCerts = issuedCertsRes.data;
+    const { certificatesUnlocked, batchProgress } = batchSettings;
 
     // 7. Enrich Students with Certificate Download Status
     const certsByUserId = new Map<string, { cert_id: string; created_at: string }>();

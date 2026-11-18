@@ -42,7 +42,7 @@ export default function Navbar() {
   const rafRef = React.useRef<number | null>(null)
   
   // Use the shared access control hook
-  const { isLoggedIn, hasAccess: hasMyBatchAccess, userId, userEmail } = useAccessControl()
+  const { isLoggedIn, hasAccess: hasMyBatchAccess, userId, userEmail, loading } = useAccessControl()
 
   useEffect(() => {
     // ✅ Use requestAnimationFrame for optimal performance (syncs with 60fps)
@@ -209,7 +209,9 @@ export default function Navbar() {
               <div className="w-[40px] h-[40px]" />
             )}
   
-            {isLoggedIn ? (
+            {loading ? (
+              <div className="w-[140px] h-[40px] flex items-center justify-end" />
+            ) : isLoggedIn ? (
               <Link 
                 href="/profile" 
                 className="flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300"
@@ -258,7 +260,9 @@ export default function Navbar() {
               <div className="w-[36px] h-[36px]" />
             )}
   
-            {isLoggedIn ? (
+            {loading ? (
+              <div className="w-[36px] h-[36px]" />
+            ) : isLoggedIn ? (
               <Link 
                 href="/profile" 
                 className="flex items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 shadow-sm hover:scale-105 transition-all duration-300"

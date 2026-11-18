@@ -200,6 +200,75 @@ export interface BatchProgressData {
   progressPercentage: number;
 }
 
+export interface BatchSettingsData {
+  certificatesUnlocked: boolean;
+  batchProgress: BatchProgressData;
+}
+
+/**
+ * Optimally retrieves both certificate unlock state and batch progress in a single database roundtrip.
+ */
+export async function getBatchSettings(batchId: string): Promise<BatchSettingsData> {
+  const isBootcamp2 = batchId === "6c19c464-2224-40f5-8528-c3d7c4a999fa";
+  const defaultTotal = 24;
+  const defaultCompleted = isBootcamp2 ? 18 : 0;
+  const defaultPercentage = isBootcamp2 ? 75 : 0;
+
+  const defaultProgress: BatchProgressData = {
+    totalSessions: defaultTotal,
+    completedSessions: defaultCompleted,
+    progressPercentage: defaultPercentage,
+  };
+
+  try {
+    const adminClient = createSupabaseAdmin();
+    const certTitle = `CERT_UNLOCK:${batchId}`;
+    const progressTitle = `BATCH_PROGRESS:${batchId}`;
+
+    const { data: rows, error } = await adminClient
+      .from("cohort_sessions")
+      .select("title, is_active, join_url")
+      .in("title", [certTitle, progressTitle]);
+
+    if (error || !rows) {
+      return { certificatesUnlocked: false, batchProgress: defaultProgress };
+    }
+
+    const certRow = rows.find((r) => r.title === certTitle);
+    const progressRow = rows.find((r) => r.title === progressTitle);
+
+    let progress = defaultProgress;
+    if (progressRow?.join_url) {
+      try {
+        const parsed = JSON.parse(progressRow.join_url);
+        if (typeof parsed.totalSessions === "number" && typeof parsed.completedSessions === "number") {
+          const total = Math.max(1, parsed.totalSessions);
+          const completed = Math.max(0, Math.min(total, parsed.completedSessions));
+          const pct =
+            typeof parsed.progressPercentage === "number"
+              ? Math.max(0, Math.min(100, Math.round(parsed.progressPercentage)))
+              : Math.round((completed / total) * 100);
+          progress = {
+            totalSessions: total,
+            completedSessions: completed,
+            progressPercentage: pct,
+          };
+        }
+      } catch (parseErr) {
+        console.error("[adminAuth] Failed to parse batch progress JSON:", parseErr);
+      }
+    }
+
+    return {
+      certificatesUnlocked: Boolean(certRow?.is_active),
+      batchProgress: progress,
+    };
+  } catch (err) {
+    console.error("[adminAuth] Error loading batch settings:", err);
+    return { certificatesUnlocked: false, batchProgress: defaultProgress };
+  }
+}
+
 /**
  * Retrieves the session progress configured for a given batch.
  * Defaults:

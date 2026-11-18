@@ -88,7 +88,7 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const paymentTier = (!fromParam || fromParam === "bootcamp" || fromParam === "courses") ? "full" : "partial";
   const [promoCode, setPromoCode] = useState("");
   const displayAmount = paymentTier === "full" ? calculateBootcampPriceRupees(promoCode) : PARTIAL_BOOK_SLOT_AMOUNT_RUPEES;
-  const isFullPayment = displayAmount === 10000 || displayAmount === 8500 || displayAmount === 7800;
+  const isFullPayment = displayAmount === 10000 || displayAmount === 8500 || displayAmount === 7800 || displayAmount === 6800;
   const isInstallmentPayment = !isFullPayment;
   const [errorMsg, setErrorMsg] = useState("");
   const [gatewayNotice, setGatewayNotice] = useState("");

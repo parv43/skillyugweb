@@ -147,6 +147,11 @@ export default function MyBatchPage() {
     const isPaid = hasSlotAccess || isAdmin;
     if (!isPaid) return;
 
+    // If recordings were already loaded via access payload or cache, avoid waterfall duplicate request
+    if (videos.length > 0 && videos[0].id !== "mock-1") {
+      return;
+    }
+
     const fetchVideos = async () => {
       try {
         const { data: sessionData } = await supabase.auth.getSession();
@@ -188,7 +193,7 @@ export default function MyBatchPage() {
     };
 
     fetchVideos();
-  }, [user, hasSlotAccess, isAdmin]);
+  }, [user, hasSlotAccess, isAdmin, videos]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -666,34 +671,28 @@ export default function MyBatchPage() {
         return;
       }
 
-      // Check admin status immediately
-      let isAdminUser = false;
-      try {
-        const { data: adminRow } = await supabase
-          .from("admins")
-          .select("id")
-          .eq("user_id", session.user.id)
-          .maybeSingle();
-        isAdminUser = !!adminRow;
-        setIsAdmin(isAdminUser);
-      } catch (err) {
-        console.error("Error checking admin status:", err);
-      }
-
       // ── Instant hydration from sessionStorage cache to avoid layout shift ──
       const cacheKey = `mybatch_access_${session.user.id}`;
+      let cachedHasAccess = false;
       try {
         const cached = sessionStorage.getItem(cacheKey);
         if (cached) {
           const { value } = JSON.parse(cached);
-          if (value && (value.hasAccess || isAdminUser)) {
+          if (value && (value.hasAccess || value.isAdmin)) {
+            cachedHasAccess = true;
             const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
             const avatarUrl = session.user.user_metadata?.avatar_url || null;
             setHasSlotAccess(Boolean(value.hasSlot));
+            if (value.isAdmin !== undefined) setIsAdmin(Boolean(value.isAdmin));
             setUserId(session.user.id);
             if (value.certificatesUnlocked !== undefined) setCertsUnlocked(Boolean(value.certificatesUnlocked));
             if (value.adminProfile) setAdminProfile(value.adminProfile);
             if (value.batchProgress) setBatchProgress(value.batchProgress);
+            if (Array.isArray(value.recordings) && value.recordings.length > 0) {
+              setVideos(value.recordings);
+              const firstPlayable = value.recordings.find((v: any) => v.videoId) || value.recordings[0];
+              setActiveVideo(firstPlayable);
+            }
             setUser({
               avatarUrl,
               batchLabel: value.activeBatch?.label || "Skillyug Bootcamp",
@@ -710,6 +709,7 @@ export default function MyBatchPage() {
       // ── Always fetch fresh access, schedule & progress data from server ──
       let hasAccess = false;
       let slotAccess = false;
+      let isAdminResolved = false;
       let activeBatch: any = null;
       try {
         const res = await fetch(`/api/my-batch/access?t=${Date.now()}`, {
@@ -727,6 +727,7 @@ export default function MyBatchPage() {
           const data = (await res.json()) as {
             hasAccess?: boolean;
             hasSlot?: boolean;
+            isAdmin?: boolean;
             activeBatch?: any;
             certificatesUnlocked?: boolean;
             adminProfile?: any;
@@ -735,13 +736,21 @@ export default function MyBatchPage() {
               completedSessions: number;
               progressPercentage: number;
             };
+            recordings?: VideoItem[];
           };
           hasAccess = Boolean(data.hasAccess);
           slotAccess = Boolean(data.hasSlot);
+          isAdminResolved = Boolean(data.isAdmin);
+          setIsAdmin(isAdminResolved);
           activeBatch = data.activeBatch;
           if (data.certificatesUnlocked !== undefined) setCertsUnlocked(Boolean(data.certificatesUnlocked));
           if (data.adminProfile) setAdminProfile(data.adminProfile);
           if (data.batchProgress) setBatchProgress(data.batchProgress);
+          if (Array.isArray(data.recordings) && data.recordings.length > 0) {
+            setVideos(data.recordings);
+            const firstPlayable = data.recordings.find((v: any) => v.videoId) || data.recordings[0];
+            setActiveVideo(firstPlayable);
+          }
           try {
             sessionStorage.setItem(
               cacheKey,
@@ -749,10 +758,12 @@ export default function MyBatchPage() {
                 value: {
                   hasAccess,
                   hasSlot: slotAccess,
+                  isAdmin: isAdminResolved,
                   activeBatch,
                   certificatesUnlocked: data.certificatesUnlocked,
                   adminProfile: data.adminProfile,
                   batchProgress: data.batchProgress,
+                  recordings: data.recordings,
                 },
                 expiry: Date.now() + 5 * 60 * 1000,
               })
@@ -765,7 +776,7 @@ export default function MyBatchPage() {
         console.error("[MyBatch] Access fetch error:", e);
       }
 
-      if (!hasAccess && !isAdminUser) {
+      if (!hasAccess && !isAdminResolved && !cachedHasAccess) {
         router.replace("/");
         return;
       }

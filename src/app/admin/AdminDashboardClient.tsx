@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createBrowserClient } from "@supabase/ssr";
+import { supabase } from "@/lib/supabaseClient";
 import {
   Users,
   Video,
@@ -126,14 +126,32 @@ export default function AdminDashboardClient() {
   const [certFilter, setCertFilter] = useState<"all" | "downloaded" | "pending">("all");
   const [certSearchQuery, setCertSearchQuery] = useState("");
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
   const loadBatchData = useCallback(async () => {
     try {
-      setLoading(true);
+      // ── Instant hydration from sessionStorage cache if available ──
+      try {
+        const cached = sessionStorage.getItem("admin_batch_cache");
+        if (cached) {
+          const { data: cachedData, expiry } = JSON.parse(cached);
+          if (cachedData && Date.now() < expiry) {
+            setAdmin(cachedData.admin);
+            setBatch(cachedData.batch);
+            setStudents(cachedData.students || []);
+            setRecordings(cachedData.recordings || []);
+            setIssuedCerts(cachedData.issuedCertificates || []);
+            setCertsUnlocked(Boolean(cachedData.certificatesUnlocked));
+            if (cachedData.batchProgress) {
+              setBatchProgress(cachedData.batchProgress);
+              setEditTotal(cachedData.batchProgress.totalSessions);
+              setEditCompleted(cachedData.batchProgress.completedSessions);
+            }
+            setLoading(false);
+          }
+        }
+      } catch {
+        /* ignore cache read error */
+      }
+
       setError(null);
 
       const { data: sessionData } = await supabase.auth.getSession();
@@ -171,13 +189,25 @@ export default function AdminDashboardClient() {
         setEditTotal(data.batchProgress.totalSessions);
         setEditCompleted(data.batchProgress.completedSessions);
       }
+
+      try {
+        sessionStorage.setItem(
+          "admin_batch_cache",
+          JSON.stringify({
+            data,
+            expiry: Date.now() + 5 * 60 * 1000,
+          })
+        );
+      } catch {
+        /* ignore storage write error */
+      }
     } catch (err: any) {
       console.error("[AdminDashboard] Error loading batch data:", err);
       setError(err.message || "Failed to load admin batch data.");
     } finally {
       setLoading(false);
     }
-  }, [router, supabase]);
+  }, [router]);
 
   useEffect(() => {
     loadBatchData();
@@ -222,8 +252,9 @@ export default function AdminDashboardClient() {
         message: data.message || `Progress updated to ${data.progress.progressPercentage}% (${data.progress.completedSessions} of ${data.progress.totalSessions} sessions completed).`,
       });
 
-      // Clear cached student session data and notify any open client tabs
+      // Clear cached admin and student session data and notify any open client tabs
       try {
+        sessionStorage.removeItem("admin_batch_cache");
         Object.keys(sessionStorage).forEach((key) => {
           if (key.startsWith("mybatch_access")) {
             sessionStorage.removeItem(key);
@@ -276,6 +307,10 @@ export default function AdminDashboardClient() {
         message: data.message || `Synced ${data.count} recordings successfully!`,
       });
 
+      try {
+        sessionStorage.removeItem("admin_batch_cache");
+      } catch {}
+
       // Reload batch recordings
       loadBatchData();
     } catch (err: any) {
@@ -324,6 +359,15 @@ export default function AdminDashboardClient() {
         type: "success",
         message: data.message || `Certificates are now ${newTargetState ? "UNLOCKED" : "LOCKED"}.`,
       });
+
+      try {
+        sessionStorage.removeItem("admin_batch_cache");
+        Object.keys(sessionStorage).forEach((key) => {
+          if (key.startsWith("mybatch_access")) {
+            sessionStorage.removeItem(key);
+          }
+        });
+      } catch {}
     } catch (err: any) {
       console.error("[AdminDashboard] Cert toggle error:", err);
       setCertActionStatus({
