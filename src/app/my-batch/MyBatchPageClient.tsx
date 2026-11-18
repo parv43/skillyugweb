@@ -907,14 +907,14 @@ export default function MyBatchPage() {
               <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 md:items-center border-t border-slate-100 dark:border-white/5 pt-4 md:border-t-0 md:pt-0">
                 <div className="shrink-0">
                   <p className="text-xl font-black text-slate-900 dark:text-white tracking-tight">2 December 2026</p>
-                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Tuesday • Batch Starting Date</p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Wednesday • Batch Starting Date</p>
                 </div>
                 
                 <div className="hidden sm:block h-10 w-px bg-slate-200 dark:bg-white/10 shrink-0"></div>
                 
                 <div className="max-w-md">
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200 leading-snug">
-                    Rescheduled to 2 December as many students have exams between 20 Nov and 28 Dec.
+                    Rescheduled to 2 December 2026 to accommodate students&apos; examinations from 20 November to 28 November.
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Your class schedule will be shared soon. Thank you for your cooperation!
@@ -1055,7 +1055,7 @@ export default function MyBatchPage() {
                       <div>
                         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Date & Status</p>
                         <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">
-                          Tuesday, 2 December 2026 • Timings to be announced
+                          Wednesday, 2 December 2026 • Timings to be announced
                         </p>
                       </div>
                       {user.activeBatch?.meet_link ? (
@@ -1706,7 +1706,7 @@ export default function MyBatchPage() {
                   {isBootcamp3 ? (
                     <>
                       <p className="mt-3 text-lg font-bold text-slate-900 dark:text-white">
-                        2 December 2026 (Tuesday)
+                        2 December 2026 (Wednesday)
                       </p>
                       <p className="mt-2 text-sm text-slate-600 dark:text-slate-350">
                         First Live Session · Schedule will be shared soon
