@@ -90,6 +90,7 @@ export default function MyBatchPage() {
   const isBootcamp3 =
     batchName.includes("3.0") ||
     batchLabel.includes("3.0") ||
+    user?.activeBatch?.start_date === "2026-12-02" ||
     user?.activeBatch?.start_date === "2026-11-20";
   const isBootcamp2 =
     !isBootcamp3 &&
@@ -97,7 +98,7 @@ export default function MyBatchPage() {
       batchLabel.includes("2.0") ||
       user?.activeBatch?.start_date === "2026-10-05");
 
-  const batchStartDate = user?.activeBatch?.start_date || (isBootcamp3 ? "2026-11-20" : "2026-10-05");
+  const batchStartDate = user?.activeBatch?.start_date || (isBootcamp3 ? "2026-12-02" : "2026-10-05");
 
   const now = new Date();
   const startDateObj = new Date(batchStartDate + "T00:00:00");
@@ -903,17 +904,22 @@ export default function MyBatchPage() {
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 md:items-center border-t border-slate-100 dark:border-white/5 pt-4 md:border-t-0 md:pt-0">
-                <div>
-                  <p className="text-xl font-black text-slate-900 dark:text-white tracking-tight">20 November 2026</p>
-                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Batch Starting Date</p>
+              <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 md:items-center border-t border-slate-100 dark:border-white/5 pt-4 md:border-t-0 md:pt-0">
+                <div className="shrink-0">
+                  <p className="text-xl font-black text-slate-900 dark:text-white tracking-tight">2 December 2026</p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Tuesday • Batch Starting Date</p>
                 </div>
                 
-                <div className="hidden sm:block h-10 w-px bg-slate-200 dark:bg-white/10"></div>
+                <div className="hidden sm:block h-10 w-px bg-slate-200 dark:bg-white/10 shrink-0"></div>
                 
-                <div>
-                  <p className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-200">Your class schedule will be shared soon.</p>
-                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Class Schedule & Timings</p>
+                <div className="max-w-md">
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 leading-snug">
+                    Rescheduled to 2 December as many students have exams between 20 Nov and 28 Dec.
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Your class schedule will be shared soon. Thank you for your cooperation!
+                  </p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Schedule Update & Timings</p>
                 </div>
               </div>
             </div>
@@ -1049,7 +1055,7 @@ export default function MyBatchPage() {
                       <div>
                         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Date & Status</p>
                         <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">
-                          Friday, 20 November 2026 • Timings to be announced
+                          Tuesday, 2 December 2026 • Timings to be announced
                         </p>
                       </div>
                       {user.activeBatch?.meet_link ? (
@@ -1391,7 +1397,7 @@ export default function MyBatchPage() {
                       </p>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
                         {isBootcamp3
-                          ? "Your class recordings will appear here after live sessions begin on 20 November 2026."
+                          ? "Your class recordings will appear here after live sessions begin on 2 December 2026."
                           : "Class recordings will appear here once published."}
                       </p>
                     </div>
@@ -1489,7 +1495,7 @@ export default function MyBatchPage() {
                       </p>
                       <p className="text-xs text-slate-400 mt-2 max-w-sm mx-auto leading-relaxed">
                         {isBootcamp3
-                          ? "Your class recordings will appear here after live sessions begin on 20 November 2026."
+                          ? "Your class recordings will appear here after live sessions begin on 2 December 2026."
                           : "Session recording will appear here once ready."}
                       </p>
                     </div>
@@ -1640,7 +1646,7 @@ export default function MyBatchPage() {
                   ) : (
                     <div className="flex items-center justify-center w-full">
                       <span className="text-xs text-slate-500 font-bold uppercase tracking-widest select-none">
-                        {isBootcamp3 ? "Sessions starting 20 November 2026" : "No active recording"}
+                        {isBootcamp3 ? "Sessions starting 2 December 2026" : "No active recording"}
                       </span>
                     </div>
                   )}
@@ -1700,7 +1706,7 @@ export default function MyBatchPage() {
                   {isBootcamp3 ? (
                     <>
                       <p className="mt-3 text-lg font-bold text-slate-900 dark:text-white">
-                        20 November 2026
+                        2 December 2026 (Tuesday)
                       </p>
                       <p className="mt-2 text-sm text-slate-600 dark:text-slate-350">
                         First Live Session · Schedule will be shared soon
