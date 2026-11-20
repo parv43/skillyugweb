@@ -28,6 +28,8 @@ export interface BookingOrderNotes {
   phoneNumber?: string | null;
   promoCode?: string | null;
   studentName?: string | null;
+  fatherName?: string | null;
+  motherName?: string | null;
   userId?: string | null;
   batchId?: string | null;
 }
@@ -187,6 +189,8 @@ export function parseBookingOrderNotes(notes: unknown): BookingOrderNotes {
     phoneNumber: readString(record.phone_number),
     promoCode: readString(record.promo_code),
     studentName: readString(record.student_name),
+    fatherName: readString(record.father_name),
+    motherName: readString(record.mother_name),
     userId: readString(record.user_id),
     batchId: readString(record.batch_id),
   };

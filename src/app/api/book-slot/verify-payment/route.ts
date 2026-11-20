@@ -63,6 +63,8 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const studentName = typeof body.studentName === "string" ? body.studentName.trim() : null;
+    const fatherName = typeof body.fatherName === "string" ? body.fatherName.trim() : null;
+    const motherName = typeof body.motherName === "string" ? body.motherName.trim() : null;
     const phoneNumber = typeof body.phoneNumber === "string" ? body.phoneNumber.trim() : null;
     const grade = typeof body.grade === "string" ? body.grade.trim() : null;
     const promoCode =
@@ -121,6 +123,8 @@ export async function POST(request: Request) {
           phoneNumber,
           promoCode,
           studentName,
+          fatherName,
+          motherName,
           userId: user.id,
         },
         order,

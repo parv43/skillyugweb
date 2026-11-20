@@ -9,6 +9,12 @@ import {
   isBatchCertificatesUnlocked,
   getBatchProgress,
 } from "@/lib/adminAuth";
+import {
+  getAllStudentConfigsForBatch,
+  calculateStudentFeeStatus,
+  getBatchNotification,
+  getAuditLogsForBatch,
+} from "@/lib/bootcamp3Config";
 
 export const runtime = "nodejs";
 
@@ -75,6 +81,9 @@ export async function GET(request: NextRequest) {
       recordingsRes,
       issuedCertsRes,
       batchSettings,
+      studentConfigs,
+      batchNotification,
+      auditLogs,
     ] = await Promise.all([
       adminClient.from("batches").select("*").eq("id", targetBatchId).maybeSingle(),
       adminClient
@@ -93,6 +102,9 @@ export async function GET(request: NextRequest) {
         .eq("batch_id", targetBatchId)
         .order("created_at", { ascending: false }),
       getBatchSettings(targetBatchId),
+      getAllStudentConfigsForBatch(targetBatchId),
+      getBatchNotification(targetBatchId),
+      getAuditLogsForBatch(targetBatchId, 50),
     ]);
 
     const batchData = batchRes.data;
@@ -138,6 +150,10 @@ export async function GET(request: NextRequest) {
         certsByName.get((s.name || "").toLowerCase().trim()) ||
         null;
 
+      const normEmail = (s.email || "").toLowerCase().trim();
+      const cfg = studentConfigs.get(normEmail);
+      const feeStatus = calculateStudentFeeStatus(s, cfg);
+
       return {
         ...s,
         certificate: matchedCert
@@ -149,6 +165,7 @@ export async function GET(request: NextRequest) {
           : {
               downloaded: false,
             },
+        feeStatus,
       };
     });
 
@@ -166,6 +183,8 @@ export async function GET(request: NextRequest) {
       issuedCertificates: issuedCerts || [],
       certificatesUnlocked,
       batchProgress,
+      notification: batchNotification,
+      auditLogs: auditLogs || [],
     });
 
     response.headers.set("Cache-Control", "no-store, max-age=0");

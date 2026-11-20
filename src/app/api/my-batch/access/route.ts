@@ -10,7 +10,14 @@ import {
   getBatchProgress,
   BatchProgressData,
   AdminProfile,
+  BOOTCAMP_3_BATCH_ID,
 } from "@/lib/adminAuth";
+import {
+  getBatchNotification,
+  getStudentConfig,
+  calculateStudentFeeStatus,
+  type BatchNotification,
+} from "@/lib/bootcamp3Config";
 
 export const runtime = "nodejs";
 
@@ -68,6 +75,17 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
   certificatesUnlocked?: boolean;
   batchProgress?: BatchProgressData | null;
   recordings?: Array<{ id: string; title: string; date: string; videoId: string }>;
+  liveSessionAccess?: {
+    isLocked: boolean;
+    meetLink?: string | null;
+    remainingBalance?: number;
+    totalFee?: number;
+    amountPaid?: number;
+    paymentDeadline?: string;
+    isBlocked?: boolean;
+    lockReason?: string;
+  };
+  notification?: BatchNotification | null;
 }> {
   const admin = createSupabaseAdmin();
 
@@ -77,7 +95,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
     admin.from("batches").select("*").eq("is_active", true).maybeSingle(),
     admin
       .from("slot_bookings")
-      .select("batch_id, payment_status, created_at")
+      .select("batch_id, payment_status, created_at, name, email, amount_paid, promo_code")
       .or(`user_id.eq.${userId}${email ? `,email.eq.${email}` : ""}`),
   ]);
 
@@ -101,14 +119,15 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
 
     const targetBatchId = targetBatch?.id || adminProfile.assignedBatchId;
 
-    // Concurrently fetch batch settings and recordings
-    const [batchSettings, recordingsRes] = await Promise.all([
+    // Concurrently fetch batch settings, recordings, and notification
+    const [batchSettings, recordingsRes, batchNotification] = await Promise.all([
       getBatchSettings(targetBatchId),
       admin
         .from("session_recordings")
         .select("id, title, custom_date, youtube_video_id, published_at")
         .eq("batch_id", targetBatchId)
         .order("published_at", { ascending: false }),
+      getBatchNotification(targetBatchId),
     ]);
 
     const recordings = (recordingsRes.data || []).map((r) => ({
@@ -126,12 +145,19 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
       certificatesUnlocked: batchSettings.certificatesUnlocked,
       batchProgress: batchSettings.batchProgress,
       recordings,
+      liveSessionAccess: {
+        isLocked: false,
+        meetLink: (targetBatch?.meet_link as string) || null,
+        remainingBalance: 0,
+      },
+      notification: batchNotification,
     };
   }
 
   // ── Unenrolled Student Flow ──
   if (!hasSlot) {
     const batchSettings = globalActiveBatch ? await getBatchSettings(globalActiveBatch.id) : null;
+    const batchNotification = globalActiveBatch ? await getBatchNotification(globalActiveBatch.id) : null;
     return {
       hasSlot: false,
       isAdmin: false,
@@ -139,6 +165,12 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
       certificatesUnlocked: false,
       batchProgress: batchSettings ? batchSettings.batchProgress : null,
       recordings: [],
+      liveSessionAccess: {
+        isLocked: true,
+        meetLink: null,
+        lockReason: "Please enroll in the bootcamp to access live classes.",
+      },
+      notification: batchNotification,
     };
   }
 
@@ -178,13 +210,20 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
   const targetBatchId = targetBatch?.id;
 
   if (targetBatchId) {
-    const [batchSettings, recordingsRes] = await Promise.all([
+    const isBootcamp3 =
+      targetBatchId === BOOTCAMP_3_BATCH_ID ||
+      (targetBatch?.name as string)?.includes("3.0") ||
+      (targetBatch?.label as string)?.includes("3.0");
+
+    const [batchSettings, recordingsRes, batchNotification, studentConfig] = await Promise.all([
       getBatchSettings(targetBatchId),
       admin
         .from("session_recordings")
         .select("id, title, custom_date, youtube_video_id, published_at")
         .eq("batch_id", targetBatchId)
         .order("published_at", { ascending: false }),
+      getBatchNotification(targetBatchId),
+      isBootcamp3 ? getStudentConfig(targetBatchId, email || "") : Promise.resolve(null),
     ]);
 
     const recordings = (recordingsRes.data || []).map((r) => ({
@@ -194,14 +233,67 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
       videoId: r.youtube_video_id || "",
     }));
 
+    let liveSessionAccess: {
+      isLocked: boolean;
+      meetLink?: string | null;
+      remainingBalance?: number;
+      totalFee?: number;
+      amountPaid?: number;
+      paymentDeadline?: string;
+      isBlocked?: boolean;
+      lockReason?: string;
+    } = {
+      isLocked: false,
+      meetLink: (targetBatch?.meet_link as string) || null,
+      remainingBalance: 0,
+    };
+
+    let sanitizedActiveBatch = targetBatch;
+
+    if (isBootcamp3) {
+      // Resolve user's booking row for fee status calculation
+      const userBooking = bookings.find((b) => b.batch_id === targetBatchId) || bookings[0] || {};
+      const feeStatus = calculateStudentFeeStatus(userBooking, studentConfig);
+
+      if (feeStatus.isLocked) {
+        // CRITICAL SECURITY ENFORCEMENT:
+        // Meeting URL is completely stripped from activeBatch and liveSessionAccess
+        sanitizedActiveBatch = {
+          ...targetBatch,
+          meet_link: null,
+        };
+
+        liveSessionAccess = {
+          isLocked: true,
+          meetLink: null,
+          remainingBalance: feeStatus.remainingBalanceRupees,
+          totalFee: feeStatus.totalFeeRupees,
+          amountPaid: feeStatus.amountPaidRupees,
+          paymentDeadline: feeStatus.paymentDeadline,
+          isBlocked: feeStatus.isBlocked,
+          lockReason: feeStatus.lockReason || "Please pay your remaining course fee to access the live class link.",
+        };
+      } else {
+        liveSessionAccess = {
+          isLocked: false,
+          meetLink: (targetBatch?.meet_link as string) || null,
+          remainingBalance: 0,
+          totalFee: feeStatus.totalFeeRupees,
+          amountPaid: feeStatus.amountPaidRupees,
+        };
+      }
+    }
+
     return {
       hasSlot: true,
       isAdmin: false,
-      activeBatch: targetBatch,
+      activeBatch: sanitizedActiveBatch,
       enrolledBatches,
       certificatesUnlocked: batchSettings.certificatesUnlocked,
       batchProgress: batchSettings.batchProgress,
       recordings,
+      liveSessionAccess,
+      notification: batchNotification,
     };
   }
 
@@ -213,6 +305,11 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
     certificatesUnlocked: false,
     batchProgress: null,
     recordings: [],
+    liveSessionAccess: {
+      isLocked: true,
+      meetLink: null,
+    },
+    notification: null,
   };
 }
 
@@ -238,6 +335,8 @@ export async function GET(request: NextRequest) {
       certificatesUnlocked: details.certificatesUnlocked,
       batchProgress: details.batchProgress,
       recordings: details.recordings || [],
+      liveSessionAccess: details.liveSessionAccess,
+      notification: details.notification,
     });
 
     response.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate");

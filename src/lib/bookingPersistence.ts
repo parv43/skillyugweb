@@ -6,11 +6,14 @@ import {
   type RazorpayOrder,
   type RazorpayPayment,
 } from "@/lib/razorpayServer";
+import { saveStudentConfig } from "@/lib/bootcamp3Config";
 
 interface SlotFallbackDetails {
   email?: string | null;
   phoneNumber?: string | null;
   studentName?: string | null;
+  fatherName?: string | null;
+  motherName?: string | null;
   userId?: string | null;
   gradeClass?: string | null;
   promoCode?: string | null;
@@ -37,6 +40,7 @@ type SlotBookingRow = {
   grade_class: string;
   promo_code: string | null;
   batch_id: string | null;
+  created_at?: string;
 };
 
 function cleanString(value?: string | null) {
@@ -67,7 +71,7 @@ function createSupabaseAdmin() {
   );
 }
 
-async function saveBookingRow<TBookingRow extends { razorpay_payment_id: string }>(
+async function saveBookingRow<TBookingRow extends { razorpay_payment_id: string; created_at?: string }>(
   table: "slot_bookings",
   payload: TBookingRow
 ) {
@@ -97,7 +101,10 @@ async function saveBookingRow<TBookingRow extends { razorpay_payment_id: string 
     return;
   }
 
-  const { error } = await supabaseAdmin.from(table).insert(payload);
+  const { error } = await supabaseAdmin.from(table).insert({
+    ...payload,
+    created_at: payload.created_at || new Date().toISOString(),
+  });
   if (error) {
     // 23505 = unique_violation. This happens if the webhook and client both try to insert at the exact same millisecond.
     if (error.code === "23505") {
@@ -123,12 +130,15 @@ export async function persistSlotBooking({
   }
 
   const studentName = cleanString(notes.studentName) ?? cleanString(fallbackDetails?.studentName);
+  const fatherName = cleanString(notes.fatherName) ?? cleanString(fallbackDetails?.fatherName);
+  const motherName = cleanString(notes.motherName) ?? cleanString(fallbackDetails?.motherName);
   const phoneNumber = cleanString(notes.phoneNumber) ?? cleanString(fallbackDetails?.phoneNumber);
   const email = cleanString(notes.email) ?? cleanString(fallbackDetails?.email);
   const gradeClass = cleanString(notes.gradeClass) ?? cleanString(fallbackDetails?.gradeClass);
   const promoCode =
     normalizePromoCode(notes.promoCode) ?? normalizePromoCode(fallbackDetails?.promoCode);
   const userId = normalizeUserId(notes.userId) ?? normalizeUserId(fallbackDetails?.userId);
+  const batchId = notes.batchId ?? fallbackDetails?.batchId ?? null;
 
   if (!studentName || !phoneNumber || !gradeClass) {
     throw new Error("Booking details are incomplete. Contact support with your payment ID.");
@@ -146,8 +156,29 @@ export async function persistSlotBooking({
     razorpay_order_id: order.id,
     razorpay_payment_id: payment.id,
     user_id: userId,
-    batch_id: notes.batchId ?? fallbackDetails?.batchId ?? null,
+    batch_id: batchId,
+    created_at: new Date().toISOString(),
   };
 
   await saveBookingRow("slot_bookings", payload);
+
+  if (batchId && email) {
+    try {
+      const amountPaidRupees = Math.round(payment.amount / 100);
+      await saveStudentConfig(
+        batchId,
+        email,
+        {
+          studentName,
+          fatherName: fatherName || undefined,
+          motherName: motherName || undefined,
+          amountPaidRupees,
+        },
+        "system@skillyugedu.com",
+        "System Enrollment"
+      );
+    } catch (cfgErr) {
+      console.error("[persistSlotBooking] Failed to save student config:", cfgErr);
+    }
+  }
 }

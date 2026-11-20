@@ -48,15 +48,17 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const studentName = typeof body.studentName === "string" ? body.studentName.trim() : "";
+    const fatherName = typeof body.fatherName === "string" ? body.fatherName.trim() : "";
+    const motherName = typeof body.motherName === "string" ? body.motherName.trim() : "";
     const phoneNumber = typeof body.phoneNumber === "string" ? body.phoneNumber.trim() : "";
     const grade = typeof body.grade === "string" ? body.grade.trim() : "";
     const promoCode = typeof body.promoCode === "string" ? body.promoCode.trim().toUpperCase() : "";
     const paymentTier = body.paymentTier === "full" ? "full" : "partial";
     const amount = paymentTier === "full" ? calculateBootcampPricePaise(promoCode) : PARTIAL_BOOK_SLOT_AMOUNT_PAISE;
 
-    if (!studentName || !grade || !/^\d{10}$/.test(phoneNumber)) {
+    if (!studentName || !fatherName || !motherName || !grade || !/^\d{10}$/.test(phoneNumber)) {
       return NextResponse.json(
-        { error: "Student name, class/grade, and a valid 10-digit phone number are required." },
+        { error: "Student name, father's name, mother's name, class/grade, and a valid 10-digit phone number are required." },
         { status: 400 }
       );
     }
@@ -95,6 +97,8 @@ export async function POST(request: Request) {
           phone_number: phoneNumber,
           promo_code: promoCode || "NONE",
           student_name: studentName,
+          father_name: fatherName,
+          mother_name: motherName,
           user_id: user.id,
           batch_id: activeBatch.id,
         },

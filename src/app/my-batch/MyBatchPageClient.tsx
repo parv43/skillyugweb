@@ -76,6 +76,8 @@ export default function MyBatchPage() {
   const [user, setUser] = useState<BatchUser | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [hasSlotAccess, setHasSlotAccess] = useState(false);
+  const [liveSessionAccess, setLiveSessionAccess] = useState<any>(null);
+  const [batchNotification, setBatchNotification] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   // Certificate modal state
   const [showCertModal, setShowCertModal] = useState(false);
@@ -684,6 +686,8 @@ export default function MyBatchPage() {
             const fullName = session.user.user_metadata?.full_name || "Skillyug Student";
             const avatarUrl = session.user.user_metadata?.avatar_url || null;
             setHasSlotAccess(Boolean(value.hasSlot));
+            if (value.liveSessionAccess) setLiveSessionAccess(value.liveSessionAccess);
+            if (value.notification) setBatchNotification(value.notification);
             if (value.isAdmin !== undefined) setIsAdmin(Boolean(value.isAdmin));
             setUserId(session.user.id);
             if (value.certificatesUnlocked !== undefined) setCertsUnlocked(Boolean(value.certificatesUnlocked));
@@ -738,6 +742,8 @@ export default function MyBatchPage() {
               progressPercentage: number;
             };
             recordings?: VideoItem[];
+            liveSessionAccess?: any;
+            notification?: any;
           };
           hasAccess = Boolean(data.hasAccess);
           slotAccess = Boolean(data.hasSlot);
@@ -747,6 +753,8 @@ export default function MyBatchPage() {
           if (data.certificatesUnlocked !== undefined) setCertsUnlocked(Boolean(data.certificatesUnlocked));
           if (data.adminProfile) setAdminProfile(data.adminProfile);
           if (data.batchProgress) setBatchProgress(data.batchProgress);
+          if (data.liveSessionAccess) setLiveSessionAccess(data.liveSessionAccess);
+          if (data.notification) setBatchNotification(data.notification);
           if (Array.isArray(data.recordings) && data.recordings.length > 0) {
             setVideos(data.recordings);
             const firstPlayable = data.recordings.find((v: any) => v.videoId) || data.recordings[0];
@@ -765,6 +773,8 @@ export default function MyBatchPage() {
                   adminProfile: data.adminProfile,
                   batchProgress: data.batchProgress,
                   recordings: data.recordings,
+                  liveSessionAccess: data.liveSessionAccess,
+                  notification: data.notification,
                 },
                 expiry: Date.now() + 5 * 60 * 1000,
               })
@@ -914,10 +924,14 @@ export default function MyBatchPage() {
                 
                 <div className="max-w-md">
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200 leading-snug">
-                    Rescheduled to 2 December 2026 to accommodate students&apos; examinations from 20 November to 28 November.
+                    {batchNotification?.isActive && batchNotification?.headline
+                      ? batchNotification.headline
+                      : "Rescheduled to 2 December 2026 to accommodate students' examinations from 20 November to 28 November."}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Your class schedule will be shared soon. Thank you for your cooperation!
+                    {batchNotification?.isActive && batchNotification?.message
+                      ? batchNotification.message
+                      : "Your class schedule will be shared soon. Thank you for your cooperation!"}
                   </p>
                   <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Schedule Update & Timings</p>
                 </div>
@@ -1039,17 +1053,40 @@ export default function MyBatchPage() {
                   <>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-bold uppercase tracking-[0.24em] px-2.5 py-1 rounded-full border ${
-                          batchStatus === "LIVE" 
-                            ? "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-450 animate-pulse" 
-                            : "bg-[#0060aa]/10 border-[#0060aa]/20 text-[#0060aa] dark:text-blue-400"
-                        }`}>
-                          {batchStatus === "LIVE" ? "Live Now" : "First Class • Upcoming"}
-                        </span>
+                        {liveSessionAccess?.isLocked ? (
+                          <span className="text-[10px] font-bold uppercase tracking-[0.24em] px-2.5 py-1 rounded-full border bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                            <Lock className="w-3 h-3" />
+                            Live Class Access Locked
+                          </span>
+                        ) : (
+                          <span className={`text-[10px] font-bold uppercase tracking-[0.24em] px-2.5 py-1 rounded-full border ${
+                            batchStatus === "LIVE" 
+                              ? "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-450 animate-pulse" 
+                              : "bg-[#0060aa]/10 border-[#0060aa]/20 text-[#0060aa] dark:text-blue-400"
+                          }`}>
+                            {batchStatus === "LIVE" ? "Live Now" : "First Class • Upcoming"}
+                          </span>
+                        )}
                       </div>
                       <h3 className="mt-4 text-xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
                         SKILLYUG Bootcamp 3.0 Live Class
                       </h3>
+
+                      {liveSessionAccess?.isLocked && (
+                        <div className="mt-4 p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 dark:bg-amber-950/20 backdrop-blur-sm">
+                          <p className="text-sm font-bold text-amber-800 dark:text-amber-300 leading-snug">
+                            {liveSessionAccess.lockReason || "Please pay your remaining course fee to access the live class link."}
+                          </p>
+                          {typeof liveSessionAccess.remainingBalance === "number" && liveSessionAccess.remainingBalance > 0 && (
+                            <div className="mt-2.5 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                              <span>Remaining Balance: <strong className="text-amber-600 dark:text-amber-400 font-black">₹{liveSessionAccess.remainingBalance.toLocaleString("en-IN")}</strong></span>
+                              {liveSessionAccess.paymentDeadline && (
+                                <span>Deadline: <strong className="text-slate-700 dark:text-slate-300">{new Date(liveSessionAccess.paymentDeadline).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</strong></span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="mt-6 pt-5 border-t border-slate-200/50 dark:border-white/5 flex flex-wrap items-center justify-between gap-4">
                       <div>
@@ -1058,10 +1095,15 @@ export default function MyBatchPage() {
                           Wednesday, 2 December 2026 • Timings to be announced
                         </p>
                       </div>
-                      {user.activeBatch?.meet_link ? (
+                      {liveSessionAccess?.isLocked ? (
+                        <div className="inline-flex items-center gap-2 rounded-xl border border-amber-300/60 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/30 px-3.5 py-2 text-xs font-bold text-amber-700 dark:text-amber-400 cursor-not-allowed shadow-sm select-none">
+                          <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                          Class Link Locked
+                        </div>
+                      ) : (liveSessionAccess?.meetLink || user.activeBatch?.meet_link) ? (
                         batchStatus === "LIVE" ? (
                           <a 
-                            href={user.activeBatch.meet_link}
+                            href={liveSessionAccess?.meetLink || user.activeBatch.meet_link}
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-red-500/10"
@@ -1078,7 +1120,7 @@ export default function MyBatchPage() {
                           </a>
                         ) : (
                           <a 
-                            href={user.activeBatch.meet_link}
+                            href={liveSessionAccess?.meetLink || user.activeBatch.meet_link}
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 dark:border-white/10 dark:bg-slate-900/60 dark:hover:bg-slate-900/80 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition-all hover:scale-105 active:scale-95 shadow-sm"

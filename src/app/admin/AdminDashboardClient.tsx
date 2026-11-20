@@ -27,7 +27,34 @@ import {
   Sliders,
   Clock,
   TrendingUp,
+  Link2,
+  Bell,
+  AlertTriangle,
+  ShieldAlert,
+  History,
+  Edit,
+  DollarSign,
+  X,
+  Check,
 } from "lucide-react";
+
+interface StudentFeeStatus {
+  email: string;
+  studentName: string;
+  fatherName: string;
+  motherName: string;
+  totalFeeRupees: number;
+  amountPaidRupees: number;
+  remainingBalanceRupees: number;
+  daysAllowed: number;
+  paymentDeadline: string;
+  isDeadlineExpired: boolean;
+  isBlocked: boolean;
+  blockReason?: string;
+  isLocked: boolean;
+  lockReason?: string;
+  enrollmentDate: string;
+}
 
 interface StudentRecord {
   name: string;
@@ -44,6 +71,40 @@ interface StudentRecord {
     cert_id?: string;
     issued_at?: string;
   };
+  feeStatus?: StudentFeeStatus;
+}
+
+interface BatchNotificationData {
+  headline: string;
+  message: string;
+  isActive: boolean;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+interface AuditLogData {
+  id: string;
+  batchId: string;
+  adminEmail: string;
+  adminName: string;
+  timestamp: string;
+  actionType: string;
+  studentEmail?: string;
+  studentName?: string;
+  previousValue?: string;
+  updatedValue?: string;
+  notes?: string;
+}
+
+function formatEnrollmentDate(dateStr?: string | null) {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime()) || d.getFullYear() <= 1970) return "—";
+  return d.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 interface BatchProgressData {
@@ -100,8 +161,44 @@ export default function AdminDashboardClient() {
   const [certsUnlocked, setCertsUnlocked] = useState(false);
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<"students" | "recordings" | "certificates">("students");
+  const [activeTab, setActiveTab] = useState<"students" | "recordings" | "certificates" | "audit">("students");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Meet Link State (Bootcamp 3.0)
+  const [meetLinkInput, setMeetLinkInput] = useState("");
+  const [isSavingMeetLink, setIsSavingMeetLink] = useState(false);
+  const [meetLinkStatus, setMeetLinkStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Notification State (Bootcamp 3.0)
+  const [notificationHeadline, setNotificationHeadline] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationActive, setNotificationActive] = useState(true);
+  const [isSavingNotification, setIsSavingNotification] = useState(false);
+  const [notificationStatus, setNotificationStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Audit Logs State
+  const [auditLogs, setAuditLogs] = useState<AuditLogData[]>([]);
+
+  // Student Management Modal State (Bootcamp 3.0)
+  const [selectedStudent, setSelectedStudent] = useState<StudentRecord | null>(null);
+  const [editFatherName, setEditFatherName] = useState("");
+  const [editMotherName, setEditMotherName] = useState("");
+  const [editTotalFee, setEditTotalFee] = useState<number>(10000);
+  const [editAmountPaid, setEditAmountPaid] = useState<number>(0);
+  const [editDaysAllowed, setEditDaysAllowed] = useState<number>(14);
+  const [editPaymentDeadline, setEditPaymentDeadline] = useState("");
+  const [editIsBlocked, setEditIsBlocked] = useState(false);
+  const [editBlockReason, setEditBlockReason] = useState("");
+  const [isSavingStudent, setIsSavingStudent] = useState(false);
+  const [studentActionStatus, setStudentActionStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Confirmation Dialog State
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   // Sync State
   const [isSyncing, setIsSyncing] = useState(false);
@@ -144,6 +241,17 @@ export default function AdminDashboardClient() {
               setBatchProgress(cachedData.batchProgress);
               setEditTotal(cachedData.batchProgress.totalSessions);
               setEditCompleted(cachedData.batchProgress.completedSessions);
+            }
+            if (cachedData.batch?.meet_link !== undefined) {
+              setMeetLinkInput(cachedData.batch.meet_link || "");
+            }
+            if (cachedData.notification) {
+              setNotificationHeadline(cachedData.notification.headline || "");
+              setNotificationMessage(cachedData.notification.message || "");
+              setNotificationActive(cachedData.notification.isActive ?? true);
+            }
+            if (Array.isArray(cachedData.auditLogs)) {
+              setAuditLogs(cachedData.auditLogs);
             }
             setLoading(false);
           }
@@ -189,6 +297,17 @@ export default function AdminDashboardClient() {
         setEditTotal(data.batchProgress.totalSessions);
         setEditCompleted(data.batchProgress.completedSessions);
       }
+      if (data.batch?.meet_link !== undefined) {
+        setMeetLinkInput(data.batch.meet_link || "");
+      }
+      if (data.notification) {
+        setNotificationHeadline(data.notification.headline || "");
+        setNotificationMessage(data.notification.message || "");
+        setNotificationActive(data.notification.isActive ?? true);
+      }
+      if (Array.isArray(data.auditLogs)) {
+        setAuditLogs(data.auditLogs);
+      }
 
       try {
         sessionStorage.setItem(
@@ -212,6 +331,180 @@ export default function AdminDashboardClient() {
   useEffect(() => {
     loadBatchData();
   }, [loadBatchData]);
+
+  // Handle Meet Link Save (Bootcamp 3.0)
+  const handleSaveMeetLink = async (clearLink = false) => {
+    if (!batch) return;
+    setIsSavingMeetLink(true);
+    setMeetLinkStatus(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      const targetUrl = clearLink ? "" : meetLinkInput.trim();
+
+      const res = await fetch("/api/admin/batch/meet-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          batchId: batch.id,
+          meetLink: targetUrl,
+        }),
+      });
+
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || "Failed to save meeting link");
+
+      setMeetLinkStatus({
+        type: "success",
+        message: targetUrl ? "Meeting link published successfully." : "Meeting link cleared.",
+      });
+      if (clearLink) setMeetLinkInput("");
+      setBatch((prev) => (prev ? { ...prev, meet_link: targetUrl || undefined } : null));
+      sessionStorage.removeItem("admin_batch_cache");
+      loadBatchData();
+    } catch (err: any) {
+      setMeetLinkStatus({ type: "error", message: err.message || "Error saving meeting link." });
+    } finally {
+      setIsSavingMeetLink(false);
+      setTimeout(() => setMeetLinkStatus(null), 5000);
+    }
+  };
+
+  // Handle Notification Save (Bootcamp 3.0)
+  const handleSaveNotification = async (deactivate = false) => {
+    if (!batch) return;
+    setIsSavingNotification(true);
+    setNotificationStatus(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await fetch("/api/admin/batch/notification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          batchId: batch.id,
+          headline: notificationHeadline.trim(),
+          message: notificationMessage.trim(),
+          isActive: deactivate ? false : notificationActive,
+        }),
+      });
+
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || "Failed to save notification");
+
+      setNotificationStatus({
+        type: "success",
+        message: deactivate ? "Notification announcement deactivated." : "Notification announcement published successfully.",
+      });
+      if (deactivate) setNotificationActive(false);
+      sessionStorage.removeItem("admin_batch_cache");
+      loadBatchData();
+    } catch (err: any) {
+      setNotificationStatus({ type: "error", message: err.message || "Error saving notification." });
+    } finally {
+      setIsSavingNotification(false);
+      setTimeout(() => setNotificationStatus(null), 5000);
+    }
+  };
+
+  // Handle Open Student Edit Modal
+  const handleOpenStudentModal = (student: StudentRecord) => {
+    setSelectedStudent(student);
+    const fs = student.feeStatus;
+    setEditFatherName(fs?.fatherName || "");
+    setEditMotherName(fs?.motherName || "");
+    setEditTotalFee(fs?.totalFeeRupees ?? (student.amount_paid ? Math.round(student.amount_paid / 100) : 10000));
+    setEditAmountPaid(fs?.amountPaidRupees ?? (student.amount_paid ? Math.round(student.amount_paid / 100) : 0));
+    setEditDaysAllowed(fs?.daysAllowed ?? 14);
+    setEditPaymentDeadline(fs?.paymentDeadline ? fs.paymentDeadline.split("T")[0] : "");
+    setEditIsBlocked(Boolean(fs?.isBlocked));
+    setEditBlockReason(fs?.blockReason || "");
+    setStudentActionStatus(null);
+  };
+
+  // Execute Student Updates in DB
+  const executeStudentUpdate = async () => {
+    if (!selectedStudent || !batch) return;
+    setIsSavingStudent(true);
+    setStudentActionStatus(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await fetch("/api/admin/batch/student", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          batchId: batch.id,
+          email: selectedStudent.email,
+          actionType: "UPDATE_ALL",
+          fatherName: editFatherName.trim(),
+          motherName: editMotherName.trim(),
+          totalFeeRupees: Number(editTotalFee),
+          amountPaidRupees: Number(editAmountPaid),
+          daysAllowed: Number(editDaysAllowed),
+          paymentDeadline: editPaymentDeadline ? new Date(editPaymentDeadline + "T23:59:59").toISOString() : undefined,
+          isBlocked: editIsBlocked,
+          blockReason: editBlockReason.trim() || undefined,
+        }),
+      });
+
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || "Failed to update student");
+
+      setStudentActionStatus({
+        type: "success",
+        message: "Student configuration updated successfully.",
+      });
+      sessionStorage.removeItem("admin_batch_cache");
+      await loadBatchData();
+      setTimeout(() => {
+        setSelectedStudent(null);
+        setStudentActionStatus(null);
+      }, 1200);
+    } catch (err: any) {
+      setStudentActionStatus({ type: "error", message: err.message || "Error updating student." });
+    } finally {
+      setIsSavingStudent(false);
+    }
+  };
+
+  // Prompt Confirmation Modal for Sensitive Changes
+  const handleConfirmStudentUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedStudent) return;
+
+    const currentIsBlocked = Boolean(selectedStudent.feeStatus?.isBlocked);
+    const isBlockingOrUnblocking = currentIsBlocked !== editIsBlocked;
+    const currentFee = selectedStudent.feeStatus?.totalFeeRupees;
+    const isFeeChanging = currentFee !== undefined && currentFee !== Number(editTotalFee);
+
+    if (isBlockingOrUnblocking || isFeeChanging) {
+      setConfirmDialog({
+        isOpen: true,
+        title: editIsBlocked && !currentIsBlocked ? "Confirm Block Student" : "Confirm Student Update",
+        message: editIsBlocked && !currentIsBlocked
+          ? `Are you sure you want to block ${selectedStudent.name}? They will immediately lose access to live sessions.`
+          : `Are you sure you want to apply these fee or access modifications to ${selectedStudent.name}?`,
+        onConfirm: () => {
+          setConfirmDialog(null);
+          executeStudentUpdate();
+        },
+      });
+    } else {
+      executeStudentUpdate();
+    }
+  };
 
   // Handle Batch Progress Updates
   const handleSaveProgress = async () => {
@@ -380,6 +673,11 @@ export default function AdminDashboardClient() {
     }
   };
 
+  const isBootcamp3 =
+    batch?.id === "e1c5673b-d2c9-4828-8e52-4322ccad2270" ||
+    (batch?.name || "").includes("3.0") ||
+    (batch?.label || "").includes("3.0");
+
   // Filter students by search query
   const filteredStudents = students.filter((s) => {
     const q = searchQuery.toLowerCase().trim();
@@ -389,7 +687,9 @@ export default function AdminDashboardClient() {
       (s.email || "").toLowerCase().includes(q) ||
       (s.phone || "").toLowerCase().includes(q) ||
       (s.grade_class || "").toLowerCase().includes(q) ||
-      (s.certificate?.cert_id || "").toLowerCase().includes(q)
+      (s.certificate?.cert_id || "").toLowerCase().includes(q) ||
+      (s.feeStatus?.fatherName || "").toLowerCase().includes(q) ||
+      (s.feeStatus?.motherName || "").toLowerCase().includes(q)
     );
   });
 
@@ -845,6 +1145,162 @@ export default function AdminDashboardClient() {
           </div>
         </div>
 
+        {/* Bootcamp 3.0 Live Session Link & Notification Controllers */}
+        {isBootcamp3 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Card A: Next Live Session Link Controller */}
+            <div className="rounded-3xl border border-blue-500/20 dark:border-blue-500/10 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                    <Link2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white">Next Live Session Meeting Link</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Class link published to eligible Bootcamp 3.0 students.</p>
+                  </div>
+                </div>
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
+                  batch.meet_link
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                    : "bg-slate-100 dark:bg-white/5 text-slate-500 border-slate-200 dark:border-white/10"
+                }`}>
+                  {batch.meet_link ? "Published" : "No Link Set"}
+                </span>
+              </div>
+
+              {meetLinkStatus && (
+                <div className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
+                  meetLinkStatus.type === "success"
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                }`}>
+                  {meetLinkStatus.type === "success" ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                  {meetLinkStatus.message}
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Meeting URL (Google Meet / Zoom)
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                  value={meetLinkInput}
+                  onChange={(e) => setMeetLinkInput(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs font-mono rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-between gap-3">
+                {batch.meet_link ? (
+                  <button
+                    type="button"
+                    onClick={() => handleSaveMeetLink(true)}
+                    disabled={isSavingMeetLink}
+                    className="px-4 py-2 rounded-xl border border-rose-200 dark:border-rose-900/40 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    Clear Link
+                  </button>
+                ) : <div />}
+                <button
+                  type="button"
+                  onClick={() => handleSaveMeetLink(false)}
+                  disabled={isSavingMeetLink || !meetLinkInput.trim()}
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white text-xs font-bold shadow-md hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer transition-all"
+                >
+                  {isSavingMeetLink ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                  Save & Publish Link
+                </button>
+              </div>
+            </div>
+
+            {/* Card B: Cohort Notification Manager */}
+            <div className="rounded-3xl border border-orange-500/20 dark:border-orange-500/10 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-orange-50 dark:bg-orange-950/40 text-[#ff8b12] flex items-center justify-center">
+                    <Bell className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white">Cohort Notification & Schedule Notice</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Displayed in students&apos; Cohort Launch & Schedule card.</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
+                    notificationActive
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                      : "bg-slate-100 dark:bg-white/5 text-slate-500 border-slate-200 dark:border-white/10"
+                  }`}>
+                    {notificationActive ? "Active" : "Inactive"}
+                  </span>
+                </div>
+              </div>
+
+              {notificationStatus && (
+                <div className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
+                  notificationStatus.type === "success"
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                }`}>
+                  {notificationStatus.type === "success" ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                  {notificationStatus.message}
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Announcement Headline
+                  </label>
+                  <input
+                    type="text"
+                    value={notificationHeadline}
+                    onChange={(e) => setNotificationHeadline(e.target.value)}
+                    placeholder="e.g. Rescheduled to 2 December 2026..."
+                    className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Supporting Details / Note
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={notificationMessage}
+                    onChange={(e) => setNotificationMessage(e.target.value)}
+                    placeholder="e.g. Your class schedule will be shared soon. Thank you for your cooperation!"
+                    className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-between gap-3">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={notificationActive}
+                    onChange={(e) => setNotificationActive(e.target.checked)}
+                    className="rounded text-[#0060aa] focus:ring-[#0060aa]"
+                  />
+                  <span>Publish to Students</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => handleSaveNotification(false)}
+                  disabled={isSavingNotification || !notificationHeadline.trim()}
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white text-xs font-bold shadow-md hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer transition-all"
+                >
+                  {isSavingNotification ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                  Save Announcement
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Tab Navigation Toolbar */}
         <div className="border-b border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-4 pb-2">
           <div className="flex items-center gap-2">
@@ -883,6 +1339,20 @@ export default function AdminDashboardClient() {
               <Award className="w-4 h-4" />
               Certificates ({issuedCerts.length})
             </button>
+
+            {isBootcamp3 && (
+              <button
+                onClick={() => setActiveTab("audit")}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  activeTab === "audit"
+                    ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
+                }`}
+              >
+                <History className="w-4 h-4" />
+                Audit Trail ({auditLogs.length})
+              </button>
+            )}
           </div>
 
           {activeTab === "students" && (
@@ -903,88 +1373,233 @@ export default function AdminDashboardClient() {
         {activeTab === "students" && (
           <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
-                    <th className="py-4 px-6">Student</th>
-                    <th className="py-4 px-6">Contact</th>
-                    <th className="py-4 px-6">Grade</th>
-                    <th className="py-4 px-6">Payment</th>
-                    <th className="py-4 px-6">Promo Code</th>
-                    <th className="py-4 px-6">Certificate</th>
-                    <th className="py-4 px-6">Enrolled Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                  {filteredStudents.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
-                        No students found for this cohort.
-                      </td>
+              {isBootcamp3 ? (
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                      <th className="py-4 px-6">Student</th>
+                      <th className="py-4 px-6">Parents</th>
+                      <th className="py-4 px-6">Contact & Grade</th>
+                      <th className="py-4 px-6">Fee Status</th>
+                      <th className="py-4 px-6">Class Access</th>
+                      <th className="py-4 px-6">Certificate</th>
+                      <th className="py-4 px-6">Enrolled Date</th>
+                      <th className="py-4 px-6 text-right">Action</th>
                     </tr>
-                  ) : (
-                    filteredStudents.map((st, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
-                        <td className="py-4 px-6">
-                          <p className="font-bold text-slate-900 dark:text-white text-sm">{st.name}</p>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400">{st.email}</p>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-                            <Phone className="w-3.5 h-3.5 text-slate-400" />
-                            <span>{st.phone || "—"}</span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 font-semibold text-slate-700 dark:text-slate-300">
-                          {st.grade_class || "—"}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                            {st.payment_status || "captured"}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 font-mono text-[11px] text-slate-600 dark:text-slate-400">
-                          {st.promo_code || "—"}
-                        </td>
-                        <td className="py-4 px-6">
-                          {st.certificate?.downloaded ? (
-                            <div className="flex flex-col gap-1 items-start">
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                <CheckCircle2 className="w-3 h-3" />
-                                Downloaded
-                              </span>
-                              <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">
-                                  {st.certificate.cert_id}
-                                </span>
-                                <Link
-                                  href={`/verify/${st.certificate.cert_id}`}
-                                  target="_blank"
-                                  className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
-                                >
-                                  Verify <ExternalLink className="w-2.5 h-2.5" />
-                                </Link>
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10">
-                              <Clock className="w-3 h-3" />
-                              Not Downloaded
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6 text-slate-500 dark:text-slate-400">
-                          {new Date(st.created_at).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                    {filteredStudents.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                          No students found for this cohort.
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      filteredStudents.map((st, idx) => {
+                        const fs = st.feeStatus;
+                        return (
+                          <tr key={idx} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
+                            <td className="py-4 px-6">
+                              <p className="font-bold text-slate-900 dark:text-white text-sm">{st.name}</p>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400">{st.email}</p>
+                            </td>
+                            <td className="py-4 px-6">
+                              {fs?.fatherName || fs?.motherName ? (
+                                <div className="space-y-0.5 text-[11px]">
+                                  <p className="text-slate-800 dark:text-slate-200">
+                                    <span className="text-slate-400 font-medium">F:</span> {fs.fatherName || "—"}
+                                  </p>
+                                  <p className="text-slate-800 dark:text-slate-200">
+                                    <span className="text-slate-400 font-medium">M:</span> {fs.motherName || "—"}
+                                  </p>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => handleOpenStudentModal(st)}
+                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#ff8b12] hover:underline"
+                                >
+                                  + Add Parents
+                                </button>
+                              )}
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                                <Phone className="w-3.5 h-3.5 text-slate-400" />
+                                <span>{st.phone || "—"}</span>
+                              </div>
+                              <p className="text-[10px] text-slate-400 mt-0.5">Grade: {st.grade_class || "—"}</p>
+                            </td>
+                            <td className="py-4 px-6">
+                              {fs ? (
+                                <div className="space-y-1">
+                                  <div>
+                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                      fs.remainingBalanceRupees === 0
+                                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                                        : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+                                    }`}>
+                                      {fs.remainingBalanceRupees === 0 ? "Fully Paid" : `₹${fs.remainingBalanceRupees.toLocaleString("en-IN")} Due`}
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                                    ₹{fs.amountPaidRupees.toLocaleString("en-IN")} / ₹{fs.totalFeeRupees.toLocaleString("en-IN")}
+                                  </p>
+                                </div>
+                              ) : (
+                                <span className="text-slate-400">—</span>
+                              )}
+                            </td>
+                            <td className="py-4 px-6">
+                              {fs?.isBlocked ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                  <ShieldAlert className="w-3 h-3" />
+                                  BLOCKED
+                                </span>
+                              ) : fs?.isLocked ? (
+                                <div className="space-y-0.5">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                    <Lock className="w-3 h-3" />
+                                    LOCKED
+                                  </span>
+                                  {fs.paymentDeadline && (
+                                    <p className="text-[10px] text-slate-400">
+                                      Due: {formatEnrollmentDate(fs.paymentDeadline)}
+                                    </p>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                  <Unlock className="w-3 h-3" />
+                                  UNLOCKED
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-4 px-6">
+                              {st.certificate?.downloaded ? (
+                                <div className="flex flex-col gap-1 items-start">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    Downloaded
+                                  </span>
+                                  <div className="flex items-center gap-1.5 mt-0.5">
+                                    <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">
+                                      {st.certificate.cert_id}
+                                    </span>
+                                    <Link
+                                      href={`/verify/${st.certificate.cert_id}`}
+                                      target="_blank"
+                                      className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                                    >
+                                      Verify <ExternalLink className="w-2.5 h-2.5" />
+                                    </Link>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10">
+                                  <Clock className="w-3 h-3" />
+                                  Not Downloaded
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-4 px-6 text-slate-500 dark:text-slate-400 font-medium">
+                              {formatEnrollmentDate(st.created_at)}
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenStudentModal(st)}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                              >
+                                <Edit className="w-3 h-3" />
+                                Manage
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              ) : (
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                      <th className="py-4 px-6">Student</th>
+                      <th className="py-4 px-6">Contact</th>
+                      <th className="py-4 px-6">Grade</th>
+                      <th className="py-4 px-6">Payment</th>
+                      <th className="py-4 px-6">Promo Code</th>
+                      <th className="py-4 px-6">Certificate</th>
+                      <th className="py-4 px-6">Enrolled Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                    {filteredStudents.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                          No students found for this cohort.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredStudents.map((st, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
+                          <td className="py-4 px-6">
+                            <p className="font-bold text-slate-900 dark:text-white text-sm">{st.name}</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">{st.email}</p>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                              <Phone className="w-3.5 h-3.5 text-slate-400" />
+                              <span>{st.phone || "—"}</span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 font-semibold text-slate-700 dark:text-slate-300">
+                            {st.grade_class || "—"}
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              {st.payment_status || "captured"}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 font-mono text-[11px] text-slate-600 dark:text-slate-400">
+                            {st.promo_code || "—"}
+                          </td>
+                          <td className="py-4 px-6">
+                            {st.certificate?.downloaded ? (
+                              <div className="flex flex-col gap-1 items-start">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                  <CheckCircle2 className="w-3 h-3" />
+                                  Downloaded
+                                </span>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">
+                                    {st.certificate.cert_id}
+                                  </span>
+                                  <Link
+                                    href={`/verify/${st.certificate.cert_id}`}
+                                    target="_blank"
+                                    className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                                  >
+                                    Verify <ExternalLink className="w-2.5 h-2.5" />
+                                  </Link>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10">
+                                <Clock className="w-3 h-3" />
+                                Not Downloaded
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 text-slate-500 dark:text-slate-400">
+                            {formatEnrollmentDate(st.created_at)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         )}
@@ -1341,7 +1956,289 @@ export default function AdminDashboardClient() {
             </div>
           </div>
         )}
+
+        {/* Tab 4: Audit Trail (Bootcamp 3.0) */}
+        {activeTab === "audit" && isBootcamp3 && (
+          <div className="rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md overflow-hidden shadow-sm space-y-4">
+            <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+              <div>
+                <h4 className="text-base font-black text-slate-900 dark:text-white">Admin Activity & Audit Trail</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Immutable record of administrative actions, fee updates, block states, and class link modifications.
+                </p>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                    <th className="py-4 px-6">Timestamp</th>
+                    <th className="py-4 px-6">Admin</th>
+                    <th className="py-4 px-6">Action</th>
+                    <th className="py-4 px-6">Affected Student</th>
+                    <th className="py-4 px-6">Previous Value</th>
+                    <th className="py-4 px-6">Updated Value</th>
+                    <th className="py-4 px-6">Notes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                  {auditLogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                        No administrative actions recorded yet for this batch.
+                      </td>
+                    </tr>
+                  ) : (
+                    auditLogs.map((log, idx) => (
+                      <tr key={log.id || idx} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
+                        <td className="py-4 px-6 text-slate-500 dark:text-slate-400 font-mono text-[11px] whitespace-nowrap">
+                          {log.timestamp ? new Date(log.timestamp).toLocaleString("en-IN") : "—"}
+                        </td>
+                        <td className="py-4 px-6">
+                          <p className="font-bold text-slate-900 dark:text-white">{log.adminName || "Admin"}</p>
+                          <p className="text-[10px] text-slate-400">{log.adminEmail}</p>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                            {log.actionType}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          {log.studentName || log.studentEmail ? (
+                            <div>
+                              <p className="font-bold text-slate-900 dark:text-white">{log.studentName || "—"}</p>
+                              <p className="text-[10px] text-slate-400">{log.studentEmail}</p>
+                            </div>
+                          ) : (
+                            <span className="text-slate-400">—</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-slate-500 dark:text-slate-400 max-w-xs truncate font-mono text-[11px]">
+                          {log.previousValue || "—"}
+                        </td>
+                        <td className="py-4 px-6 font-bold text-slate-800 dark:text-slate-200 max-w-xs truncate font-mono text-[11px]">
+                          {log.updatedValue || "—"}
+                        </td>
+                        <td className="py-4 px-6 text-slate-600 dark:text-slate-400 max-w-xs truncate text-[11px]">
+                          {log.notes || "—"}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </main>
+
+      {/* Student Management Modal (Bootcamp 3.0) */}
+      {selectedStudent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-2xl bg-white dark:bg-[#0a0f1c] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden animate-scale-up max-h-[90vh] flex flex-col">
+            <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  Manage Student: {selectedStudent.name}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{selectedStudent.email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedStudent(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmStudentUpdate} className="p-6 overflow-y-auto space-y-6 flex-grow">
+              {studentActionStatus && (
+                <div className={`p-4 rounded-xl text-xs font-bold flex items-center gap-2 ${
+                  studentActionStatus.type === "success"
+                    ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                    : "bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400"
+                }`}>
+                  {studentActionStatus.type === "success" ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                  {studentActionStatus.message}
+                </div>
+              )}
+
+              {/* Section 1: Parents Details */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-[#ff8b12]" /> Parent Information
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Father&apos;s Full Name</label>
+                    <input
+                      type="text"
+                      value={editFatherName}
+                      onChange={(e) => setEditFatherName(e.target.value)}
+                      placeholder="Enter father's full name"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Mother&apos;s Full Name</label>
+                    <input
+                      type="text"
+                      value={editMotherName}
+                      onChange={(e) => setEditMotherName(e.target.value)}
+                      placeholder="Enter mother's full name"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Fee & Access Configuration */}
+              <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-white/5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <DollarSign className="w-4 h-4 text-emerald-500" /> Course Fee & Payment Access
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Total Course Fee (₹)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editTotalFee}
+                      onChange={(e) => setEditTotalFee(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="w-full px-3.5 py-2.5 text-xs font-bold rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Amount Paid (₹)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editAmountPaid}
+                      onChange={(e) => setEditAmountPaid(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="w-full px-3.5 py-2.5 text-xs font-bold rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Remaining Balance</label>
+                    <div className="px-3.5 py-2.5 text-xs font-black rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-amber-600 dark:text-amber-400">
+                      ₹{Math.max(0, editTotalFee - editAmountPaid).toLocaleString("en-IN")}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Days Allowed To Pay</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="90"
+                      value={editDaysAllowed}
+                      onChange={(e) => setEditDaysAllowed(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Payment Deadline Date</label>
+                    <input
+                      type="date"
+                      value={editPaymentDeadline}
+                      onChange={(e) => setEditPaymentDeadline(e.target.value)}
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Student Blocking Control */}
+              <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-white/5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                      <ShieldAlert className="w-4 h-4 text-rose-500" /> Restrict / Block Student Access
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Blocking immediately revokes live class access regardless of payment status.
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editIsBlocked}
+                      onChange={(e) => setEditIsBlocked(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-600"></div>
+                  </label>
+                </div>
+
+                {editIsBlocked && (
+                  <div className="space-y-1.5 animate-fade-in">
+                    <label className="text-xs font-semibold text-rose-600 dark:text-rose-400">Block Reason (Recorded in Audit Trail)</label>
+                    <input
+                      type="text"
+                      value={editBlockReason}
+                      onChange={(e) => setEditBlockReason(e.target.value)}
+                      placeholder="e.g. Disciplinary hold, fees overdue"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 outline-none focus:ring-2 focus:ring-rose-500 text-slate-900 dark:text-white"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedStudent(null)}
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingStudent}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white text-xs font-bold shadow-md hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                >
+                  {isSavingStudent ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  Save Student Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Sensitive Action Confirmation Dialog */}
+      {confirmDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-[#0a0f1c] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl p-6 text-center animate-scale-up">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-black text-slate-900 dark:text-white">{confirmDialog.title}</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+              {confirmDialog.message}
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmDialog(null)}
+                className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDialog.onConfirm}
+                className="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              >
+                Yes, Proceed
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -101,6 +101,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
   const [prefilledName, setPrefilledName] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [studentName, setStudentName] = useState("");
+  const [fatherName, setFatherName] = useState("");
+  const [motherName, setMotherName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [grade, setGrade] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -172,8 +174,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
 
     if (isProcessingPayment) return;
 
-    if (!studentName.trim() || !phoneNumber.trim() || !grade.trim()) {
-      setErrorMsg("Please fill out all required fields.");
+    if (!studentName.trim() || !fatherName.trim() || !motherName.trim() || !phoneNumber.trim() || !grade.trim()) {
+      setErrorMsg("Please fill out all required fields, including father's and mother's names.");
       return;
     }
 
@@ -204,6 +206,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
         body: JSON.stringify({
           paymentTier,
           studentName,
+          fatherName,
+          motherName,
           phoneNumber,
           grade,
           promoCode: promoCode.trim() || undefined,
@@ -272,6 +276,8 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                 razorpay_payment_id: paymentPayload.razorpay_payment_id,
                 razorpay_signature: paymentPayload.razorpay_signature,
                 studentName,
+                fatherName,
+                motherName,
                 phoneNumber,
                 grade,
                 promoCode: promoCode.trim() || undefined,
@@ -530,9 +536,43 @@ export default function BookSlotPage({ nonce = "" }: { nonce?: string }) {
                       value={studentName}
                       onChange={(e) => setStudentName(e.currentTarget.value)}
                       className="w-full bg-white/70 border border-slate-200 dark:bg-slate-900/60 dark:border-white/5 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-505 focus:ring-1 focus:ring-[#ff8b12]/20 focus:border-[#ff8b12] dark:focus:ring-[#ff9d3b]/20 dark:focus:border-[#ff9d3b] transition-all font-medium"
-                      placeholder="Enter full name"
+                      placeholder="Enter student's full name"
                       type="text"
                      />
+                  </div>
+                </div>
+
+                <div className="group">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-[#0060aa] dark:group-focus-within:text-[#ff9d3b] transition-colors">
+                    Father&apos;s Full Name
+                  </label>
+                  <div className="relative">
+                    <input
+                      name="fatherName"
+                      required
+                      value={fatherName}
+                      onChange={(e) => setFatherName(e.currentTarget.value)}
+                      className="w-full bg-white/70 border border-slate-200 dark:bg-slate-900/60 dark:border-white/5 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-505 focus:ring-1 focus:ring-[#ff8b12]/20 focus:border-[#ff8b12] dark:focus:ring-[#ff9d3b]/20 dark:focus:border-[#ff9d3b] transition-all font-medium"
+                      placeholder="Enter father's full name"
+                      type="text"
+                    />
+                  </div>
+                </div>
+
+                <div className="group">
+                  <label className="block font-label text-[10px] uppercase tracking-[0.05rem] font-bold text-slate-500 dark:text-slate-450 mb-2 group-focus-within:text-[#0060aa] dark:group-focus-within:text-[#ff9d3b] transition-colors">
+                    Mother&apos;s Full Name
+                  </label>
+                  <div className="relative">
+                    <input
+                      name="motherName"
+                      required
+                      value={motherName}
+                      onChange={(e) => setMotherName(e.currentTarget.value)}
+                      className="w-full bg-white/70 border border-slate-200 dark:bg-slate-900/60 dark:border-white/5 outline-none rounded-xl py-4 px-5 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-505 focus:ring-1 focus:ring-[#ff8b12]/20 focus:border-[#ff8b12] dark:focus:ring-[#ff9d3b]/20 dark:focus:border-[#ff9d3b] transition-all font-medium"
+                      placeholder="Enter mother's full name"
+                      type="text"
+                    />
                   </div>
                 </div>
 
