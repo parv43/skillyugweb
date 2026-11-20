@@ -14,9 +14,11 @@ import {
 } from "@/lib/adminAuth";
 import {
   getBatchNotification,
+  getCohortSchedule,
   getStudentConfig,
   calculateStudentFeeStatus,
   type BatchNotification,
+  type CohortScheduleConfig,
 } from "@/lib/bootcamp3Config";
 
 export const runtime = "nodejs";
@@ -86,6 +88,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
     lockReason?: string;
   };
   notification?: BatchNotification | null;
+  cohortSchedule?: CohortScheduleConfig | null;
 }> {
   const admin = createSupabaseAdmin();
 
@@ -119,8 +122,8 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
 
     const targetBatchId = targetBatch?.id || adminProfile.assignedBatchId;
 
-    // Concurrently fetch batch settings, recordings, and notification
-    const [batchSettings, recordingsRes, batchNotification] = await Promise.all([
+    // Concurrently fetch batch settings, recordings, notification, and schedule
+    const [batchSettings, recordingsRes, batchNotification, cohortSchedule] = await Promise.all([
       getBatchSettings(targetBatchId),
       admin
         .from("session_recordings")
@@ -128,6 +131,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
         .eq("batch_id", targetBatchId)
         .order("published_at", { ascending: false }),
       getBatchNotification(targetBatchId),
+      getCohortSchedule(targetBatchId),
     ]);
 
     const recordings = (recordingsRes.data || []).map((r) => ({
@@ -151,6 +155,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
         remainingBalance: 0,
       },
       notification: batchNotification,
+      cohortSchedule,
     };
   }
 
@@ -158,6 +163,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
   if (!hasSlot) {
     const batchSettings = globalActiveBatch ? await getBatchSettings(globalActiveBatch.id) : null;
     const batchNotification = globalActiveBatch ? await getBatchNotification(globalActiveBatch.id) : null;
+    const cohortSchedule = globalActiveBatch ? await getCohortSchedule(globalActiveBatch.id) : null;
     return {
       hasSlot: false,
       isAdmin: false,
@@ -171,6 +177,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
         lockReason: "Please enroll in the bootcamp to access live classes.",
       },
       notification: batchNotification,
+      cohortSchedule,
     };
   }
 
@@ -215,7 +222,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
       (targetBatch?.name as string)?.includes("3.0") ||
       (targetBatch?.label as string)?.includes("3.0");
 
-    const [batchSettings, recordingsRes, batchNotification, studentConfig] = await Promise.all([
+    const [batchSettings, recordingsRes, batchNotification, cohortSchedule, studentConfig] = await Promise.all([
       getBatchSettings(targetBatchId),
       admin
         .from("session_recordings")
@@ -223,6 +230,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
         .eq("batch_id", targetBatchId)
         .order("published_at", { ascending: false }),
       getBatchNotification(targetBatchId),
+      getCohortSchedule(targetBatchId),
       isBootcamp3 ? getStudentConfig(targetBatchId, email || "") : Promise.resolve(null),
     ]);
 
@@ -294,6 +302,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
       recordings,
       liveSessionAccess,
       notification: batchNotification,
+      cohortSchedule,
     };
   }
 
@@ -310,6 +319,7 @@ async function getAccessDetails(userId: string, email: string | null): Promise<{
       meetLink: null,
     },
     notification: null,
+    cohortSchedule: null,
   };
 }
 
@@ -337,6 +347,7 @@ export async function GET(request: NextRequest) {
       recordings: details.recordings || [],
       liveSessionAccess: details.liveSessionAccess,
       notification: details.notification,
+      cohortSchedule: details.cohortSchedule,
     });
 
     response.headers.set("Cache-Control", "private, no-cache, no-store, must-revalidate");

@@ -37,6 +37,7 @@ import { supabase } from "@/lib/supabaseClient";
 import BatchCalendar from "@/components/BatchCalendar";
 import VoucherCard from "@/components/VoucherCard";
 import { getNextLiveSession, getCompletedDaysCount, getCurriculumDays } from "@/lib/curriculum";
+import { formatScheduleDisplayDate, type CohortScheduleConfig } from "@/lib/bootcamp3Config";
 
 export type VideoItem = {
   id: string | number;
@@ -78,6 +79,7 @@ export default function MyBatchPage() {
   const [hasSlotAccess, setHasSlotAccess] = useState(false);
   const [liveSessionAccess, setLiveSessionAccess] = useState<any>(null);
   const [batchNotification, setBatchNotification] = useState<any>(null);
+  const [cohortSchedule, setCohortSchedule] = useState<CohortScheduleConfig | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   // Certificate modal state
   const [showCertModal, setShowCertModal] = useState(false);
@@ -688,6 +690,7 @@ export default function MyBatchPage() {
             setHasSlotAccess(Boolean(value.hasSlot));
             if (value.liveSessionAccess) setLiveSessionAccess(value.liveSessionAccess);
             if (value.notification) setBatchNotification(value.notification);
+            if (value.cohortSchedule) setCohortSchedule(value.cohortSchedule);
             if (value.isAdmin !== undefined) setIsAdmin(Boolean(value.isAdmin));
             setUserId(session.user.id);
             if (value.certificatesUnlocked !== undefined) setCertsUnlocked(Boolean(value.certificatesUnlocked));
@@ -744,6 +747,7 @@ export default function MyBatchPage() {
             recordings?: VideoItem[];
             liveSessionAccess?: any;
             notification?: any;
+            cohortSchedule?: CohortScheduleConfig;
           };
           hasAccess = Boolean(data.hasAccess);
           slotAccess = Boolean(data.hasSlot);
@@ -755,6 +759,7 @@ export default function MyBatchPage() {
           if (data.batchProgress) setBatchProgress(data.batchProgress);
           if (data.liveSessionAccess) setLiveSessionAccess(data.liveSessionAccess);
           if (data.notification) setBatchNotification(data.notification);
+          if (data.cohortSchedule) setCohortSchedule(data.cohortSchedule);
           if (Array.isArray(data.recordings) && data.recordings.length > 0) {
             setVideos(data.recordings);
             const firstPlayable = data.recordings.find((v: any) => v.videoId) || data.recordings[0];
@@ -901,39 +906,55 @@ export default function MyBatchPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#0060aa] dark:text-blue-400">SKILLYUG BOOTCAMP 3.0</span>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#0060aa] dark:text-blue-400">
+                      {cohortSchedule?.batchLabel || "SKILLYUG BOOTCAMP 3.0"}
+                    </span>
                     <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                      batchStatus === "LIVE"
+                      (cohortSchedule?.statusBadge || batchStatus) === "LIVE"
                         ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                        : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                        : (cohortSchedule?.statusBadge || batchStatus) === "COMPLETED"
+                          ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                          : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
                     }`}>
-                      {batchStatus}
+                      {cohortSchedule?.statusBadge || batchStatus}
                     </span>
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white mt-1">Cohort Launch & Schedule</h3>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white mt-1">
+                    {cohortSchedule?.sectionHeading || "Cohort Launch & Schedule"}
+                  </h3>
                 </div>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 md:items-center border-t border-slate-100 dark:border-white/5 pt-4 md:border-t-0 md:pt-0">
                 <div className="shrink-0">
-                  <p className="text-xl font-black text-slate-900 dark:text-white tracking-tight">2 December 2026</p>
-                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Wednesday • Batch Starting Date</p>
+                  <p className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {formatScheduleDisplayDate(cohortSchedule?.startDate || batchStartDate)}
+                  </p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">
+                    {cohortSchedule?.weekday || "Wednesday"} • Batch Starting Date
+                  </p>
                 </div>
                 
                 <div className="hidden sm:block h-10 w-px bg-slate-200 dark:bg-white/10 shrink-0"></div>
                 
                 <div className="max-w-md">
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-200 leading-snug">
-                    {batchNotification?.isActive && batchNotification?.headline
-                      ? batchNotification.headline
-                      : "Rescheduled to 2 December 2026 to accommodate students' examinations from 20 November to 28 November."}
+                    {cohortSchedule?.isActive && cohortSchedule?.announcementHeadline
+                      ? cohortSchedule.announcementHeadline
+                      : (batchNotification?.isActive && batchNotification?.headline
+                          ? batchNotification.headline
+                          : "Rescheduled to 2 December 2026 to accommodate students' examinations from 20 November to 28 November.")}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    {batchNotification?.isActive && batchNotification?.message
-                      ? batchNotification.message
-                      : "Your class schedule will be shared soon. Thank you for your cooperation!"}
+                    {cohortSchedule?.isActive && cohortSchedule?.announcementMessage
+                      ? cohortSchedule.announcementMessage
+                      : (batchNotification?.isActive && batchNotification?.message
+                          ? batchNotification.message
+                          : "Your class schedule will be shared soon. Thank you for your cooperation!")}
                   </p>
-                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Schedule Update & Timings</p>
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">
+                    {cohortSchedule?.scheduleSubtitle || "Schedule Update & Timings"}
+                  </p>
                 </div>
               </div>
             </div>

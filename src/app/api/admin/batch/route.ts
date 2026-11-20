@@ -13,6 +13,7 @@ import {
   getAllStudentConfigsForBatch,
   calculateStudentFeeStatus,
   getBatchNotification,
+  getCohortSchedule,
   getAuditLogsForBatch,
 } from "@/lib/bootcamp3Config";
 
@@ -83,12 +84,13 @@ export async function GET(request: NextRequest) {
       batchSettings,
       studentConfigs,
       batchNotification,
+      cohortSchedule,
       auditLogs,
     ] = await Promise.all([
       adminClient.from("batches").select("*").eq("id", targetBatchId).maybeSingle(),
       adminClient
         .from("slot_bookings")
-        .select("name, email, phone, grade_class, payment_status, amount_paid, promo_code, created_at, user_id")
+        .select("name, email, phone, grade_class, payment_status, amount_paid, promo_code, created_at, user_id, razorpay_payment_id, razorpay_order_id")
         .eq("batch_id", targetBatchId)
         .order("created_at", { ascending: false }),
       adminClient
@@ -104,6 +106,7 @@ export async function GET(request: NextRequest) {
       getBatchSettings(targetBatchId),
       getAllStudentConfigsForBatch(targetBatchId),
       getBatchNotification(targetBatchId),
+      getCohortSchedule(targetBatchId),
       getAuditLogsForBatch(targetBatchId, 50),
     ]);
 
@@ -184,6 +187,7 @@ export async function GET(request: NextRequest) {
       certificatesUnlocked,
       batchProgress,
       notification: batchNotification,
+      cohortSchedule,
       auditLogs: auditLogs || [],
     });
 

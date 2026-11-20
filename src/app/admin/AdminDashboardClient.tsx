@@ -36,7 +36,18 @@ import {
   DollarSign,
   X,
   Check,
+  UserPlus,
+  Key,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
+import {
+  calculateWeekday,
+  formatScheduleDisplayDate,
+  type CohortScheduleConfig,
+} from "@/lib/bootcamp3Config";
 
 interface StudentFeeStatus {
   email: string;
@@ -66,6 +77,8 @@ interface StudentRecord {
   promo_code?: string;
   created_at: string;
   user_id?: string;
+  razorpay_payment_id?: string;
+  razorpay_order_id?: string;
   certificate?: {
     downloaded: boolean;
     cert_id?: string;
@@ -169,7 +182,21 @@ export default function AdminDashboardClient() {
   const [isSavingMeetLink, setIsSavingMeetLink] = useState(false);
   const [meetLinkStatus, setMeetLinkStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  // Notification State (Bootcamp 3.0)
+  // Dynamic Cohort Launch & Schedule State (Bootcamp 3.0)
+  const [cohortSchedule, setCohortSchedule] = useState<CohortScheduleConfig | null>(null);
+  const [scheduleHeading, setScheduleHeading] = useState("Cohort Launch & Schedule");
+  const [scheduleBatchLabel, setScheduleBatchLabel] = useState("SKILLYUG BOOTCAMP 3.0");
+  const [scheduleStartDate, setScheduleStartDate] = useState("2026-12-02");
+  const [scheduleWeekday, setScheduleWeekday] = useState("Wednesday");
+  const [scheduleStatusBadge, setScheduleStatusBadge] = useState<"UPCOMING" | "LIVE" | "COMPLETED" | "PAUSED">("UPCOMING");
+  const [scheduleHeadline, setScheduleHeadline] = useState("");
+  const [scheduleMessage, setScheduleMessage] = useState("");
+  const [scheduleSubtitle, setScheduleSubtitle] = useState("Schedule Update & Timings");
+  const [scheduleActive, setScheduleActive] = useState(true);
+  const [isSavingSchedule, setIsSavingSchedule] = useState(false);
+  const [scheduleStatus, setScheduleStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Notification State (Fallback)
   const [notificationHeadline, setNotificationHeadline] = useState("");
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationActive, setNotificationActive] = useState(true);
@@ -179,8 +206,29 @@ export default function AdminDashboardClient() {
   // Audit Logs State
   const [auditLogs, setAuditLogs] = useState<AuditLogData[]>([]);
 
+  // Manual Add Student State (Bootcamp 3.0)
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [addName, setAddName] = useState("");
+  const [addEmail, setAddEmail] = useState("");
+  const [addPassword, setAddPassword] = useState("");
+  const [addShowPassword, setAddShowPassword] = useState(false);
+  const [addPhone, setAddPhone] = useState("");
+  const [addGradeClass, setAddGradeClass] = useState("");
+  const [addFatherName, setAddFatherName] = useState("");
+  const [addMotherName, setAddMotherName] = useState("");
+  const [addTotalFee, setAddTotalFee] = useState<number>(8500);
+  const [addAmountPaid, setAddAmountPaid] = useState<number>(8500);
+  const [addDaysAllowed, setAddDaysAllowed] = useState<number>(14);
+  const [addShowOptional, setAddShowOptional] = useState(false);
+  const [isAddingStudent, setIsAddingStudent] = useState(false);
+  const [addStudentError, setAddStudentError] = useState("");
+  const [addStudentSuccess, setAddStudentSuccess] = useState("");
+
   // Student Management Modal State (Bootcamp 3.0)
   const [selectedStudent, setSelectedStudent] = useState<StudentRecord | null>(null);
+  const [editStudentName, setEditStudentName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editGradeClass, setEditGradeClass] = useState("");
   const [editFatherName, setEditFatherName] = useState("");
   const [editMotherName, setEditMotherName] = useState("");
   const [editTotalFee, setEditTotalFee] = useState<number>(10000);
@@ -192,13 +240,22 @@ export default function AdminDashboardClient() {
   const [isSavingStudent, setIsSavingStudent] = useState(false);
   const [studentActionStatus, setStudentActionStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  // Confirmation Dialog State
+  // Password Management / Reset State
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [newTemporaryPassword, setNewTemporaryPassword] = useState("");
+  const [showNewTempPassword, setShowNewTempPassword] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [resetPasswordStatus, setResetPasswordStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Confirmation Dialog State (with Admin Password Re-auth)
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     title: string;
     message: string;
-    onConfirm: () => void;
+    requiresPassword?: boolean;
+    onConfirm: (adminPassword?: string) => void;
   } | null>(null);
+  const [adminPasswordInput, setAdminPasswordInput] = useState("");
 
   // Sync State
   const [isSyncing, setIsSyncing] = useState(false);
@@ -249,6 +306,18 @@ export default function AdminDashboardClient() {
               setNotificationHeadline(cachedData.notification.headline || "");
               setNotificationMessage(cachedData.notification.message || "");
               setNotificationActive(cachedData.notification.isActive ?? true);
+            }
+            if (cachedData.cohortSchedule) {
+              setCohortSchedule(cachedData.cohortSchedule);
+              setScheduleHeading(cachedData.cohortSchedule.sectionHeading || "Cohort Launch & Schedule");
+              setScheduleBatchLabel(cachedData.cohortSchedule.batchLabel || "SKILLYUG BOOTCAMP 3.0");
+              setScheduleStartDate(cachedData.cohortSchedule.startDate || "2026-12-02");
+              setScheduleWeekday(cachedData.cohortSchedule.weekday || calculateWeekday(cachedData.cohortSchedule.startDate));
+              setScheduleStatusBadge(cachedData.cohortSchedule.statusBadge || "UPCOMING");
+              setScheduleHeadline(cachedData.cohortSchedule.announcementHeadline || "");
+              setScheduleMessage(cachedData.cohortSchedule.announcementMessage || "");
+              setScheduleSubtitle(cachedData.cohortSchedule.scheduleSubtitle || "Schedule Update & Timings");
+              setScheduleActive(cachedData.cohortSchedule.isActive ?? true);
             }
             if (Array.isArray(cachedData.auditLogs)) {
               setAuditLogs(cachedData.auditLogs);
@@ -304,6 +373,18 @@ export default function AdminDashboardClient() {
         setNotificationHeadline(data.notification.headline || "");
         setNotificationMessage(data.notification.message || "");
         setNotificationActive(data.notification.isActive ?? true);
+      }
+      if (data.cohortSchedule) {
+        setCohortSchedule(data.cohortSchedule);
+        setScheduleHeading(data.cohortSchedule.sectionHeading || "Cohort Launch & Schedule");
+        setScheduleBatchLabel(data.cohortSchedule.batchLabel || "SKILLYUG BOOTCAMP 3.0");
+        setScheduleStartDate(data.cohortSchedule.startDate || "2026-12-02");
+        setScheduleWeekday(data.cohortSchedule.weekday || calculateWeekday(data.cohortSchedule.startDate));
+        setScheduleStatusBadge(data.cohortSchedule.statusBadge || "UPCOMING");
+        setScheduleHeadline(data.cohortSchedule.announcementHeadline || "");
+        setScheduleMessage(data.cohortSchedule.announcementMessage || "");
+        setScheduleSubtitle(data.cohortSchedule.scheduleSubtitle || "Schedule Update & Timings");
+        setScheduleActive(data.cohortSchedule.isActive ?? true);
       }
       if (Array.isArray(data.auditLogs)) {
         setAuditLogs(data.auditLogs);
@@ -414,10 +495,133 @@ export default function AdminDashboardClient() {
     }
   };
 
+  // Handle Dynamic Cohort Launch & Schedule Save (Bootcamp 3.0)
+  const handleSaveSchedule = async () => {
+    if (!batch) return;
+    setIsSavingSchedule(true);
+    setScheduleStatus(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await fetch("/api/admin/batch/schedule", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          batchId: batch.id,
+          sectionHeading: scheduleHeading.trim(),
+          batchLabel: scheduleBatchLabel.trim(),
+          startDate: scheduleStartDate.trim(),
+          weekday: scheduleWeekday,
+          statusBadge: scheduleStatusBadge,
+          announcementHeadline: scheduleHeadline.trim(),
+          announcementMessage: scheduleMessage.trim(),
+          scheduleSubtitle: scheduleSubtitle.trim(),
+          isActive: scheduleActive,
+        }),
+      });
+
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || "Failed to save schedule.");
+
+      setScheduleStatus({
+        type: "success",
+        message: "Cohort Launch & Schedule updated and published successfully.",
+      });
+      sessionStorage.removeItem("admin_batch_cache");
+      loadBatchData();
+    } catch (err: any) {
+      setScheduleStatus({ type: "error", message: err.message || "Error saving schedule." });
+    } finally {
+      setIsSavingSchedule(false);
+      setTimeout(() => setScheduleStatus(null), 5000);
+    }
+  };
+
+  // Handle Manual Student Account Creation (Bootcamp 3.0)
+  const handleAddStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddStudentError("");
+    setAddStudentSuccess("");
+
+    if (!addName.trim() || addName.trim().length < 2) {
+      setAddStudentError("Student Full Name is required (minimum 2 characters).");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!addEmail.trim() || !emailRegex.test(addEmail.trim())) {
+      setAddStudentError("Please enter a valid student email address.");
+      return;
+    }
+    if (!addPassword || addPassword.length < 6) {
+      setAddStudentError("Initial Password is required (minimum 6 characters).");
+      return;
+    }
+
+    setIsAddingStudent(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await fetch("/api/admin/batch/student/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          batchId: batch?.id,
+          name: addName.trim(),
+          email: addEmail.trim().toLowerCase(),
+          password: addPassword.trim(),
+          phone: addPhone.trim() || undefined,
+          gradeClass: addGradeClass.trim() || undefined,
+          fatherName: addFatherName.trim() || undefined,
+          motherName: addMotherName.trim() || undefined,
+          totalFeeRupees: Number(addTotalFee),
+          amountPaidRupees: Number(addAmountPaid),
+          daysAllowed: Number(addDaysAllowed),
+        }),
+      });
+
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || "Failed to create student account.");
+
+      setAddStudentSuccess(`Student "${addName}" created and enrolled in Bootcamp 3.0 successfully.`);
+      if (resData.student) {
+        setStudents((prev) => [resData.student, ...prev]);
+      }
+      sessionStorage.removeItem("admin_batch_cache");
+      await loadBatchData();
+      setTimeout(() => {
+        setShowAddStudentModal(false);
+        setAddName("");
+        setAddEmail("");
+        setAddPassword("");
+        setAddPhone("");
+        setAddGradeClass("");
+        setAddFatherName("");
+        setAddMotherName("");
+        setAddStudentSuccess("");
+        setAddStudentError("");
+      }, 1500);
+    } catch (err: any) {
+      setAddStudentError(err.message || "Failed to add student.");
+    } finally {
+      setIsAddingStudent(false);
+    }
+  };
+
   // Handle Open Student Edit Modal
   const handleOpenStudentModal = (student: StudentRecord) => {
     setSelectedStudent(student);
     const fs = student.feeStatus;
+    setEditStudentName(student.name || "");
+    setEditPhone(student.phone || "");
+    setEditGradeClass(student.grade_class || "");
     setEditFatherName(fs?.fatherName || "");
     setEditMotherName(fs?.motherName || "");
     setEditTotalFee(fs?.totalFeeRupees ?? (student.amount_paid ? Math.round(student.amount_paid / 100) : 10000));
@@ -427,10 +631,70 @@ export default function AdminDashboardClient() {
     setEditIsBlocked(Boolean(fs?.isBlocked));
     setEditBlockReason(fs?.blockReason || "");
     setStudentActionStatus(null);
+    setShowResetPassword(false);
+    setNewTemporaryPassword("");
+    setResetPasswordStatus(null);
+  };
+
+  // Handle Temporary Password Reset
+  const handleResetStudentPassword = () => {
+    if (!selectedStudent) return;
+    if (!newTemporaryPassword || newTemporaryPassword.length < 6) {
+      setResetPasswordStatus({
+        type: "error",
+        message: "Temporary password must be at least 6 characters.",
+      });
+      return;
+    }
+
+    setConfirmDialog({
+      isOpen: true,
+      title: "Confirm Temporary Password Reset",
+      message: `Are you sure you want to assign a new temporary password for ${selectedStudent.name} (${selectedStudent.email})?`,
+      requiresPassword: true,
+      onConfirm: async (adminPassword) => {
+        setIsResettingPassword(true);
+        setResetPasswordStatus(null);
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const token = sessionData?.session?.access_token;
+
+          const res = await fetch("/api/admin/batch/student", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              batchId: batch?.id,
+              email: selectedStudent.email,
+              actionType: "RESET_PASSWORD",
+              newPassword: newTemporaryPassword.trim(),
+              adminPassword,
+            }),
+          });
+
+          const resData = await res.json();
+          if (!res.ok) throw new Error(resData.error || "Failed to reset password.");
+
+          setResetPasswordStatus({
+            type: "success",
+            message: `New temporary password has been successfully assigned.`,
+          });
+          setNewTemporaryPassword("");
+          sessionStorage.removeItem("admin_batch_cache");
+          await loadBatchData();
+        } catch (err: any) {
+          setResetPasswordStatus({ type: "error", message: err.message || "Error resetting password." });
+        } finally {
+          setIsResettingPassword(false);
+        }
+      },
+    });
   };
 
   // Execute Student Updates in DB
-  const executeStudentUpdate = async () => {
+  const executeStudentUpdate = async (adminPassword?: string) => {
     if (!selectedStudent || !batch) return;
     setIsSavingStudent(true);
     setStudentActionStatus(null);
@@ -448,6 +712,9 @@ export default function AdminDashboardClient() {
           batchId: batch.id,
           email: selectedStudent.email,
           actionType: "UPDATE_ALL",
+          studentName: editStudentName.trim(),
+          phone: editPhone.trim(),
+          gradeClass: editGradeClass.trim(),
           fatherName: editFatherName.trim(),
           motherName: editMotherName.trim(),
           totalFeeRupees: Number(editTotalFee),
@@ -456,6 +723,7 @@ export default function AdminDashboardClient() {
           paymentDeadline: editPaymentDeadline ? new Date(editPaymentDeadline + "T23:59:59").toISOString() : undefined,
           isBlocked: editIsBlocked,
           blockReason: editBlockReason.trim() || undefined,
+          adminPassword,
         }),
       });
 
@@ -464,7 +732,7 @@ export default function AdminDashboardClient() {
 
       setStudentActionStatus({
         type: "success",
-        message: "Student configuration updated successfully.",
+        message: "Student configuration and profile updated successfully.",
       });
       sessionStorage.removeItem("admin_batch_cache");
       await loadBatchData();
@@ -488,17 +756,20 @@ export default function AdminDashboardClient() {
     const isBlockingOrUnblocking = currentIsBlocked !== editIsBlocked;
     const currentFee = selectedStudent.feeStatus?.totalFeeRupees;
     const isFeeChanging = currentFee !== undefined && currentFee !== Number(editTotalFee);
+    const currentPaid = selectedStudent.feeStatus?.amountPaidRupees;
+    const isPaidChanging = currentPaid !== undefined && currentPaid !== Number(editAmountPaid);
 
-    if (isBlockingOrUnblocking || isFeeChanging) {
+    if (isBlockingOrUnblocking || isFeeChanging || isPaidChanging) {
       setConfirmDialog({
         isOpen: true,
         title: editIsBlocked && !currentIsBlocked ? "Confirm Block Student" : "Confirm Student Update",
         message: editIsBlocked && !currentIsBlocked
           ? `Are you sure you want to block ${selectedStudent.name}? They will immediately lose access to live sessions.`
           : `Are you sure you want to apply these fee or access modifications to ${selectedStudent.name}?`,
-        onConfirm: () => {
+        requiresPassword: true,
+        onConfirm: (adminPassword) => {
           setConfirmDialog(null);
-          executeStudentUpdate();
+          executeStudentUpdate(adminPassword);
         },
       });
     } else {
@@ -1216,39 +1487,107 @@ export default function AdminDashboardClient() {
               </div>
             </div>
 
-            {/* Card B: Cohort Notification Manager */}
+            {/* Card B: Cohort Launch & Schedule Controller (Bootcamp 3.0) */}
             <div className="rounded-3xl border border-orange-500/20 dark:border-orange-500/10 bg-white/80 dark:bg-[#0a0f1c]/80 backdrop-blur-md p-6 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-orange-50 dark:bg-orange-950/40 text-[#ff8b12] flex items-center justify-center">
-                    <Bell className="w-4 h-4" />
+                    <Calendar className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-slate-900 dark:text-white">Cohort Notification & Schedule Notice</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Displayed in students&apos; Cohort Launch & Schedule card.</p>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white">Cohort Launch & Schedule Controller</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Customizes the live schedule banner shown to Bootcamp 3.0 students.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
-                    notificationActive
+                    scheduleActive
                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                       : "bg-slate-100 dark:bg-white/5 text-slate-500 border-slate-200 dark:border-white/10"
                   }`}>
-                    {notificationActive ? "Active" : "Inactive"}
+                    {scheduleActive ? "Active" : "Inactive"}
                   </span>
                 </div>
               </div>
 
-              {notificationStatus && (
+              {scheduleStatus && (
                 <div className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
-                  notificationStatus.type === "success"
+                  scheduleStatus.type === "success"
                     ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                     : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
                 }`}>
-                  {notificationStatus.type === "success" ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
-                  {notificationStatus.message}
+                  {scheduleStatus.type === "success" ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                  {scheduleStatus.message}
                 </div>
               )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Batch Label
+                  </label>
+                  <input
+                    type="text"
+                    value={scheduleBatchLabel}
+                    onChange={(e) => setScheduleBatchLabel(e.target.value)}
+                    placeholder="SKILLYUG BOOTCAMP 3.0"
+                    className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={scheduleHeading}
+                    onChange={(e) => setScheduleHeading(e.target.value)}
+                    placeholder="Cohort Launch & Schedule"
+                    className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Batch Starting Date
+                  </label>
+                  <input
+                    type="date"
+                    value={scheduleStartDate}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setScheduleStartDate(val);
+                      setScheduleWeekday(calculateWeekday(val));
+                    }}
+                    className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Weekday (Calculated)
+                  </label>
+                  <div className="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-blue-600 dark:text-blue-400">
+                    {scheduleWeekday}
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Status Badge
+                  </label>
+                  <select
+                    value={scheduleStatusBadge}
+                    onChange={(e) => setScheduleStatusBadge(e.target.value as any)}
+                    className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                  >
+                    <option value="UPCOMING">UPCOMING</option>
+                    <option value="LIVE">LIVE</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="PAUSED">PAUSED</option>
+                  </select>
+                </div>
+              </div>
 
               <div className="space-y-3">
                 <div className="space-y-1">
@@ -1257,23 +1596,60 @@ export default function AdminDashboardClient() {
                   </label>
                   <input
                     type="text"
-                    value={notificationHeadline}
-                    onChange={(e) => setNotificationHeadline(e.target.value)}
-                    placeholder="e.g. Rescheduled to 2 December 2026..."
+                    value={scheduleHeadline}
+                    onChange={(e) => setScheduleHeadline(e.target.value)}
+                    placeholder="e.g. Rescheduled to 2 December 2026 to accommodate students' examinations..."
                     className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Supporting Details / Note
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={notificationMessage}
-                    onChange={(e) => setNotificationMessage(e.target.value)}
-                    placeholder="e.g. Your class schedule will be shared soon. Thank you for your cooperation!"
-                    className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white resize-none"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Supporting Details / Note
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={scheduleMessage}
+                      onChange={(e) => setScheduleMessage(e.target.value)}
+                      placeholder="e.g. Your class schedule will be shared soon. Thank you for your cooperation!"
+                      className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white resize-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Schedule Update Subtitle
+                    </label>
+                    <input
+                      type="text"
+                      value={scheduleSubtitle}
+                      onChange={(e) => setScheduleSubtitle(e.target.value)}
+                      placeholder="Schedule Update & Timings"
+                      className="w-full px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Student View Preview */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/5 space-y-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Live Student View Preview</p>
+                <div className="p-3 rounded-xl border border-blue-500/20 bg-white dark:bg-[#0a0f1c] flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-[#0060aa] dark:text-blue-400">{scheduleBatchLabel || "SKILLYUG BOOTCAMP 3.0"}</span>
+                      <span className="text-[9px] px-2 py-0.5 rounded-full font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">{scheduleStatusBadge}</span>
+                    </div>
+                    <p className="font-bold text-slate-900 dark:text-white mt-0.5">{scheduleHeading || "Cohort Launch & Schedule"}</p>
+                  </div>
+                  <div className="shrink-0">
+                    <p className="font-black text-slate-900 dark:text-white text-sm">{formatScheduleDisplayDate(scheduleStartDate)}</p>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase">{scheduleWeekday} • Batch Starting Date</p>
+                  </div>
+                  <div className="max-w-xs text-[11px]">
+                    <p className="font-bold text-slate-800 dark:text-slate-200 line-clamp-1">{scheduleHeadline || "Announcement Headline"}</p>
+                    <p className="text-slate-500 line-clamp-1">{scheduleMessage || "Supporting details..."}</p>
+                  </div>
                 </div>
               </div>
 
@@ -1281,20 +1657,20 @@ export default function AdminDashboardClient() {
                 <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
                   <input
                     type="checkbox"
-                    checked={notificationActive}
-                    onChange={(e) => setNotificationActive(e.target.checked)}
+                    checked={scheduleActive}
+                    onChange={(e) => setScheduleActive(e.target.checked)}
                     className="rounded text-[#0060aa] focus:ring-[#0060aa]"
                   />
                   <span>Publish to Students</span>
                 </label>
                 <button
                   type="button"
-                  onClick={() => handleSaveNotification(false)}
-                  disabled={isSavingNotification || !notificationHeadline.trim()}
+                  onClick={handleSaveSchedule}
+                  disabled={isSavingSchedule}
                   className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white text-xs font-bold shadow-md hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer transition-all"
                 >
-                  {isSavingNotification ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-                  Save Announcement
+                  {isSavingSchedule ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                  Save & Publish Schedule
                 </button>
               </div>
             </div>
@@ -1356,15 +1732,31 @@ export default function AdminDashboardClient() {
           </div>
 
           {activeTab === "students" && (
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search students..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-[#0a0f1c] border border-slate-200 dark:border-white/10 outline-none focus:ring-1 focus:ring-[#0060aa] text-slate-900 dark:text-white"
-              />
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="relative w-full sm:w-72">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search students..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-[#0a0f1c] border border-slate-200 dark:border-white/10 outline-none focus:ring-1 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                />
+              </div>
+              {isBootcamp3 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddStudentModal(true);
+                    setAddStudentError("");
+                    setAddStudentSuccess("");
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white text-xs font-bold shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>+ Add Student</span>
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -2064,8 +2456,140 @@ export default function AdminDashboardClient() {
                 </div>
               )}
 
-              {/* Section 1: Parents Details */}
+              {/* Section 1: Student Profile & Registration Details */}
               <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-[#0060aa]" /> Student Profile & Registration
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] px-2 py-0.5 rounded-md font-mono bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/10">
+                      Enrolled: {formatEnrollmentDate(selectedStudent.created_at)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1.5 sm:col-span-1">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Student Full Name</label>
+                    <input
+                      type="text"
+                      value={editStudentName}
+                      onChange={(e) => setEditStudentName(e.target.value)}
+                      placeholder="Student full name"
+                      className="w-full px-3.5 py-2.5 text-xs font-bold rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5 sm:col-span-1">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Phone Number</label>
+                    <input
+                      type="text"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      placeholder="Phone number"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                    />
+                  </div>
+                  <div className="space-y-1.5 sm:col-span-1">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Class / Grade</label>
+                    <input
+                      type="text"
+                      value={editGradeClass}
+                      onChange={(e) => setEditGradeClass(e.target.value)}
+                      placeholder="e.g. 5th, 6th, 10th"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 text-[11px]">
+                  <div>
+                    <span className="text-slate-400 font-medium">Email: </span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedStudent.email}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium">Payment ID: </span>
+                    <span className="font-mono text-slate-700 dark:text-slate-300">{selectedStudent.razorpay_payment_id || "N/A"}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium">Promo: </span>
+                    <span className="font-bold text-[#ff8b12]">{selectedStudent.promo_code || "None"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Password Management (Reset Password) */}
+              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                      <Key className="w-4 h-4 text-amber-500" /> Password Management
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Existing passwords are encrypted and never retrievable. You can assign a new temporary password.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowResetPassword((prev) => !prev)}
+                    className="text-xs font-bold text-[#0060aa] dark:text-blue-400 hover:underline cursor-pointer"
+                  >
+                    {showResetPassword ? "Hide Reset" : "Reset Password"}
+                  </button>
+                </div>
+
+                {resetPasswordStatus && (
+                  <div className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
+                    resetPasswordStatus.type === "success"
+                      ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                      : "bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400"
+                  }`}>
+                    {resetPasswordStatus.type === "success" ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                    {resetPasswordStatus.message}
+                  </div>
+                )}
+
+                {showResetPassword && (
+                  <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/30 space-y-3 animate-fade-in">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-amber-900 dark:text-amber-300">
+                        New Temporary Password (min 6 characters)
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showNewTempPassword ? "text" : "password"}
+                          value={newTemporaryPassword}
+                          onChange={(e) => setNewTemporaryPassword(e.target.value)}
+                          placeholder="Enter new temporary password"
+                          className="w-full pl-3.5 pr-10 py-2 text-xs rounded-xl bg-white dark:bg-[#0a0f1c] border border-amber-200 dark:border-amber-900/40 outline-none focus:ring-2 focus:ring-amber-500 text-slate-900 dark:text-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewTempPassword((prev) => !prev)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                        >
+                          {showNewTempPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={handleResetStudentPassword}
+                        disabled={isResettingPassword || !newTemporaryPassword || newTemporaryPassword.length < 6}
+                        className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-sm hover:scale-105 active:scale-95 disabled:opacity-50 transition-all cursor-pointer flex items-center gap-1.5"
+                      >
+                        {isResettingPassword ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Key className="w-3.5 h-3.5" />}
+                        Assign New Temporary Password
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Section 3: Parents Details */}
+              <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-white/5">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <Users className="w-4 h-4 text-[#ff8b12]" /> Parent Information
                 </h4>
@@ -2093,7 +2617,7 @@ export default function AdminDashboardClient() {
                 </div>
               </div>
 
-              {/* Section 2: Fee & Access Configuration */}
+              {/* Section 4: Fee & Access Configuration */}
               <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-white/5">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <DollarSign className="w-4 h-4 text-emerald-500" /> Course Fee & Payment Access
@@ -2151,7 +2675,7 @@ export default function AdminDashboardClient() {
                 </div>
               </div>
 
-              {/* Section 3: Student Blocking Control */}
+              {/* Section 5: Student Blocking Control */}
               <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-white/5">
                 <div className="flex items-center justify-between">
                   <div>
@@ -2209,7 +2733,227 @@ export default function AdminDashboardClient() {
         </div>
       )}
 
-      {/* Sensitive Action Confirmation Dialog */}
+      {/* Manual Add Student Modal (Bootcamp 3.0) */}
+      {showAddStudentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-xl bg-white dark:bg-[#0a0f1c] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden animate-scale-up max-h-[90vh] flex flex-col">
+            <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-[#0060aa] dark:text-blue-400 flex items-center justify-center">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">
+                    Add New Student (Bootcamp 3.0)
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Only Name, Email, and Initial Password are mandatory.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddStudentModal(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddStudent} className="p-6 overflow-y-auto space-y-5 flex-grow">
+              {addStudentError && (
+                <div className="p-4 rounded-xl text-xs font-bold flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {addStudentError}
+                </div>
+              )}
+              {addStudentSuccess && (
+                <div className="p-4 rounded-xl text-xs font-bold flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  {addStudentSuccess}
+                </div>
+              )}
+
+              {/* 3 Mandatory Fields */}
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                    <span>Student Full Name <span className="text-rose-500">*</span></span>
+                    <span className="text-[10px] text-slate-400 uppercase font-medium">Mandatory</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={addName}
+                    onChange={(e) => setAddName(e.target.value)}
+                    placeholder="e.g. Rahul Sharma"
+                    className="w-full px-3.5 py-2.5 text-xs font-bold rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                    <span>Email Address <span className="text-rose-500">*</span></span>
+                    <span className="text-[10px] text-slate-400 uppercase font-medium">Mandatory (Login Email)</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={addEmail}
+                    onChange={(e) => setAddEmail(e.target.value)}
+                    placeholder="student@example.com"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                    <span>Initial Password <span className="text-rose-500">*</span></span>
+                    <span className="text-[10px] text-slate-400 uppercase font-medium">Min 6 chars</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={addShowPassword ? "text" : "password"}
+                      required
+                      minLength={6}
+                      value={addPassword}
+                      onChange={(e) => setAddPassword(e.target.value)}
+                      placeholder="Create temporary login password"
+                      className="w-full pl-3.5 pr-10 py-2.5 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setAddShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                    >
+                      {addShowPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Optional Fields Toggle */}
+              <div className="pt-2 border-t border-slate-100 dark:border-white/5">
+                <button
+                  type="button"
+                  onClick={() => setAddShowOptional((prev) => !prev)}
+                  className="flex items-center justify-between w-full text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-[#0060aa] py-1 cursor-pointer"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Sliders className="w-3.5 h-3.5 text-[#ff8b12]" />
+                    Additional Details (Optional & Can be added later)
+                  </span>
+                  {addShowOptional ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+
+                {addShowOptional && (
+                  <div className="space-y-4 pt-3 animate-fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Phone Number</label>
+                        <input
+                          type="text"
+                          value={addPhone}
+                          onChange={(e) => setAddPhone(e.target.value)}
+                          placeholder="e.g. 9876543210"
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Class / Grade</label>
+                        <input
+                          type="text"
+                          value={addGradeClass}
+                          onChange={(e) => setAddGradeClass(e.target.value)}
+                          placeholder="e.g. 5th, 6th"
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Father&apos;s Full Name</label>
+                        <input
+                          type="text"
+                          value={addFatherName}
+                          onChange={(e) => setAddFatherName(e.target.value)}
+                          placeholder="Father's name"
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Mother&apos;s Full Name</label>
+                        <input
+                          type="text"
+                          value={addMotherName}
+                          onChange={(e) => setAddMotherName(e.target.value)}
+                          placeholder="Mother's name"
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Total Fee (₹)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={addTotalFee}
+                          onChange={(e) => setAddTotalFee(Math.max(0, parseInt(e.target.value) || 0))}
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Amount Paid (₹)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={addAmountPaid}
+                          onChange={(e) => setAddAmountPaid(Math.max(0, parseInt(e.target.value) || 0))}
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Days Allowed</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="90"
+                          value={addDaysAllowed}
+                          onChange={(e) => setAddDaysAllowed(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddStudentModal(false)}
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isAddingStudent}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0060aa] to-[#ff8b12] hover:from-[#005291] hover:to-[#e0770b] text-white text-xs font-bold shadow-md hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                >
+                  {isAddingStudent ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
+                  Create & Enroll Student
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Sensitive Action Confirmation Dialog (with Admin Re-Authentication) */}
       {confirmDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-md bg-white dark:bg-[#0a0f1c] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl p-6 text-center animate-scale-up">
@@ -2220,17 +2964,44 @@ export default function AdminDashboardClient() {
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
               {confirmDialog.message}
             </p>
+
+            {confirmDialog.requiresPassword && (
+              <div className="mt-4 text-left space-y-1.5 p-3.5 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10">
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-[#0060aa]" /> Administrator Authorization
+                </label>
+                <input
+                  type="password"
+                  placeholder="Enter administrator password (or CONFIRM if OAuth)"
+                  value={adminPasswordInput}
+                  onChange={(e) => setAdminPasswordInput(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-white dark:bg-[#0a0f1c] border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-[#0060aa] text-slate-900 dark:text-white"
+                  autoFocus
+                />
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  Sensitive actions (passwords, fee adjustments, and access blocks) strictly require server-side administrator authorization.
+                </p>
+              </div>
+            )}
+
             <div className="mt-6 flex items-center justify-center gap-3">
               <button
                 type="button"
-                onClick={() => setConfirmDialog(null)}
+                onClick={() => {
+                  setConfirmDialog(null);
+                  setAdminPasswordInput("");
+                }}
                 className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
-                onClick={confirmDialog.onConfirm}
+                onClick={() => {
+                  const pwd = adminPasswordInput;
+                  setAdminPasswordInput("");
+                  confirmDialog.onConfirm(pwd);
+                }}
                 className="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 Yes, Proceed
