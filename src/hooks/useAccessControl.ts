@@ -12,28 +12,51 @@ export type AccessState = {
   userEmail?: string;
 };
 
+// Module-level in-memory cache to prevent duplicate fetches across component re-renders
 let memoryCachedAccessState: AccessState | null = null;
 let fetchPromise: Promise<any> | null = null;
 
-function readStoredAuth(): AccessState | null {
+/**
+ * Reads verified access data stored in sessionStorage.
+ * This data is ONLY stored after a successful /api/my-batch/access HTTP 200 response.
+ */
+function readVerifiedSession(userId?: string): AccessState | null {
   if (typeof window === "undefined") return null;
   try {
-    const cached = sessionStorage.getItem("mybatch_access");
-    if (cached) {
+    const keysToCheck = userId
+      ? [`mybatch_access_${userId}`, "mybatch_access"]
+      : ["mybatch_access"];
+
+    for (const key of keysToCheck) {
+      const cached = sessionStorage.getItem(key);
+      if (!cached) continue;
       const { value, expiry } = JSON.parse(cached);
-      if (Date.now() < expiry && value) {
-        return {
-          isLoggedIn: true,
-          hasAccess: Boolean(value.hasAccess),
-          hasSlot: Boolean(value.hasSlot),
-          loading: false,
-          userId: value.userId,
-          userEmail: value.userEmail,
-        };
+      if (Date.now() < expiry && value && typeof value.hasAccess === "boolean") {
+        if (!userId || !value.userId || value.userId === userId) {
+          return {
+            isLoggedIn: true,
+            hasAccess: Boolean(value.hasAccess),
+            hasSlot: Boolean(value.hasSlot),
+            loading: false,
+            userId: value.userId,
+            userEmail: value.userEmail,
+          };
+        }
       }
     }
   } catch {}
+  return null;
+}
 
+/**
+ * Reads the lightweight auth UI hint from localStorage.
+ * Used solely so the Navbar can immediately display the avatar on cold start
+ * without flashing the "Log in" button while the session and access resolve.
+ *
+ * NOTE: This hint NEVER authorizes batch access and MUST NOT be used to set hasAccess.
+ */
+function readAuthHint(): AccessState | null {
+  if (typeof window === "undefined") return null;
   try {
     const hint = localStorage.getItem("skillyug_auth_hint");
     if (hint) {
@@ -41,50 +64,61 @@ function readStoredAuth(): AccessState | null {
       if (parsed && parsed.isLoggedIn) {
         return {
           isLoggedIn: true,
-          hasAccess: Boolean(parsed.hasAccess),
-          hasSlot: Boolean(parsed.hasSlot),
-          loading: false,
+          hasAccess: false, // Never assume access from unverified auth hint
+          hasSlot: false,
+          loading: false, // Auth state is known, preventing "Log in" button flash
           userId: parsed.userId,
           userEmail: parsed.userEmail,
         };
       }
     }
   } catch {}
-
   return null;
 }
 
+/**
+ * Initial state reader: prefers verified session cache; falls back to auth UI hint;
+ * defaults to unauthenticated loading state.
+ */
+function getInitialAccessState(): AccessState {
+  if (memoryCachedAccessState) return memoryCachedAccessState;
+  const verified = readVerifiedSession();
+  if (verified) {
+    memoryCachedAccessState = verified;
+    return verified;
+  }
+  const hint = readAuthHint();
+  if (hint) {
+    // Return hint for initial render without caching in memoryCachedAccessState
+    // so that the background verification always runs.
+    return hint;
+  }
+  return {
+    isLoggedIn: false,
+    hasAccess: false,
+    hasSlot: false,
+    loading: true,
+    userId: undefined,
+    userEmail: undefined,
+  };
+}
+
 export function useAccessControl(): AccessState {
-  const [state, setState] = useState<AccessState>(() => {
-    if (memoryCachedAccessState) return memoryCachedAccessState;
-    const stored = readStoredAuth();
-    if (stored) {
-      memoryCachedAccessState = stored;
-      return stored;
-    }
-    return {
-      isLoggedIn: false,
-      hasAccess: false,
-      hasSlot: false,
-      loading: true,
-      userId: undefined,
-      userEmail: undefined,
-    };
-  });
+  const [state, setState] = useState<AccessState>(getInitialAccessState);
 
   useEffect(() => {
     let cancelled = false;
 
-    // Check if we can hydrate from local cache immediately on mount
+    // Check if we can hydrate from verified session cache immediately on mount
     if (!memoryCachedAccessState) {
-      const stored = readStoredAuth();
-      if (stored && !cancelled) {
-        memoryCachedAccessState = stored;
-        setState(stored);
+      const verified = readVerifiedSession();
+      if (verified && !cancelled) {
+        memoryCachedAccessState = verified;
+        setState(verified);
       }
     }
 
-    const checkAccess = async () => {
+    const checkAccess = async (forceRefresh = false) => {
       try {
         const {
           data: { session },
@@ -104,20 +138,29 @@ export function useAccessControl(): AccessState {
             setState(loggedOutState);
             try {
               sessionStorage.removeItem("mybatch_access");
+              Object.keys(sessionStorage).forEach((key) => {
+                if (key.startsWith("mybatch_access")) {
+                  sessionStorage.removeItem(key);
+                }
+              });
               localStorage.removeItem("skillyug_auth_hint");
             } catch {}
           }
           return;
         }
 
-        // Check if stored cache is already valid for this user
-        const cached = readStoredAuth();
-        if (cached && cached.userId === session.user.id) {
-          if (!cancelled) {
-            memoryCachedAccessState = cached;
-            setState(cached);
+        // Authenticated user exists.
+        // If not a forced refresh, check if we already have verified server access in sessionStorage
+        if (!forceRefresh) {
+          const verified = readVerifiedSession(session.user.id);
+          // Only skip server check if access was explicitly verified as TRUE by the server
+          if (verified && verified.hasAccess) {
+            if (!cancelled) {
+              memoryCachedAccessState = verified;
+              setState(verified);
+            }
+            return;
           }
-          return;
         }
 
         // Fetch fresh access data from server API
@@ -141,10 +184,13 @@ export function useAccessControl(): AccessState {
 
         const data = await fetchPromise;
         if (!cancelled) {
+          const hasAccess = Boolean(data.hasAccess);
+          const hasSlot = Boolean(data.hasSlot);
+
           const newState: AccessState = {
             isLoggedIn: true,
-            hasAccess: Boolean(data.hasAccess),
-            hasSlot: Boolean(data.hasSlot),
+            hasAccess,
+            hasSlot,
             loading: false,
             userId: session.user.id,
             userEmail: session.user.email,
@@ -154,26 +200,25 @@ export function useAccessControl(): AccessState {
 
           try {
             const cachePayload = {
-              hasAccess: Boolean(data.hasAccess),
-              hasSlot: Boolean(data.hasSlot),
+              hasAccess,
+              hasSlot,
               activeBatch: data.activeBatch,
               userId: session.user.id,
               userEmail: session.user.email,
               isAdmin: Boolean(data.isAdmin),
             };
-            sessionStorage.setItem(
-              "mybatch_access",
-              JSON.stringify({
-                value: cachePayload,
-                expiry: Date.now() + 5 * 60 * 1000,
-              })
-            );
+            const cacheString = JSON.stringify({
+              value: cachePayload,
+              expiry: Date.now() + 5 * 60 * 1000,
+            });
+            sessionStorage.setItem("mybatch_access", cacheString);
+            sessionStorage.setItem(`mybatch_access_${session.user.id}`, cacheString);
+
+            // Store clean auth hint in localStorage (UI display only, no access authorization)
             localStorage.setItem(
               "skillyug_auth_hint",
               JSON.stringify({
                 isLoggedIn: true,
-                hasAccess: Boolean(data.hasAccess),
-                hasSlot: Boolean(data.hasSlot),
                 userId: session.user.id,
                 userEmail: session.user.email,
               })
@@ -205,7 +250,8 @@ export function useAccessControl(): AccessState {
             );
           } catch {}
         }
-        checkAccess();
+        // Force fresh server verification on sign-in
+        checkAccess(true);
       } else if (event === "SIGNED_OUT") {
         memoryCachedAccessState = {
           isLoggedIn: false,
@@ -217,6 +263,11 @@ export function useAccessControl(): AccessState {
         };
         try {
           sessionStorage.removeItem("mybatch_access");
+          Object.keys(sessionStorage).forEach((key) => {
+            if (key.startsWith("mybatch_access")) {
+              sessionStorage.removeItem(key);
+            }
+          });
           localStorage.removeItem("skillyug_auth_hint");
         } catch {}
         if (!cancelled) {
